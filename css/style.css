@@ -435,6 +435,33 @@ body {
 .chat-msg.skill { color: #ffcc44; border-left-color: rgba(255,204,68,0.3); }
 .chat-msg.info { color: #8aa0b8; }
 
+/* Chat Resize Handle */
+#chat-resize-handle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 14px;
+    height: 14px;
+    cursor: nesw-resize;
+    z-index: 11;
+}
+#chat-resize-handle::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 6px;
+    height: 6px;
+    border-right: 2px solid #2a4a6a;
+    border-top: 2px solid #2a4a6a;
+    opacity: 0.6;
+    transition: all 0.2s;
+}
+#chat-box:hover #chat-resize-handle::after {
+    border-color: #00c8ff;
+    opacity: 1;
+}
+
 /* ========================================
    Game Panels (Generic)
    ======================================== */
@@ -2608,6 +2635,10 @@ body.resizing-nesw, body.resizing-nesw * { cursor:nesw-resize !important; }
     #chat-box {
         max-height: 120px;
         font-size: 11px;
+    }
+    #chat-resize-handle {
+        width: 20px;
+        height: 20px;
     }
     #game-canvas {
         touch-action: none;

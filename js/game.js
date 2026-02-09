@@ -506,6 +506,7 @@ const player = {
     minimapExpanded: false,
     panelSizes: {},
     minimapSize: { width: 180, height: 180 },
+    chatSize: null,
     autoEat: false,
     autoEatThreshold: 0.5,
     autoRetaliate: true,
@@ -6056,6 +6057,24 @@ function setupPanelButtons(){
     });
 }
 
+function openDefaultPanels(){
+    // Skip on small screens (mobile) to avoid cluttering the viewport
+    if(window.innerWidth<600)return;
+    var defaults=['inventory-panel','equipment-panel'];
+    defaults.forEach(function(pid){
+        var panel=document.getElementById(pid);
+        if(!panel)return;
+        panel.style.display='flex';
+        // Mark the corresponding button as active
+        var bid='btn-'+pid.replace('-panel','');
+        var btn=document.getElementById(bid);
+        if(btn)btn.classList.add('active');
+        // Render panel contents
+        if(pid==='inventory-panel')renderInventory();
+        if(pid==='equipment-panel')renderEquipment();
+    });
+}
+
 function setupPanelDragging(){
     document.querySelectorAll('.panel-header').forEach(function(header){
         var dragging=false,sx,sy,px,py;
@@ -6374,6 +6393,58 @@ function setupMinimapResize(){
         player.waypoint=null;
         EventBus.emit('chat',{type:'info',text:'Waypoint cleared.'});
     });
+}
+
+function setupChatResize(){
+    var chatBox=document.getElementById('chat-box');
+    if(!chatBox)return;
+    // Restore saved chat size
+    var savedSize=player.chatSize||{width:340,height:160};
+    chatBox.style.width=savedSize.width+'px';
+    chatBox.style.height=savedSize.height+'px';
+    // Create resize handle (top-right corner — chat is bottom-left anchored)
+    var handle=document.createElement('div');
+    handle.id='chat-resize-handle';
+    chatBox.appendChild(handle);
+    var CHAT_MIN_W=250,CHAT_MIN_H=100,CHAT_MAX_W=700,CHAT_MAX_H=500;
+    var resizing=false,startX,startY,startW,startH;
+    function onStart(cx,cy){
+        resizing=true;startX=cx;startY=cy;
+        var rect=chatBox.getBoundingClientRect();
+        startW=rect.width;startH=rect.height;
+    }
+    function onMove(cx,cy){
+        if(!resizing)return;
+        var dx=cx-startX;
+        var dy=startY-cy; // drag up = taller (chat grows upward)
+        var newW=Math.max(CHAT_MIN_W,Math.min(CHAT_MAX_W,startW+dx));
+        var newH=Math.max(CHAT_MIN_H,Math.min(CHAT_MAX_H,startH+dy));
+        chatBox.style.width=newW+'px';
+        chatBox.style.height=newH+'px';
+    }
+    function onEnd(){
+        if(!resizing)return;
+        resizing=false;
+        var rect=chatBox.getBoundingClientRect();
+        player.chatSize={width:Math.round(rect.width),height:Math.round(rect.height)};
+    }
+    // Mouse events
+    handle.addEventListener('mousedown',function(e){
+        e.preventDefault();e.stopPropagation();
+        onStart(e.clientX,e.clientY);
+        document.body.style.cursor='nesw-resize';
+    });
+    window.addEventListener('mousemove',function(e){onMove(e.clientX,e.clientY);});
+    window.addEventListener('mouseup',function(){if(resizing){document.body.style.cursor='';onEnd();}});
+    // Touch events for mobile
+    handle.addEventListener('touchstart',function(e){
+        e.preventDefault();e.stopPropagation();
+        var t=e.touches[0];onStart(t.clientX,t.clientY);
+    },{passive:false});
+    window.addEventListener('touchmove',function(e){
+        if(!resizing)return;var t=e.touches[0];onMove(t.clientX,t.clientY);
+    },{passive:false});
+    window.addEventListener('touchend',function(){onEnd();});
 }
 
 var LOCKABLE_PANELS=['inventory-panel','equipment-panel','skills-panel','prestige-panel','prestige-shop-panel','bestiary-panel'];
@@ -7983,7 +8054,7 @@ function initGame(){
     // Enemies & NPCs
     spawnEnemies();spawnNPCs();
     // UI
-    setupPanelButtons();setupPanelDragging();setupPanelResizing();setupMinimapResize();setupPanelLocks();setupUIEvents();updateActionBar();initStyleHUD();initSkillTabs();
+    setupPanelButtons();setupPanelDragging();setupPanelResizing();setupMinimapResize();setupChatResize();setupPanelLocks();setupUIEvents();updateActionBar();initStyleHUD();initSkillTabs();
     setAreaAtmosphere('station-hub');
     // Event wiring
     EventBus.on('leftClick',hit=>{
@@ -8451,6 +8522,7 @@ function saveGame(){
                 panelPositions:player.panelPositions||{},
                 panelSizes:player.panelSizes||{},
                 minimapSize:player.minimapSize||{width:180,height:180},
+                chatSize:player.chatSize||null,
                 minimapExpanded:player.minimapExpanded||false,
                 autoEat:player.autoEat||false,
                 autoRetaliate:player.autoRetaliate!==false,
@@ -8603,6 +8675,7 @@ function loadGame(){
         player.panelPositions=d.panelPositions||{};
         player.panelSizes=d.panelSizes||{};
         player.minimapSize=d.minimapSize||(d.minimapExpanded?{width:360,height:360}:{width:180,height:180});
+        player.chatSize=d.chatSize||null;
         player.minimapExpanded=d.minimapExpanded||false;
         player.autoEat=d.autoEat||false;
         player.autoRetaliate=d.autoRetaliate!==false;
@@ -8836,6 +8909,7 @@ async function startGame(){
         await new Promise(r=>setTimeout(r,800));
         document.getElementById('loading-screen').style.display='none';
         document.getElementById('ui-overlay').style.display='block';
+        setTimeout(openDefaultPanels,200);
         if(loaded){
             EventBus.emit('chat',{type:'system',text:'Save data loaded! Welcome back, recruit.'});
             EventBus.emit('chat',{type:'info',text:'Your progress has been restored.'});
