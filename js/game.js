@@ -8475,15 +8475,15 @@ const enemyHPContainer=document.getElementById('enemy-hp-bars');
 const enemyHPBars=new Map();
 
 function updateEnemyHPBars(){
-    // Hide overworld enemy bars while in dungeon
-    if(DungeonState.active){
-        enemyHPBars.forEach(function(bar){bar.el.style.display='none';});
-        return;
-    }
     const cam=GameState.camera,w=window.innerWidth,h=window.innerHeight;
     // Track which enemies are visible this frame
     const activeIds=new Set();
     GameState.enemies.forEach(enemy=>{
+        // Hide overworld enemy bars while in dungeon
+        if(DungeonState.active&&!enemy.isDungeonEnemy){
+            if(enemyHPBars.has(enemy))enemyHPBars.get(enemy).el.style.display='none';
+            return;
+        }
         if(!enemy.alive||!enemy.mesh||!enemy.mesh.visible){
             // Remove bar if enemy is dead
             if(enemyHPBars.has(enemy)){
