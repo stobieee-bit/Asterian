@@ -2340,6 +2340,99 @@ body.resizing-nesw, body.resizing-nesw * { cursor:nesw-resize !important; }
     color: #00ff88;
 }
 
+/* Audio Button */
+#btn-audio {
+    background: rgba(180,140,255,0.15);
+    border-color: rgba(180,140,255,0.3);
+    color: #b48cff;
+    font-size: 14px;
+    line-height: 1;
+}
+#btn-audio.muted {
+    background: rgba(100,80,120,0.15);
+    border-color: rgba(100,80,120,0.3);
+    color: #665577;
+}
+
+/* Audio Volume Controls Popup */
+#audio-controls {
+    position: absolute;
+    top: 44px;
+    right: 8px;
+    background: rgba(10,12,20,0.95);
+    border: 1px solid rgba(180,140,255,0.3);
+    border-radius: 6px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1500;
+    min-width: 160px;
+    backdrop-filter: blur(8px);
+}
+.audio-controls-header {
+    font-size: 11px;
+    color: #b48cff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+.audio-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.audio-slider-row label {
+    font-size: 11px;
+    color: #8899aa;
+    min-width: 38px;
+}
+.audio-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100px;
+    height: 4px;
+    background: rgba(80,90,120,0.5);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+.audio-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #b48cff;
+    cursor: pointer;
+    border: none;
+}
+.audio-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #b48cff;
+    cursor: pointer;
+    border: none;
+}
+.audio-mute-btn {
+    background: rgba(180,140,255,0.15);
+    border: 1px solid rgba(180,140,255,0.3);
+    color: #b48cff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: inherit;
+    margin-top: 4px;
+    transition: all 0.2s;
+}
+.audio-mute-btn:hover {
+    background: rgba(180,140,255,0.3);
+    color: #d4bcff;
+}
+
 /* MP Status HUD */
 #mp-status-hud {
     position: absolute;

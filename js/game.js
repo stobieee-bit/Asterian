@@ -1459,6 +1459,8 @@ function setAreaAtmosphere(areaId){
     // Area color grading via CSS filter
     var areaFilters={'station-hub':'saturate(1.05) brightness(1.0)','asteroid-mines':'saturate(1.1) brightness(0.95) sepia(0.05)','alien-wastes':'saturate(1.15) brightness(0.95) hue-rotate(5deg)','bio-lab':'saturate(1.1) brightness(1.0)','corrupted-mines':'saturate(1.2) brightness(0.9) hue-rotate(-5deg)','corrupted-wastes':'saturate(1.15) brightness(0.85)','corrupted-lab':'saturate(1.2) brightness(0.9)','the-abyss':'saturate(0.8) brightness(0.75) hue-rotate(20deg)'};
     var cv=document.getElementById('game-canvas');if(cv)cv.style.filter=areaFilters[areaId]||'';
+    // Crossfade music to new area
+    crossfadeToArea(areaId);
 }
 function updateAreaAtmosphere(){
     if(!_targetAtmo||!GameState.ambientLight)return;
@@ -6008,7 +6010,50 @@ function setupPanelButtons(){
             if(!vis){if(pid==='inventory-panel')renderInventory();if(pid==='equipment-panel')renderEquipment();if(pid==='skills-panel')renderSkills();checkTutorialEvent('panelOpened');}
         });
     });
-    EventBus.on('escape',()=>{Object.entries(panels).forEach(([bid,pid])=>{if(!player.panelLocks[pid]){document.getElementById(pid).style.display='none';document.getElementById(bid).classList.remove('active');}});if(!player.panelLocks['crafting-panel']){document.getElementById('crafting-panel').style.display='none';craftingFromStation=false;}document.getElementById('board-panel').style.display='none';document.getElementById('skill-guide-panel').style.display='none';document.getElementById('bestiary-panel').style.display='none';document.getElementById('world-map-panel').style.display='none';if(bankOpen)closeBank();if(activeShop)closeShop();if(activeNPC)closeDialogue();});
+    EventBus.on('escape',()=>{Object.entries(panels).forEach(([bid,pid])=>{if(!player.panelLocks[pid]){document.getElementById(pid).style.display='none';document.getElementById(bid).classList.remove('active');}});if(!player.panelLocks['crafting-panel']){document.getElementById('crafting-panel').style.display='none';craftingFromStation=false;}document.getElementById('board-panel').style.display='none';document.getElementById('skill-guide-panel').style.display='none';document.getElementById('bestiary-panel').style.display='none';document.getElementById('world-map-panel').style.display='none';if(bankOpen)closeBank();if(activeShop)closeShop();if(activeNPC)closeDialogue();var ac=document.getElementById('audio-controls');if(ac)ac.style.display='none';});
+    // Audio button — click opens volume popup, right-click toggles mute
+    var audioBtn=document.getElementById('btn-audio');
+    if(audioBtn){
+        audioBtn.textContent=musicState.muted?'🔇':'🔊';
+        audioBtn.classList.toggle('muted',musicState.muted);
+        audioBtn.addEventListener('click',function(e){
+            e.stopPropagation();
+            var ctrl=document.getElementById('audio-controls');
+            if(ctrl)ctrl.style.display=ctrl.style.display==='none'?'flex':'none';
+        });
+        audioBtn.addEventListener('contextmenu',function(e){
+            e.preventDefault();e.stopPropagation();
+            toggleMute();
+        });
+    }
+    // Mute toggle button inside popup
+    var muteBtn=document.getElementById('btn-mute-toggle');
+    if(muteBtn){
+        muteBtn.textContent=musicState.muted?'Unmute All':'Mute All';
+        muteBtn.addEventListener('click',function(e){
+            e.stopPropagation();
+            toggleMute();
+            this.textContent=musicState.muted?'Unmute All':'Mute All';
+        });
+    }
+    // Volume sliders
+    var musicSlider=document.getElementById('music-volume');
+    var sfxSlider=document.getElementById('sfx-volume');
+    if(musicSlider){
+        musicSlider.value=musicState.musicVolume*100;
+        musicSlider.addEventListener('input',function(){setMusicVolume(this.value/100);});
+    }
+    if(sfxSlider){
+        sfxSlider.value=musicState.sfxVolume*100;
+        sfxSlider.addEventListener('input',function(){setSFXVolume(this.value/100);});
+    }
+    // Close audio popup when clicking elsewhere
+    document.addEventListener('click',function(e){
+        var ctrl=document.getElementById('audio-controls');
+        if(ctrl&&ctrl.style.display!=='none'&&!ctrl.contains(e.target)&&e.target.id!=='btn-audio'){
+            ctrl.style.display='none';
+        }
+    });
 }
 
 function setupPanelDragging(){
@@ -6646,43 +6691,44 @@ function playSound(type,opts){
     try{
         ensureAudio();if(!audioCtx||audioCtx.state==='suspended')audioCtx.resume();
         const now=audioCtx.currentTime;
+        const dest=getSFXDestination();
         opts=opts||{};
         switch(type){
             case 'hit':{
                 const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
-                osc.connect(gain);gain.connect(audioCtx.destination);
+                osc.connect(gain);gain.connect(dest);
                 osc.type='sawtooth';osc.frequency.setValueAtTime(200+Math.random()*100,now);osc.frequency.exponentialRampToValueAtTime(80,now+0.15);
                 gain.gain.setValueAtTime(0.15,now);gain.gain.exponentialRampToValueAtTime(0.001,now+0.15);
                 osc.start(now);osc.stop(now+0.15);break;
             }
             case 'miss':{
                 const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
-                osc.connect(gain);gain.connect(audioCtx.destination);
+                osc.connect(gain);gain.connect(dest);
                 osc.type='sine';osc.frequency.setValueAtTime(800,now);osc.frequency.exponentialRampToValueAtTime(200,now+0.2);
                 gain.gain.setValueAtTime(0.06,now);gain.gain.exponentialRampToValueAtTime(0.001,now+0.2);
                 osc.start(now);osc.stop(now+0.2);break;
             }
             case 'mine':{
                 const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
-                osc.connect(gain);gain.connect(audioCtx.destination);
+                osc.connect(gain);gain.connect(dest);
                 osc.type='square';osc.frequency.setValueAtTime(400+Math.random()*200,now);osc.frequency.exponentialRampToValueAtTime(100,now+0.1);
                 gain.gain.setValueAtTime(0.08,now);gain.gain.exponentialRampToValueAtTime(0.001,now+0.1);
                 osc.start(now);osc.stop(now+0.1);break;
             }
             case 'mine_success':{
                 const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
-                osc.connect(gain);gain.connect(audioCtx.destination);
+                osc.connect(gain);gain.connect(dest);
                 osc.type='sine';osc.frequency.setValueAtTime(500,now);osc.frequency.setValueAtTime(700,now+0.1);osc.frequency.setValueAtTime(900,now+0.2);
                 gain.gain.setValueAtTime(0.1,now);gain.gain.exponentialRampToValueAtTime(0.001,now+0.35);
                 osc.start(now);osc.stop(now+0.35);break;
             }
             case 'levelup':{
-                [0,0.1,0.2,0.3].forEach((t,idx)=>{const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.connect(gain);gain.connect(audioCtx.destination);osc.type='sine';osc.frequency.setValueAtTime([523,659,784,1047][idx],now+t);gain.gain.setValueAtTime(0.12,now+t);gain.gain.exponentialRampToValueAtTime(0.001,now+t+0.2);osc.start(now+t);osc.stop(now+t+0.2);});
+                [0,0.1,0.2,0.3].forEach((t,idx)=>{const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.connect(gain);gain.connect(dest);osc.type='sine';osc.frequency.setValueAtTime([523,659,784,1047][idx],now+t);gain.gain.setValueAtTime(0.12,now+t);gain.gain.exponentialRampToValueAtTime(0.001,now+t+0.2);osc.start(now+t);osc.stop(now+t+0.2);});
                 break;
             }
             case 'ability':{
                 const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(),n=audioCtx.createOscillator(),ng=audioCtx.createGain();
-                osc.connect(gain);gain.connect(audioCtx.destination);n.connect(ng);ng.connect(audioCtx.destination);
+                osc.connect(gain);gain.connect(dest);n.connect(ng);ng.connect(dest);
                 osc.type='sawtooth';osc.frequency.setValueAtTime(300,now);osc.frequency.exponentialRampToValueAtTime(600,now+0.1);osc.frequency.exponentialRampToValueAtTime(150,now+0.3);
                 gain.gain.setValueAtTime(0.12,now);gain.gain.exponentialRampToValueAtTime(0.001,now+0.3);
                 n.type='square';n.frequency.setValueAtTime(100,now);ng.gain.setValueAtTime(0.05,now);ng.gain.exponentialRampToValueAtTime(0.001,now+0.15);
@@ -6690,57 +6736,325 @@ function playSound(type,opts){
             }
             case 'ultimate':{
                 const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
-                osc.connect(gain);gain.connect(audioCtx.destination);
+                osc.connect(gain);gain.connect(dest);
                 osc.type='sawtooth';osc.frequency.setValueAtTime(80,now);osc.frequency.exponentialRampToValueAtTime(400,now+0.3);osc.frequency.exponentialRampToValueAtTime(60,now+0.8);
                 gain.gain.setValueAtTime(0.2,now);gain.gain.exponentialRampToValueAtTime(0.001,now+0.8);
                 osc.start(now);osc.stop(now+0.8);
                 const o2=audioCtx.createOscillator(),g2=audioCtx.createGain();
-                o2.connect(g2);g2.connect(audioCtx.destination);
+                o2.connect(g2);g2.connect(dest);
                 o2.type='sine';o2.frequency.setValueAtTime(200,now+0.1);o2.frequency.exponentialRampToValueAtTime(800,now+0.4);
                 g2.gain.setValueAtTime(0.15,now+0.1);g2.gain.exponentialRampToValueAtTime(0.001,now+0.6);
                 o2.start(now+0.1);o2.stop(now+0.6);break;
             }
             case 'portal':{
                 const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
-                osc.connect(gain);gain.connect(audioCtx.destination);
+                osc.connect(gain);gain.connect(dest);
                 osc.type='sine';osc.frequency.setValueAtTime(300,now);osc.frequency.exponentialRampToValueAtTime(800,now+0.3);osc.frequency.exponentialRampToValueAtTime(400,now+0.6);
                 gain.gain.setValueAtTime(0.1,now);gain.gain.exponentialRampToValueAtTime(0.001,now+0.6);
                 osc.start(now);osc.stop(now+0.6);break;
             }
             case 'buy':{
                 const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
-                osc.connect(gain);gain.connect(audioCtx.destination);
+                osc.connect(gain);gain.connect(dest);
                 osc.type='sine';osc.frequency.setValueAtTime(600,now);osc.frequency.setValueAtTime(800,now+0.08);
                 gain.gain.setValueAtTime(0.08,now);gain.gain.exponentialRampToValueAtTime(0.001,now+0.2);
                 osc.start(now);osc.stop(now+0.2);break;
             }
             case 'eat':{
                 const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
-                osc.connect(gain);gain.connect(audioCtx.destination);
+                osc.connect(gain);gain.connect(dest);
                 osc.type='sine';osc.frequency.setValueAtTime(400,now);osc.frequency.setValueAtTime(500,now+0.1);osc.frequency.setValueAtTime(600,now+0.2);
                 gain.gain.setValueAtTime(0.08,now);gain.gain.exponentialRampToValueAtTime(0.001,now+0.3);
                 osc.start(now);osc.stop(now+0.3);break;
             }
             case 'death':{
                 const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
-                osc.connect(gain);gain.connect(audioCtx.destination);
+                osc.connect(gain);gain.connect(dest);
                 osc.type='sawtooth';osc.frequency.setValueAtTime(400,now);osc.frequency.exponentialRampToValueAtTime(50,now+1);
                 gain.gain.setValueAtTime(0.15,now);gain.gain.exponentialRampToValueAtTime(0.001,now+1);
                 osc.start(now);osc.stop(now+1);break;
             }
             case 'equip':{
                 const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
-                osc.connect(gain);gain.connect(audioCtx.destination);
+                osc.connect(gain);gain.connect(dest);
                 osc.type='triangle';osc.frequency.setValueAtTime(300,now);osc.frequency.setValueAtTime(500,now+0.05);osc.frequency.setValueAtTime(400,now+0.1);
                 gain.gain.setValueAtTime(0.1,now);gain.gain.exponentialRampToValueAtTime(0.001,now+0.15);
                 osc.start(now);osc.stop(now+0.15);break;
             }
             case 'quest':{
-                [0,0.12,0.24,0.36,0.48].forEach((t,idx)=>{const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.connect(gain);gain.connect(audioCtx.destination);osc.type='sine';osc.frequency.setValueAtTime([523,659,784,880,1047][idx],now+t);gain.gain.setValueAtTime(0.1,now+t);gain.gain.exponentialRampToValueAtTime(0.001,now+t+0.15);osc.start(now+t);osc.stop(now+t+0.15);});
+                [0,0.12,0.24,0.36,0.48].forEach((t,idx)=>{const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.connect(gain);gain.connect(dest);osc.type='sine';osc.frequency.setValueAtTime([523,659,784,880,1047][idx],now+t);gain.gain.setValueAtTime(0.1,now+t);gain.gain.exponentialRampToValueAtTime(0.001,now+t+0.15);osc.start(now+t);osc.stop(now+t+0.15);});
                 break;
             }
         }
     }catch(e){}
+}
+
+// ========================================
+// Procedural Ambient Music System
+// ========================================
+const AREA_MUSIC = {
+    'station-hub': {
+        layers: [
+            {type:'sine',freq:55,gain:0.04,lfoFreq:0.08,lfoDepth:2},
+            {type:'triangle',freq:110,gain:0.025,lfoFreq:0.12,lfoDepth:3},
+            {type:'sine',freq:220,gain:0.015,lfoFreq:0.05,lfoDepth:1,filterFreq:400}
+        ]
+    },
+    'asteroid-mines': {
+        layers: [
+            {type:'sawtooth',freq:40,gain:0.035,lfoFreq:0.06,lfoDepth:1.5,filterFreq:200},
+            {type:'square',freq:80,gain:0.02,lfoFreq:0.1,lfoDepth:2,filterFreq:300},
+            {type:'triangle',freq:320,gain:0.012,lfoFreq:0.15,lfoDepth:5}
+        ]
+    },
+    'alien-wastes': {
+        layers: [
+            {type:'sine',freq:73,gain:0.04,lfoFreq:0.04,lfoDepth:4},
+            {type:'triangle',freq:146,gain:0.02,lfoFreq:0.07,lfoDepth:3},
+            {type:'sine',freq:587,gain:0.008,lfoFreq:0.2,lfoDepth:8,filterFreq:800}
+        ]
+    },
+    'bio-lab': {
+        layers: [
+            {type:'sine',freq:130,gain:0.035,lfoFreq:0.09,lfoDepth:2},
+            {type:'triangle',freq:260,gain:0.018,lfoFreq:0.06,lfoDepth:1.5},
+            {type:'sine',freq:520,gain:0.008,lfoFreq:0.14,lfoDepth:3,filterFreq:700}
+        ]
+    },
+    'the-abyss': {
+        layers: [
+            {type:'sine',freq:30,gain:0.05,lfoFreq:0.03,lfoDepth:1},
+            {type:'sawtooth',freq:61,gain:0.02,lfoFreq:0.05,lfoDepth:2,filterFreq:150},
+            {type:'triangle',freq:45,gain:0.03,lfoFreq:0.04,lfoDepth:1.5}
+        ]
+    },
+    'corrupted-mines': {
+        layers: [
+            {type:'sawtooth',freq:40.8,gain:0.04,lfoFreq:0.07,lfoDepth:2,filterFreq:220},
+            {type:'square',freq:81.6,gain:0.025,lfoFreq:0.12,lfoDepth:3,filterFreq:320},
+            {type:'sawtooth',freq:163,gain:0.015,lfoFreq:0.18,lfoDepth:4,filterFreq:400}
+        ]
+    },
+    'corrupted-wastes': {
+        layers: [
+            {type:'sine',freq:74.5,gain:0.045,lfoFreq:0.05,lfoDepth:5},
+            {type:'sawtooth',freq:149,gain:0.02,lfoFreq:0.09,lfoDepth:4,filterFreq:350},
+            {type:'triangle',freq:298,gain:0.012,lfoFreq:0.22,lfoDepth:6}
+        ]
+    },
+    'corrupted-lab': {
+        layers: [
+            {type:'sine',freq:132.6,gain:0.04,lfoFreq:0.1,lfoDepth:3},
+            {type:'sawtooth',freq:265,gain:0.018,lfoFreq:0.08,lfoDepth:2.5,filterFreq:500},
+            {type:'sine',freq:530,gain:0.01,lfoFreq:0.16,lfoDepth:4,filterFreq:750}
+        ]
+    }
+};
+
+var musicState = {
+    active: false,
+    currentArea: null,
+    layers: [],
+    masterMusicGain: null,
+    masterSFXGain: null,
+    masterGain: null,
+    musicVolume: parseFloat(localStorage.getItem('asterian_music_vol'))||0.5,
+    sfxVolume: parseFloat(localStorage.getItem('asterian_sfx_vol'))||0.7,
+    muted: localStorage.getItem('asterian_muted')==='true',
+    initialized: false
+};
+
+function initMusicNodes(){
+    ensureAudio();
+    if(!audioCtx||musicState.initialized)return;
+    // Create master routing: music + SFX -> master -> destination
+    musicState.masterGain=audioCtx.createGain();
+    musicState.masterGain.gain.value=musicState.muted?0:1;
+    musicState.masterGain.connect(audioCtx.destination);
+    musicState.masterMusicGain=audioCtx.createGain();
+    musicState.masterMusicGain.gain.value=musicState.musicVolume;
+    musicState.masterMusicGain.connect(musicState.masterGain);
+    musicState.masterSFXGain=audioCtx.createGain();
+    musicState.masterSFXGain.gain.value=musicState.sfxVolume;
+    musicState.masterSFXGain.connect(musicState.masterGain);
+    musicState.initialized=true;
+    console.log('[Music] Nodes initialized, music:'+musicState.musicVolume+' sfx:'+musicState.sfxVolume+' muted:'+musicState.muted);
+}
+
+function startAreaMusic(areaId){
+    if(!audioCtx||!musicState.initialized)return;
+    if(audioCtx.state==='suspended')audioCtx.resume();
+    var config=AREA_MUSIC[areaId]||AREA_MUSIC['station-hub'];
+    // Stop any existing layers
+    stopMusicLayers();
+    musicState.layers=[];
+    musicState.currentArea=areaId;
+    musicState.active=true;
+    var now=audioCtx.currentTime;
+    config.layers.forEach(function(layerDef){
+        var osc=audioCtx.createOscillator();
+        osc.type=layerDef.type;
+        osc.frequency.setValueAtTime(layerDef.freq,now);
+        var gain=audioCtx.createGain();
+        gain.gain.setValueAtTime(0.001,now);
+        gain.gain.exponentialRampToValueAtTime(Math.max(layerDef.gain,0.001),now+2);
+        // Optional lowpass filter
+        var filter=null;
+        if(layerDef.filterFreq){
+            filter=audioCtx.createBiquadFilter();
+            filter.type='lowpass';
+            filter.frequency.setValueAtTime(layerDef.filterFreq,now);
+            filter.Q.setValueAtTime(1,now);
+            osc.connect(filter);
+            filter.connect(gain);
+        }else{
+            osc.connect(gain);
+        }
+        gain.connect(musicState.masterMusicGain);
+        osc.start(now);
+        musicState.layers.push({
+            osc:osc,gain:gain,filter:filter,
+            baseFreq:layerDef.freq,targetGain:layerDef.gain,
+            lfoFreq:layerDef.lfoFreq,lfoDepth:layerDef.lfoDepth,
+            lfoPhase:Math.random()*Math.PI*2
+        });
+    });
+}
+
+function stopMusicLayers(){
+    if(!audioCtx)return;
+    var now=audioCtx.currentTime;
+    musicState.layers.forEach(function(layer){
+        try{
+            layer.gain.gain.exponentialRampToValueAtTime(0.001,now+1);
+            layer.osc.stop(now+1.1);
+        }catch(e){}
+    });
+    musicState.layers=[];
+    musicState.active=false;
+}
+
+function crossfadeToArea(areaId){
+    if(!audioCtx||!musicState.initialized)return;
+    if(musicState.currentArea===areaId)return;
+    if(audioCtx.state==='suspended')audioCtx.resume();
+    var config=AREA_MUSIC[areaId]||AREA_MUSIC['station-hub'];
+    var now=audioCtx.currentTime;
+    var fadeDur=2.5;
+    // Fade out current layers
+    musicState.layers.forEach(function(layer){
+        try{
+            layer.gain.gain.cancelScheduledValues(now);
+            layer.gain.gain.setValueAtTime(Math.max(layer.gain.gain.value,0.001),now);
+            layer.gain.gain.exponentialRampToValueAtTime(0.001,now+fadeDur*0.8);
+            layer.osc.stop(now+fadeDur);
+        }catch(e){}
+    });
+    // Fade in new layers after brief overlap
+    var newLayers=[];
+    var startTime=now+fadeDur*0.3;
+    config.layers.forEach(function(layerDef){
+        var osc=audioCtx.createOscillator();
+        osc.type=layerDef.type;
+        osc.frequency.setValueAtTime(layerDef.freq,startTime);
+        var gain=audioCtx.createGain();
+        gain.gain.setValueAtTime(0.001,startTime);
+        gain.gain.exponentialRampToValueAtTime(Math.max(layerDef.gain,0.001),startTime+fadeDur);
+        var filter=null;
+        if(layerDef.filterFreq){
+            filter=audioCtx.createBiquadFilter();
+            filter.type='lowpass';
+            filter.frequency.setValueAtTime(layerDef.filterFreq,startTime);
+            filter.Q.setValueAtTime(1,startTime);
+            osc.connect(filter);
+            filter.connect(gain);
+        }else{
+            osc.connect(gain);
+        }
+        gain.connect(musicState.masterMusicGain);
+        osc.start(startTime);
+        newLayers.push({
+            osc:osc,gain:gain,filter:filter,
+            baseFreq:layerDef.freq,targetGain:layerDef.gain,
+            lfoFreq:layerDef.lfoFreq,lfoDepth:layerDef.lfoDepth,
+            lfoPhase:Math.random()*Math.PI*2
+        });
+    });
+    musicState.layers=newLayers;
+    musicState.currentArea=areaId;
+    musicState.active=true;
+}
+
+function updateMusicLFO(dt){
+    if(!musicState.active||!musicState.layers.length||!audioCtx)return;
+    var now=audioCtx.currentTime;
+    musicState.layers.forEach(function(layer){
+        layer.lfoPhase+=layer.lfoFreq*dt*Math.PI*2;
+        var mod=Math.sin(layer.lfoPhase)*layer.lfoDepth;
+        try{
+            layer.osc.frequency.setValueAtTime(layer.baseFreq+mod,now);
+        }catch(e){}
+    });
+}
+
+function setMusicVolume(v){
+    musicState.musicVolume=Math.max(0,Math.min(1,v));
+    localStorage.setItem('asterian_music_vol',String(musicState.musicVolume));
+    if(musicState.masterMusicGain&&audioCtx){
+        musicState.masterMusicGain.gain.setValueAtTime(musicState.musicVolume,audioCtx.currentTime);
+    }
+}
+
+function setSFXVolume(v){
+    musicState.sfxVolume=Math.max(0,Math.min(1,v));
+    localStorage.setItem('asterian_sfx_vol',String(musicState.sfxVolume));
+    if(musicState.masterSFXGain&&audioCtx){
+        musicState.masterSFXGain.gain.setValueAtTime(musicState.sfxVolume,audioCtx.currentTime);
+    }
+}
+
+function toggleMute(){
+    musicState.muted=!musicState.muted;
+    localStorage.setItem('asterian_muted',String(musicState.muted));
+    if(musicState.masterGain&&audioCtx){
+        var now=audioCtx.currentTime;
+        musicState.masterGain.gain.cancelScheduledValues(now);
+        musicState.masterGain.gain.setValueAtTime(musicState.masterGain.gain.value||0.001,now);
+        musicState.masterGain.gain.exponentialRampToValueAtTime(musicState.muted?0.001:1,now+0.3);
+    }
+    // Update UI
+    var btn=document.getElementById('btn-audio');
+    if(btn){
+        btn.textContent=musicState.muted?'🔇':'🔊';
+        btn.classList.toggle('muted',musicState.muted);
+    }
+}
+
+function getSFXDestination(){
+    if(musicState.initialized&&musicState.masterSFXGain)return musicState.masterSFXGain;
+    return audioCtx?audioCtx.destination:null;
+}
+
+// First-interaction music starter (browsers require gesture for audio)
+var _musicStarted=false;
+function tryStartMusic(){
+    if(_musicStarted)return;
+    _musicStarted=true;
+    ensureAudio();
+    if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();
+    initMusicNodes();
+    var area=(player&&player.currentArea)?player.currentArea:'station-hub';
+    startAreaMusic(area);
+    // Update mute button state
+    var btn=document.getElementById('btn-audio');
+    if(btn){
+        btn.textContent=musicState.muted?'🔇':'🔊';
+        btn.classList.toggle('muted',musicState.muted);
+    }
+    document.removeEventListener('click',tryStartMusic);
+    document.removeEventListener('touchstart',tryStartMusic);
+    document.removeEventListener('keydown',tryStartMusic);
+    console.log('[Music] Started for area:',area);
 }
 
 // ========================================
@@ -8374,6 +8688,7 @@ function gameLoop(){
     if(minimapTimer%30===0)updateXPTracker();
     checkIdleNotification();
     updateAmbientParticles();
+    updateMusicLFO(GameState.deltaTime);
     // Multiplayer tick (if connected)
     if(window.AsterianMP)window.AsterianMP.tick(GameState.deltaTime);
     // Render
@@ -8540,6 +8855,10 @@ async function startGame(){
         EventBus.emit('chat',{type:'info',text:'Press SPACE to eat food. Click enemies to attack.'});
         EventBus.emit('chat',{type:'info',text:'Keys: V=Auto-eat | X=Reset XP tracker | M=World map | 1-5=Quick slots'});
         EventBus.emit('chat',{type:'info',text:'Game auto-saves every 60s. Press F5 to quick-save.'});
+        // Music starts on first user interaction (browser autoplay policy)
+        document.addEventListener('click',tryStartMusic,{once:false});
+        document.addEventListener('touchstart',tryStartMusic,{once:false});
+        document.addEventListener('keydown',tryStartMusic,{once:false});
         gameLoop();
     }catch(err){console.error('Asterian failed:',err);setLoading(0,'Error: '+err.message);}
 }
@@ -8547,6 +8866,6 @@ async function startGame(){
 startGame();
 
 // Debug exposure for testing
-window.DEBUG={GameState,player,world,enemies:()=>world.enemies,saveGame,loadGame,openShop,openDialogue,startVexQuest,gainXp,questState,EventBus,updateQuestProgress,checkVexCompletion,addItem,addCredits,shopEconomy:function(){return shopEconomy;},checkSynergies,hasSynergy,getSynergyValue,degradeWeapon,degradeArmor,openRepairStation,initShopEconomy,renderSynergiesTab,SYNERGY_DEFS,BOARD_QUESTS,startBoardQuest,assignSlayerTask,completeSlayerTask,openBoardPanel,SKILL_UNLOCKS,getSkillBonus,hasSkillMilestone,openSkillGuide,DungeonState,enterDungeon,exitDungeon,advanceDungeonFloor,enterTimeLoopDungeon,performTKPush,performMindControl,performTimeDilate,releaseMindControl,executePrestige,confirmPrestige,getTotalLevel,getPrestigeXpMultiplier,getPrestigeDamageMultiplier,getPrestigeReduction,openPrestigePanel,openPrestigeShop,PRESTIGE_CONFIG,PRESTIGE_PASSIVES,PRESTIGE_SHOP_ITEMS,CORRUPTED_AREAS,initCorruptedEnemies,buildCorruptedAreas,hasPrestigePassive,buildSimplePlayerMesh,addChatMessage,getTierColor,getCombatLevel,getHighestCombatLevel,enemyById,applyRemoteDamage,remoteKillEnemy,THREE:THREE};
+window.DEBUG={GameState,player,world,enemies:()=>world.enemies,saveGame,loadGame,openShop,openDialogue,startVexQuest,gainXp,questState,EventBus,updateQuestProgress,checkVexCompletion,addItem,addCredits,shopEconomy:function(){return shopEconomy;},checkSynergies,hasSynergy,getSynergyValue,degradeWeapon,degradeArmor,openRepairStation,initShopEconomy,renderSynergiesTab,SYNERGY_DEFS,BOARD_QUESTS,startBoardQuest,assignSlayerTask,completeSlayerTask,openBoardPanel,SKILL_UNLOCKS,getSkillBonus,hasSkillMilestone,openSkillGuide,DungeonState,enterDungeon,exitDungeon,advanceDungeonFloor,enterTimeLoopDungeon,performTKPush,performMindControl,performTimeDilate,releaseMindControl,executePrestige,confirmPrestige,getTotalLevel,getPrestigeXpMultiplier,getPrestigeDamageMultiplier,getPrestigeReduction,openPrestigePanel,openPrestigeShop,PRESTIGE_CONFIG,PRESTIGE_PASSIVES,PRESTIGE_SHOP_ITEMS,CORRUPTED_AREAS,initCorruptedEnemies,buildCorruptedAreas,hasPrestigePassive,buildSimplePlayerMesh,addChatMessage,getTierColor,getCombatLevel,getHighestCombatLevel,enemyById,applyRemoteDamage,remoteKillEnemy,musicState,setMusicVolume,setSFXVolume,toggleMute,AREA_MUSIC,THREE:THREE};
 
 })();
