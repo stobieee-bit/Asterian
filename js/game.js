@@ -1316,7 +1316,7 @@ function initInput(){
     var isMobile='ontouchstart' in window || navigator.maxTouchPoints > 0;
     if(isMobile){
         canvas.style.touchAction='none';
-        var touchState={startX:0,startY:0,startTime:0,pinchDist:0,twoFingerAngle:0,twoFingerPitch:0,longPressTimer:null,isTap:true,touches:0};
+        var touchState={startX:0,startY:0,startTime:0,pinchDist:0,longPressTimer:null,isTap:true,isDragging:false,touches:0,lastX:0,lastY:0};
 
         canvas.addEventListener('touchstart',function(e){
             e.preventDefault();
@@ -1325,8 +1325,11 @@ function initInput(){
             if(t.length===1){
                 touchState.startX=t[0].clientX;
                 touchState.startY=t[0].clientY;
+                touchState.lastX=t[0].clientX;
+                touchState.lastY=t[0].clientY;
                 touchState.startTime=Date.now();
                 touchState.isTap=true;
+                touchState.isDragging=false;
                 // Long press for context menu
                 touchState.longPressTimer=setTimeout(function(){
                     touchState.isTap=false;
@@ -1336,55 +1339,68 @@ function initInput(){
                 },600);
             } else if(t.length===2){
                 clearTimeout(touchState.longPressTimer);
+                touchState.longPressTimer=null;
                 touchState.isTap=false;
+                touchState.isDragging=false;
                 var dx=t[1].clientX-t[0].clientX,dy=t[1].clientY-t[0].clientY;
                 touchState.pinchDist=Math.sqrt(dx*dx+dy*dy);
-                touchState.twoFingerAngle=cameraState.angle;
-                touchState.twoFingerPitch=cameraState.pitch;
-                touchState.startX=(t[0].clientX+t[1].clientX)/2;
-                touchState.startY=(t[0].clientY+t[1].clientY)/2;
+                touchState.lastX=(t[0].clientX+t[1].clientX)/2;
+                touchState.lastY=(t[0].clientY+t[1].clientY)/2;
             }
         },{passive:false});
 
         canvas.addEventListener('touchmove',function(e){
             e.preventDefault();
             var t=e.touches;
-            if(t.length===1&&touchState.longPressTimer){
+            if(t.length===1){
                 var mx=t[0].clientX-touchState.startX,my=t[0].clientY-touchState.startY;
-                if(Math.sqrt(mx*mx+my*my)>10){
+                var moveDist=Math.sqrt(mx*mx+my*my);
+                if(moveDist>10){
+                    // Cancel tap/long-press, start drag orbit
                     clearTimeout(touchState.longPressTimer);
                     touchState.longPressTimer=null;
                     touchState.isTap=false;
+                    touchState.isDragging=true;
+                }
+                if(touchState.isDragging){
+                    // Single-finger drag = orbit camera
+                    var dx=t[0].clientX-touchState.lastX;
+                    var dy=t[0].clientY-touchState.lastY;
+                    cameraState.angle-=dx*cameraState.sensitivity;
+                    cameraState.pitch=Math.max(cameraState.minPitch,Math.min(cameraState.maxPitch,cameraState.pitch+dy*cameraState.sensitivity));
+                    touchState.lastX=t[0].clientX;
+                    touchState.lastY=t[0].clientY;
                 }
             }
             if(t.length===2){
                 // Pinch zoom
-                var dx=t[1].clientX-t[0].clientX,dy=t[1].clientY-t[0].clientY;
-                var dist=Math.sqrt(dx*dx+dy*dy);
+                var dx2=t[1].clientX-t[0].clientX,dy2=t[1].clientY-t[0].clientY;
+                var dist=Math.sqrt(dx2*dx2+dy2*dy2);
                 var pinchDelta=(touchState.pinchDist-dist)*0.05;
                 cameraState.distance=Math.max(cameraState.minDistance,Math.min(cameraState.maxDistance,cameraState.distance+pinchDelta));
                 touchState.pinchDist=dist;
                 // Two-finger drag to orbit
                 var cx=(t[0].clientX+t[1].clientX)/2;
                 var cy=(t[0].clientY+t[1].clientY)/2;
-                var orbitDx=cx-touchState.startX,orbitDy=cy-touchState.startY;
+                var orbitDx=cx-touchState.lastX,orbitDy=cy-touchState.lastY;
                 cameraState.angle-=orbitDx*cameraState.sensitivity;
                 cameraState.pitch=Math.max(cameraState.minPitch,Math.min(cameraState.maxPitch,cameraState.pitch+orbitDy*cameraState.sensitivity));
-                touchState.startX=cx;touchState.startY=cy;
+                touchState.lastX=cx;touchState.lastY=cy;
             }
         },{passive:false});
 
         canvas.addEventListener('touchend',function(e){
             clearTimeout(touchState.longPressTimer);
             touchState.longPressTimer=null;
-            if(touchState.isTap&&touchState.touches===1&&(Date.now()-touchState.startTime)<300){
-                // Single tap = left click
+            if(touchState.isTap&&touchState.touches===1&&!touchState.isDragging&&(Date.now()-touchState.startTime)<300){
+                // Single tap = left click (move/attack)
                 var fake={clientX:touchState.startX,clientY:touchState.startY};
                 hideContextMenu();
                 var hit=raycastWorld(fake);
                 if(hit) EventBus.emit('leftClick',hit);
             }
             touchState.touches=e.touches.length;
+            touchState.isDragging=false;
         },{passive:false});
 
         // Show mobile eat button
@@ -8369,25 +8385,28 @@ function gameLoop(){
 // Tutorial System
 // ========================================
 var TUTORIAL_KEY='asterian_tutorial_done';
+var TUTORIAL_STEP_KEY='asterian_tutorial_step';
 var tutorialActive=false;
 var tutorialStep=0;
 
 var TUTORIAL_STEPS=[
     {text:'Welcome to <strong>Asterian</strong>!<br>A sci-fi survival RPG beyond the stars.',action:'continue'},
-    {text:'<strong>Click the ground</strong> to move your character around the station.',action:'move',highlight:null},
-    {text:'<strong>Middle-mouse drag</strong> to rotate the camera.<br><strong>Scroll wheel</strong> to zoom in/out.',action:'continue'},
-    {text:'<strong>Click an enemy</strong> to start attacking!<br>Your character will auto-attack once in range.',action:'combat',highlight:null},
+    {text:'<strong>Tap the ground</strong> to move your character around the station.',action:'move',highlight:null},
+    {text:'<strong>Drag</strong> to rotate the camera. <strong>Pinch</strong> to zoom in/out.',action:'continue'},
+    {text:'<strong>Tap an enemy</strong> to start attacking!<br>Your character will auto-attack once in range.',action:'combat',highlight:null},
     {text:'You\'re earning <strong>XP</strong>! Open the <strong>Skills</strong> panel to see your progress.',action:'panel',target:'btn-skills',highlight:'#btn-skills'},
-    {text:'Enemies drop <strong>loot</strong> on the ground.<br><strong>Click items</strong> on the ground to pick them up.',action:'continue'},
+    {text:'Enemies drop <strong>loot</strong> on the ground.<br><strong>Tap items</strong> on the ground to pick them up.',action:'continue'},
     {text:'Open your <strong>Inventory</strong> to see your items and gear.',action:'panel',target:'btn-inventory',highlight:'#btn-inventory'},
-    {text:'Talk to <strong>Commander Vex</strong> near the station for a mission!<br>Right-click NPCs for more options.',action:'continue'},
+    {text:'Talk to <strong>Commander Vex</strong> near the station for a mission!<br>Long-press NPCs for more options.',action:'continue'},
     {text:'You\'re ready to explore! Fight enemies, gather resources, and grow stronger.<br><strong>Good luck, recruit!</strong>',action:'continue'}
 ];
 
 function startTutorial(){
     tutorialActive=true;
-    tutorialStep=0;
-    showTutorialStep(0);
+    // Resume from saved step if reloading mid-tutorial
+    var savedStep=parseInt(localStorage.getItem(TUTORIAL_STEP_KEY))||0;
+    tutorialStep=savedStep;
+    showTutorialStep(savedStep);
 }
 
 function showTutorialStep(idx){
@@ -8433,6 +8452,7 @@ function showTutorialStep(idx){
 function advanceTutorial(){
     if(!tutorialActive) return;
     tutorialStep++;
+    localStorage.setItem(TUTORIAL_STEP_KEY,String(tutorialStep));
     if(tutorialStep>=TUTORIAL_STEPS.length){completeTutorial();return;}
     showTutorialStep(tutorialStep);
 }
@@ -8440,6 +8460,7 @@ function advanceTutorial(){
 function completeTutorial(){
     tutorialActive=false;
     localStorage.setItem(TUTORIAL_KEY,'1');
+    localStorage.removeItem(TUTORIAL_STEP_KEY);
     var overlay=document.getElementById('tutorial-overlay');
     if(overlay) overlay.style.display='none';
 }
@@ -8511,6 +8532,10 @@ async function startGame(){
             if(!localStorage.getItem(TUTORIAL_KEY)){
                 setTimeout(startTutorial,1500);
             }
+        }
+        // Resume tutorial if it was in progress (reload mid-tutorial)
+        if(!localStorage.getItem(TUTORIAL_KEY)&&localStorage.getItem(TUTORIAL_STEP_KEY)){
+            setTimeout(startTutorial,1500);
         }
         EventBus.emit('chat',{type:'info',text:'Press SPACE to eat food. Click enemies to attack.'});
         EventBus.emit('chat',{type:'info',text:'Keys: V=Auto-eat | X=Reset XP tracker | M=World map | 1-5=Quick slots'});
