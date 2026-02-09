@@ -6257,13 +6257,19 @@ function savePanelSize(panel){
 function restorePanelSizes(){
     if(!player.panelSizes)return;
     var noScroll={'inventory-panel':true,'equipment-panel':true};
+    // Enforce minimum widths matching CSS defaults so panels never open tiny
+    var defaultWidths={'inventory-panel':208,'equipment-panel':220,'skills-panel':250,'shop-panel':500,'crafting-panel':400,'bestiary-panel':280,'prestige-panel':320,'prestige-shop-panel':260,'board-panel':280};
     Object.entries(player.panelSizes).forEach(function(entry){
         var pid=entry[0],size=entry[1];
         var panel=document.getElementById(pid);
         if(!panel||!size)return;
-        panel.style.width=size.width+'px';
+        var minW=defaultWidths[pid]||200;
+        panel.style.width=Math.max(size.width,minW)+'px';
         // No-scroll panels keep auto height so all content is always visible
-        if(!noScroll[pid])panel.style.height=size.height+'px';
+        if(!noScroll[pid]){
+            var minH=Math.max(150,size.height);
+            panel.style.height=minH+'px';
+        }
     });
 }
 
