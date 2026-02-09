@@ -583,8 +583,11 @@ function initUI(){
         chatInput.addEventListener('keydown', function(e){
             e.stopPropagation();
             if(e.key === 'Enter'){
-                sendChat(chatInput.value);
+                if(chatInput.value.trim()){
+                    sendChat(chatInput.value);
+                }
                 chatInput.value = '';
+                chatInput.blur();
             }
         });
         chatInput.addEventListener('keyup', function(e){ e.stopPropagation(); });

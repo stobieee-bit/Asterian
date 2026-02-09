@@ -1316,6 +1316,26 @@ function initInput(){
         const hit=raycastWorld(e); if(hit)EventBus.emit('rightClick',{hit,screenX:e.clientX,screenY:e.clientY});
     });
     window.addEventListener('keydown',e=>{
+        var chatFocused=document.activeElement&&document.activeElement.id==='mp-chat-input';
+        // Enter key: focus/unfocus chat input
+        if(e.key==='Enter'){
+            var chatIn=document.getElementById('mp-chat-input');
+            if(chatIn){
+                if(chatFocused){
+                    // If chat has text, send it (handled by multiplayer.js keydown); then blur
+                    if(!chatIn.value.trim())chatIn.blur();
+                } else {
+                    e.preventDefault();
+                    chatIn.focus();
+                }
+            }
+            return;
+        }
+        // Escape blurs chat, then skip other game keybinds while typing
+        if(chatFocused){
+            if(e.key==='Escape'){document.activeElement.blur();}
+            return;
+        }
         keys[e.key.toLowerCase()]=true;
         // Number keys 1-9 no longer trigger abilities (OSRS auto-attack only)
         if(e.key==='Escape'){EventBus.emit('escape');hideContextMenu();}
