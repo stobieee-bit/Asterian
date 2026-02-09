@@ -8392,6 +8392,7 @@ function startTutorial(){
 
 function showTutorialStep(idx){
     var overlay=document.getElementById('tutorial-overlay');
+    var mask=document.getElementById('tutorial-mask');
     if(!overlay) return;
     if(idx>=TUTORIAL_STEPS.length){completeTutorial();return;}
     tutorialStep=idx;
@@ -8400,12 +8401,19 @@ function showTutorialStep(idx){
     document.getElementById('tutorial-step-num').textContent='Step '+(idx+1)+' of '+TUTORIAL_STEPS.length;
     document.getElementById('tutorial-text').innerHTML=step.text;
     var continueBtn=document.getElementById('tutorial-continue');
-    // Show/hide continue button based on action type
-    if(step.action==='continue'){
+    // For action steps (move, combat, panel), let clicks pass through to the game
+    if(step.action!=='continue'){
+        overlay.style.pointerEvents='none';
+        if(mask) mask.style.display='none';
+        // Keep the tutorial box clickable
+        document.getElementById('tutorial-box').style.pointerEvents='auto';
+        continueBtn.style.display='none';
+    } else {
+        overlay.style.pointerEvents='auto';
+        if(mask) mask.style.display='block';
+        document.getElementById('tutorial-box').style.pointerEvents='auto';
         continueBtn.style.display='';
         continueBtn.textContent=idx===TUTORIAL_STEPS.length-1?'Start Playing':'Continue';
-    } else {
-        continueBtn.style.display='none';
     }
     // Highlight element
     var hl=document.getElementById('tutorial-highlight');
