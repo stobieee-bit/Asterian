@@ -8927,7 +8927,7 @@ async function startGame(){
             setTimeout(startTutorial,1500);
         }
         EventBus.emit('chat',{type:'info',text:'Press SPACE to eat food. Click enemies to attack.'});
-        EventBus.emit('chat',{type:'info',text:'Keys: V=Auto-eat | X=Reset XP tracker | M=World map | 1-5=Quick slots'});
+        EventBus.emit('chat',{type:'info',text:'Keys: V=Auto-eat | X=Reset XP tracker | M=World map'});
         EventBus.emit('chat',{type:'info',text:'Game auto-saves every 60s. Press F5 to quick-save.'});
         // Music starts on first user interaction (browser autoplay policy)
         document.addEventListener('click',tryStartMusic,{once:false});
