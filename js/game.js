@@ -8475,6 +8475,11 @@ const enemyHPContainer=document.getElementById('enemy-hp-bars');
 const enemyHPBars=new Map();
 
 function updateEnemyHPBars(){
+    // Hide overworld enemy bars while in dungeon
+    if(DungeonState.active){
+        enemyHPBars.forEach(function(bar){bar.el.style.display='none';});
+        return;
+    }
     const cam=GameState.camera,w=window.innerWidth,h=window.innerHeight;
     // Track which enemies are visible this frame
     const activeIds=new Set();
@@ -8533,6 +8538,11 @@ const npcNameContainer=document.getElementById('npc-name-bars');
 const npcNameBars=new Map();
 
 function updateNPCNameBars(){
+    // Hide overworld NPC labels while in dungeon
+    if(DungeonState.active){
+        npcNameBars.forEach(function(bar){bar.el.style.display='none';});
+        return;
+    }
     const cam=GameState.camera,w=window.innerWidth,h=window.innerHeight;
     var playerPos=player.mesh?player.mesh.position:null;
     GameState.npcs.forEach(function(npc){
