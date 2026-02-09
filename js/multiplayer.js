@@ -404,20 +404,25 @@ function initUI(){
         mpBtn.addEventListener('click', function(){
             var modal = document.getElementById('mp-connect-modal');
             if(!modal) return;
-            modal.style.display = modal.style.display === 'none' ? '' : 'none';
+            if(modal.style.display === 'none'){
+                modal.style.display = 'flex';
+            } else {
+                modal.style.display = 'none';
+            }
         });
     }
 
-    // Close button on modal
-    var modal = document.getElementById('mp-connect-modal');
-    if(modal){
-        var closeBtn = modal.querySelector('.panel-close');
-        if(closeBtn){
-            closeBtn.addEventListener('click', function(){
-                modal.style.display = 'none';
-            });
-        }
-    }
+    // Close button on modal (handled by game.js global .panel-close handler)
+
+    // Stop game keybinds when typing in MP modal inputs
+    var mpNameInput = document.getElementById('mp-name');
+    var mpServerInput = document.getElementById('mp-server');
+    [mpNameInput, mpServerInput].forEach(function(inp){
+        if(!inp) return;
+        inp.addEventListener('keydown', function(e){ e.stopPropagation(); });
+        inp.addEventListener('keyup', function(e){ e.stopPropagation(); });
+        inp.addEventListener('keypress', function(e){ e.stopPropagation(); });
+    });
 
     // Connect button
     var connectBtn = document.getElementById('mp-connect-btn');
@@ -426,7 +431,7 @@ function initUI(){
             var nameInput = document.getElementById('mp-name');
             var serverInput = document.getElementById('mp-server');
             var name = (nameInput ? nameInput.value.trim() : '') || 'Player';
-            var url = (serverInput ? serverInput.value.trim() : '') || 'ws://localhost:3000';
+            var url = (serverInput ? serverInput.value.trim() : '') || 'wss://asterian-server.onrender.com';
             connect(url, name);
         });
     }
