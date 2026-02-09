@@ -1,0 +1,19 @@
+node_modules/
+server/
+*.log
+.DS_Store
+Thumbs.db
+.claude/
+nul
+# Legacy unused module files
+js/combat.js
+js/enemies.js
+js/input.js
+js/inventory.js
+js/items.js
+js/main.js
+js/npc.js
+js/player.js
+js/skills.js
+js/ui.js
+js/world.js

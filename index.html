@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RunEscape</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div id="loading-content">
+            <h1 class="game-title">RUN<span class="accent">ESCAPE</span></h1>
+            <p class="tagline">Beyond the Stars. Beyond Survival.</p>
+            <div id="loading-bar-container">
+                <div id="loading-bar"></div>
+            </div>
+            <p id="loading-text">Initializing systems...</p>
+        </div>
+    </div>
+
+    <!-- Game Canvas (Three.js renders here) -->
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        <div id="vignette-overlay"></div>
+        <div id="low-hp-vignette"></div>
+        <div id="screen-flash"></div>
+        <div id="kill-streak"></div>
+    </div>
+
+    <!-- UI Overlay -->
+    <div id="ui-overlay" style="display:none;">
+        <div id="snap-guides" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;"></div>
+        <!-- Top Left: Player Bars + Food -->
+        <div id="player-bars">
+            <div class="bar-row">
+                <span class="bar-label">HP</span>
+                <div class="bar-container hp-bar">
+                    <div class="bar-fill" id="hp-fill"></div>
+                    <span class="bar-text" id="hp-text">100/100</span>
+                </div>
+                <div id="food-indicator"></div>
+            </div>
+            <div class="bar-row">
+                <span class="bar-label">EN</span>
+                <div class="bar-container energy-bar">
+                    <div class="bar-fill" id="energy-fill"></div>
+                    <span class="bar-text" id="energy-text">100/100</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Right: Minimap -->
+        <div id="minimap-container">
+            <canvas id="minimap-canvas" width="180" height="180"></canvas>
+            <div id="area-name">Station Hub</div>
+            <button id="minimap-expand-btn" title="Expand minimap">&#x2922;</button>
+        </div>
+
+        <!-- Action Bar removed - OSRS style auto-attack only -->
+        <div id="action-bar" style="display:none;"></div>
+
+        <!-- Quick Bar (Feature 5) -->
+        <div id="quick-bar">
+            <div class="quick-slot" data-slot="0"><span class="quick-key">1</span><span class="quick-icon"></span></div>
+            <div class="quick-slot" data-slot="1"><span class="quick-key">2</span><span class="quick-icon"></span></div>
+            <div class="quick-slot" data-slot="2"><span class="quick-key">3</span><span class="quick-icon"></span></div>
+            <div class="quick-slot" data-slot="3"><span class="quick-key">4</span><span class="quick-icon"></span></div>
+            <div class="quick-slot" data-slot="4"><span class="quick-key">5</span><span class="quick-icon"></span></div>
+        </div>
+
+        <!-- Bottom Right: Panel Buttons -->
+        <div id="panel-buttons">
+            <button class="panel-btn" id="btn-inventory" title="Inventory">INV</button>
+            <button class="panel-btn" id="btn-equipment" title="Equipment">EQP</button>
+            <button class="panel-btn" id="btn-skills" title="Skills">SKL</button>
+            <button class="panel-btn" id="btn-bestiary" title="Bestiary">BST</button>
+            <button class="panel-btn save-btn" id="btn-save" title="Save (F5)">💾</button>
+            <button class="panel-btn" id="btn-mp" title="Multiplayer">MP</button>
+        </div>
+
+        <!-- Bottom Left: Chat Box -->
+        <div id="chat-box">
+            <div id="chat-filters">
+                <button class="chat-filter active" data-filter="all">All</button>
+                <button class="chat-filter" data-filter="combat">Combat</button>
+                <button class="chat-filter" data-filter="loot">Loot</button>
+                <button class="chat-filter" data-filter="skill">Skills</button>
+                <button class="chat-filter" data-filter="system">System</button>
+                <button class="chat-filter" data-filter="multiplayer">MP</button>
+            </div>
+            <div id="chat-messages"></div>
+            <div id="mp-chat-row" style="display:none;">
+                <input id="mp-chat-input" type="text" placeholder="Type to chat..." maxlength="200">
+            </div>
+        </div>
+
+        <!-- Inventory Panel -->
+        <div id="inventory-panel" class="game-panel" style="display:none;">
+            <div class="panel-header">
+                <span>Inventory</span>
+                <button class="panel-close">&times;</button>
+            </div>
+            <div id="inventory-grid"></div>
+        </div>
+
+        <!-- Equipment Panel -->
+        <div id="equipment-panel" class="game-panel" style="display:none;">
+            <div class="panel-header">
+                <span>Equipment</span>
+                <button class="panel-close">&times;</button>
+            </div>
+            <div id="equipment-slots">
+                <div class="equip-row"><div class="equip-slot" data-slot="head">Head</div></div>
+                <div class="equip-row">
+                    <div class="equip-slot" data-slot="weapon">Weapon</div>
+                    <div class="equip-slot" data-slot="body">Body</div>
+                    <div class="equip-slot" data-slot="offhand">Offhand</div>
+                </div>
+                <div class="equip-row"><div class="equip-slot" data-slot="legs">Legs</div></div>
+                <div class="equip-row">
+                    <div class="equip-slot" data-slot="gloves">Gloves</div>
+                    <div class="equip-slot" data-slot="boots">Boots</div>
+                </div>
+            </div>
+            <div id="equipment-stats"></div>
+        </div>
+
+        <!-- Skills Panel -->
+        <div id="skills-panel" class="game-panel" style="display:none;">
+            <div class="panel-header">
+                <span>Skills</span>
+                <button class="panel-close">&times;</button>
+            </div>
+            <div id="skills-tabs">
+                <button class="skill-tab-btn active" data-tab="skills">Skills</button>
+                <button class="skill-tab-btn" data-tab="synergies">Synergies</button>
+            </div>
+            <div id="skills-list"></div>
+            <div id="synergies-list" style="display:none;"></div>
+        </div>
+
+        <!-- Skill Guide Panel -->
+        <div id="skill-guide-panel" class="game-panel" style="display:none;">
+            <div class="panel-header">
+                <span id="skill-guide-title">Skill Guide</span>
+                <button class="panel-close">&times;</button>
+            </div>
+            <div id="skill-guide-header"></div>
+            <div id="skill-guide-list"></div>
+        </div>
+
+        <!-- Combat Style Panel -->
+        <div id="combat-panel" class="game-panel" style="display:none;">
+            <div class="panel-header">
+                <span>Combat Styles</span>
+                <button class="panel-close">&times;</button>
+            </div>
+            <div id="combat-styles"></div>
+        </div>
+
+        <!-- Shop Panel -->
+        <div id="shop-panel" class="game-panel" style="display:none;">
+            <div class="panel-header">
+                <span id="shop-name">Shop</span>
+                <button class="panel-close">&times;</button>
+            </div>
+            <div id="shop-content">
+                <div id="shop-items"></div>
+                <div id="shop-player-inv"></div>
+            </div>
+        </div>
+
+        <!-- Dialogue Panel -->
+        <div id="dialogue-panel" style="display:none;">
+            <div id="dialogue-speaker"></div>
+            <div id="dialogue-text"></div>
+            <div id="dialogue-options"></div>
+        </div>
+
+        <!-- Crafting Panel -->
+        <div id="crafting-panel" class="game-panel" style="display:none;">
+            <div class="panel-header">
+                <span id="crafting-title">Crafting</span>
+                <button class="panel-close">&times;</button>
+            </div>
+            <div id="crafting-recipes"></div>
+        </div>
+
+        <!-- Quest Board Panel -->
+        <div id="board-panel" class="game-panel" style="display:none;">
+            <div class="panel-header">
+                <span>Quest Board</span>
+                <button class="panel-close">&times;</button>
+            </div>
+            <div id="board-quests-list"></div>
+        </div>
+
+        <!-- Prestige Panel -->
+        <div id="prestige-panel" class="game-panel" style="display:none;">
+            <div class="panel-header"><span>Prestige</span><button class="panel-close">&times;</button></div>
+            <div id="prestige-content" style="padding:8px;"></div>
+        </div>
+
+        <!-- Prestige Shop Panel -->
+        <div id="prestige-shop-panel" class="game-panel" style="display:none;">
+            <div class="panel-header"><span>Prestige Shop</span><button class="panel-close">&times;</button></div>
+            <div id="prestige-shop-content" style="padding:8px;"></div>
+        </div>
+
+        <!-- Context Menu -->
+        <div id="context-menu" style="display:none;">
+            <ul id="context-options"></ul>
+        </div>
+
+        <!-- Tooltip -->
+        <div id="tooltip" style="display:none;"></div>
+
+        <!-- Bank Panel -->
+        <div id="bank-panel" class="game-panel" style="display:none;">
+            <div class="panel-header">
+                <span>Bank</span>
+                <button class="panel-close">&times;</button>
+            </div>
+            <div id="bank-search-bar" style="padding:4px 8px;"><input id="bank-search" type="text" placeholder="Search items..." style="width:100%;background:rgba(10,15,25,0.8);border:1px solid #1a3050;border-radius:3px;color:#8aa0b8;padding:4px 8px;font-size:11px;outline:none;"></div>
+            <div id="bank-grid"></div>
+            <div id="bank-inv-grid"></div>
+        </div>
+
+        <!-- Bestiary Panel (Feature 6) -->
+        <div id="bestiary-panel" class="game-panel" style="display:none;">
+            <div class="panel-header">Bestiary<button class="panel-close">&times;</button></div>
+            <div id="bestiary-list" style="padding:8px;"></div>
+        </div>
+
+        <!-- World Map Panel (Feature 14) -->
+        <div id="world-map-panel" class="game-panel" style="display:none;">
+            <div class="panel-header">World Map<button class="panel-close">&times;</button></div>
+            <canvas id="world-map-canvas" width="480" height="400"></canvas>
+        </div>
+
+        <!-- XP Tracker (Feature 7) -->
+        <div id="xp-tracker" style="display:none;"></div>
+
+        <!-- Combat Style HUD (removed - OSRS style) -->
+        <div id="style-hud" style="display:none;"></div>
+
+        <!-- Dungeon HUD -->
+        <div id="dungeon-hud" style="display:none;">
+            <div id="dungeon-floor-label">Floor 1</div>
+            <div id="dungeon-enemies-left">Enemies: 0</div>
+            <button id="dungeon-exit-btn" class="panel-btn">Exit</button>
+        </div>
+
+        <!-- Area Transition Overlay -->
+        <div id="area-transition"><div class="area-name-flash"></div></div>
+
+        <!-- Loot Toast Container -->
+        <div id="loot-toasts"></div>
+
+        <!-- XP Drop Container -->
+        <div id="xp-drops"></div>
+
+        <!-- Hit Splat Container -->
+        <div id="hit-splats"></div>
+
+        <!-- Hover Label (RS-style top-left mouseover text) -->
+        <div id="hover-label" style="display:none;"></div>
+
+        <!-- Enemy HP Bars Container -->
+        <div id="enemy-hp-bars"></div>
+
+        <!-- NPC Name Bars Container -->
+        <div id="npc-name-bars"></div>
+
+        <!-- Quest Tracker -->
+        <div id="quest-tracker" style="display:none;"></div>
+
+        <!-- Floating Text Container -->
+        <div id="floating-texts"></div>
+
+        <!-- Gathering Progress Bar -->
+        <div id="gather-bar-container" style="display:none;">
+            <div id="gather-bar-fill"></div>
+            <span id="gather-bar-text"></span>
+        </div>
+
+        <!-- Attack Progress Bar -->
+        <div id="attack-bar-container" style="display:none;">
+            <div id="attack-bar-fill"></div>
+            <span id="attack-bar-text">Attacking...</span>
+        </div>
+
+        <!-- Target Info -->
+        <div id="target-info" style="display:none;">
+            <span id="target-name"></span>
+            <div class="bar-container target-hp-bar">
+                <div class="bar-fill" id="target-hp-fill"></div>
+                <span class="bar-text" id="target-hp-text"></span>
+            </div>
+        </div>
+
+        <!-- Multiplayer Connect Modal -->
+        <div id="mp-connect-modal" class="game-panel" style="display:none;">
+            <div class="panel-header"><span>Multiplayer</span><button class="panel-close">&times;</button></div>
+            <div id="mp-connect-body">
+                <label class="mp-label">Name:</label>
+                <input id="mp-name" type="text" maxlength="16" placeholder="Your name" class="mp-input">
+                <label class="mp-label">Server:</label>
+                <input id="mp-server" type="text" value="ws://localhost:3000" class="mp-input">
+                <div id="mp-status"></div>
+                <div id="mp-btn-row">
+                    <button id="mp-connect-btn" class="mp-action-btn">Connect</button>
+                    <button id="mp-disconnect-btn" class="mp-action-btn" style="display:none;">Disconnect</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MP Player Name Labels -->
+        <div id="mp-name-labels"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/multiplayer.js"></script>
+</body>
+</html>
