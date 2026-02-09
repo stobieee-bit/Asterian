@@ -1518,6 +1518,17 @@ const CORRIDORS = [
      label:'The Abyss \u2193', labelPos:{x:0,z:-500}},
 ];
 
+var AREA_LEVEL_RANGES = {
+    'station-hub':     {min:0, max:0, label:'Safe Zone'},
+    'asteroid-mines':  {min:1, max:99, label:'Lv 1-99 Mining'},
+    'alien-wastes':    {min:1, max:60, label:'Lv 1-60 Combat'},
+    'bio-lab':         {min:1, max:99, label:'Crafting Hub'},
+    'the-abyss':       {min:100, max:150, label:'Lv 100+ Combat'},
+    'corrupted-mines': {min:80, max:99, label:'Lv 80-99 Prestige'},
+    'corrupted-wastes':{min:80, max:99, label:'Lv 80-99 Prestige'},
+    'corrupted-lab':   {min:80, max:99, label:'Lv 80-99 Prestige'},
+};
+
 function isInCorridor(x, z) {
     for (var ci = 0; ci < CORRIDORS.length; ci++) {
         var c = CORRIDORS[ci];
@@ -7934,12 +7945,27 @@ function renderWorldMap(){
     var w=canvas.width,h=canvas.height;
     ctx.fillStyle='#080c14';ctx.fillRect(0,0,w,h);
     var mapCX=w/2+worldMapPanX,mapCY=h/2+worldMapPanZ,mapSc=worldMapZoom;
-    // Draw corridors
-    ctx.fillStyle='rgba(40,60,80,0.5)';
+    // Draw corridors with animated dashes
+    var animT=performance.now()*0.001;
     CORRIDORS.forEach(function(c){
-        var x1=mapCX+c.minX*mapSc,z1=mapCY+c.minZ*mapSc;
-        var x2=mapCX+c.maxX*mapSc,z2=mapCY+c.maxZ*mapSc;
-        ctx.fillRect(Math.min(x1,x2),Math.min(z1,z2),Math.abs(x2-x1),Math.abs(z2-z1));
+        var fromArea=AREAS[c.from],toArea=AREAS[c.to];
+        if(!fromArea||!toArea)return;
+        var fx=mapCX+fromArea.center.x*mapSc,fz=mapCY+fromArea.center.z*mapSc;
+        var tx=mapCX+toArea.center.x*mapSc,tz=mapCY+toArea.center.z*mapSc;
+        // Background corridor fill (dimmer)
+        ctx.fillStyle='rgba(40,60,80,0.3)';
+        var rx1=mapCX+c.minX*mapSc,rz1=mapCY+c.minZ*mapSc;
+        var rx2=mapCX+c.maxX*mapSc,rz2=mapCY+c.maxZ*mapSc;
+        ctx.fillRect(Math.min(rx1,rx2),Math.min(rz1,rz2),Math.abs(rx2-rx1),Math.abs(rz2-rz1));
+        // Animated dashed center-line
+        ctx.save();
+        ctx.strokeStyle='rgba(100,180,255,0.5)';
+        ctx.lineWidth=Math.max(1,2*mapSc);
+        ctx.setLineDash([8,6]);
+        ctx.lineDashOffset=-animT*30;
+        ctx.beginPath();ctx.moveTo(fx,fz);ctx.lineTo(tx,tz);ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
     });
     // Draw areas
     var areaColors={'station-hub':'rgba(30,50,80,0.4)','asteroid-mines':'rgba(80,50,20,0.4)','alien-wastes':'rgba(20,60,30,0.4)','bio-lab':'rgba(20,60,60,0.4)','the-abyss':'rgba(10,5,40,0.4)'};
@@ -7953,6 +7979,15 @@ function renderWorldMap(){
         var fontSize=Math.max(8,Math.min(14,Math.round(12*mapSc)));
         ctx.fillStyle='#8aa0b8';ctx.font='bold '+fontSize+'px monospace';ctx.textAlign='center';
         ctx.fillText(area.name,ax,az-ar+fontSize+2);
+        // Level range label
+        var lr=AREA_LEVEL_RANGES[areaId];
+        if(lr){
+            var pLvl=player.combatLevel||1;
+            var lrColor=lr.min===0?'#66ddaa':pLvl>=lr.min?'#88ccff':'#ff6666';
+            ctx.fillStyle=lrColor;
+            ctx.font=Math.max(7,Math.min(10,Math.round(9*mapSc)))+'px monospace';
+            ctx.fillText(lr.label,ax,az-ar+fontSize+14);
+        }
     });
     // Draw corrupted areas (if built)
     if(corruptedAreaBuilt){
@@ -7963,6 +7998,12 @@ function renderWorldMap(){
             ctx.fillStyle='rgba(80,10,10,0.35)';ctx.beginPath();ctx.arc(cax,caz,car,0,Math.PI*2);ctx.fill();
             ctx.strokeStyle='rgba(255,34,68,0.3)';ctx.lineWidth=1;ctx.stroke();
             ctx.fillStyle='#cc4466';ctx.font='9px monospace';ctx.textAlign='center';ctx.fillText(ca.name,cax,caz+3);
+            var clr=AREA_LEVEL_RANGES[cid];
+            if(clr){
+                ctx.fillStyle=(player.combatLevel||1)>=clr.min?'#ff8888':'#ff4444';
+                ctx.font='7px monospace';
+                ctx.fillText(clr.label,cax,caz+12);
+            }
         });
     }
     // Draw resource nodes
@@ -8011,6 +8052,26 @@ function renderWorldMap(){
     ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(ppx,ppz,5,0,Math.PI*2);ctx.fill();
     ctx.strokeStyle='#00c8ff';ctx.lineWidth=2;ctx.stroke();
     ctx.fillStyle='#ffffff';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.fillText('YOU',ppx,ppz+14);
+    // Draw remote players (multiplayer)
+    if(window.AsterianMP&&window.AsterianMP.getRemotePlayers){
+        var rp=window.AsterianMP.getRemotePlayers();
+        var rpStyleColors={nano:'#22ee66',tesla:'#44aaff','void':'#aa66ff'};
+        Object.keys(rp).forEach(function(rid){
+            var r=rp[rid];
+            if(!r||r.currentX===undefined)return;
+            var rx=mapCX+r.currentX*mapSc,rz=mapCY+r.currentZ*mapSc;
+            if(rx<-10||rx>w+10||rz<-10||rz>h+10)return;
+            var sty=(r.stats&&r.stats.combatStyle)||'nano';
+            ctx.fillStyle=rpStyleColors[sty]||'#44aaff';
+            ctx.globalAlpha=0.8;
+            ctx.beginPath();ctx.arc(rx,rz,3,0,Math.PI*2);ctx.fill();
+            ctx.globalAlpha=1.0;
+            if(r.name&&mapSc>0.3){
+                ctx.fillStyle='#aaccee';ctx.font='7px monospace';ctx.textAlign='center';
+                ctx.fillText(r.name,rx,rz+10);
+            }
+        });
+    }
     // Draw waypoint
     if(player.waypoint){
         var wpx2=mapCX+player.waypoint.x*mapSc,wpz2=mapCY+player.waypoint.z*mapSc;
@@ -8021,13 +8082,14 @@ function renderWorldMap(){
     }
     // Legend
     ctx.textAlign='left';ctx.font='9px monospace';
-    var ly=h-84;
+    var ly=h-98;
     ctx.fillStyle='#44ffaa';ctx.fillRect(10,ly,8,8);ctx.fillStyle='#8aa0b8';ctx.fillText('Resources',22,ly+7);ly+=14;
     ctx.fillStyle='#ffcc00';ctx.fillRect(10,ly,8,8);ctx.fillStyle='#8aa0b8';ctx.fillText('NPCs',22,ly+7);ly+=14;
     ctx.fillStyle='#ff8844';ctx.fillRect(10,ly,8,8);ctx.fillStyle='#8aa0b8';ctx.fillText('Stations',22,ly+7);ly+=14;
     ctx.fillStyle='#ff4444';ctx.fillRect(10,ly,8,8);ctx.fillStyle='#8aa0b8';ctx.fillText('Enemies',22,ly+7);ly+=14;
     ctx.fillStyle='#aa44ff';ctx.fillRect(10,ly,8,8);ctx.fillStyle='#8aa0b8';ctx.fillText('Dungeon',22,ly+7);ly+=14;
-    ctx.fillStyle='#ffffff';ctx.fillRect(10,ly,8,8);ctx.fillStyle='#8aa0b8';ctx.fillText('Player',22,ly+7);
+    ctx.fillStyle='#ffffff';ctx.fillRect(10,ly,8,8);ctx.fillStyle='#8aa0b8';ctx.fillText('Player',22,ly+7);ly+=14;
+    ctx.fillStyle='#44aaff';ctx.fillRect(10,ly,8,8);ctx.fillStyle='#8aa0b8';ctx.fillText('Players (MP)',22,ly+7);
     // Controls hint
     ctx.fillStyle='rgba(255,255,255,0.3)';ctx.font='8px monospace';ctx.textAlign='right';
     ctx.fillText('Scroll: Zoom | Drag: Pan | DblClick: Reset | RClick: Waypoint',w-8,h-6);

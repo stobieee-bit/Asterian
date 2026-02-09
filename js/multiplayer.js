@@ -629,7 +629,8 @@ window.AsterianMP = {
         }
     },
     sendAttack: sendAttack,
-    sendKill: sendKill
+    sendKill: sendKill,
+    getRemotePlayers: function(){ return remotePlayers; }
 };
 
 // ── Init ───────────────────────────────────────────────────────
