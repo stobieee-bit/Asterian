@@ -1,5 +1,5 @@
 // ========================================
-// RunEscape Multiplayer Client — Tier 1
+// Asterian Multiplayer Client — Tier 1
 // Presence, chat, name labels, walk sync
 // Loaded AFTER game.js — uses window.DEBUG
 // ========================================
@@ -456,7 +456,7 @@ function initUI(){
 }
 
 // ── Game Loop Hook ─────────────────────────────────────────────
-window.RunEscapeMP = {
+window.AsterianMP = {
     tick: function(dt){
         if(!connected) return;
         sendPosition(dt);

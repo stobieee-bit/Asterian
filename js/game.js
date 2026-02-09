@@ -2,7 +2,7 @@
 'use strict';
 
 // ========================================
-// RunEscape - Consolidated Game File
+// Asterian - Consolidated Game File
 // ========================================
 
 // ----------------------------------------
@@ -7161,7 +7161,7 @@ function filterBankItems(){
 }
 
 // Feature 10: Idle Notification
-var idleNotifyTimer=0;var idleNotifyActive=false;var originalTitle='RunEscape';
+var idleNotifyTimer=0;var idleNotifyActive=false;var originalTitle='Asterian';
 function checkIdleNotification(){
     if(document.hidden){
         if(!player.inCombat&&!player.isGathering&&!idleNotifyActive){
@@ -7172,7 +7172,7 @@ function checkIdleNotification(){
     }
     if(idleNotifyActive){
         idleNotifyTimer+=GameState.deltaTime;
-        if(idleNotifyTimer%1<0.05)document.title=document.title===originalTitle?'Idle - RunEscape':originalTitle;
+        if(idleNotifyTimer%1<0.05)document.title=document.title===originalTitle?'Idle - Asterian':originalTitle;
     }
 }
 
@@ -7840,7 +7840,7 @@ function updateNPCNameBars(){
 // ========================================
 // Save / Load System
 // ========================================
-const SAVE_KEY='runescape_save_v1';
+const SAVE_KEY='runescape_save_v1'; // kept for backwards compat with existing saves
 let autoSaveTimer=0;
 
 function saveGame(){
@@ -8108,7 +8108,7 @@ function gameLoop(){
     checkIdleNotification();
     updateAmbientParticles();
     // Multiplayer tick (if connected)
-    if(window.RunEscapeMP)window.RunEscapeMP.tick(GameState.deltaTime);
+    if(window.AsterianMP)window.AsterianMP.tick(GameState.deltaTime);
     // Render
     GameState.renderer.render(GameState.scene,GameState.camera);
 }
@@ -8152,7 +8152,7 @@ async function startGame(){
             EventBus.emit('chat',{type:'system',text:'Save data loaded! Welcome back, recruit.'});
             EventBus.emit('chat',{type:'info',text:'Your progress has been restored.'});
         }else{
-            EventBus.emit('chat',{type:'system',text:'Welcome to RunEscape! Click to move, right-click for options.'});
+            EventBus.emit('chat',{type:'system',text:'Welcome to Asterian! Click to move, right-click for options.'});
             EventBus.emit('chat',{type:'info',text:'You are at Nova Station. Explore the areas around you.'});
             EventBus.emit('chat',{type:'info',text:'Talk to Commander Vex for a mission. Middle-mouse to orbit camera.'});
         }
@@ -8160,7 +8160,7 @@ async function startGame(){
         EventBus.emit('chat',{type:'info',text:'Keys: V=Auto-eat | X=Reset XP tracker | M=World map | 1-5=Quick slots'});
         EventBus.emit('chat',{type:'info',text:'Game auto-saves every 60s. Press F5 to quick-save.'});
         gameLoop();
-    }catch(err){console.error('RunEscape failed:',err);setLoading(0,'Error: '+err.message);}
+    }catch(err){console.error('Asterian failed:',err);setLoading(0,'Error: '+err.message);}
 }
 
 startGame();
