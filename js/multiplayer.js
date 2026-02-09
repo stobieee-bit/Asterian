@@ -80,7 +80,8 @@ function addRemotePlayer(id, name, x, z, ry, moving, equipment, stats){
     mesh.rotation.y = ry || 0;
 
     var s = scene();
-    if(s) s.add(mesh);
+    if(s){ s.add(mesh); console.log('[MP] Added mesh to scene for', name, 'at', x, z); }
+    else { console.warn('[MP] No scene available! Cannot add mesh for', name); }
 
     var label = document.createElement('div');
     label.className = 'mp-player-name';
@@ -287,11 +288,13 @@ function connect(url, name){
             case 'welcome':
                 myId = msg.id;
                 connected = true;
+                console.log('[MP] Welcome! My ID:', myId, 'Existing players:', msg.players.length);
                 setStatus('Connected (' + (msg.players.length + 1) + ' online)', 'connected');
                 updateUIConnected(true);
                 updateHUD();
                 for(var i = 0; i < msg.players.length; i++){
                     var p = msg.players[i];
+                    console.log('[MP] Adding existing player:', p.name, 'at', p.x, p.z);
                     addRemotePlayer(p.id, p.name, p.x, p.z, p.ry, p.moving, p.equipment, p.stats);
                 }
                 addChat('system', 'Multiplayer connected! You are: ' + name);
@@ -302,6 +305,7 @@ function connect(url, name){
                 break;
 
             case 'join':
+                console.log('[MP] Player joined:', msg.name, 'id:', msg.id);
                 addRemotePlayer(msg.id, msg.name, 0, 0, 0, false, {}, {});
                 addChat('multiplayer', msg.name + ' joined the world.');
                 updatePlayerCount();
@@ -328,6 +332,7 @@ function connect(url, name){
 
             case 'chat':
                 if(msg.id === myId) break;
+                console.log('[MP] Chat from', msg.name, ':', msg.text);
                 addChat('multiplayer', msg.name + ': ' + msg.text);
                 break;
 
@@ -620,11 +625,23 @@ window.AsterianMP = {
 };
 
 // ── Init ───────────────────────────────────────────────────────
+function waitForGame(cb){
+    // Wait until GameState.scene exists (game fully initialized)
+    var d = D();
+    if(d.GameState && d.GameState.scene && d.GameState.camera){
+        cb();
+    } else {
+        setTimeout(function(){ waitForGame(cb); }, 500);
+    }
+}
+
 function tryInit(){
     if(document.getElementById('btn-mp')){
         initUI();
-        // Auto-connect 2 seconds after game loads
-        setTimeout(tryAutoConnect, 2000);
+        // Auto-connect once game is fully loaded
+        waitForGame(function(){
+            setTimeout(tryAutoConnect, 500);
+        });
     } else {
         setTimeout(tryInit, 200);
     }
