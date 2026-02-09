@@ -791,6 +791,7 @@ function moveTo(point) {
     }
     player.moveTarget = new THREE.Vector3(destX, 0, destZ);
     player.isMoving = true; player.isGathering = false; player.gatherTarget = null; player.gatherProgress = 0;
+    checkTutorialEvent('playerMoved');
 }
 
 function updatePlayerMovement() {
@@ -857,6 +858,14 @@ function updatePlayerMovement() {
     const ll=player.mesh.getObjectByName('leftLeg'), rl=player.mesh.getObjectByName('rightLeg');
     if(la)la.rotation.x=swing; if(ra)ra.rotation.x=-swing;
     if(ll)ll.rotation.x=-swing; if(rl)rl.rotation.x=swing;
+    // Walking dust puffs
+    if(!player._dustTimer)player._dustTimer=0;
+    player._dustTimer+=GameState.deltaTime;
+    if(player._dustTimer>0.25){
+        player._dustTimer=0;
+        var fp=player.mesh.position;
+        spawnParticles(new THREE.Vector3(fp.x+(Math.random()-0.5)*0.3,0.1,fp.z+(Math.random()-0.5)*0.3),0x888888,2,0.4,0.6,0.05);
+    }
 }
 
 function resetWalkAnimation() {
@@ -1302,6 +1311,86 @@ function initInput(){
     window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
     window.addEventListener('mousedown',e=>{if(e.button===1)e.preventDefault();});
     window.addEventListener('click',e=>{if(!e.target.closest('#context-menu'))hideContextMenu();});
+
+    // ── Mobile Touch Support ──────────────────────────────
+    var isMobile='ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if(isMobile){
+        canvas.style.touchAction='none';
+        var touchState={startX:0,startY:0,startTime:0,pinchDist:0,twoFingerAngle:0,twoFingerPitch:0,longPressTimer:null,isTap:true,touches:0};
+
+        canvas.addEventListener('touchstart',function(e){
+            e.preventDefault();
+            var t=e.touches;
+            touchState.touches=t.length;
+            if(t.length===1){
+                touchState.startX=t[0].clientX;
+                touchState.startY=t[0].clientY;
+                touchState.startTime=Date.now();
+                touchState.isTap=true;
+                // Long press for context menu
+                touchState.longPressTimer=setTimeout(function(){
+                    touchState.isTap=false;
+                    var fake={clientX:touchState.startX,clientY:touchState.startY};
+                    var hit=raycastWorld(fake);
+                    if(hit) EventBus.emit('rightClick',{hit:hit,screenX:touchState.startX,screenY:touchState.startY});
+                },600);
+            } else if(t.length===2){
+                clearTimeout(touchState.longPressTimer);
+                touchState.isTap=false;
+                var dx=t[1].clientX-t[0].clientX,dy=t[1].clientY-t[0].clientY;
+                touchState.pinchDist=Math.sqrt(dx*dx+dy*dy);
+                touchState.twoFingerAngle=cameraState.angle;
+                touchState.twoFingerPitch=cameraState.pitch;
+                touchState.startX=(t[0].clientX+t[1].clientX)/2;
+                touchState.startY=(t[0].clientY+t[1].clientY)/2;
+            }
+        },{passive:false});
+
+        canvas.addEventListener('touchmove',function(e){
+            e.preventDefault();
+            var t=e.touches;
+            if(t.length===1&&touchState.longPressTimer){
+                var mx=t[0].clientX-touchState.startX,my=t[0].clientY-touchState.startY;
+                if(Math.sqrt(mx*mx+my*my)>10){
+                    clearTimeout(touchState.longPressTimer);
+                    touchState.longPressTimer=null;
+                    touchState.isTap=false;
+                }
+            }
+            if(t.length===2){
+                // Pinch zoom
+                var dx=t[1].clientX-t[0].clientX,dy=t[1].clientY-t[0].clientY;
+                var dist=Math.sqrt(dx*dx+dy*dy);
+                var pinchDelta=(touchState.pinchDist-dist)*0.05;
+                cameraState.distance=Math.max(cameraState.minDistance,Math.min(cameraState.maxDistance,cameraState.distance+pinchDelta));
+                touchState.pinchDist=dist;
+                // Two-finger drag to orbit
+                var cx=(t[0].clientX+t[1].clientX)/2;
+                var cy=(t[0].clientY+t[1].clientY)/2;
+                var orbitDx=cx-touchState.startX,orbitDy=cy-touchState.startY;
+                cameraState.angle-=orbitDx*cameraState.sensitivity;
+                cameraState.pitch=Math.max(cameraState.minPitch,Math.min(cameraState.maxPitch,cameraState.pitch+orbitDy*cameraState.sensitivity));
+                touchState.startX=cx;touchState.startY=cy;
+            }
+        },{passive:false});
+
+        canvas.addEventListener('touchend',function(e){
+            clearTimeout(touchState.longPressTimer);
+            touchState.longPressTimer=null;
+            if(touchState.isTap&&touchState.touches===1&&(Date.now()-touchState.startTime)<300){
+                // Single tap = left click
+                var fake={clientX:touchState.startX,clientY:touchState.startY};
+                hideContextMenu();
+                var hit=raycastWorld(fake);
+                if(hit) EventBus.emit('leftClick',hit);
+            }
+            touchState.touches=e.touches.length;
+        },{passive:false});
+
+        // Show mobile eat button
+        var eatBtn=document.getElementById('mobile-eat-btn');
+        if(eatBtn) eatBtn.style.display='flex';
+    }
 }
 
 // ========================================
@@ -1476,14 +1565,31 @@ function buildGround(){
 }
 
 function buildStarfield(){
-    const ct=2000,geo=new THREE.BufferGeometry(),p=new Float32Array(ct*3),c=new Float32Array(ct*3);
+    const ct=4000,geo=new THREE.BufferGeometry(),p=new Float32Array(ct*3),c=new Float32Array(ct*3),sz=new Float32Array(ct);
+    // Star color palette: blue-white, yellow-white, white, faint red
+    var starColors=[[0.7,0.8,1],[1,0.95,0.8],[1,1,1],[1,0.7,0.6],[0.6,0.9,1],[1,0.85,0.7]];
     for(let i=0;i<ct;i++){
-        const th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1),r=400+Math.random()*50;
+        const th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1),r=380+Math.random()*80;
         p[i*3]=r*Math.sin(ph)*Math.cos(th);p[i*3+1]=r*Math.sin(ph)*Math.sin(th);p[i*3+2]=r*Math.cos(ph);
-        const br=0.5+Math.random()*0.5;c[i*3]=br;c[i*3+1]=br;c[i*3+2]=br;
+        var sc=starColors[Math.floor(Math.random()*starColors.length)];
+        var br=0.3+Math.random()*0.7;
+        c[i*3]=sc[0]*br;c[i*3+1]=sc[1]*br;c[i*3+2]=sc[2]*br;
+        sz[i]=0.8+Math.random()*2.0;
     }
     geo.setAttribute('position',new THREE.BufferAttribute(p,3));geo.setAttribute('color',new THREE.BufferAttribute(c,3));
-    GameState.scene.add(new THREE.Points(geo,new THREE.PointsMaterial({size:1.5,vertexColors:true,sizeAttenuation:false})));
+    geo.setAttribute('size',new THREE.BufferAttribute(sz,1));
+    // Main stars layer
+    GameState.scene.add(new THREE.Points(geo,new THREE.PointsMaterial({size:1.5,vertexColors:true,sizeAttenuation:false,transparent:true,opacity:0.9})));
+    // Bright star clusters — sparse, bigger points for depth
+    var ct2=200,geo2=new THREE.BufferGeometry(),p2=new Float32Array(ct2*3),c2=new Float32Array(ct2*3);
+    for(let i=0;i<ct2;i++){
+        var th2=Math.random()*Math.PI*2,ph2=Math.acos(2*Math.random()-1),r2=350+Math.random()*60;
+        p2[i*3]=r2*Math.sin(ph2)*Math.cos(th2);p2[i*3+1]=r2*Math.sin(ph2)*Math.sin(th2);p2[i*3+2]=r2*Math.cos(ph2);
+        var bright=0.8+Math.random()*0.2;
+        c2[i*3]=bright;c2[i*3+1]=bright;c2[i*3+2]=bright*1.1;
+    }
+    geo2.setAttribute('position',new THREE.BufferAttribute(p2,3));geo2.setAttribute('color',new THREE.BufferAttribute(c2,3));
+    GameState.scene.add(new THREE.Points(geo2,new THREE.PointsMaterial({size:3,vertexColors:true,sizeAttenuation:false,transparent:true,opacity:0.6})));
 }
 
 function buildSkyDome(){
@@ -3247,7 +3353,14 @@ function applyDamageToEnemy(enemy,damage){
     // Hit splat instead of float text
     var isBigHit=damage>enemy.maxHp*0.3;
     createHitSplat(hitPos,damage,isBigHit?'crit':'damage');
-    if(isBigHit){spawnParticles(hitPos,0xffffff,20,5,0.5,0.1);triggerScreenShake(0.3,0.2);}
+    if(isBigHit){
+        spawnParticles(hitPos,0xffffff,25,5,0.5,0.12);
+        spawnParticles(hitPos,0xffcc44,10,3,0.6,0.08);
+        var critScale=Math.min(1.0,damage/enemy.maxHp);
+        triggerScreenShake(0.2+critScale*0.4,0.15+critScale*0.15);
+        triggerScreenFlash('rgba(255,255,255,0.08)',60);
+        spawnStyleBurst(hitPos,vfxStyle);
+    }
     EventBus.emit('enemyDamaged',{enemy,damage});
     // Psionic Mind Shatter execute
     if(player.psionicsUnlocked&&player.skills.psionics&&enemy.hp>0&&enemy.alive){
@@ -3258,17 +3371,33 @@ function applyDamageToEnemy(enemy,damage){
             enemy.hp=0;
         }
     }
+    // Broadcast attack to multiplayer
+    if(enemy.enemyId&&window.AsterianMP&&window.AsterianMP.sendAttack){
+        window.AsterianMP.sendAttack(enemy.enemyId,damage,vfxStyle);
+    }
     if(enemy.hp<=0){enemy.hp=0;killEnemy(enemy);}
 }
 
 function killEnemy(enemy){
     enemy.alive=false;enemy.respawnTimer=enemy.respawnTime;
+    // Broadcast kill to multiplayer
+    if(enemy.enemyId&&window.AsterianMP&&window.AsterianMP.sendKill){
+        window.AsterianMP.sendKill(enemy.enemyId);
+    }
     // Death dissolve animation instead of instant hide
     enemy.deathAnim=1.0; // 1 second dissolve
-    // Death explosion particles
+    // Death explosion particles — bigger burst with enemy-colored shards
     const deathPos=enemy.mesh.position.clone().add(new THREE.Vector3(0,1,0));
-    spawnParticles(deathPos,0xff4444,25,4,1.0,0.12);
-    spawnParticles(deathPos,0xffcc44,15,3,0.8,0.08);
+    spawnParticles(deathPos,0xff4444,30,5,1.0,0.14);
+    spawnParticles(deathPos,0xffcc44,18,3.5,0.9,0.1);
+    spawnParticles(deathPos,0xffffff,8,6,0.4,0.06);
+    // Expanding death ring at feet
+    var deathRingGeo=new THREE.RingGeometry(0.2,0.8,16);
+    var deathRingMat=new THREE.MeshBasicMaterial({color:0xff6644,transparent:true,opacity:0.7,side:THREE.DoubleSide});
+    var deathRing=new THREE.Mesh(deathRingGeo,deathRingMat);
+    deathRing.position.copy(enemy.mesh.position).add(new THREE.Vector3(0,0.2,0));deathRing.rotation.x=-Math.PI/2;
+    GameState.scene.add(deathRing);
+    particles.push({mesh:deathRing,velocity:new THREE.Vector3(0,0,0),life:0.6,maxLife:0.6,gravity:0,isRing:true,expandSpeed:10});
     // Kill streak
     killStreak.count++;killStreak.timer=3.0;
     var ksEl=document.getElementById('kill-streak');
@@ -3363,6 +3492,7 @@ function attackTarget(enemy){
     if(player.combatTarget===enemy&&player.inCombat)return;
     if(!player.inCombat){player.deathRecap={lastDamageSource:'',totalDamageTaken:0,combatDuration:0,killCount:0};}
     player.combatTarget=enemy;player.autoAttackTimer=Math.min(player.autoAttackTimer,0.5);player.inCombat=true;EventBus.emit('targetChanged',enemy);
+    checkTutorialEvent('combatStarted');
 }
 
 // ----------------------------------------
@@ -4766,7 +4896,10 @@ function buildEnemyMesh(type){
     return buildChithariMesh('normal');
 }
 
+var enemyById = {}; // enemyId → enemy object for shared combat lookup
+
 function spawnEnemies(){
+    enemyById = {};
     // Data-driven: spawn all enemies from ENEMY_DEFS based on area + level → position mapping
     var areaConfig = {
         'alien-wastes': {cx:0, cz:-300, radius:250, levelRange:[1,99],
@@ -4802,10 +4935,43 @@ function spawnEnemies(){
                 respawnTimer:0,animPhase:Math.random()*Math.PI*2,deathAnim:0};
             if(td.isBoss) enemy.isBoss=true;
             if(td.meshTemplate) enemy.meshTemplate=td.meshTemplate;
+            // Stable enemy ID for shared combat sync
+            enemy.enemyId=d.area+'_'+d.id+'_'+i;
+            enemyById[enemy.enemyId]=enemy;
             mesh.userData.entityType='enemy';mesh.userData.entity=enemy;
             GameState.scene.add(mesh);GameState.enemies.push(enemy);
         }
     }
+}
+
+// ── Shared Combat: Remote damage/kill (no XP/loot for remote actions) ──
+function applyRemoteDamage(enemyId, damage, style, attackerName){
+    var enemy=enemyById[enemyId];
+    if(!enemy||!enemy.alive) return;
+    enemy.hp-=damage;
+    if(enemy.hp<0) enemy.hp=0;
+    if(enemy.state!=='aggro'){enemy.state='aggro';enemy.wanderTarget=null;}
+    var hitPos=enemy.mesh.position.clone().add(new THREE.Vector3(0,1.5,0));
+    var styleColors={nano:0x44ff88,tesla:0x44aaff,void:0xaa44ff};
+    var sc=styleColors[style]||0xffffff;
+    spawnParticles(hitPos,sc,5,1.5,0.4,0.05);
+    spawnImpactRing(enemy.mesh.position.clone().add(new THREE.Vector3(0,0.3,0)),sc);
+    enemy.hitFlash=0.1;
+    var isBig=damage>enemy.maxHp*0.3;
+    createHitSplat(hitPos,damage,isBig?'crit':'damage');
+    if(enemy.hp<=0){enemy.hp=0;remoteKillEnemy(enemyId,attackerName);}
+}
+
+function remoteKillEnemy(enemyId, killerName){
+    var enemy=enemyById[enemyId];
+    if(!enemy) return;
+    enemy.alive=false;enemy.respawnTimer=enemy.respawnTime;
+    enemy.deathAnim=1.0;
+    var deathPos=enemy.mesh.position.clone().add(new THREE.Vector3(0,1,0));
+    spawnParticles(deathPos,0xff4444,20,4,0.8,0.1);
+    spawnParticles(deathPos,0xffcc44,10,3,0.7,0.07);
+    if(player.combatTarget===enemy){player.combatTarget=null;player.inCombat=false;}
+    if(killerName) addChatMessage('multiplayer',killerName+' defeated '+enemy.name+'!');
 }
 
 function enemyMoveToward(enemy,target,speed){
@@ -5823,7 +5989,7 @@ function setupPanelButtons(){
     Object.entries(panels).forEach(([bid,pid])=>{
         document.getElementById(bid).addEventListener('click',()=>{
             const p=document.getElementById(pid),vis=p.style.display!=='none';if(vis&&player.panelLocks[pid]){EventBus.emit('chat',{type:'info',text:'Panel is locked.'});return;}p.style.display=vis?'none':'flex';document.getElementById(bid).classList.toggle('active',!vis);
-            if(!vis){if(pid==='inventory-panel')renderInventory();if(pid==='equipment-panel')renderEquipment();if(pid==='skills-panel')renderSkills();}
+            if(!vis){if(pid==='inventory-panel')renderInventory();if(pid==='equipment-panel')renderEquipment();if(pid==='skills-panel')renderSkills();checkTutorialEvent('panelOpened');}
         });
     });
     EventBus.on('escape',()=>{Object.entries(panels).forEach(([bid,pid])=>{if(!player.panelLocks[pid]){document.getElementById(pid).style.display='none';document.getElementById(bid).classList.remove('active');}});if(!player.panelLocks['crafting-panel']){document.getElementById('crafting-panel').style.display='none';craftingFromStation=false;}document.getElementById('board-panel').style.display='none';document.getElementById('skill-guide-panel').style.display='none';document.getElementById('bestiary-panel').style.display='none';document.getElementById('world-map-panel').style.display='none';if(bankOpen)closeBank();if(activeShop)closeShop();if(activeNPC)closeDialogue();});
@@ -6222,7 +6388,7 @@ function setupUIEvents(){
     EventBus.on('chat',({type,text})=>addChatMessage(type,text));
     EventBus.on('floatText',({position,text,type})=>createFloatText(position,text,type));
     EventBus.on('xpGained',({skill,amount})=>{createXPDrop(skill,amount);});
-    EventBus.on('levelUp',({skill,level})=>{addChatMessage('skill','LEVEL UP! '+SKILL_DEFS[skill].name+' is now level '+level+'!');});
+    EventBus.on('levelUp',({skill,level})=>{addChatMessage('skill','LEVEL UP! '+SKILL_DEFS[skill].name+' is now level '+level+'!');spawnLevelUpVFX();});
     EventBus.on('inventoryChanged',()=>{if(document.getElementById('inventory-panel').style.display!=='none')renderInventory();});
     EventBus.on('equipmentChanged',()=>{if(document.getElementById('equipment-panel').style.display!=='none')renderEquipment();});
     EventBus.on('styleChanged',()=>{updateActionBar();});
@@ -6337,10 +6503,76 @@ function spawnCombatVFX(position,style,type){
             spawnParticles(pos,c,1,0.3,0.8,0.04);
         }
     } else if(type==='hit'){
-        if(style==='nano'){spawnParticles(position,0x44ff88,6,1.5,0.5,0.06);spawnParticles(position,0x22aa44,4,1,0.4,0.04);}
-        else if(style==='tesla'){spawnParticles(position,0x44aaff,5,3,0.3,0.05);spawnParticles(position,0xaaddff,3,2,0.4,0.03);}
-        else if(style==='void'){spawnParticles(position,0xaa44ff,6,1,0.6,0.07);spawnParticles(position,0x6622aa,4,0.8,0.5,0.05);}
+        if(style==='nano'){
+            // Green sparks + small leaf-like scatter
+            spawnParticles(position,0x44ff88,8,2,0.5,0.07);
+            spawnParticles(position,0x22aa44,5,1.2,0.4,0.04);
+            spawnParticles(position,0x88ffcc,3,3,0.3,0.05);
+        } else if(style==='tesla'){
+            // Blue electric bolts + white sparks
+            spawnParticles(position,0x44aaff,7,4,0.3,0.06);
+            spawnParticles(position,0xaaddff,4,3,0.35,0.04);
+            spawnParticles(position,0xffffff,3,5,0.2,0.03);
+        } else if(style==='void'){
+            // Purple wisps + dark core implosion
+            spawnParticles(position,0xaa44ff,8,1.2,0.7,0.08);
+            spawnParticles(position,0x6622aa,5,0.8,0.6,0.06);
+            spawnParticles(position,0x220044,3,0.4,0.9,0.1);
+        }
     }
+}
+// Style-specific VFX burst for special attacks
+function spawnStyleBurst(position,style){
+    if(style==='nano'){
+        spawnImpactRing(position.clone().add(new THREE.Vector3(0,0.5,0)),0x44ff88);
+        spawnParticles(position.clone().add(new THREE.Vector3(0,1,0)),0x88ffcc,12,3,0.6,0.08);
+    }else if(style==='tesla'){
+        // Electric burst — fast, wide spread
+        for(var i=0;i<4;i++){
+            var off=new THREE.Vector3((Math.random()-0.5)*2,1+Math.random(),(Math.random()-0.5)*2);
+            spawnParticles(position.clone().add(off),0x88ccff,3,6,0.2,0.04);
+        }
+        spawnImpactRing(position.clone().add(new THREE.Vector3(0,0.5,0)),0x44aaff);
+    }else if(style==='void'){
+        // Implosion then burst
+        spawnParticles(position.clone().add(new THREE.Vector3(0,1.5,0)),0xcc66ff,15,0.5,1.0,0.1);
+        spawnImpactRing(position.clone().add(new THREE.Vector3(0,0.5,0)),0xaa44ff);
+    }
+}
+
+// Level-up pillar of light + expanding ring
+function spawnLevelUpVFX(){
+    if(!player.mesh)return;
+    var pos=player.mesh.position.clone();
+    // Golden pillar particles rising upward
+    for(var i=0;i<40;i++){
+        var ppos=pos.clone().add(new THREE.Vector3((Math.random()-0.5)*0.6,Math.random()*4,(Math.random()-0.5)*0.6));
+        var geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(new Float32Array([0,0,0]),3));
+        var mat=new THREE.PointsMaterial({color:Math.random()>0.5?0xffd700:0xfffacd,size:0.1+Math.random()*0.1,sizeAttenuation:true,transparent:true,opacity:1});
+        var pt=new THREE.Points(geo,mat);pt.position.copy(ppos);
+        GameState.scene.add(pt);
+        particles.push({mesh:pt,velocity:new THREE.Vector3((Math.random()-0.5)*0.3,3+Math.random()*4,(Math.random()-0.5)*0.3),life:1.5+Math.random()*0.5,maxLife:2.0,gravity:-0.5});
+    }
+    // White sparkle burst
+    spawnParticles(pos.clone().add(new THREE.Vector3(0,2,0)),0xffffff,20,3,1.0,0.08);
+    // Expanding golden ring at feet
+    var ringGeo=new THREE.RingGeometry(0.1,0.6,24);
+    var ringMat=new THREE.MeshBasicMaterial({color:0xffd700,transparent:true,opacity:0.9,side:THREE.DoubleSide});
+    var ring=new THREE.Mesh(ringGeo,ringMat);
+    ring.position.copy(pos).add(new THREE.Vector3(0,0.2,0));ring.rotation.x=-Math.PI/2;
+    GameState.scene.add(ring);
+    particles.push({mesh:ring,velocity:new THREE.Vector3(0,0,0),life:1.2,maxLife:1.2,gravity:0,isRing:true,expandSpeed:12});
+    // Second ring slightly delayed (stagger effect)
+    setTimeout(function(){
+        var ring2Geo=new THREE.RingGeometry(0.1,0.4,24);
+        var ring2Mat=new THREE.MeshBasicMaterial({color:0xfffacd,transparent:true,opacity:0.7,side:THREE.DoubleSide});
+        var ring2=new THREE.Mesh(ring2Geo,ring2Mat);
+        ring2.position.copy(pos).add(new THREE.Vector3(0,0.3,0));ring2.rotation.x=-Math.PI/2;
+        GameState.scene.add(ring2);
+        particles.push({mesh:ring2,velocity:new THREE.Vector3(0,0,0),life:1.0,maxLife:1.0,gravity:0,isRing:true,expandSpeed:15});
+    },200);
+    triggerScreenFlash('rgba(255,215,0,0.15)',200);
+    playSound('levelUp');
 }
 
 let combatAuraTimer=0;
@@ -7385,8 +7617,12 @@ function initRenderer(){
     const scene=new THREE.Scene();scene.background=null;scene.fog=new THREE.FogExp2(0x020810,0.004);GameState.scene=scene;
     const camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,0.1,1000);camera.position.set(0,25,30);camera.lookAt(0,0,0);GameState.camera=camera;
     GameState.clock=new THREE.Clock();
-    GameState.ambientLight=new THREE.AmbientLight(0x1a2a4a,0.6);scene.add(GameState.ambientLight);
+    GameState.ambientLight=new THREE.AmbientLight(0x1a2a4a,0.4);scene.add(GameState.ambientLight);
+    // Hemisphere light for sky/ground color contrast
+    var hemiLight=new THREE.HemisphereLight(0x2244aa,0x111122,0.35);scene.add(hemiLight);
     const dl=new THREE.DirectionalLight(0xaaccff,0.8);dl.position.set(30,50,20);dl.castShadow=true;dl.shadow.mapSize.width=2048;dl.shadow.mapSize.height=2048;dl.shadow.camera.near=0.5;dl.shadow.camera.far=200;dl.shadow.camera.left=-60;dl.shadow.camera.right=60;dl.shadow.camera.top=60;dl.shadow.camera.bottom=-60;scene.add(dl);GameState.dirLight=dl;
+    // Rim/back light for silhouette definition
+    var rimLight=new THREE.DirectionalLight(0x4488cc,0.3);rimLight.position.set(-20,30,-30);scene.add(rimLight);
     const pl2=new THREE.PointLight(0x00c8ff,0.4,80);pl2.position.set(0,10,0);scene.add(pl2);
     window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
 }
@@ -7540,20 +7776,35 @@ function triggerAreaTransition(areaName){
 function updatePortalAnimations(){
     var t=GameState.elapsedTime;
     if(world.dungeonPortalPlane){
-        world.dungeonPortalPlane.material.opacity=0.35+Math.sin(t*2)*0.15;
+        world.dungeonPortalPlane.material.opacity=0.3+Math.sin(t*2)*0.15+Math.sin(t*5)*0.05;
         world.dungeonPortalPlane.rotation.y+=GameState.deltaTime*0.5;
+        // Pulsing glow scale
+        var pulse=1.0+Math.sin(t*3)*0.08;
+        world.dungeonPortalPlane.scale.setScalar(pulse);
     }
     GameState.scene.children.forEach(function(child){
         if(child.userData&&child.userData.entityType==='corruptedPortal'&&child.userData.portalPlane){
             var pp=child.userData.portalPlane;
-            pp.material.opacity=0.3+Math.sin(t*2.5+child.position.x)*0.15;
+            pp.material.opacity=0.25+Math.sin(t*2.5+child.position.x)*0.15+Math.sin(t*6+child.position.z)*0.05;
             pp.rotation.y+=GameState.deltaTime*0.4;
+            var cpulse=1.0+Math.sin(t*3.5+child.position.x)*0.1;
+            pp.scale.setScalar(cpulse);
         }
     });
-    if(world.dungeonEntrance&&Math.random()<GameState.deltaTime*3){
+    if(world.dungeonEntrance&&Math.random()<GameState.deltaTime*4){
         var ep=world.dungeonEntrance.position;
-        spawnParticles(new THREE.Vector3(ep.x+(Math.random()-0.5)*2,1+Math.random()*3,ep.z+(Math.random()-0.5)*0.5),0x8844ff,1,0.5,1.5,0.06);
+        spawnParticles(new THREE.Vector3(ep.x+(Math.random()-0.5)*2,0.5+Math.random()*3.5,ep.z+(Math.random()-0.5)*0.5),0x8844ff,1,0.6,1.8,0.07);
+        // Occasional bright spark
+        if(Math.random()<0.3){
+            spawnParticles(new THREE.Vector3(ep.x+(Math.random()-0.5)*1,2+Math.random()*2,ep.z),0xcc88ff,1,1.5,0.5,0.04);
+        }
     }
+    // Area portals glow particles
+    world.portalMeshes&&world.portalMeshes.forEach(function(pm){
+        if(pm&&pm.position&&Math.random()<GameState.deltaTime*2){
+            spawnParticles(new THREE.Vector3(pm.position.x+(Math.random()-0.5)*1.5,0.5+Math.random()*2,pm.position.z+(Math.random()-0.5)*1.5),0x00c8ff,1,0.3,1.5,0.05);
+        }
+    });
 }
 
 const ambientParticles=[];
@@ -8114,6 +8365,99 @@ function gameLoop(){
 }
 
 // ========================================
+// ========================================
+// Tutorial System
+// ========================================
+var TUTORIAL_KEY='asterian_tutorial_done';
+var tutorialActive=false;
+var tutorialStep=0;
+
+var TUTORIAL_STEPS=[
+    {text:'Welcome to <strong>Asterian</strong>!<br>A sci-fi survival RPG beyond the stars.',action:'continue'},
+    {text:'<strong>Click the ground</strong> to move your character around the station.',action:'move',highlight:null},
+    {text:'<strong>Middle-mouse drag</strong> to rotate the camera.<br><strong>Scroll wheel</strong> to zoom in/out.',action:'continue'},
+    {text:'<strong>Click an enemy</strong> to start attacking!<br>Your character will auto-attack once in range.',action:'combat',highlight:null},
+    {text:'You\'re earning <strong>XP</strong>! Open the <strong>Skills</strong> panel to see your progress.',action:'panel',target:'btn-skills',highlight:'#btn-skills'},
+    {text:'Enemies drop <strong>loot</strong> on the ground.<br><strong>Click items</strong> on the ground to pick them up.',action:'continue'},
+    {text:'Open your <strong>Inventory</strong> to see your items and gear.',action:'panel',target:'btn-inventory',highlight:'#btn-inventory'},
+    {text:'Talk to <strong>Commander Vex</strong> near the station for a mission!<br>Right-click NPCs for more options.',action:'continue'},
+    {text:'You\'re ready to explore! Fight enemies, gather resources, and grow stronger.<br><strong>Good luck, recruit!</strong>',action:'continue'}
+];
+
+function startTutorial(){
+    tutorialActive=true;
+    tutorialStep=0;
+    showTutorialStep(0);
+}
+
+function showTutorialStep(idx){
+    var overlay=document.getElementById('tutorial-overlay');
+    if(!overlay) return;
+    if(idx>=TUTORIAL_STEPS.length){completeTutorial();return;}
+    tutorialStep=idx;
+    var step=TUTORIAL_STEPS[idx];
+    overlay.style.display='block';
+    document.getElementById('tutorial-step-num').textContent='Step '+(idx+1)+' of '+TUTORIAL_STEPS.length;
+    document.getElementById('tutorial-text').innerHTML=step.text;
+    var continueBtn=document.getElementById('tutorial-continue');
+    // Show/hide continue button based on action type
+    if(step.action==='continue'){
+        continueBtn.style.display='';
+        continueBtn.textContent=idx===TUTORIAL_STEPS.length-1?'Start Playing':'Continue';
+    } else {
+        continueBtn.style.display='none';
+    }
+    // Highlight element
+    var hl=document.getElementById('tutorial-highlight');
+    if(step.highlight){
+        var target=document.querySelector(step.highlight);
+        if(target){
+            var rect=target.getBoundingClientRect();
+            hl.style.display='block';
+            hl.style.left=(rect.left-4)+'px';
+            hl.style.top=(rect.top-4)+'px';
+            hl.style.width=(rect.width+8)+'px';
+            hl.style.height=(rect.height+8)+'px';
+        }else{hl.style.display='none';}
+    }else{hl.style.display='none';}
+}
+
+function advanceTutorial(){
+    if(!tutorialActive) return;
+    tutorialStep++;
+    if(tutorialStep>=TUTORIAL_STEPS.length){completeTutorial();return;}
+    showTutorialStep(tutorialStep);
+}
+
+function completeTutorial(){
+    tutorialActive=false;
+    localStorage.setItem(TUTORIAL_KEY,'1');
+    var overlay=document.getElementById('tutorial-overlay');
+    if(overlay) overlay.style.display='none';
+}
+
+function skipTutorial(){
+    completeTutorial();
+}
+
+// Tutorial event hooks
+function checkTutorialEvent(eventType){
+    if(!tutorialActive) return;
+    var step=TUTORIAL_STEPS[tutorialStep];
+    if(!step) return;
+    if(step.action==='move'&&eventType==='playerMoved') advanceTutorial();
+    else if(step.action==='combat'&&eventType==='combatStarted') advanceTutorial();
+    else if(step.action==='panel'&&eventType==='panelOpened') advanceTutorial();
+}
+
+// Wire tutorial UI buttons
+document.addEventListener('DOMContentLoaded',function(){
+    var cb=document.getElementById('tutorial-continue');
+    if(cb) cb.addEventListener('click',function(){advanceTutorial();});
+    var sb=document.getElementById('tutorial-skip');
+    if(sb) sb.addEventListener('click',function(){skipTutorial();});
+});
+
 // Start
 // ========================================
 const loadingBar=document.getElementById('loading-bar'),loadingText=document.getElementById('loading-text');
@@ -8155,6 +8499,10 @@ async function startGame(){
             EventBus.emit('chat',{type:'system',text:'Welcome to Asterian! Click to move, right-click for options.'});
             EventBus.emit('chat',{type:'info',text:'You are at Nova Station. Explore the areas around you.'});
             EventBus.emit('chat',{type:'info',text:'Talk to Commander Vex for a mission. Middle-mouse to orbit camera.'});
+            // Start tutorial for first-time players
+            if(!localStorage.getItem(TUTORIAL_KEY)){
+                setTimeout(startTutorial,1500);
+            }
         }
         EventBus.emit('chat',{type:'info',text:'Press SPACE to eat food. Click enemies to attack.'});
         EventBus.emit('chat',{type:'info',text:'Keys: V=Auto-eat | X=Reset XP tracker | M=World map | 1-5=Quick slots'});
@@ -8166,6 +8514,6 @@ async function startGame(){
 startGame();
 
 // Debug exposure for testing
-window.DEBUG={GameState,player,world,enemies:()=>world.enemies,saveGame,loadGame,openShop,openDialogue,startVexQuest,gainXp,questState,EventBus,updateQuestProgress,checkVexCompletion,addItem,addCredits,shopEconomy:function(){return shopEconomy;},checkSynergies,hasSynergy,getSynergyValue,degradeWeapon,degradeArmor,openRepairStation,initShopEconomy,renderSynergiesTab,SYNERGY_DEFS,BOARD_QUESTS,SLAYER_TASKS,startBoardQuest,assignSlayerTask,completeSlayerTask,openBoardPanel,SKILL_UNLOCKS,getSkillBonus,hasSkillMilestone,openSkillGuide,DungeonState,enterDungeon,exitDungeon,advanceDungeonFloor,enterTimeLoopDungeon,performTKPush,performMindControl,performTimeDilate,releaseMindControl,executePrestige,confirmPrestige,getTotalLevel,getPrestigeXpMultiplier,getPrestigeDamageMultiplier,getPrestigeReduction,openPrestigePanel,openPrestigeShop,PRESTIGE_CONFIG,PRESTIGE_PASSIVES,PRESTIGE_SHOP_ITEMS,CORRUPTED_AREAS,initCorruptedEnemies,buildCorruptedAreas,hasPrestigePassive,buildSimplePlayerMesh,addChatMessage,getTierColor,getCombatLevel,getHighestCombatLevel,THREE:THREE};
+window.DEBUG={GameState,player,world,enemies:()=>world.enemies,saveGame,loadGame,openShop,openDialogue,startVexQuest,gainXp,questState,EventBus,updateQuestProgress,checkVexCompletion,addItem,addCredits,shopEconomy:function(){return shopEconomy;},checkSynergies,hasSynergy,getSynergyValue,degradeWeapon,degradeArmor,openRepairStation,initShopEconomy,renderSynergiesTab,SYNERGY_DEFS,BOARD_QUESTS,SLAYER_TASKS,startBoardQuest,assignSlayerTask,completeSlayerTask,openBoardPanel,SKILL_UNLOCKS,getSkillBonus,hasSkillMilestone,openSkillGuide,DungeonState,enterDungeon,exitDungeon,advanceDungeonFloor,enterTimeLoopDungeon,performTKPush,performMindControl,performTimeDilate,releaseMindControl,executePrestige,confirmPrestige,getTotalLevel,getPrestigeXpMultiplier,getPrestigeDamageMultiplier,getPrestigeReduction,openPrestigePanel,openPrestigeShop,PRESTIGE_CONFIG,PRESTIGE_PASSIVES,PRESTIGE_SHOP_ITEMS,CORRUPTED_AREAS,initCorruptedEnemies,buildCorruptedAreas,hasPrestigePassive,buildSimplePlayerMesh,addChatMessage,getTierColor,getCombatLevel,getHighestCombatLevel,enemyById,applyRemoteDamage,remoteKillEnemy,THREE:THREE};
 
 })();

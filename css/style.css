@@ -2339,3 +2339,205 @@ body.resizing-nesw, body.resizing-nesw * { cursor:nesw-resize !important; }
     border-color: rgba(0,255,120,0.4);
     color: #00ff88;
 }
+
+/* MP Status HUD */
+#mp-status-hud {
+    position: absolute;
+    top: 68px;
+    left: 12px;
+    font-size: 11px;
+    color: #667788;
+    pointer-events: none;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+#mp-status-hud.mp-hud-online { color: #44dd88; }
+#mp-status-hud.mp-hud-offline { color: #667788; }
+.mp-hud-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #667788;
+}
+.mp-hud-dot.online {
+    background: #44dd88;
+    box-shadow: 0 0 4px rgba(68,221,136,0.6);
+}
+.mp-hud-dot.offline {
+    background: #555;
+}
+
+/* ── Tutorial Overlay ───────────────────────────────── */
+#tutorial-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 2000;
+    pointer-events: auto;
+}
+#tutorial-mask {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.55);
+    pointer-events: none;
+}
+#tutorial-box {
+    position: absolute;
+    bottom: 180px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, rgba(10,18,32,0.95), rgba(15,25,45,0.95));
+    border: 1px solid rgba(0,200,255,0.4);
+    border-radius: 8px;
+    padding: 20px 28px;
+    max-width: 420px;
+    min-width: 280px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,200,255,0.15), inset 0 0 30px rgba(0,200,255,0.05);
+    z-index: 2001;
+}
+#tutorial-step-num {
+    font-size: 10px;
+    color: #4488aa;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+}
+#tutorial-text {
+    font-size: 14px;
+    color: #c0d8e8;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+#tutorial-text strong {
+    color: #00c8ff;
+}
+#tutorial-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.tutorial-btn {
+    padding: 8px 20px;
+    border: 1px solid rgba(0,200,255,0.4);
+    border-radius: 4px;
+    background: rgba(0,200,255,0.12);
+    color: #88ccee;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+    transition: background 0.2s, color 0.2s;
+}
+.tutorial-btn:hover {
+    background: rgba(0,200,255,0.25);
+    color: #ffffff;
+}
+.tutorial-skip-btn {
+    background: transparent;
+    border-color: rgba(100,120,140,0.3);
+    color: #556677;
+}
+.tutorial-skip-btn:hover {
+    background: rgba(255,100,100,0.1);
+    color: #aa6666;
+    border-color: rgba(255,100,100,0.3);
+}
+#tutorial-highlight {
+    position: absolute;
+    border: 2px solid rgba(0,200,255,0.7);
+    border-radius: 6px;
+    box-shadow: 0 0 12px rgba(0,200,255,0.4), inset 0 0 12px rgba(0,200,255,0.1);
+    pointer-events: none;
+    display: none;
+    z-index: 2002;
+    animation: tutorial-pulse 1.5s ease-in-out infinite;
+}
+@keyframes tutorial-pulse {
+    0%, 100% { box-shadow: 0 0 12px rgba(0,200,255,0.4), inset 0 0 12px rgba(0,200,255,0.1); }
+    50% { box-shadow: 0 0 20px rgba(0,200,255,0.6), inset 0 0 20px rgba(0,200,255,0.2); }
+}
+
+/* ── Mobile Controls ────────────────────────────────── */
+#mobile-eat-btn {
+    position: absolute;
+    bottom: 95px;
+    left: 12px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(0,200,100,0.2);
+    border: 2px solid rgba(0,200,100,0.4);
+    color: #44dd88;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    cursor: pointer;
+    z-index: 50;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+#mobile-eat-btn:active {
+    background: rgba(0,200,100,0.4);
+    transform: scale(0.9);
+}
+
+/* ── Mobile Responsive ──────────────────────────────── */
+@media (pointer: coarse) {
+    .panel-btn {
+        min-width: 44px;
+        min-height: 44px;
+        font-size: 12px;
+    }
+    .panel-close {
+        min-width: 36px;
+        min-height: 36px;
+        font-size: 18px;
+    }
+    .quick-slot {
+        width: 48px;
+        height: 48px;
+    }
+    #minimap-container {
+        width: 140px;
+        height: 140px;
+    }
+    #minimap-canvas {
+        width: 140px;
+        height: 140px;
+    }
+    #chat-box {
+        max-height: 120px;
+        font-size: 11px;
+    }
+    #game-canvas {
+        touch-action: none;
+    }
+    #tutorial-box {
+        bottom: 120px;
+        max-width: 320px;
+        padding: 14px 18px;
+    }
+    #tutorial-text {
+        font-size: 13px;
+    }
+    .game-panel {
+        max-height: 60vh;
+    }
+    .bar-container {
+        height: 18px;
+    }
+    #player-bars {
+        top: 8px;
+        left: 8px;
+    }
+    #panel-buttons {
+        gap: 3px;
+    }
+}

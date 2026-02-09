@@ -50,6 +50,9 @@
             </div>
         </div>
 
+        <!-- MP Status HUD (below player bars) -->
+        <div id="mp-status-hud"><span class="mp-hud-dot offline"></span> Offline</div>
+
         <!-- Top Right: Minimap -->
         <div id="minimap-container">
             <canvas id="minimap-canvas" width="180" height="180"></canvas>
@@ -318,6 +321,23 @@
 
         <!-- MP Player Name Labels -->
         <div id="mp-name-labels"></div>
+
+        <!-- Mobile Controls -->
+        <button id="mobile-eat-btn" style="display:none;" onclick="if(window.DEBUG&&window.DEBUG.EventBus)window.DEBUG.EventBus.emit('eatFood');">🍖 EAT</button>
+
+        <!-- Tutorial Overlay -->
+        <div id="tutorial-overlay" style="display:none;">
+            <div id="tutorial-mask"></div>
+            <div id="tutorial-box">
+                <div id="tutorial-step-num"></div>
+                <div id="tutorial-text"></div>
+                <div id="tutorial-buttons">
+                    <button id="tutorial-continue" class="tutorial-btn">Continue</button>
+                    <button id="tutorial-skip" class="tutorial-btn tutorial-skip-btn">Skip Tutorial</button>
+                </div>
+            </div>
+            <div id="tutorial-highlight"></div>
+        </div>
     </div>
 
     <!-- Scripts -->

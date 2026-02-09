@@ -1,19 +1,32 @@
 // ========================================
-// Asterian Multiplayer Client — Tier 1
+// Asterian Multiplayer Client — Tier 1.5
 // Presence, chat, name labels, walk sync
+// Auto-connect, reconnect, HUD indicator
 // Loaded AFTER game.js — uses window.DEBUG
 // ========================================
 (function(){
 'use strict';
 
+// ── Config ──────────────────────────────────────────────────────
+var MP_NAME_KEY = 'asterian_mp_name';
+var DEFAULT_SERVER = 'wss://asterian-server.onrender.com';
+var RECONNECT_MIN = 1000;
+var RECONNECT_MAX = 30000;
+
 // ── State ──────────────────────────────────────────────────────
 var ws = null;
 var myId = null;
 var connected = false;
-var remotePlayers = {};   // id → { mesh, label, targetX, targetZ, targetRy, currentX, currentZ, currentRy, moving, name, stats, animPhase }
+var remotePlayers = {};   // id → { mesh, label, targetX, targetZ, targetRy, currentX, currentZ, currentRy, moving, name, stats, animPhase, attackAnim }
 var sendTimer = 0;
 var SEND_INTERVAL = 0.1;  // 10 updates/sec
 var LERP_SPEED = 10;
+
+// Auto-reconnect state
+var intentionalDisconnect = false;
+var reconnectDelay = RECONNECT_MIN;
+var reconnectTimeout = null;
+var autoConnectDone = false;
 
 // Style colors for remote player meshes
 var STYLE_COLORS = {
@@ -27,6 +40,9 @@ function D(){ return window.DEBUG || {}; }
 function scene(){ var d=D(); return d.GameState ? d.GameState.scene : null; }
 function player(){ return D().player; }
 function camera(){ var d=D(); return d.GameState ? d.GameState.camera : null; }
+
+function getSavedName(){ return localStorage.getItem(MP_NAME_KEY) || ''; }
+function saveName(name){ localStorage.setItem(MP_NAME_KEY, name); }
 
 function getAreaName(){
     var p=player();
@@ -46,7 +62,7 @@ function getCombatStyleName(){
 
 // ── Remote Player Management ───────────────────────────────────
 function addRemotePlayer(id, name, x, z, ry, moving, equipment, stats){
-    if(remotePlayers[id]) return; // already exists
+    if(remotePlayers[id]) return;
 
     var color = STYLE_COLORS[(stats && stats.combatStyle) || 'nano'] || 0x446688;
     var mesh;
@@ -54,7 +70,6 @@ function addRemotePlayer(id, name, x, z, ry, moving, equipment, stats){
     if(buildFn){
         mesh = buildFn(color, 0xddccbb);
     } else {
-        // Fallback: simple box
         var THREE = D().THREE || window.THREE;
         mesh = new THREE.Mesh(
             new THREE.BoxGeometry(0.5, 1.5, 0.3),
@@ -67,7 +82,6 @@ function addRemotePlayer(id, name, x, z, ry, moving, equipment, stats){
     var s = scene();
     if(s) s.add(mesh);
 
-    // Name label div
     var label = document.createElement('div');
     label.className = 'mp-player-name';
     label.innerHTML = name + '<span class="mp-level"> Lv' + ((stats && stats.level) || 1) + '</span>';
@@ -82,7 +96,8 @@ function addRemotePlayer(id, name, x, z, ry, moving, equipment, stats){
         moving: moving || false,
         equipment: equipment || {},
         stats: stats || {},
-        animPhase: 0
+        animPhase: 0,
+        attackAnim: 0
     };
 }
 
@@ -117,7 +132,6 @@ function updateRemotePlayers(dt){
         // Lerp position
         rp.currentX += (rp.targetX - rp.currentX) * Math.min(1, LERP_SPEED * dt);
         rp.currentZ += (rp.targetZ - rp.currentZ) * Math.min(1, LERP_SPEED * dt);
-        // Lerp rotation (handle wrapping)
         var dRy = rp.targetRy - rp.currentRy;
         while(dRy > Math.PI) dRy -= Math.PI * 2;
         while(dRy < -Math.PI) dRy += Math.PI * 2;
@@ -127,8 +141,14 @@ function updateRemotePlayers(dt){
         rp.mesh.position.z = rp.currentZ;
         rp.mesh.rotation.y = rp.currentRy;
 
-        // Walk animation
-        if(rp.moving){
+        // Attack animation override
+        if(rp.attackAnim > 0){
+            rp.attackAnim -= dt;
+            var at = Math.max(0, rp.attackAnim) / 0.25;
+            if(rp.mesh.userData.rightArm) rp.mesh.userData.rightArm.rotation.x = -1.2 * at;
+            if(rp.mesh.userData.leftArm) rp.mesh.userData.leftArm.rotation.x = 0.3 * at;
+        } else if(rp.moving){
+            // Walk animation
             rp.animPhase += dt * 8;
             var swing = Math.sin(rp.animPhase) * 0.4;
             if(rp.mesh.userData.leftArm) rp.mesh.userData.leftArm.rotation.x = swing;
@@ -149,7 +169,6 @@ function updateRemotePlayers(dt){
             pos.project(cam);
             var sx = (pos.x * 0.5 + 0.5) * width;
             var sy = (-pos.y * 0.5 + 0.5) * height;
-            // Hide if behind camera
             if(pos.z > 1 || pos.z < -1){
                 rp.label.style.display = 'none';
             } else {
@@ -222,9 +241,27 @@ function sendEquipIfChanged(){
     ws.send(JSON.stringify({ type: 'equip', equipment: simplified }));
 }
 
+// ── HUD Status Indicator ──────────────────────────────────────
+function updateHUD(){
+    var hud = document.getElementById('mp-status-hud');
+    if(!hud) return;
+    if(connected){
+        var count = Object.keys(remotePlayers).length + 1;
+        hud.innerHTML = '<span class="mp-hud-dot online"></span> Online (' + count + ')';
+        hud.className = 'mp-hud-online';
+    } else {
+        hud.innerHTML = '<span class="mp-hud-dot offline"></span> Offline';
+        hud.className = 'mp-hud-offline';
+    }
+}
+
 // ── WebSocket Connection ───────────────────────────────────────
 function connect(url, name){
     if(ws) disconnect();
+    intentionalDisconnect = false;
+
+    // Save name for future sessions
+    if(name) saveName(name);
 
     setStatus('Connecting...', 'connecting');
 
@@ -232,11 +269,14 @@ function connect(url, name){
         ws = new WebSocket(url);
     } catch(e){
         setStatus('Invalid URL', 'error');
+        scheduleReconnect(url, name);
         return;
     }
 
     ws.onopen = function(){
         ws.send(JSON.stringify({ type: 'join', name: name }));
+        // Reset reconnect delay on success
+        reconnectDelay = RECONNECT_MIN;
     };
 
     ws.onmessage = function(evt){
@@ -249,13 +289,12 @@ function connect(url, name){
                 connected = true;
                 setStatus('Connected (' + (msg.players.length + 1) + ' online)', 'connected');
                 updateUIConnected(true);
-                // Add existing players
+                updateHUD();
                 for(var i = 0; i < msg.players.length; i++){
                     var p = msg.players[i];
                     addRemotePlayer(p.id, p.name, p.x, p.z, p.ry, p.moving, p.equipment, p.stats);
                 }
                 addChat('system', 'Multiplayer connected! You are: ' + name);
-                // Send initial stats
                 lastSentStats = '';
                 lastSentEquip = '';
                 sendStatsIfChanged();
@@ -266,6 +305,7 @@ function connect(url, name){
                 addRemotePlayer(msg.id, msg.name, 0, 0, 0, false, {}, {});
                 addChat('multiplayer', msg.name + ' joined the world.');
                 updatePlayerCount();
+                updateHUD();
                 break;
 
             case 'leave':
@@ -273,6 +313,7 @@ function connect(url, name){
                 if(lp) addChat('multiplayer', lp.name + ' left the world.');
                 removeRemotePlayer(msg.id);
                 updatePlayerCount();
+                updateHUD();
                 break;
 
             case 'move':
@@ -286,7 +327,7 @@ function connect(url, name){
                 break;
 
             case 'chat':
-                if(msg.id === myId) break; // skip own echo — we already showed it locally
+                if(msg.id === myId) break;
                 addChat('multiplayer', msg.name + ': ' + msg.text);
                 break;
 
@@ -299,16 +340,22 @@ function connect(url, name){
                 var sp = remotePlayers[msg.id];
                 if(sp){
                     sp.stats = msg.stats || {};
-                    // Update mesh color based on combat style
                     var color = STYLE_COLORS[(sp.stats.combatStyle) || 'nano'] || 0x446688;
                     if(sp.mesh && sp.mesh.children && sp.mesh.children[0]){
                         sp.mesh.children[0].material.color.setHex(color);
                     }
-                    // Update label
                     if(sp.label){
                         sp.label.innerHTML = sp.name + '<span class="mp-level"> Lv' + (sp.stats.level || 1) + '</span>';
                     }
                 }
+                break;
+
+            case 'attack':
+                handleRemoteAttack(msg);
+                break;
+
+            case 'enemyKill':
+                handleRemoteKill(msg);
                 break;
 
             case 'ping':
@@ -329,8 +376,13 @@ function connect(url, name){
         removeAllRemotePlayers();
         setStatus('Disconnected', 'error');
         updateUIConnected(false);
+        updateHUD();
         addChat('system', 'Multiplayer disconnected.');
         ws = null;
+        // Auto-reconnect if not intentional
+        if(!intentionalDisconnect){
+            scheduleReconnect(url, name);
+        }
     };
 
     ws.onerror = function(){
@@ -339,6 +391,8 @@ function connect(url, name){
 }
 
 function disconnect(){
+    intentionalDisconnect = true;
+    clearReconnectTimeout();
     if(ws){
         ws.close();
         ws = null;
@@ -348,6 +402,68 @@ function disconnect(){
     removeAllRemotePlayers();
     setStatus('Disconnected', '');
     updateUIConnected(false);
+    updateHUD();
+}
+
+// ── Auto-Reconnect ────────────────────────────────────────────
+function scheduleReconnect(url, name){
+    if(intentionalDisconnect) return;
+    clearReconnectTimeout();
+    var delay = reconnectDelay;
+    reconnectDelay = Math.min(reconnectDelay * 2, RECONNECT_MAX);
+    addChat('system', 'Reconnecting in ' + Math.round(delay / 1000) + 's...');
+    setStatus('Reconnecting in ' + Math.round(delay / 1000) + 's...', 'connecting');
+    reconnectTimeout = setTimeout(function(){
+        if(!connected && !intentionalDisconnect){
+            connect(url, name);
+        }
+    }, delay);
+}
+
+function clearReconnectTimeout(){
+    if(reconnectTimeout){
+        clearTimeout(reconnectTimeout);
+        reconnectTimeout = null;
+    }
+}
+
+// ── Shared Combat: send attack/kill ────────────────────────────
+function sendAttack(enemyId, damage, style){
+    if(!connected || !ws) return;
+    var p = player();
+    if(!p || !p.mesh) return;
+    ws.send(JSON.stringify({
+        type: 'attack',
+        enemyId: enemyId,
+        damage: damage,
+        style: style || 'nano',
+        x: Math.round(p.mesh.position.x * 100) / 100,
+        z: Math.round(p.mesh.position.z * 100) / 100
+    }));
+}
+
+function sendKill(enemyId){
+    if(!connected || !ws) return;
+    ws.send(JSON.stringify({ type: 'enemyKill', enemyId: enemyId }));
+}
+
+function handleRemoteAttack(msg){
+    // Trigger attack animation on remote player
+    var rp = remotePlayers[msg.id];
+    if(rp) rp.attackAnim = 0.25;
+
+    // Apply damage to local enemy representation
+    var applyRemote = D().applyRemoteDamage;
+    if(applyRemote && msg.enemyId){
+        applyRemote(msg.enemyId, msg.damage, msg.style, msg.name);
+    }
+}
+
+function handleRemoteKill(msg){
+    var remoteKill = D().remoteKillEnemy;
+    if(remoteKill && msg.enemyId){
+        remoteKill(msg.enemyId, msg.name);
+    }
 }
 
 // ── Chat ───────────────────────────────────────────────────────
@@ -361,9 +477,7 @@ function sendChat(text){
     text = text.trim().slice(0, 200);
     if(!text) return;
     ws.send(JSON.stringify({ type: 'chat', text: text }));
-    // Show own message immediately (server echoes too, but we skip our own echo)
-    var nameEl = document.getElementById('mp-name');
-    var name = (nameEl && nameEl.value) || 'You';
+    var name = getSavedName() || 'You';
     addChat('multiplayer', name + ': ' + text);
 }
 
@@ -398,6 +512,17 @@ function updatePlayerCount(){
 
 // ── UI Event Bindings ──────────────────────────────────────────
 function initUI(){
+    // Pre-fill modal with saved name/server
+    var mpNameInput = document.getElementById('mp-name');
+    var mpServerInput = document.getElementById('mp-server');
+    if(mpNameInput){
+        var saved = getSavedName();
+        if(saved) mpNameInput.value = saved;
+    }
+    if(mpServerInput && !mpServerInput.value){
+        mpServerInput.value = DEFAULT_SERVER;
+    }
+
     // MP button opens connect modal
     var mpBtn = document.getElementById('btn-mp');
     if(mpBtn){
@@ -412,11 +537,7 @@ function initUI(){
         });
     }
 
-    // Close button on modal (handled by game.js global .panel-close handler)
-
     // Stop game keybinds when typing in MP modal inputs
-    var mpNameInput = document.getElementById('mp-name');
-    var mpServerInput = document.getElementById('mp-server');
     [mpNameInput, mpServerInput].forEach(function(inp){
         if(!inp) return;
         inp.addEventListener('keydown', function(e){ e.stopPropagation(); });
@@ -431,7 +552,8 @@ function initUI(){
             var nameInput = document.getElementById('mp-name');
             var serverInput = document.getElementById('mp-server');
             var name = (nameInput ? nameInput.value.trim() : '') || 'Player';
-            var url = (serverInput ? serverInput.value.trim() : '') || 'wss://asterian-server.onrender.com';
+            var url = (serverInput ? serverInput.value.trim() : '') || DEFAULT_SERVER;
+            saveName(name);
             connect(url, name);
         });
     }
@@ -448,16 +570,38 @@ function initUI(){
     var chatInput = document.getElementById('mp-chat-input');
     if(chatInput){
         chatInput.addEventListener('keydown', function(e){
-            e.stopPropagation(); // Don't trigger game keybinds
+            e.stopPropagation();
             if(e.key === 'Enter'){
                 sendChat(chatInput.value);
                 chatInput.value = '';
             }
         });
-        // Prevent game from receiving key events while typing
         chatInput.addEventListener('keyup', function(e){ e.stopPropagation(); });
         chatInput.addEventListener('keypress', function(e){ e.stopPropagation(); });
     }
+
+    // Initialize HUD
+    updateHUD();
+}
+
+// ── Auto-Connect on Game Load ──────────────────────────────────
+function tryAutoConnect(){
+    if(autoConnectDone) return;
+    autoConnectDone = true;
+
+    var savedName = getSavedName();
+    if(!savedName){
+        // First time — prompt for name
+        savedName = window.prompt('Enter your multiplayer name:', 'Player');
+        if(!savedName || !savedName.trim()) savedName = 'Player';
+        savedName = savedName.trim().slice(0, 16);
+        saveName(savedName);
+        // Also pre-fill the modal
+        var ni = document.getElementById('mp-name');
+        if(ni) ni.value = savedName;
+    }
+
+    connect(DEFAULT_SERVER, savedName);
 }
 
 // ── Game Loop Hook ─────────────────────────────────────────────
@@ -466,20 +610,21 @@ window.AsterianMP = {
         if(!connected) return;
         sendPosition(dt);
         updateRemotePlayers(dt);
-        // Periodic stats/equip sync (every ~2 seconds)
-        sendTimer; // reuse timing — check every 2s
         if(Math.random() < dt * 0.5){
             sendStatsIfChanged();
             sendEquipIfChanged();
         }
-    }
+    },
+    sendAttack: sendAttack,
+    sendKill: sendKill
 };
 
 // ── Init ───────────────────────────────────────────────────────
-// Wait for DOM + game to be ready
 function tryInit(){
     if(document.getElementById('btn-mp')){
         initUI();
+        // Auto-connect 2 seconds after game loads
+        setTimeout(tryAutoConnect, 2000);
     } else {
         setTimeout(tryInit, 200);
     }
