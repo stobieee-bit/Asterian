@@ -258,6 +258,7 @@ function updateHUD(){
 
 // ── WebSocket Connection ───────────────────────────────────────
 function connect(url, name){
+    console.log('[MP] connect() called - url:', url, 'name:', name);
     if(ws) disconnect();
     intentionalDisconnect = false;
 
@@ -268,13 +269,16 @@ function connect(url, name){
 
     try {
         ws = new WebSocket(url);
+        console.log('[MP] WebSocket created');
     } catch(e){
+        console.error('[MP] WebSocket creation failed:', e);
         setStatus('Invalid URL', 'error');
         scheduleReconnect(url, name);
         return;
     }
 
     ws.onopen = function(){
+        console.log('[MP] WebSocket opened, sending join');
         ws.send(JSON.stringify({ type: 'join', name: name }));
         // Reset reconnect delay on success
         reconnectDelay = RECONNECT_MIN;
@@ -375,7 +379,8 @@ function connect(url, name){
         }
     };
 
-    ws.onclose = function(){
+    ws.onclose = function(ev){
+        console.log('[MP] WebSocket closed, code:', ev.code, 'reason:', ev.reason, 'intentional:', intentionalDisconnect);
         connected = false;
         myId = null;
         removeAllRemotePlayers();
@@ -390,7 +395,8 @@ function connect(url, name){
         }
     };
 
-    ws.onerror = function(){
+    ws.onerror = function(ev){
+        console.error('[MP] WebSocket error:', ev);
         setStatus('Connection failed', 'error');
     };
 }
@@ -591,10 +597,12 @@ function initUI(){
 
 // ── Auto-Connect on Game Load ──────────────────────────────────
 function tryAutoConnect(){
+    console.log('[MP] tryAutoConnect called, done:', autoConnectDone);
     if(autoConnectDone) return;
     autoConnectDone = true;
 
     var savedName = getSavedName();
+    console.log('[MP] Saved name:', savedName || '(none)');
     if(!savedName){
         // First time — prompt for name
         savedName = window.prompt('Enter your multiplayer name:', 'Player');
@@ -625,10 +633,16 @@ window.AsterianMP = {
 };
 
 // ── Init ───────────────────────────────────────────────────────
+var waitForGameAttempts = 0;
 function waitForGame(cb){
     // Wait until GameState.scene exists (game fully initialized)
     var d = D();
+    waitForGameAttempts++;
+    if(waitForGameAttempts % 10 === 1){
+        console.log('[MP] waitForGame attempt', waitForGameAttempts, '- DEBUG:', !!d.GameState, 'scene:', !!(d.GameState && d.GameState.scene), 'camera:', !!(d.GameState && d.GameState.camera));
+    }
     if(d.GameState && d.GameState.scene && d.GameState.camera){
+        console.log('[MP] Game ready after', waitForGameAttempts, 'attempts');
         cb();
     } else {
         setTimeout(function(){ waitForGame(cb); }, 500);
@@ -636,10 +650,13 @@ function waitForGame(cb){
 }
 
 function tryInit(){
+    console.log('[MP] tryInit called, btn-mp:', !!document.getElementById('btn-mp'));
     if(document.getElementById('btn-mp')){
         initUI();
+        console.log('[MP] initUI done, waiting for game...');
         // Auto-connect once game is fully loaded
         waitForGame(function(){
+            console.log('[MP] Game loaded, auto-connecting in 500ms...');
             setTimeout(tryAutoConnect, 500);
         });
     } else {
