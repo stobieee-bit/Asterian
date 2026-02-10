@@ -5011,29 +5011,38 @@ function spawnEnemies(){
         }
         return false;
     }
-    // Assign each band a cluster center, spread bands across the area
+    // Distribute bands across the full area using rows + columns to fill the circle
     var bandKeys=Object.keys(bandMap);
-    bandKeys.forEach(function(key){
+    // Sort bands by level so low levels are near hub (south edge) and high far away (north)
+    bandKeys.sort(function(a,b){return bandMap[a].band-bandMap[b].band;});
+    // Arrange into rows — each row is a Z-slice, bands fill left-to-right across the row
+    var numBands=bandKeys.length;
+    // Use ~4 bands per row for good horizontal spread
+    var bandsPerRow=4;
+    var numRows=Math.ceil(numBands/bandsPerRow);
+    bandKeys.forEach(function(key,idx){
         var bg=bandMap[key];
         var ac=areaConfig[bg.area];
-        var minLvl=ac.levelRange[0],maxLvl=ac.levelRange[1];
-        var totalBands=Math.ceil((maxLvl-minLvl)/2);
-        var bandIdx=bg.band-Math.floor((minLvl-1)/2);
-        // Distribute bands across the area — use 0.7 spread so edges stay clear of safe zones
-        var t=totalBands>1?(bandIdx/(totalBands-1)):0.5;
-        var bandZ=ac.cz+ac.radius*0.7*(1-2*t);
-        // Wider stagger X since many more bands now — spiral outward
-        var xOffset=(bandIdx%2===0?-1:1)*(25+bandIdx*5);
-        var bandX=ac.cx+xOffset;
-        // Clamp within area circle
+        var row=Math.floor(idx/bandsPerRow);
+        var col=idx%bandsPerRow;
+        var colsInRow=Math.min(bandsPerRow,numBands-row*bandsPerRow);
+        // Z: distribute rows evenly across area height (0.85 of radius)
+        var rowT=numRows>1?(row/(numRows-1)):0.5;
+        var bandZ=ac.cz+ac.radius*0.85*(1-2*rowT); // south (low lv) to north (high lv)
+        // X: spread columns across the full available width at this Z
         var dzFromCenter=bandZ-ac.cz;
-        var maxX=Math.sqrt(Math.max(0,ac.radius*ac.radius-dzFromCenter*dzFromCenter))*0.8;
-        maxX=Math.max(15,maxX);
-        if(Math.abs(bandX-ac.cx)>maxX)bandX=ac.cx+(bandX>ac.cx?1:-1)*maxX*0.8;
-        // If band center lands in a safe zone, push it away
+        var rowHalfWidth=Math.sqrt(Math.max(0,ac.radius*ac.radius-dzFromCenter*dzFromCenter))*0.85;
+        rowHalfWidth=Math.max(20,rowHalfWidth);
+        var colT=colsInRow>1?(col/(colsInRow-1)):0.5;
+        var bandX=ac.cx-rowHalfWidth+2*rowHalfWidth*colT;
+        // Add small random jitter so it doesn't look perfectly gridded
+        bandX+=Math.random()*16-8;
+        bandZ+=Math.random()*10-5;
+        // If band center lands in a safe zone, push it deeper into the wastes
         if(inSafeZone(bandX,bandZ)){
-            bandZ=ac.cz;
-            if(inSafeZone(bandX,bandZ)) bandZ=ac.cz-ac.radius*0.3;
+            bandZ=ac.cz-ac.radius*0.2;
+            bandX=ac.cx+(bandX>ac.cx?60:-60);
+            if(inSafeZone(bandX,bandZ)){bandX=ac.cx;bandZ=ac.cz-ac.radius*0.4;}
         }
         // Spawn each enemy type in this band: 1-2 per type, max 4 total per group
         var clusterSpread=8;
@@ -5052,10 +5061,10 @@ function spawnEnemies(){
                 // Verify within area radius
                 var ddx=sx-ac.cx,ddz=sz2-ac.cz;
                 if(Math.sqrt(ddx*ddx+ddz*ddz)>ac.radius*0.95){sx=bandX;sz2=bandZ;}
-                // Reject if in safe zone — nudge away from hub
+                // Reject if in safe zone — nudge away
                 if(inSafeZone(sx,sz2)){
-                    sx=bandX+(sx>ac.cx?20:-20);
-                    sz2=bandZ-20;
+                    sx=bandX+(sx>ac.cx?25:-25);
+                    sz2=bandZ-25;
                     if(inSafeZone(sx,sz2)){sx=ac.cx;sz2=ac.cz;}
                 }
                 var mesh=buildEnemyMesh(d.id);mesh.position.set(sx,0,sz2);
