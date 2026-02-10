@@ -1232,8 +1232,10 @@ function showContextMenu(x,y,options){
     });
     menu.style.display='block'; menu.style.left=x+'px'; menu.style.top=y+'px';
     const rect=menu.getBoundingClientRect();
-    if(rect.right>window.innerWidth)menu.style.left=(x-rect.width)+'px';
-    if(rect.bottom>window.innerHeight)menu.style.top=(y-rect.height)+'px';
+    var mx=x,my=y,vw=window.innerWidth,vh=window.innerHeight;
+    if(rect.right>vw-8)mx=Math.max(8,x-rect.width);
+    if(rect.bottom>vh-8)my=Math.max(8,y-rect.height);
+    menu.style.left=mx+'px';menu.style.top=my+'px';
     contextMenuVisible=true;
 }
 function hideContextMenu(){if(contextMenuVisible){document.getElementById('context-menu').style.display='none';contextMenuVisible=false;}}
@@ -1357,6 +1359,18 @@ function initInput(){
         if(e.key==='m'){toggleWorldMap();}
         // Quest log
         if(e.key==='q'){var qp=document.getElementById('quest-panel'),qb=document.getElementById('btn-quests');if(qp){var qVis=qp.style.display!=='none';qp.style.display=qVis?'none':'flex';if(qb)qb.classList.toggle('active',!qVis);if(!qVis)renderQuestPanel();}}
+        // Inventory
+        if(e.key==='i'){var ip=document.getElementById('inventory-panel'),ib=document.getElementById('btn-inventory');if(ip){var iVis=ip.style.display!=='none';if(iVis&&player.panelLocks['inventory-panel'])return;ip.style.display=iVis?'none':'flex';if(ib)ib.classList.toggle('active',!iVis);if(!iVis)renderInventory();}}
+        // Equipment
+        if(e.key==='e'){var ep=document.getElementById('equipment-panel'),eb=document.getElementById('btn-equipment');if(ep){var eVis=ep.style.display!=='none';if(eVis&&player.panelLocks['equipment-panel'])return;ep.style.display=eVis?'none':'flex';if(eb)eb.classList.toggle('active',!eVis);if(!eVis)renderEquipment();}}
+        // Skills
+        if(e.key==='k'){var kp=document.getElementById('skills-panel'),kb=document.getElementById('btn-skills');if(kp){var kVis=kp.style.display!=='none';if(kVis&&player.panelLocks['skills-panel'])return;kp.style.display=kVis?'none':'flex';if(kb)kb.classList.toggle('active',!kVis);if(!kVis)renderSkills();}}
+        // Bestiary
+        if(e.key==='b'){var bp=document.getElementById('bestiary-panel');if(bp){if(bp.style.display!=='none')bp.style.display='none';else openBestiary();}}
+        // Fullscreen
+        if(e.key==='F11'){e.preventDefault();toggleFullscreen();}
+        // Help/shortcuts
+        if(e.key==='?'||e.key==='/'){toggleHelpPanel();}
     });
     window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
     window.addEventListener('mousedown',e=>{if(e.button===1)e.preventDefault();});
@@ -1644,7 +1658,7 @@ function buildGround(){
 }
 
 function buildStarfield(){
-    const ct=4000,geo=new THREE.BufferGeometry(),p=new Float32Array(ct*3),c=new Float32Array(ct*3),sz=new Float32Array(ct);
+    const ct=GameState.isMobilePerf?1500:4000,geo=new THREE.BufferGeometry(),p=new Float32Array(ct*3),c=new Float32Array(ct*3),sz=new Float32Array(ct);
     // Star color palette: blue-white, yellow-white, white, faint red
     var starColors=[[0.7,0.8,1],[1,0.95,0.8],[1,1,1],[1,0.7,0.6],[0.6,0.9,1],[1,0.85,0.7]];
     for(let i=0;i<ct;i++){
@@ -1660,7 +1674,7 @@ function buildStarfield(){
     // Main stars layer
     GameState.scene.add(new THREE.Points(geo,new THREE.PointsMaterial({size:1.5,vertexColors:true,sizeAttenuation:false,transparent:true,opacity:0.9})));
     // Bright star clusters — sparse, bigger points for depth
-    var ct2=200,geo2=new THREE.BufferGeometry(),p2=new Float32Array(ct2*3),c2=new Float32Array(ct2*3);
+    var ct2=GameState.isMobilePerf?80:200,geo2=new THREE.BufferGeometry(),p2=new Float32Array(ct2*3),c2=new Float32Array(ct2*3);
     for(let i=0;i<ct2;i++){
         var th2=Math.random()*Math.PI*2,ph2=Math.acos(2*Math.random()-1),r2=350+Math.random()*60;
         p2[i*3]=r2*Math.sin(ph2)*Math.cos(th2);p2[i*3+1]=r2*Math.sin(ph2)*Math.sin(th2);p2[i*3+2]=r2*Math.cos(ph2);
@@ -5504,7 +5518,7 @@ function renderShop(){
             var stockEl=document.createElement('span');stockEl.style.cssText='position:absolute;top:1px;left:2px;font-size:8px;color:#8aa0b8;';stockEl.textContent='x'+stock;s.appendChild(stockEl);
         }
         s.addEventListener('mouseenter',e=>{showTooltip(e.clientX,e.clientY,def,'<div style="color:'+priceColor+';font-size:10px;margin-top:3px;">Click to buy ('+price+' Cr) | Stock: '+stock+'</div>');});
-        s.addEventListener('mousemove',e=>{if(tooltip.style.display!=='none'){tooltip.style.left=Math.min(e.clientX+12,window.innerWidth-260)+'px';tooltip.style.top=Math.min(e.clientY+12,window.innerHeight-tooltip.offsetHeight-10)+'px';}});
+        s.addEventListener('mousemove',e=>{if(tooltip.style.display!=='none'){var _tw=tooltip.offsetWidth,_th=tooltip.offsetHeight,_vw=window.innerWidth,_vh=window.innerHeight,_tx=e.clientX+12,_ty=e.clientY+12;if(_tx+_tw>_vw-8)_tx=Math.max(8,e.clientX-_tw-8);if(_ty+_th>_vh-8)_ty=Math.max(8,e.clientY-_th-8);tooltip.style.left=_tx+'px';tooltip.style.top=_ty+'px';}});
         s.addEventListener('mouseleave',()=>{hideTooltip();});
         if(!soldOut){s.addEventListener('click',()=>{hideTooltip();buyItem(item);});}
         si.appendChild(s);
@@ -5782,7 +5796,7 @@ function renderInventory(){
             var tooltipDef=def;
             if(inv.durability!==undefined){tooltipDef=Object.assign({},def);tooltipDef.durability=inv.durability;tooltipDef.maxDurability=inv.maxDurability;}
             slot.addEventListener('mouseenter',(function(td){return function(e){showTooltip(e.clientX,e.clientY,td);};})(tooltipDef));
-            slot.addEventListener('mousemove',e=>{if(tooltip.style.display!=='none'){tooltip.style.left=Math.min(e.clientX+12,window.innerWidth-260)+'px';tooltip.style.top=Math.min(e.clientY+12,window.innerHeight-tooltip.offsetHeight-10)+'px';}});
+            slot.addEventListener('mousemove',e=>{if(tooltip.style.display!=='none'){var _tw=tooltip.offsetWidth,_th=tooltip.offsetHeight,_vw=window.innerWidth,_vh=window.innerHeight,_tx=e.clientX+12,_ty=e.clientY+12;if(_tx+_tw>_vw-8)_tx=Math.max(8,e.clientX-_tw-8);if(_ty+_th>_vh-8)_ty=Math.max(8,e.clientY-_th-8);tooltip.style.left=_tx+'px';tooltip.style.top=_ty+'px';}});
             slot.addEventListener('mouseleave',()=>{hideTooltip();});
             slot.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();invSelectedSlot=-1;hideTooltip();showItemContextMenu(e.clientX,e.clientY,i,def);});
         }
@@ -5844,7 +5858,7 @@ function renderEquipment(){
             }
             el.innerHTML='<span class="item-icon">'+item.icon+'</span>'+durHTML;
             el.onmouseenter=function(e){showTooltip(e.clientX,e.clientY,item);};
-            el.onmousemove=function(e){if(tooltip.style.display!=='none'){tooltip.style.left=Math.min(e.clientX+12,window.innerWidth-260)+'px';tooltip.style.top=Math.min(e.clientY+12,window.innerHeight-tooltip.offsetHeight-10)+'px';}};
+            el.onmousemove=function(e){if(tooltip.style.display!=='none'){var _tw=tooltip.offsetWidth,_th=tooltip.offsetHeight,_vw=window.innerWidth,_vh=window.innerHeight,_tx=e.clientX+12,_ty=e.clientY+12;if(_tx+_tw>_vw-8)_tx=Math.max(8,e.clientX-_tw-8);if(_ty+_th>_vh-8)_ty=Math.max(8,e.clientY-_th-8);tooltip.style.left=_tx+'px';tooltip.style.top=_ty+'px';}};
             el.onmouseleave=function(){hideTooltip();};
             el.onclick=()=>{hideTooltip();unequipItem(sn);renderEquipment();renderInventory();};}
         else{el.classList.remove('has-item');el.textContent=sn.charAt(0).toUpperCase()+sn.slice(1);el.onmouseenter=null;el.onmouseleave=null;el.onmousemove=null;el.onclick=null;}
@@ -6147,7 +6161,7 @@ function setupPanelButtons(){
             if(!vis){if(pid==='inventory-panel')renderInventory();if(pid==='equipment-panel')renderEquipment();if(pid==='skills-panel')renderSkills();if(pid==='quest-panel')renderQuestPanel();checkTutorialEvent('panelOpened');}
         });
     });
-    EventBus.on('escape',()=>{Object.entries(panels).forEach(([bid,pid])=>{if(!player.panelLocks[pid]){document.getElementById(pid).style.display='none';document.getElementById(bid).classList.remove('active');}});if(!player.panelLocks['crafting-panel']){document.getElementById('crafting-panel').style.display='none';craftingFromStation=false;}document.getElementById('board-panel').style.display='none';document.getElementById('skill-guide-panel').style.display='none';document.getElementById('bestiary-panel').style.display='none';document.getElementById('quest-panel').style.display='none';document.getElementById('world-map-panel').style.display='none';if(bankOpen)closeBank();if(activeShop)closeShop();if(activeNPC)closeDialogue();var ac=document.getElementById('audio-controls');if(ac)ac.style.display='none';});
+    EventBus.on('escape',()=>{Object.entries(panels).forEach(([bid,pid])=>{if(!player.panelLocks[pid]){document.getElementById(pid).style.display='none';document.getElementById(bid).classList.remove('active');}});if(!player.panelLocks['crafting-panel']){document.getElementById('crafting-panel').style.display='none';craftingFromStation=false;}document.getElementById('board-panel').style.display='none';document.getElementById('skill-guide-panel').style.display='none';document.getElementById('bestiary-panel').style.display='none';document.getElementById('quest-panel').style.display='none';document.getElementById('world-map-panel').style.display='none';document.getElementById('settings-panel').style.display='none';document.getElementById('help-panel').style.display='none';if(bankOpen)closeBank();if(activeShop)closeShop();if(activeNPC)closeDialogue();var ac=document.getElementById('audio-controls');if(ac)ac.style.display='none';});
     // Audio button — click opens volume popup, right-click toggles mute
     var audioBtn=document.getElementById('btn-audio');
     if(audioBtn){
@@ -6765,6 +6779,151 @@ function setupUIEvents(){
     pstBtn.textContent='PST';pstBtn.style.color='#ffd700';
     pstBtn.addEventListener('click',function(){openPrestigePanel();});
     document.getElementById('panel-buttons').appendChild(pstBtn);
+
+    // ── Fullscreen Toggle ──────────────────────────────
+    var fsBtn=document.getElementById('btn-fullscreen');
+    if(fsBtn)fsBtn.addEventListener('click',toggleFullscreen);
+
+    // ── Help Panel Toggle ──────────────────────────────
+    var helpBtn=document.getElementById('btn-help');
+    if(helpBtn)helpBtn.addEventListener('click',toggleHelpPanel);
+
+    // ── Settings Panel ─────────────────────────────────
+    var settingsBtn=document.getElementById('btn-settings');
+    if(settingsBtn)settingsBtn.addEventListener('click',toggleSettingsPanel);
+    initSettingsPanel();
+}
+
+// ========================================
+// Fullscreen
+// ========================================
+function toggleFullscreen(){
+    if(!document.fullscreenElement&&!document.webkitFullscreenElement){
+        var el=document.documentElement;
+        if(el.requestFullscreen)el.requestFullscreen();
+        else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();
+    }else{
+        if(document.exitFullscreen)document.exitFullscreen();
+        else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
+    }
+}
+document.addEventListener('fullscreenchange',updateFullscreenBtn);
+document.addEventListener('webkitfullscreenchange',updateFullscreenBtn);
+function updateFullscreenBtn(){
+    var btn=document.getElementById('btn-fullscreen');
+    if(btn)btn.textContent=(document.fullscreenElement||document.webkitFullscreenElement)?'⛶':'⛶';
+    if(btn)btn.classList.toggle('active',!!(document.fullscreenElement||document.webkitFullscreenElement));
+}
+
+// ========================================
+// Help Panel
+// ========================================
+function toggleHelpPanel(){
+    var p=document.getElementById('help-panel');
+    if(!p)return;
+    if(p.style.display!=='none')p.style.display='none';
+    else p.style.display='flex';
+}
+
+// ========================================
+// Settings Panel
+// ========================================
+function toggleSettingsPanel(){
+    var p=document.getElementById('settings-panel');
+    if(!p)return;
+    if(p.style.display!=='none')p.style.display='none';
+    else p.style.display='flex';
+}
+
+var gameSettings={quality:'high',shadows:'high',particles:'high',uiScale:100,panelOpacity:97,showFps:false};
+
+function initSettingsPanel(){
+    // Load saved settings
+    try{var saved=localStorage.getItem('asterian_settings');if(saved)gameSettings=Object.assign(gameSettings,JSON.parse(saved));}catch(e){}
+    applySettings();
+
+    // Quality
+    var qualSel=document.getElementById('settings-quality');
+    if(qualSel){qualSel.value=gameSettings.quality;qualSel.addEventListener('change',function(){gameSettings.quality=this.value;applySettings();saveSettings();});}
+
+    // Shadows
+    var shadSel=document.getElementById('settings-shadows');
+    if(shadSel){shadSel.value=gameSettings.shadows;shadSel.addEventListener('change',function(){gameSettings.shadows=this.value;applySettings();saveSettings();});}
+
+    // Particles
+    var partSel=document.getElementById('settings-particles');
+    if(partSel){partSel.value=gameSettings.particles;partSel.addEventListener('change',function(){gameSettings.particles=this.value;applySettings();saveSettings();});}
+
+    // UI Scale
+    var uiSlider=document.getElementById('settings-ui-scale');
+    var uiVal=document.getElementById('settings-ui-scale-val');
+    if(uiSlider){uiSlider.value=gameSettings.uiScale;if(uiVal)uiVal.textContent=gameSettings.uiScale+'%';
+        uiSlider.addEventListener('input',function(){gameSettings.uiScale=parseInt(this.value);if(uiVal)uiVal.textContent=this.value+'%';applySettings();saveSettings();});}
+
+    // Panel Opacity
+    var opSlider=document.getElementById('settings-panel-opacity');
+    var opVal=document.getElementById('settings-panel-opacity-val');
+    if(opSlider){opSlider.value=gameSettings.panelOpacity;if(opVal)opVal.textContent=gameSettings.panelOpacity+'%';
+        opSlider.addEventListener('input',function(){gameSettings.panelOpacity=parseInt(this.value);if(opVal)opVal.textContent=this.value+'%';applySettings();saveSettings();});}
+
+    // FPS toggle
+    var fpsBtn=document.getElementById('settings-fps-toggle');
+    if(fpsBtn){updateFpsToggle(fpsBtn);fpsBtn.addEventListener('click',function(){gameSettings.showFps=!gameSettings.showFps;updateFpsToggle(this);applySettings();saveSettings();});}
+}
+
+function updateFpsToggle(btn){
+    btn.textContent=gameSettings.showFps?'ON':'OFF';
+    btn.classList.toggle('active',gameSettings.showFps);
+}
+
+function saveSettings(){
+    try{localStorage.setItem('asterian_settings',JSON.stringify(gameSettings));}catch(e){}
+}
+
+function applySettings(){
+    // Graphics quality
+    var renderer=GameState.renderer;
+    if(renderer){
+        if(gameSettings.quality==='low'){renderer.setPixelRatio(1);}
+        else if(gameSettings.quality==='medium'){renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));}
+        else{renderer.setPixelRatio(Math.min(window.devicePixelRatio,GameState.isMobilePerf?1.5:2));}
+    }
+    // Shadows
+    if(renderer){
+        if(gameSettings.shadows==='off'){renderer.shadowMap.enabled=false;}
+        else{renderer.shadowMap.enabled=true;renderer.shadowMap.type=gameSettings.shadows==='low'?THREE.PCFShadowMap:THREE.PCFSoftShadowMap;}
+    }
+    // Particle multiplier (used by spawnParticles)
+    if(gameSettings.particles==='low')GameState.particleScale=0.3;
+    else if(gameSettings.particles==='medium')GameState.particleScale=0.6;
+    else GameState.particleScale=1.0;
+    // UI scale
+    var overlay=document.getElementById('ui-overlay');
+    if(overlay)overlay.style.fontSize=(gameSettings.uiScale/100)+'em';
+    // Panel opacity
+    document.querySelectorAll('.game-panel').forEach(function(p){
+        p.style.setProperty('--panel-opacity',gameSettings.panelOpacity/100);
+        p.style.background='rgba(10, 15, 25, '+(gameSettings.panelOpacity/100).toFixed(2)+')';
+    });
+    // FPS counter
+    var fpsEl=document.getElementById('fps-counter');
+    if(fpsEl)fpsEl.style.display=gameSettings.showFps?'block':'none';
+}
+
+// FPS counter update
+var fpsFrames=0,fpsTime=0;
+function updateFpsCounter(){
+    fpsFrames++;
+    fpsTime+=GameState.deltaTime;
+    if(fpsTime>=0.5){
+        var fps=Math.round(fpsFrames/fpsTime);
+        var el=document.getElementById('fps-counter');
+        if(el&&gameSettings.showFps){
+            el.textContent=fps+' FPS';
+            el.style.color=fps>=50?'#44ff88':fps>=30?'#ffcc44':'#ff4444';
+        }
+        fpsFrames=0;fpsTime=0;
+    }
 }
 
 // ========================================
@@ -6772,6 +6931,8 @@ function setupUIEvents(){
 // ========================================
 const particles=[];
 function spawnParticles(position,color,count,speed,life,size){
+    if(GameState.isMobilePerf)count=Math.max(1,Math.floor(count*0.4));
+    else if(GameState.particleScale&&GameState.particleScale<1)count=Math.max(1,Math.floor(count*GameState.particleScale));
     for(let i=0;i<count;i++){
         const geo=new THREE.BufferGeometry();
         const sz=size||0.08;
@@ -6787,6 +6948,8 @@ function spawnParticles(position,color,count,speed,life,size){
     }
 }
 function spawnDirectedParticles(from,to,color,count,speed,life){
+    if(GameState.isMobilePerf)count=Math.max(1,Math.floor(count*0.4));
+    else if(GameState.particleScale&&GameState.particleScale<1)count=Math.max(1,Math.floor(count*GameState.particleScale));
     const dir=new THREE.Vector3().subVectors(to,from).normalize();
     for(let i=0;i<count;i++){
         const geo=new THREE.BufferGeometry();
@@ -7398,8 +7561,12 @@ function showTooltip(x,y,itemDef,extra){
     if(extra)html+=extra;
     tooltip.className=({1:'rarity-common',2:'rarity-uncommon',3:'rarity-rare',4:'rarity-duranium',5:'rarity-titanex',6:'rarity-epic',7:'rarity-quantum',8:'rarity-neutronium',9:'rarity-darkmatter',10:'rarity-legendary',11:'rarity-ascendant',12:'rarity-corrupted'})[itemDef.tier]||'';
     tooltip.innerHTML=html;tooltip.style.display='block';
-    tooltip.style.left=Math.min(x+12,window.innerWidth-260)+'px';
-    tooltip.style.top=Math.min(y+12,window.innerHeight-tooltip.offsetHeight-10)+'px';
+    var tw=tooltip.offsetWidth,th=tooltip.offsetHeight,vw=window.innerWidth,vh=window.innerHeight;
+    var tx=x+12,ty=y+12;
+    if(tx+tw>vw-8)tx=Math.max(8,x-tw-8);
+    if(ty+th>vh-8)ty=Math.max(8,y-th-8);
+    tooltip.style.left=tx+'px';
+    tooltip.style.top=ty+'px';
 }
 function hideTooltip(){tooltip.style.display='none';}
 
@@ -8352,23 +8519,36 @@ let minimapTimer=0;
 var minimapZoom=1.0; // 1.0 = default, higher = zoomed in, range 0.3-4.0
 
 function initRenderer(){
+    var isMobileDevice='ontouchstart' in window || navigator.maxTouchPoints > 0;
+    var isSmallScreen=window.innerWidth<=768;
+    var isMobilePerf=isMobileDevice&&isSmallScreen;
+    GameState.isMobile=isMobileDevice;
+    GameState.isMobilePerf=isMobilePerf;
     const canvas=document.getElementById('game-canvas');
-    const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
-    renderer.setSize(window.innerWidth,window.innerHeight);renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-    renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+    const renderer=new THREE.WebGLRenderer({canvas,antialias:!isMobilePerf});
+    renderer.setSize(window.innerWidth,window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,isMobilePerf?1.5:2));
+    renderer.shadowMap.enabled=true;
+    renderer.shadowMap.type=isMobilePerf?THREE.PCFShadowMap:THREE.PCFSoftShadowMap;
     renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
     GameState.renderer=renderer;
-    const scene=new THREE.Scene();scene.background=null;scene.fog=new THREE.FogExp2(0x020810,0.004);GameState.scene=scene;
-    const camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,0.1,1000);camera.position.set(0,25,30);camera.lookAt(0,0,0);GameState.camera=camera;
+    const scene=new THREE.Scene();scene.background=null;
+    scene.fog=new THREE.FogExp2(0x020810,isMobilePerf?0.006:0.004);
+    GameState.scene=scene;
+    const camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,0.1,isMobilePerf?500:1000);camera.position.set(0,25,30);camera.lookAt(0,0,0);GameState.camera=camera;
     GameState.clock=new THREE.Clock();
     GameState.ambientLight=new THREE.AmbientLight(0x1a2a4a,0.4);scene.add(GameState.ambientLight);
     // Hemisphere light for sky/ground color contrast
     var hemiLight=new THREE.HemisphereLight(0x2244aa,0x111122,0.35);scene.add(hemiLight);
-    const dl=new THREE.DirectionalLight(0xaaccff,0.8);dl.position.set(30,50,20);dl.castShadow=true;dl.shadow.mapSize.width=2048;dl.shadow.mapSize.height=2048;dl.shadow.camera.near=0.5;dl.shadow.camera.far=200;dl.shadow.camera.left=-60;dl.shadow.camera.right=60;dl.shadow.camera.top=60;dl.shadow.camera.bottom=-60;scene.add(dl);GameState.dirLight=dl;
+    var shadowRes=isMobilePerf?1024:2048;
+    const dl=new THREE.DirectionalLight(0xaaccff,0.8);dl.position.set(30,50,20);dl.castShadow=true;dl.shadow.mapSize.width=shadowRes;dl.shadow.mapSize.height=shadowRes;dl.shadow.camera.near=0.5;dl.shadow.camera.far=200;dl.shadow.camera.left=-60;dl.shadow.camera.right=60;dl.shadow.camera.top=60;dl.shadow.camera.bottom=-60;scene.add(dl);GameState.dirLight=dl;
     // Rim/back light for silhouette definition
     var rimLight=new THREE.DirectionalLight(0x4488cc,0.3);rimLight.position.set(-20,30,-30);scene.add(rimLight);
     const pl2=new THREE.PointLight(0x00c8ff,0.4,80);pl2.position.set(0,10,0);scene.add(pl2);
-    window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
+    // Resize + orientation change handler
+    function handleResize(){camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);}
+    window.addEventListener('resize',handleResize);
+    window.addEventListener('orientationchange',function(){setTimeout(handleResize,150);});
 }
 
 function initGame(){
@@ -8555,7 +8735,8 @@ const ambientParticles=[];
 let ambientTimer=0;
 function updateAmbientParticles(){
     ambientTimer+=GameState.deltaTime;
-    if(ambientTimer<0.25)return;ambientTimer=0;
+    var ambientInterval=GameState.isMobilePerf?0.6:0.25;
+    if(ambientTimer<ambientInterval)return;ambientTimer=0;
     var area=player.currentArea,pp=player.mesh.position;
     if(area==='station-hub'){
         var px=pp.x+(Math.random()-0.5)*20,pz=pp.z+(Math.random()-0.5)*20;
@@ -9123,6 +9304,8 @@ function gameLoop(){
     updateMusicLFO(GameState.deltaTime);
     // Multiplayer tick (if connected)
     if(window.AsterianMP)window.AsterianMP.tick(GameState.deltaTime);
+    // FPS counter
+    if(gameSettings.showFps)updateFpsCounter();
     // Render
     GameState.renderer.render(GameState.scene,GameState.camera);
 }

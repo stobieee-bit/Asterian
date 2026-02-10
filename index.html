@@ -74,14 +74,17 @@
 
         <!-- Bottom Right: Panel Buttons -->
         <div id="panel-buttons">
-            <button class="panel-btn" id="btn-inventory" title="Inventory">INV</button>
-            <button class="panel-btn" id="btn-equipment" title="Equipment">EQP</button>
-            <button class="panel-btn" id="btn-skills" title="Skills">SKL</button>
-            <button class="panel-btn" id="btn-bestiary" title="Bestiary">BST</button>
+            <button class="panel-btn" id="btn-inventory" title="Inventory (I)">INV</button>
+            <button class="panel-btn" id="btn-equipment" title="Equipment (E)">EQP</button>
+            <button class="panel-btn" id="btn-skills" title="Skills (K)">SKL</button>
+            <button class="panel-btn" id="btn-bestiary" title="Bestiary (B)">BST</button>
             <button class="panel-btn" id="btn-quests" title="Quest Log (Q)">QST</button>
             <button class="panel-btn save-btn" id="btn-save" title="Save (F5)">💾</button>
             <button class="panel-btn" id="btn-mp" title="Multiplayer">MP</button>
             <button class="panel-btn" id="btn-audio" title="Audio (right-click for volume)">🔊</button>
+            <button class="panel-btn" id="btn-settings" title="Settings">⚙</button>
+            <button class="panel-btn" id="btn-fullscreen" title="Fullscreen (F11)">⛶</button>
+            <button class="panel-btn" id="btn-help" title="Keyboard Shortcuts (?)">?</button>
         </div>
 
         <!-- Audio Volume Controls Popup -->
@@ -351,6 +354,96 @@
 
         <!-- MP Player Name Labels -->
         <div id="mp-name-labels"></div>
+
+        <!-- Settings Panel -->
+        <div id="settings-panel" class="game-panel" style="display:none;">
+            <div class="panel-header"><span>Settings</span><button class="panel-close">&times;</button></div>
+            <div id="settings-content">
+                <div class="settings-section">
+                    <div class="settings-section-label">Graphics</div>
+                    <div class="settings-row">
+                        <label>Quality</label>
+                        <select id="settings-quality" class="settings-select">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high" selected>High</option>
+                        </select>
+                    </div>
+                    <div class="settings-row">
+                        <label>Shadows</label>
+                        <select id="settings-shadows" class="settings-select">
+                            <option value="off">Off</option>
+                            <option value="low">Low</option>
+                            <option value="high" selected>High</option>
+                        </select>
+                    </div>
+                    <div class="settings-row">
+                        <label>Particles</label>
+                        <select id="settings-particles" class="settings-select">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high" selected>High</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <div class="settings-section-label">Interface</div>
+                    <div class="settings-row">
+                        <label>UI Scale</label>
+                        <input type="range" id="settings-ui-scale" min="80" max="120" value="100" class="settings-slider">
+                        <span id="settings-ui-scale-val">100%</span>
+                    </div>
+                    <div class="settings-row">
+                        <label>Panel Opacity</label>
+                        <input type="range" id="settings-panel-opacity" min="50" max="100" value="97" class="settings-slider">
+                        <span id="settings-panel-opacity-val">97%</span>
+                    </div>
+                    <div class="settings-row">
+                        <label>Show FPS</label>
+                        <button id="settings-fps-toggle" class="settings-toggle">OFF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keyboard Shortcuts Help Panel -->
+        <div id="help-panel" class="game-panel" style="display:none;">
+            <div class="panel-header"><span>Keyboard Shortcuts</span><button class="panel-close">&times;</button></div>
+            <div id="help-content">
+                <div class="help-section">
+                    <div class="help-section-label">Combat & Movement</div>
+                    <div class="help-row"><kbd>Click</kbd><span>Move / Attack</span></div>
+                    <div class="help-row"><kbd>Right Click</kbd><span>Context Menu</span></div>
+                    <div class="help-row"><kbd>Space</kbd><span>Eat Food</span></div>
+                    <div class="help-row"><kbd>Tab</kbd><span>Cycle Target</span></div>
+                    <div class="help-row"><kbd>V</kbd><span>Toggle Auto-Eat</span></div>
+                    <div class="help-row"><kbd>R</kbd><span>Toggle Auto-Retaliate</span></div>
+                    <div class="help-row"><kbd>1-5</kbd><span>Quick Slots</span></div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-label">Panels</div>
+                    <div class="help-row"><kbd>I</kbd><span>Inventory</span></div>
+                    <div class="help-row"><kbd>E</kbd><span>Equipment</span></div>
+                    <div class="help-row"><kbd>K</kbd><span>Skills</span></div>
+                    <div class="help-row"><kbd>B</kbd><span>Bestiary</span></div>
+                    <div class="help-row"><kbd>Q</kbd><span>Quest Log</span></div>
+                    <div class="help-row"><kbd>M</kbd><span>World Map</span></div>
+                    <div class="help-row"><kbd>Esc</kbd><span>Close All Panels</span></div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-label">System</div>
+                    <div class="help-row"><kbd>F5</kbd><span>Save Game</span></div>
+                    <div class="help-row"><kbd>F9</kbd><span>Load Game</span></div>
+                    <div class="help-row"><kbd>F11</kbd><span>Toggle Fullscreen</span></div>
+                    <div class="help-row"><kbd>X</kbd><span>Reset XP Tracker</span></div>
+                    <div class="help-row"><kbd>Enter</kbd><span>Focus Chat</span></div>
+                    <div class="help-row"><kbd>?</kbd><span>This Help Menu</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FPS Counter -->
+        <div id="fps-counter" style="display:none;"></div>
 
         <!-- Mobile Controls -->
         <button id="mobile-eat-btn" style="display:none;" onclick="if(window.DEBUG&&window.DEBUG.EventBus)window.DEBUG.EventBus.emit('eatFood');">🍖 EAT</button>
