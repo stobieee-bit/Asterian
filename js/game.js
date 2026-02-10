@@ -4998,6 +4998,19 @@ function spawnEnemies(){
         if(!bandMap[key])bandMap[key]={area:d.area,band:band,enemies:[]};
         bandMap[key].enemies.push(d);
     }
+    // Safe zones enemies must never spawn in (hub, bio-lab, etc.)
+    var safeZones=[
+        {cx:0,cz:0,r:50},    // Station Hub (radius 35 + 15 buffer)
+        {cx:-20,cz:20,r:30}   // Bio-Lab (radius 18 + 12 buffer)
+    ];
+    function inSafeZone(x,z){
+        for(var si=0;si<safeZones.length;si++){
+            var sz=safeZones[si];
+            var dx=x-sz.cx,dz2=z-sz.cz;
+            if(dx*dx+dz2*dz2<sz.r*sz.r) return true;
+        }
+        return false;
+    }
     // Assign each band a cluster center, spread bands across the area
     var bandKeys=Object.keys(bandMap);
     bandKeys.forEach(function(key){
@@ -5006,9 +5019,9 @@ function spawnEnemies(){
         var minLvl=ac.levelRange[0],maxLvl=ac.levelRange[1];
         var totalBands=Math.ceil((maxLvl-minLvl)/5);
         var bandIdx=bg.band-Math.floor((minLvl-1)/5);
-        // Distribute bands in a spiral/staggered pattern across the area
+        // Distribute bands across the area — use 0.75 spread so edges don't reach safe zones
         var t=totalBands>1?(bandIdx/(totalBands-1)):0.5;
-        var bandZ=ac.cz+ac.radius*0.85*(1-2*t); // north (low level) to south (high level)
+        var bandZ=ac.cz+ac.radius*0.75*(1-2*t);
         // Stagger X so adjacent bands don't overlap — alternate left/right
         var xOffset=(bandIdx%2===0?-1:1)*(20+bandIdx*3);
         var bandX=ac.cx+xOffset;
@@ -5017,6 +5030,11 @@ function spawnEnemies(){
         var maxX=Math.sqrt(Math.max(0,ac.radius*ac.radius-dzFromCenter*dzFromCenter))*0.7;
         maxX=Math.max(10,maxX);
         if(Math.abs(bandX-ac.cx)>maxX)bandX=ac.cx+(bandX>ac.cx?1:-1)*maxX*0.8;
+        // If band center lands in a safe zone, push it away
+        if(inSafeZone(bandX,bandZ)){
+            bandZ=ac.cz; // fall back toward area center
+            if(inSafeZone(bandX,bandZ)) bandZ=ac.cz-ac.radius*0.3;
+        }
         // Spawn each enemy type in this band: 2-3 per type, tightly clustered
         var clusterSpread=12; // tight cluster radius
         bg.enemies.forEach(function(d){
@@ -5026,16 +5044,22 @@ function spawnEnemies(){
                 var a=Math.random()*Math.PI*2;
                 var dist=d.isBoss?0:2+Math.random()*clusterSpread;
                 var sx=bandX+Math.cos(a)*dist;
-                var sz=bandZ+Math.sin(a)*dist;
+                var sz2=bandZ+Math.sin(a)*dist;
                 // Verify within area radius
-                var ddx=sx-ac.cx,ddz=sz-ac.cz;
-                if(Math.sqrt(ddx*ddx+ddz*ddz)>ac.radius*0.95){sx=bandX;sz=bandZ;}
-                var mesh=buildEnemyMesh(d.id);mesh.position.set(sx,0,sz);
+                var ddx=sx-ac.cx,ddz=sz2-ac.cz;
+                if(Math.sqrt(ddx*ddx+ddz*ddz)>ac.radius*0.95){sx=bandX;sz2=bandZ;}
+                // Reject if in safe zone — nudge away from hub
+                if(inSafeZone(sx,sz2)){
+                    sx=bandX+(sx>ac.cx?20:-20);
+                    sz2=bandZ-20;
+                    if(inSafeZone(sx,sz2)){sx=ac.cx;sz2=ac.cz;}
+                }
+                var mesh=buildEnemyMesh(d.id);mesh.position.set(sx,0,sz2);
                 var enemy={name:td.name,level:td.level,hp:td.hp,maxHp:td.maxHp,damage:td.damage,defense:td.defense,
                     attackSpeed:td.attackSpeed,aggroRange:td.aggroRange,leashRange:td.leashRange,
                     combatStyle:td.combatStyle,respawnTime:td.respawnTime,area:td.area,desc:td.desc,
                     lootTable:td.lootTable,type:d.id,mesh:mesh,alive:true,
-                    spawnPos:new THREE.Vector3(sx,0,sz),state:'idle',wanderTarget:null,
+                    spawnPos:new THREE.Vector3(sx,0,sz2),state:'idle',wanderTarget:null,
                     wanderTimer:Math.random()*5,attackTimer:td.attackSpeed,stunTimer:0,
                     respawnTimer:0,animPhase:Math.random()*Math.PI*2,deathAnim:0};
                 if(td.isBoss) enemy.isBoss=true;
