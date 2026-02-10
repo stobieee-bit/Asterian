@@ -7627,50 +7627,14 @@ function cancelSlayerTask(){
     EventBus.emit('chat',{type:'info',text:'Slayer task cancelled. Streak reset.'});
 }
 
-let lastQuestHTML='';
-function updateQuestTracker(){
-    const tracker=document.getElementById('quest-tracker');
-    let html='';
-    // Vex quest
-    const vs=getVexStatus();
-    if(vs){
-        html+='<div class="quest-track vex-track"><div class="quest-title">'+vs.quest.name+'</div>';
-        vs.quest.steps.forEach((step,i)=>{
-            const done=vs.progress[i]>=step.count;
-            html+='<div class="quest-step'+(done?' done':'')+'">'+vs.steps[i]+'</div>';
-        });
-        html+='</div>';
-    }
-    // Board quest
-    const bs=getBoardStatus();
-    if(bs){
-        html+='<div class="quest-track board-track"><div class="quest-title">'+bs.quest.name+'</div>';
-        bs.quest.steps.forEach((step,i)=>{
-            const done=bs.progress[i]>=step.count;
-            html+='<div class="quest-step'+(done?' done':'')+'">'+bs.steps[i]+'</div>';
-        });
-        html+='</div>';
-    }
-    // Slayer task
-    if(questState.slayerTask){
-        const st=questState.slayerTask;
-        const enemyDef=ENEMY_TYPES[st.target];
-        const enemyName=enemyDef?enemyDef.name:st.target;
-        const done=questState.slayerProgress>=st.count;
-        html+='<div class="quest-track slayer-track"><div class="quest-title">Slayer Task</div>';
-        html+='<div class="quest-step'+(done?' done':'')+'">Kill '+enemyName+' ('+questState.slayerProgress+'/'+st.count+')</div>';
-        if(questState.slayerStreak>0)html+='<div class="quest-step" style="color:#ff8844;font-size:10px;">Streak: '+questState.slayerStreak+'</div>';
-        html+='</div>';
-    }
-    if(!html){if(tracker.style.display!=='none')tracker.style.display='none';return;}
-    tracker.style.display='block';
-    if(html!==lastQuestHTML){tracker.innerHTML=html;lastQuestHTML=html;}
-}
+// Quest tracker removed — replaced by Quest Log panel
+function updateQuestTracker(){}
 
 // ========================================
 // Quest Log Panel
 // ========================================
 var questPanelTab='active';
+var lastQuestPanelHTML='';
 function renderQuestPanel(){
     var content=document.getElementById('quest-panel-content');
     if(!content)return;
@@ -7756,7 +7720,7 @@ function renderQuestPanel(){
             }
         }
     }
-    content.innerHTML=html;
+    if(html!==lastQuestPanelHTML){content.innerHTML=html;lastQuestPanelHTML=html;}
 }
 function formatQuestRewards(rewards){
     if(!rewards)return '';
@@ -8998,7 +8962,8 @@ function gameLoop(){
     updateGathering();updateAutoAttack();updateCombatEffects();updateCooldowns();updateAdrenaline();
     updateEnemyAI();updateNPCs();updateWorld();updateParticles();updateGroundItems();updateCombatAura();updateShopEconomy(GameState.deltaTime);updateDungeonTraps();updatePrestigeTimers();updatePrestigeAura();updateAreaAtmosphere();updatePortalAnimations();
     // UI
-    updateBars();updateTargetInfo();updateActionBar();updateGatherBar();updateAttackBar();updateQuestTracker();updateSkillBars();updateEnemyHPBars();updateNPCNameBars();updateStyleHUD();updateFoodIndicator();
+    updateBars();updateTargetInfo();updateActionBar();updateGatherBar();updateAttackBar();updateSkillBars();updateEnemyHPBars();updateNPCNameBars();updateStyleHUD();updateFoodIndicator();
+    var qpEl=document.getElementById('quest-panel');if(qpEl&&qpEl.style.display!=='none')renderQuestPanel();
     // Auto-eat (Feature 3)
     if(player.autoEat&&player.hp>0&&player.hp<player.maxHp*player.autoEatThreshold)eatBestFood();
     minimapTimer++;if(minimapTimer%5===0)updateMinimapEnhanced();
