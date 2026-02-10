@@ -4973,8 +4973,8 @@ function buildEnemyMesh(type){
     var def=ENEMY_TYPES[type];
     if(def && def.meshTemplate && MESH_TEMPLATE_BUILDERS[def.meshTemplate]){
         var params=def.meshParams?Object.assign({},def.meshParams):{};
-        // Enforce minimum scale — double the smallest sizes for visibility
-        if(params.scale && params.scale<0.6) params.scale=0.6;
+        // Double all enemy sizes for visibility in expanded world
+        params.scale=(params.scale||1)*2;
         return MESH_TEMPLATE_BUILDERS[def.meshTemplate](params);
     }
     return buildChithariMesh('normal');
