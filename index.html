@@ -380,6 +380,19 @@
     (function(){
         var currentVersion = null;
         var reloading = false;
+        function showUpdateBanner(secs){
+            var banner=document.createElement('div');
+            banner.id='update-banner';
+            banner.style.cssText='position:fixed;top:0;left:0;width:100%;padding:12px 0;background:rgba(0,180,255,0.9);color:#fff;text-align:center;font-size:16px;font-weight:bold;z-index:999999;text-shadow:0 1px 3px rgba(0,0,0,0.5);';
+            banner.textContent='[UPDATE] New version detected! Game saved. Reloading in '+secs+' seconds...';
+            document.body.appendChild(banner);
+            var remaining=secs;
+            var countdown=setInterval(function(){
+                remaining--;
+                if(remaining<=0){clearInterval(countdown);banner.textContent='Reloading now...';return;}
+                banner.textContent='[UPDATE] New version detected! Game saved. Reloading in '+remaining+' seconds...';
+            },1000);
+        }
         function checkVersion(){
             if(reloading) return;
             fetch('version.json?t='+Date.now())
@@ -388,13 +401,11 @@
                 if(currentVersion===null){currentVersion=data.v;}
                 else if(data.v!==currentVersion){
                     reloading=true;
-                    // Save game before reload
                     if(typeof saveGame==='function'){try{saveGame();}catch(e){}}
-                    // Show warning in chat
                     if(typeof addChatMessage==='function'){
                         try{addChatMessage('system','[UPDATE] New version detected! Game saved. Reloading in 5 seconds...');}catch(e){}
                     }
-                    // Reload after 5 seconds so player can see the message
+                    showUpdateBanner(5);
                     setTimeout(function(){location.reload(true);},5000);
                 }
             }).catch(function(){});
