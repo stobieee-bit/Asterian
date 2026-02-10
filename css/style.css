@@ -1300,8 +1300,8 @@ body {
 
 .enemy-hp-bar {
     position: absolute;
-    width: 60px;
-    height: 6px;
+    width: 90px;
+    height: 7px;
     background: rgba(0, 0, 0, 0.7);
     border: 1px solid #333;
     border-radius: 3px;
@@ -1323,19 +1323,19 @@ body {
 
 .enemy-hp-bar .hp-name {
     position: absolute;
-    top: -14px;
+    top: -16px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 9px;
-    color: #ddd;
-    text-shadow: 1px 1px 2px #000;
+    font-size: 12px;
+    color: #fff;
+    text-shadow: 1px 1px 3px #000, 0 0 5px rgba(0,0,0,0.8);
     white-space: nowrap;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .enemy-hp-bar.boss {
-    width: 90px;
-    height: 8px;
+    width: 120px;
+    height: 9px;
     border-color: #cc4444;
 }
 

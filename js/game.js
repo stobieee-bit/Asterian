@@ -5022,8 +5022,8 @@ function spawnEnemies(){
     // Each band gets its own unique Z based on its index, X alternates across width
     var bandKeys=Object.keys(bandMap);
     var spawnZones={
-        'alien-wastes':{ zStart:-100, zEnd:-920 },
-        'the-abyss':{ zStart:-870, zEnd:-1520 }
+        'alien-wastes':{ zStart:-120, zEnd:-960 },
+        'the-abyss':{ zStart:-880, zEnd:-1540 }
     };
     function getHalfWidthAtZ(ac,z){
         var dz=z-ac.cz;
@@ -8259,15 +8259,23 @@ function renderWorldMap(){
             ctx.fillStyle='#44ffaa';ctx.beginPath();ctx.arc(nx,nz,Math.max(2,3*mapSc),0,Math.PI*2);ctx.fill();
         });
     }
-    // Draw enemies (realtime positions)
+    // Draw enemies (realtime positions) with level labels
     GameState.enemies.forEach(function(e){
         if(!e.alive)return;
         var ex=mapCX+e.mesh.position.x*mapSc,ez=mapCY+e.mesh.position.z*mapSc;
         if(ex<-10||ex>w+10||ez<-10||ez>h+10)return;
         ctx.fillStyle=e.isCorrupted?'#ff2244':(e.isBoss?'#ff4488':'#ff4444');
         ctx.globalAlpha=0.7;
-        ctx.beginPath();ctx.moveTo(ex,ez-3);ctx.lineTo(ex-2.5,ez+2);ctx.lineTo(ex+2.5,ez+2);ctx.closePath();ctx.fill();
+        var ts=Math.max(3,4*mapSc);
+        ctx.beginPath();ctx.moveTo(ex,ez-ts);ctx.lineTo(ex-ts*0.8,ez+ts*0.6);ctx.lineTo(ex+ts*0.8,ez+ts*0.6);ctx.closePath();ctx.fill();
         ctx.globalAlpha=1.0;
+        // Show level label when zoomed in enough
+        if(mapSc>0.15){
+            ctx.fillStyle=e.isBoss?'#ff88aa':'#ffaaaa';
+            ctx.font=Math.max(6,Math.round(7*mapSc/0.2))+'px monospace';
+            ctx.textAlign='center';
+            ctx.fillText(e.level,ex,ez+ts+8);
+        }
     });
     // Draw NPCs
     if(GameState.npcs){
