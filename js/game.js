@@ -5011,37 +5011,41 @@ function spawnEnemies(){
         }
         return false;
     }
-    // Distribute bands across the full area using rows + columns to fill the circle
+    // Distribute bands evenly across full circle using sunflower spiral
+    // Group by area so each area's bands fill its own circle
     var bandKeys=Object.keys(bandMap);
-    // Sort bands by level so low levels are near hub (south edge) and high far away (north)
-    bandKeys.sort(function(a,b){return bandMap[a].band-bandMap[b].band;});
-    // Arrange into rows — each row is a Z-slice, bands fill left-to-right across the row
-    var numBands=bandKeys.length;
-    // Use ~4 bands per row for good horizontal spread
-    var bandsPerRow=4;
-    var numRows=Math.ceil(numBands/bandsPerRow);
-    bandKeys.forEach(function(key,idx){
+    var areaKeys=Object.keys(areaConfig);
+    areaKeys.forEach(function(areaKey){
+        var ac=areaConfig[areaKey];
+        // Collect bands for this area, sorted by level
+        var areaBands=[];
+        for(var bi=0;bi<bandKeys.length;bi++){
+            if(bandMap[bandKeys[bi]].area===areaKey) areaBands.push(bandKeys[bi]);
+        }
+        areaBands.sort(function(a,b){return bandMap[a].band-bandMap[b].band;});
+        var n=areaBands.length;
+        if(n===0) return;
+        // Golden angle spiral: each point gets equal area share of circle
+        var goldenAngle=Math.PI*(3-Math.sqrt(5)); // ~2.3999 radians
+        areaBands.forEach(function(key,idx){
         var bg=bandMap[key];
-        var ac=areaConfig[bg.area];
-        var row=Math.floor(idx/bandsPerRow);
-        var col=idx%bandsPerRow;
-        var colsInRow=Math.min(bandsPerRow,numBands-row*bandsPerRow);
-        // Z: distribute rows evenly across area height (0.85 of radius)
-        var rowT=numRows>1?(row/(numRows-1)):0.5;
-        var bandZ=ac.cz+ac.radius*0.85*(1-2*rowT); // south (low lv) to north (high lv)
-        // X: spread columns across the full available width at this Z
-        var dzFromCenter=bandZ-ac.cz;
-        var rowHalfWidth=Math.sqrt(Math.max(0,ac.radius*ac.radius-dzFromCenter*dzFromCenter))*0.85;
-        rowHalfWidth=Math.max(20,rowHalfWidth);
-        var colT=colsInRow>1?(col/(colsInRow-1)):0.5;
-        var bandX=ac.cx-rowHalfWidth+2*rowHalfWidth*colT;
-        // Add small random jitter so it doesn't look perfectly gridded
-        bandX+=Math.random()*16-8;
-        bandZ+=Math.random()*10-5;
-        // If band center lands in a safe zone, push it deeper into the wastes
+        // Spiral radius: sqrt distribution for even area coverage, use 0.88 of radius
+        var r=ac.radius*0.88*Math.sqrt((idx+0.5)/n);
+        var theta=idx*goldenAngle;
+        var bandX=ac.cx+r*Math.cos(theta);
+        var bandZ=ac.cz+r*Math.sin(theta);
+        // Add small jitter for natural look
+        bandX+=Math.random()*12-6;
+        bandZ+=Math.random()*12-6;
+        // Clamp within area circle
+        var dx=bandX-ac.cx,dz=bandZ-ac.cz;
+        var dist=Math.sqrt(dx*dx+dz*dz);
+        if(dist>ac.radius*0.92){var s=ac.radius*0.92/dist;bandX=ac.cx+dx*s;bandZ=ac.cz+dz*s;}
+        // If band center lands in a safe zone, push it away
         if(inSafeZone(bandX,bandZ)){
-            bandZ=ac.cz-ac.radius*0.2;
-            bandX=ac.cx+(bandX>ac.cx?60:-60);
+            // Rotate 90 degrees and push outward
+            bandX=ac.cx+r*Math.cos(theta+Math.PI*0.5);
+            bandZ=ac.cz+r*Math.sin(theta+Math.PI*0.5);
             if(inSafeZone(bandX,bandZ)){bandX=ac.cx;bandZ=ac.cz-ac.radius*0.4;}
         }
         // Spawn each enemy type in this band: 1-2 per type, max 4 total per group
@@ -5084,7 +5088,8 @@ function spawnEnemies(){
                 groupCount++;
             }
         });
-    });
+    }); // end areaBands.forEach
+    }); // end areaKeys.forEach
 }
 
 // ── Shared Combat: Remote damage/kill (no XP/loot for remote actions) ──
