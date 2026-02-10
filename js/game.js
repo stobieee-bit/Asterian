@@ -4998,10 +4998,14 @@ function spawnEnemies(){
         if(!bandMap[key])bandMap[key]={area:d.area,band:band,enemies:[]};
         bandMap[key].enemies.push(d);
     }
-    // Safe zones enemies must never spawn in (hub, bio-lab, etc.)
+    // Deterministic seeded random for consistent spawns across all players
+    var seed=12345;
+    function seededRandom(){seed=(seed*16807+0)%2147483647;return(seed&0x7fffffff)/2147483647;}
+    // Safe zones enemies must never spawn in
     var safeZones=[
-        {cx:0,cz:0,r:50},    // Station Hub (radius 35 + 15 buffer)
-        {cx:-20,cz:20,r:30}   // Bio-Lab (radius 18 + 12 buffer)
+        {cx:0,cz:0,r:55},     // Station Hub (radius 35 + 20 buffer)
+        {cx:-20,cz:20,r:35},   // Bio-Lab (radius 18 + 17 buffer)
+        {cx:300,cz:0,r:210}    // Asteroid Mines (radius 200 + 10 buffer)
     ];
     function inSafeZone(x,z){
         for(var si=0;si<safeZones.length;si++){
@@ -5011,13 +5015,12 @@ function spawnEnemies(){
         }
         return false;
     }
-    // Distribute bands evenly across full circle using sunflower spiral
-    // Group by area so each area's bands fill its own circle
+    // Deterministic tiered layout: levels progress south→north (hub→abyss direction)
+    // Low levels spawn near the hub edge, high levels spawn far north
     var bandKeys=Object.keys(bandMap);
     var areaKeys=Object.keys(areaConfig);
     areaKeys.forEach(function(areaKey){
         var ac=areaConfig[areaKey];
-        // Collect bands for this area, sorted by level
         var areaBands=[];
         for(var bi=0;bi<bandKeys.length;bi++){
             if(bandMap[bandKeys[bi]].area===areaKey) areaBands.push(bandKeys[bi]);
@@ -5025,28 +5028,36 @@ function spawnEnemies(){
         areaBands.sort(function(a,b){return bandMap[a].band-bandMap[b].band;});
         var n=areaBands.length;
         if(n===0) return;
-        // Golden angle spiral: each point gets equal area share of circle
-        var goldenAngle=Math.PI*(3-Math.sqrt(5)); // ~2.3999 radians
+        // Layout: Z goes from near-hub edge to far edge, X spreads across available width
+        // For alien-wastes: south edge (z ~ -60) is low level, north edge (z ~ -1000) is high
+        // For the-abyss: south edge is low, north edge is high
+        var zStart=ac.cz+ac.radius*0.85;  // south edge (closest to hub)
+        var zEnd=ac.cz-ac.radius*0.85;    // north edge (farthest from hub)
+        // Use 3 columns per row, cycling left/center/right for spread
+        var colOffsets=[-0.55, 0, 0.55];
         areaBands.forEach(function(key,idx){
         var bg=bandMap[key];
-        // Spiral radius: sqrt distribution for even area coverage, use 0.88 of radius
-        var r=ac.radius*0.88*Math.sqrt((idx+0.5)/n);
-        var theta=idx*goldenAngle;
-        var bandX=ac.cx+r*Math.cos(theta);
-        var bandZ=ac.cz+r*Math.sin(theta);
-        // Add small jitter for natural look
-        bandX+=Math.random()*12-6;
-        bandZ+=Math.random()*12-6;
+        // Z: linear progression from south to north based on level index
+        var t=n>1?(idx/(n-1)):0.5;
+        var bandZ=zStart+(zEnd-zStart)*t;
+        // X: cycle through columns, use available width at this Z
+        var dzFromCenter=bandZ-ac.cz;
+        var halfWidth=Math.sqrt(Math.max(0,ac.radius*ac.radius-dzFromCenter*dzFromCenter))*0.8;
+        halfWidth=Math.max(20,halfWidth);
+        var col=idx%3;
+        var bandX=ac.cx+colOffsets[col]*halfWidth;
+        // Deterministic jitter using seeded random
+        bandX+=seededRandom()*20-10;
+        bandZ+=seededRandom()*14-7;
         // Clamp within area circle
-        var dx=bandX-ac.cx,dz=bandZ-ac.cz;
-        var dist=Math.sqrt(dx*dx+dz*dz);
-        if(dist>ac.radius*0.92){var s=ac.radius*0.92/dist;bandX=ac.cx+dx*s;bandZ=ac.cz+dz*s;}
-        // If band center lands in a safe zone, push it away
+        var cdx=bandX-ac.cx,cdz=bandZ-ac.cz;
+        var cdist=Math.sqrt(cdx*cdx+cdz*cdz);
+        if(cdist>ac.radius*0.9){var s=ac.radius*0.9/cdist;bandX=ac.cx+cdx*s;bandZ=ac.cz+cdz*s;}
+        // If in safe zone, push further into the wastes (more negative Z)
         if(inSafeZone(bandX,bandZ)){
-            // Rotate 90 degrees and push outward
-            bandX=ac.cx+r*Math.cos(theta+Math.PI*0.5);
-            bandZ=ac.cz+r*Math.sin(theta+Math.PI*0.5);
-            if(inSafeZone(bandX,bandZ)){bandX=ac.cx;bandZ=ac.cz-ac.radius*0.4;}
+            bandZ-=80;
+            if(inSafeZone(bandX,bandZ)){bandZ-=80;bandX=ac.cx;}
+            if(inSafeZone(bandX,bandZ)){bandZ=ac.cz;bandX=ac.cx;}
         }
         // Spawn each enemy type in this band: 1-2 per type, max 4 total per group
         var clusterSpread=8;
@@ -5055,20 +5066,19 @@ function spawnEnemies(){
         bg.enemies.forEach(function(d){
             if(groupCount>=maxPerGroup) return;
             var td=ENEMY_TYPES[d.id];
-            var count=d.isBoss?1:Math.floor(Math.random()*2)+1; // 1-2 regular, 1 boss
+            var count=d.isBoss?1:(seededRandom()<0.5?1:2); // 1-2 regular, 1 boss
             for(var i=0;i<count;i++){
                 if(groupCount>=maxPerGroup) break;
-                var a=Math.random()*Math.PI*2;
-                var dist=d.isBoss?0:2+Math.random()*clusterSpread;
-                var sx=bandX+Math.cos(a)*dist;
-                var sz2=bandZ+Math.sin(a)*dist;
+                var a=seededRandom()*Math.PI*2;
+                var edist=d.isBoss?0:2+seededRandom()*clusterSpread;
+                var sx=bandX+Math.cos(a)*edist;
+                var sz2=bandZ+Math.sin(a)*edist;
                 // Verify within area radius
                 var ddx=sx-ac.cx,ddz=sz2-ac.cz;
                 if(Math.sqrt(ddx*ddx+ddz*ddz)>ac.radius*0.95){sx=bandX;sz2=bandZ;}
-                // Reject if in safe zone — nudge away
+                // Reject if in safe zone — push deeper
                 if(inSafeZone(sx,sz2)){
-                    sx=bandX+(sx>ac.cx?25:-25);
-                    sz2=bandZ-25;
+                    sz2=bandZ-40;sx=bandX;
                     if(inSafeZone(sx,sz2)){sx=ac.cx;sz2=ac.cz;}
                 }
                 var mesh=buildEnemyMesh(d.id);mesh.position.set(sx,0,sz2);
@@ -5077,8 +5087,8 @@ function spawnEnemies(){
                     combatStyle:td.combatStyle,respawnTime:td.respawnTime,area:td.area,desc:td.desc,
                     lootTable:td.lootTable,type:d.id,mesh:mesh,alive:true,
                     spawnPos:new THREE.Vector3(sx,0,sz2),state:'idle',wanderTarget:null,
-                    wanderTimer:Math.random()*5,attackTimer:td.attackSpeed,stunTimer:0,
-                    respawnTimer:0,animPhase:Math.random()*Math.PI*2,deathAnim:0};
+                    wanderTimer:seededRandom()*5,attackTimer:td.attackSpeed,stunTimer:0,
+                    respawnTimer:0,animPhase:seededRandom()*Math.PI*2,deathAnim:0};
                 if(td.isBoss) enemy.isBoss=true;
                 if(td.meshTemplate) enemy.meshTemplate=td.meshTemplate;
                 enemy.enemyId=d.area+'_'+d.id+'_'+i;
