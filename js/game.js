@@ -1476,7 +1476,7 @@ function smoothNoise(x,z,scale){
 const AREAS = {
     'station-hub':{name:'Station Hub',center:{x:0,z:0},radius:35,groundColor:0x1a2030,floorY:0},
     'asteroid-mines':{name:'Asteroid Mines',center:{x:300,z:0},radius:200,groundColor:0x2a1a10,floorY:-2},
-    'alien-wastes':{name:'Alien Wastes',center:{x:0,z:-300},radius:250,groundColor:0x0a1a10,floorY:-1},
+    'alien-wastes':{name:'Alien Wastes',center:{x:0,z:-300},radius:350,groundColor:0x0a1a10,floorY:-1},
     'bio-lab':{name:'Bio-Lab',center:{x:-20,z:20},radius:18,groundColor:0x0a2020,floorY:0},
     'the-abyss':{name:'The Abyss',center:{x:0,z:-650},radius:200,groundColor:0x050510,floorY:-3},
 };
@@ -4981,48 +4981,72 @@ var enemyById = {}; // enemyId → enemy object for shared combat lookup
 
 function spawnEnemies(){
     enemyById = {};
-    // Data-driven: spawn all enemies from ENEMY_DEFS based on area + level → position mapping
+    // Data-driven: spawn enemies in level-band clusters (groups of 5 levels)
     var areaConfig = {
-        'alien-wastes': {cx:0, cz:-300, radius:250, levelRange:[1,99],
-            getZ: function(level){var t=(level-1)/98; return this.cz + 230*(1-2*t);}},
-        'the-abyss': {cx:0, cz:-650, radius:200, levelRange:[100,200],
-            getZ: function(level){var t=(level-100)/100; return this.cz + 180*(1-2*t);}}
+        'alien-wastes': {cx:0, cz:-300, radius:350, levelRange:[1,99]},
+        'the-abyss': {cx:0, cz:-650, radius:200, levelRange:[100,200]}
     };
+    // Group ENEMY_DEFS by area and level band (every 5 levels)
+    var bandMap={};
     for(var di=0;di<ENEMY_DEFS.length;di++){
         var d=ENEMY_DEFS[di];
-        var td=ENEMY_TYPES[d.id];
-        if(!td) continue;
+        if(!ENEMY_TYPES[d.id])continue;
         var ac=areaConfig[d.area];
-        if(!ac) continue;
-        var targetZ=ac.getZ(d.level);
-        // Clamp within area circle
-        var maxXSpread=Math.sqrt(Math.max(0,ac.radius*ac.radius-Math.pow(targetZ-ac.cz,2)))*0.8;
-        maxXSpread=Math.max(5,Math.min(maxXSpread,80));
-        var count=d.isBoss?1:3; // bosses: 1 spawn, regular: 3
-        var spread=d.isBoss?0:15;
-        for(var i=0;i<count;i++){
-            var sx=ac.cx+(Math.random()-0.5)*maxXSpread*2;
-            var sz=targetZ+(Math.random()-0.5)*spread*2;
-            // Verify within area radius
-            var ddx=sx-ac.cx,ddz=sz-ac.cz;
-            if(Math.sqrt(ddx*ddx+ddz*ddz)>ac.radius*0.95){sx=ac.cx+(Math.random()-0.5)*20;sz=targetZ;}
-            var mesh=buildEnemyMesh(d.id);mesh.position.set(sx,0,sz);
-            var enemy={name:td.name,level:td.level,hp:td.hp,maxHp:td.maxHp,damage:td.damage,defense:td.defense,
-                attackSpeed:td.attackSpeed,aggroRange:td.aggroRange,leashRange:td.leashRange,
-                combatStyle:td.combatStyle,respawnTime:td.respawnTime,area:td.area,desc:td.desc,
-                lootTable:td.lootTable,type:d.id,mesh:mesh,alive:true,
-                spawnPos:new THREE.Vector3(sx,0,sz),state:'idle',wanderTarget:null,
-                wanderTimer:Math.random()*5,attackTimer:td.attackSpeed,stunTimer:0,
-                respawnTimer:0,animPhase:Math.random()*Math.PI*2,deathAnim:0};
-            if(td.isBoss) enemy.isBoss=true;
-            if(td.meshTemplate) enemy.meshTemplate=td.meshTemplate;
-            // Stable enemy ID for shared combat sync
-            enemy.enemyId=d.area+'_'+d.id+'_'+i;
-            enemyById[enemy.enemyId]=enemy;
-            mesh.userData.entityType='enemy';mesh.userData.entity=enemy;
-            GameState.scene.add(mesh);GameState.enemies.push(enemy);
-        }
+        if(!ac)continue;
+        var band=Math.floor((d.level-1)/5); // 0=lv1-5, 1=lv6-10, 2=lv11-15...
+        var key=d.area+'_'+band;
+        if(!bandMap[key])bandMap[key]={area:d.area,band:band,enemies:[]};
+        bandMap[key].enemies.push(d);
     }
+    // Assign each band a cluster center, spread bands across the area
+    var bandKeys=Object.keys(bandMap);
+    bandKeys.forEach(function(key){
+        var bg=bandMap[key];
+        var ac=areaConfig[bg.area];
+        var minLvl=ac.levelRange[0],maxLvl=ac.levelRange[1];
+        var totalBands=Math.ceil((maxLvl-minLvl)/5);
+        var bandIdx=bg.band-Math.floor((minLvl-1)/5);
+        // Distribute bands in a spiral/staggered pattern across the area
+        var t=totalBands>1?(bandIdx/(totalBands-1)):0.5;
+        var bandZ=ac.cz+ac.radius*0.85*(1-2*t); // north (low level) to south (high level)
+        // Stagger X so adjacent bands don't overlap — alternate left/right
+        var xOffset=(bandIdx%2===0?-1:1)*(20+bandIdx*3);
+        var bandX=ac.cx+xOffset;
+        // Clamp within area circle
+        var dzFromCenter=bandZ-ac.cz;
+        var maxX=Math.sqrt(Math.max(0,ac.radius*ac.radius-dzFromCenter*dzFromCenter))*0.7;
+        maxX=Math.max(10,maxX);
+        if(Math.abs(bandX-ac.cx)>maxX)bandX=ac.cx+(bandX>ac.cx?1:-1)*maxX*0.8;
+        // Spawn each enemy type in this band: 2-3 per type, tightly clustered
+        var clusterSpread=12; // tight cluster radius
+        bg.enemies.forEach(function(d){
+            var td=ENEMY_TYPES[d.id];
+            var count=d.isBoss?1:Math.floor(Math.random()*2)+2; // 2-3 regular, 1 boss
+            for(var i=0;i<count;i++){
+                var a=Math.random()*Math.PI*2;
+                var dist=d.isBoss?0:2+Math.random()*clusterSpread;
+                var sx=bandX+Math.cos(a)*dist;
+                var sz=bandZ+Math.sin(a)*dist;
+                // Verify within area radius
+                var ddx=sx-ac.cx,ddz=sz-ac.cz;
+                if(Math.sqrt(ddx*ddx+ddz*ddz)>ac.radius*0.95){sx=bandX;sz=bandZ;}
+                var mesh=buildEnemyMesh(d.id);mesh.position.set(sx,0,sz);
+                var enemy={name:td.name,level:td.level,hp:td.hp,maxHp:td.maxHp,damage:td.damage,defense:td.defense,
+                    attackSpeed:td.attackSpeed,aggroRange:td.aggroRange,leashRange:td.leashRange,
+                    combatStyle:td.combatStyle,respawnTime:td.respawnTime,area:td.area,desc:td.desc,
+                    lootTable:td.lootTable,type:d.id,mesh:mesh,alive:true,
+                    spawnPos:new THREE.Vector3(sx,0,sz),state:'idle',wanderTarget:null,
+                    wanderTimer:Math.random()*5,attackTimer:td.attackSpeed,stunTimer:0,
+                    respawnTimer:0,animPhase:Math.random()*Math.PI*2,deathAnim:0};
+                if(td.isBoss) enemy.isBoss=true;
+                if(td.meshTemplate) enemy.meshTemplate=td.meshTemplate;
+                enemy.enemyId=d.area+'_'+d.id+'_'+i;
+                enemyById[enemy.enemyId]=enemy;
+                mesh.userData.entityType='enemy';mesh.userData.entity=enemy;
+                GameState.scene.add(mesh);GameState.enemies.push(enemy);
+            }
+        });
+    });
 }
 
 // ── Shared Combat: Remote damage/kill (no XP/loot for remote actions) ──
