@@ -1983,22 +1983,22 @@ function buildResourceNodes(){
     // Arranged by tier — lower tiers near entrance (west), higher tiers deeper (east/north/south)
     var minesCx=300,minesCz=0;
     var oreZones=[
-        {resource:'stellarite_ore',level:1,xp:10,color:0x888888,cx:minesCx-120,cz:minesCz,spread:35},
-        {resource:'ferrite_ore',level:10,xp:20,color:0x44cc66,cx:minesCx-80,cz:minesCz-60,spread:35},
-        {resource:'cobaltium_ore',level:20,xp:35,color:0x4488ff,cx:minesCx-80,cz:minesCz+60,spread:35},
-        {resource:'duranite_ore',level:30,xp:55,color:0x66aacc,cx:minesCx-20,cz:minesCz-100,spread:40},
-        {resource:'titanex_ore',level:40,xp:80,color:0x88cc44,cx:minesCx-20,cz:minesCz+100,spread:40},
-        {resource:'plasmite_ore',level:50,xp:110,color:0xaa44ff,cx:minesCx+40,cz:minesCz-60,spread:40},
-        {resource:'quantite_ore',level:60,xp:150,color:0xff8844,cx:minesCx+40,cz:minesCz+60,spread:40},
-        {resource:'neutronium_ore',level:70,xp:200,color:0xff4488,cx:minesCx+100,cz:minesCz-40,spread:45},
-        {resource:'darkmatter_shard',level:80,xp:260,color:0xcc44ff,cx:minesCx+100,cz:minesCz+40,spread:45},
-        {resource:'voidsteel_ore',level:90,xp:340,color:0xff8800,cx:minesCx+160,cz:minesCz,spread:45},
+        {resource:'stellarite_ore',level:1,xp:10,color:0x888888,cx:minesCx-120,cz:minesCz,spread:15},
+        {resource:'ferrite_ore',level:10,xp:20,color:0x44cc66,cx:minesCx-80,cz:minesCz-60,spread:15},
+        {resource:'cobaltium_ore',level:20,xp:35,color:0x4488ff,cx:minesCx-80,cz:minesCz+60,spread:15},
+        {resource:'duranite_ore',level:30,xp:55,color:0x66aacc,cx:minesCx-20,cz:minesCz-100,spread:18},
+        {resource:'titanex_ore',level:40,xp:80,color:0x88cc44,cx:minesCx-20,cz:minesCz+100,spread:18},
+        {resource:'plasmite_ore',level:50,xp:110,color:0xaa44ff,cx:minesCx+40,cz:minesCz-60,spread:18},
+        {resource:'quantite_ore',level:60,xp:150,color:0xff8844,cx:minesCx+40,cz:minesCz+60,spread:18},
+        {resource:'neutronium_ore',level:70,xp:200,color:0xff4488,cx:minesCx+100,cz:minesCz-40,spread:20},
+        {resource:'darkmatter_shard',level:80,xp:260,color:0xcc44ff,cx:minesCx+100,cz:minesCz+40,spread:20},
+        {resource:'voidsteel_ore',level:90,xp:340,color:0xff8800,cx:minesCx+160,cz:minesCz,spread:20},
     ];
-    // Each ore spawns 2-5 nodes clustered in its zone
+    // Each ore spawns 10 nodes tightly clustered in its zone
     oreZones.forEach(function(zone){
-        var count=2+Math.floor(Math.random()*4); // 2-5 nodes
+        var count=10;
         for(var i=0;i<count;i++){
-            var a=Math.random()*Math.PI*2,dist=3+Math.random()*zone.spread;
+            var a=Math.random()*Math.PI*2,dist=2+Math.random()*zone.spread;
             var nx=zone.cx+Math.cos(a)*dist,nz=zone.cz+Math.sin(a)*dist;
             buildOreNode({area:'asteroid-mines',type:'astromining',resource:zone.resource,level:zone.level,xp:zone.xp,color:zone.color},nx,nz);
         }
