@@ -1950,6 +1950,138 @@ body {
 }
 
 /* ========================================
+   Quest Log Panel
+   ======================================== */
+#quest-panel {
+    width: 380px;
+    max-height: 520px;
+    top: 80px;
+    right: 20px;
+}
+#quest-panel-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 8px;
+    border-bottom: 1px solid #1a3050;
+}
+.quest-tab {
+    flex: 1;
+    padding: 8px 0;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #5a7a9a;
+    font: 700 11px monospace;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.2s, border-color 0.2s;
+}
+.quest-tab:hover { color: #8ab0d0; }
+.quest-tab.active {
+    color: #ffcc44;
+    border-bottom-color: #ffcc44;
+}
+#quest-panel-content {
+    padding: 8px;
+    max-height: 420px;
+    overflow-y: auto;
+}
+.quest-entry {
+    padding: 10px;
+    border: 1px solid #1a2a3a;
+    border-left: 3px solid #ffcc44;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    background: rgba(15, 20, 35, 0.5);
+    transition: border-color 0.2s;
+}
+.quest-entry:hover { border-color: #3a5a7a; }
+.quest-entry.board { border-left-color: #00c8ff; }
+.quest-entry.slayer { border-left-color: #ff4444; }
+.quest-entry.completed-entry {
+    border-left-color: #44ff88;
+    opacity: 0.8;
+}
+.quest-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+.quest-entry-name {
+    font: 700 12px monospace;
+    color: #ffcc44;
+}
+.quest-entry.board .quest-entry-name { color: #00c8ff; }
+.quest-entry.slayer .quest-entry-name { color: #ff4444; }
+.quest-entry.completed-entry .quest-entry-name { color: #44ff88; }
+.quest-entry-badge {
+    font: 700 9px monospace;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+}
+.quest-badge-active { background: rgba(255,204,68,0.15); color: #ffcc44; }
+.quest-badge-done { background: rgba(68,255,136,0.15); color: #44ff88; }
+.quest-entry-desc {
+    font: 10px monospace;
+    color: #6a8aa0;
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+.quest-entry-steps {
+    margin-bottom: 6px;
+}
+.quest-entry-step {
+    font: 11px monospace;
+    color: #8aa0b8;
+    padding: 2px 0 2px 10px;
+    position: relative;
+}
+.quest-entry-step::before {
+    content: '\25CB';
+    position: absolute;
+    left: 0;
+    color: #5a7a9a;
+}
+.quest-entry-step.done {
+    color: #44ff88;
+    text-decoration: line-through;
+}
+.quest-entry-step.done::before {
+    content: '\25CF';
+    color: #44ff88;
+}
+.quest-entry-rewards {
+    font: 10px monospace;
+    color: #8a7a5a;
+    border-top: 1px solid rgba(100,140,180,0.1);
+    padding-top: 4px;
+    margin-top: 4px;
+}
+.quest-entry-rewards span {
+    margin-right: 8px;
+}
+.quest-reward-xp { color: #88ccff; }
+.quest-reward-credits { color: #ffcc44; }
+.quest-reward-item { color: #44ff88; }
+.quest-empty {
+    text-align: center;
+    padding: 30px 10px;
+    color: #5a7a9a;
+    font: 11px monospace;
+    line-height: 1.6;
+}
+.quest-completed-header {
+    font: 700 11px monospace;
+    color: #6a8aa0;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(100,140,180,0.1);
+    margin-bottom: 6px;
+}
+
+/* ========================================
    Quest Tracker Multi-Track
    ======================================== */
 .quest-track {

@@ -78,6 +78,7 @@
             <button class="panel-btn" id="btn-equipment" title="Equipment">EQP</button>
             <button class="panel-btn" id="btn-skills" title="Skills">SKL</button>
             <button class="panel-btn" id="btn-bestiary" title="Bestiary">BST</button>
+            <button class="panel-btn" id="btn-quests" title="Quest Log (Q)">QST</button>
             <button class="panel-btn save-btn" id="btn-save" title="Save (F5)">💾</button>
             <button class="panel-btn" id="btn-mp" title="Multiplayer">MP</button>
             <button class="panel-btn" id="btn-audio" title="Audio (right-click for volume)">🔊</button>
@@ -212,6 +213,20 @@
                 <button class="panel-close">&times;</button>
             </div>
             <div id="board-quests-list"></div>
+        </div>
+
+        <!-- Quest Log Panel -->
+        <div id="quest-panel" class="game-panel" style="display:none;">
+            <div class="panel-header">
+                <span>Quest Log</span>
+                <div class="panel-lock-btn" title="Lock position">&#128274;</div>
+                <button class="panel-close">&times;</button>
+            </div>
+            <div id="quest-panel-tabs">
+                <button class="quest-tab active" data-tab="active">Active</button>
+                <button class="quest-tab" data-tab="completed">Completed</button>
+            </div>
+            <div id="quest-panel-content"></div>
         </div>
 
         <!-- Prestige Panel -->

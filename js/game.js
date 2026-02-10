@@ -1353,6 +1353,8 @@ function initInput(){
         if(e.key==='x'){player.xpTracker={startTime:0,xpGains:{},active:false};var xpEl=document.getElementById('xp-tracker');if(xpEl)xpEl.style.display='none';EventBus.emit('chat',{type:'info',text:'XP tracker reset.'});}
         // World map (Feature 14)
         if(e.key==='m'){toggleWorldMap();}
+        // Quest log
+        if(e.key==='q'){var qp=document.getElementById('quest-panel'),qb=document.getElementById('btn-quests');if(qp){var qVis=qp.style.display!=='none';qp.style.display=qVis?'none':'flex';if(qb)qb.classList.toggle('active',!qVis);if(!qVis)renderQuestPanel();}}
     });
     window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
     window.addEventListener('mousedown',e=>{if(e.button===1)e.preventDefault();});
@@ -6062,14 +6064,14 @@ function updateGatherBar(){
 }
 
 function setupPanelButtons(){
-    const panels={'btn-inventory':'inventory-panel','btn-equipment':'equipment-panel','btn-skills':'skills-panel'};
+    const panels={'btn-inventory':'inventory-panel','btn-equipment':'equipment-panel','btn-skills':'skills-panel','btn-quests':'quest-panel'};
     Object.entries(panels).forEach(([bid,pid])=>{
         document.getElementById(bid).addEventListener('click',()=>{
             const p=document.getElementById(pid),vis=p.style.display!=='none';if(vis&&player.panelLocks[pid]){EventBus.emit('chat',{type:'info',text:'Panel is locked.'});return;}p.style.display=vis?'none':'flex';document.getElementById(bid).classList.toggle('active',!vis);
-            if(!vis){if(pid==='inventory-panel')renderInventory();if(pid==='equipment-panel')renderEquipment();if(pid==='skills-panel')renderSkills();checkTutorialEvent('panelOpened');}
+            if(!vis){if(pid==='inventory-panel')renderInventory();if(pid==='equipment-panel')renderEquipment();if(pid==='skills-panel')renderSkills();if(pid==='quest-panel')renderQuestPanel();checkTutorialEvent('panelOpened');}
         });
     });
-    EventBus.on('escape',()=>{Object.entries(panels).forEach(([bid,pid])=>{if(!player.panelLocks[pid]){document.getElementById(pid).style.display='none';document.getElementById(bid).classList.remove('active');}});if(!player.panelLocks['crafting-panel']){document.getElementById('crafting-panel').style.display='none';craftingFromStation=false;}document.getElementById('board-panel').style.display='none';document.getElementById('skill-guide-panel').style.display='none';document.getElementById('bestiary-panel').style.display='none';document.getElementById('world-map-panel').style.display='none';if(bankOpen)closeBank();if(activeShop)closeShop();if(activeNPC)closeDialogue();var ac=document.getElementById('audio-controls');if(ac)ac.style.display='none';});
+    EventBus.on('escape',()=>{Object.entries(panels).forEach(([bid,pid])=>{if(!player.panelLocks[pid]){document.getElementById(pid).style.display='none';document.getElementById(bid).classList.remove('active');}});if(!player.panelLocks['crafting-panel']){document.getElementById('crafting-panel').style.display='none';craftingFromStation=false;}document.getElementById('board-panel').style.display='none';document.getElementById('skill-guide-panel').style.display='none';document.getElementById('bestiary-panel').style.display='none';document.getElementById('quest-panel').style.display='none';document.getElementById('world-map-panel').style.display='none';if(bankOpen)closeBank();if(activeShop)closeShop();if(activeNPC)closeDialogue();var ac=document.getElementById('audio-controls');if(ac)ac.style.display='none';});
     // Audio button — click opens volume popup, right-click toggles mute
     var audioBtn=document.getElementById('btn-audio');
     if(audioBtn){
@@ -6289,7 +6291,7 @@ function restorePanelSizes(){
     if(!player.panelSizes)return;
     var noScroll={'inventory-panel':true,'equipment-panel':true};
     // Enforce minimum widths matching CSS defaults so panels never open tiny
-    var defaultWidths={'inventory-panel':208,'equipment-panel':220,'skills-panel':250,'shop-panel':500,'crafting-panel':400,'bestiary-panel':280,'prestige-panel':320,'prestige-shop-panel':260,'board-panel':280};
+    var defaultWidths={'inventory-panel':208,'equipment-panel':220,'skills-panel':250,'shop-panel':500,'crafting-panel':400,'bestiary-panel':280,'prestige-panel':320,'prestige-shop-panel':260,'board-panel':280,'quest-panel':380};
     Object.entries(player.panelSizes).forEach(function(entry){
         var pid=entry[0],size=entry[1];
         var panel=document.getElementById(pid);
@@ -7666,6 +7668,125 @@ function updateQuestTracker(){
 }
 
 // ========================================
+// Quest Log Panel
+// ========================================
+var questPanelTab='active';
+function renderQuestPanel(){
+    var content=document.getElementById('quest-panel-content');
+    if(!content)return;
+    var html='';
+    if(questPanelTab==='active'){
+        var hasAny=false;
+        // Vex quest
+        if(questState.vexQuest){
+            var vq=QUESTS[questState.vexQuest];
+            if(vq){
+                hasAny=true;
+                html+='<div class="quest-entry">';
+                html+='<div class="quest-entry-header"><span class="quest-entry-name">'+vq.name+'</span><span class="quest-entry-badge quest-badge-active">Active</span></div>';
+                html+='<div class="quest-entry-desc">'+vq.desc+'</div>';
+                html+='<div class="quest-entry-steps">';
+                vq.steps.forEach(function(step,i){
+                    var prog=questState.vexProgress[i]||0;
+                    var done=prog>=step.count;
+                    var label=step.desc.replace(/\(.*\)/,('('+Math.min(prog,step.count)+'/'+step.count+')'));
+                    html+='<div class="quest-entry-step'+(done?' done':'')+'">'+label+'</div>';
+                });
+                html+='</div>';
+                html+=formatQuestRewards(vq.rewards);
+                html+='</div>';
+            }
+        }
+        // Board quest
+        if(questState.boardQuest){
+            var bq=BOARD_QUESTS[questState.boardQuest];
+            if(bq){
+                hasAny=true;
+                html+='<div class="quest-entry board">';
+                html+='<div class="quest-entry-header"><span class="quest-entry-name">'+bq.name+'</span><span class="quest-entry-badge quest-badge-active">Board</span></div>';
+                html+='<div class="quest-entry-desc">'+bq.desc+'</div>';
+                html+='<div class="quest-entry-steps">';
+                bq.steps.forEach(function(step,i){
+                    var prog=questState.boardProgress[i]||0;
+                    var done=prog>=step.count;
+                    var label=step.desc.replace(/\(.*\)/,('('+Math.min(prog,step.count)+'/'+step.count+')'));
+                    html+='<div class="quest-entry-step'+(done?' done':'')+'">'+label+'</div>';
+                });
+                html+='</div>';
+                html+=formatQuestRewards(bq.rewards);
+                html+='</div>';
+            }
+        }
+        // Slayer task
+        if(questState.slayerTask){
+            hasAny=true;
+            var st=questState.slayerTask;
+            var eName=ENEMY_TYPES[st.target]?ENEMY_TYPES[st.target].name:st.target;
+            var sDone=questState.slayerProgress>=st.count;
+            html+='<div class="quest-entry slayer">';
+            html+='<div class="quest-entry-header"><span class="quest-entry-name">Slayer Task</span><span class="quest-entry-badge quest-badge-active">Slayer</span></div>';
+            html+='<div class="quest-entry-desc">Eliminate '+st.count+' '+eName+' for Slayer Master Grax.</div>';
+            html+='<div class="quest-entry-steps">';
+            html+='<div class="quest-entry-step'+(sDone?' done':'')+'">Kill '+eName+' ('+Math.min(questState.slayerProgress,st.count)+'/'+st.count+')</div>';
+            html+='</div>';
+            if(questState.slayerStreak>0) html+='<div class="quest-entry-rewards"><span style="color:#ff8844;">Streak: '+questState.slayerStreak+'</span></div>';
+            html+='</div>';
+        }
+        if(!hasAny){
+            html+='<div class="quest-empty">No active quests.<br><br>Visit <span style="color:#ffcc44;">Commander Vex</span> or the <span style="color:#00c8ff;">Quest Board</span> in Station Hub to get started!</div>';
+        }
+    } else {
+        // Completed tab
+        var totalQuests=Object.keys(QUESTS).length+Object.keys(BOARD_QUESTS).length;
+        var completedList=questState.completed||[];
+        html+='<div class="quest-completed-header">Completed: '+completedList.length+' / '+totalQuests+' quests</div>';
+        if(completedList.length===0){
+            html+='<div class="quest-empty">No quests completed yet.<br><br>Your completed quests will appear here.</div>';
+        } else {
+            for(var ci=completedList.length-1;ci>=0;ci--){
+                var cid=completedList[ci];
+                var cq=QUESTS[cid]||BOARD_QUESTS[cid];
+                if(!cq)continue;
+                var isBoard=!!BOARD_QUESTS[cid];
+                html+='<div class="quest-entry completed-entry'+(isBoard?' board':'')+'">';
+                html+='<div class="quest-entry-header"><span class="quest-entry-name">'+cq.name+'</span><span class="quest-entry-badge quest-badge-done">Done</span></div>';
+                html+='<div class="quest-entry-desc">'+cq.desc+'</div>';
+                html+=formatQuestRewards(cq.rewards);
+                html+='</div>';
+            }
+        }
+    }
+    content.innerHTML=html;
+}
+function formatQuestRewards(rewards){
+    if(!rewards)return '';
+    var parts=[];
+    if(rewards.xp){
+        var xpStrs=[];
+        for(var sk in rewards.xp)xpStrs.push(rewards.xp[sk]+' '+sk);
+        if(xpStrs.length)parts.push('<span class="quest-reward-xp">XP: '+xpStrs.join(', ')+'</span>');
+    }
+    if(rewards.credits)parts.push('<span class="quest-reward-credits">'+rewards.credits+' credits</span>');
+    if(rewards.items&&rewards.items.length){
+        var itemNames=rewards.items.map(function(iid){return ITEMS[iid]?ITEMS[iid].name:iid;});
+        parts.push('<span class="quest-reward-item">'+itemNames.join(', ')+'</span>');
+    }
+    if(!parts.length)return '';
+    return '<div class="quest-entry-rewards">Rewards: '+parts.join(' | ')+'</div>';
+}
+function initQuestPanelTabs(){
+    var tabs=document.querySelectorAll('.quest-tab');
+    tabs.forEach(function(tab){
+        tab.addEventListener('click',function(){
+            tabs.forEach(function(t){t.classList.remove('active');});
+            tab.classList.add('active');
+            questPanelTab=tab.getAttribute('data-tab');
+            renderQuestPanel();
+        });
+    });
+}
+
+// ========================================
 // QoL Feature Functions
 // ========================================
 
@@ -8169,7 +8290,7 @@ function initGame(){
     // Enemies & NPCs
     spawnEnemies();spawnNPCs();
     // UI
-    setupPanelButtons();setupPanelDragging();setupPanelResizing();setupMinimapResize();setupChatResize();setupPanelLocks();setupUIEvents();updateActionBar();initStyleHUD();initSkillTabs();
+    setupPanelButtons();setupPanelDragging();setupPanelResizing();setupMinimapResize();setupChatResize();setupPanelLocks();setupUIEvents();updateActionBar();initStyleHUD();initSkillTabs();initQuestPanelTabs();
     setAreaAtmosphere('station-hub');
     // Event wiring
     EventBus.on('leftClick',hit=>{
