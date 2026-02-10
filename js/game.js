@@ -1232,8 +1232,10 @@ function showContextMenu(x,y,options){
     });
     menu.style.display='block'; menu.style.left=x+'px'; menu.style.top=y+'px';
     const rect=menu.getBoundingClientRect();
-    if(rect.right>window.innerWidth)menu.style.left=(x-rect.width)+'px';
-    if(rect.bottom>window.innerHeight)menu.style.top=(y-rect.height)+'px';
+    var mx=x,my=y,vw=window.innerWidth,vh=window.innerHeight;
+    if(rect.right>vw-8)mx=Math.max(8,x-rect.width);
+    if(rect.bottom>vh-8)my=Math.max(8,y-rect.height);
+    menu.style.left=mx+'px';menu.style.top=my+'px';
     contextMenuVisible=true;
 }
 function hideContextMenu(){if(contextMenuVisible){document.getElementById('context-menu').style.display='none';contextMenuVisible=false;}}
@@ -1644,7 +1646,7 @@ function buildGround(){
 }
 
 function buildStarfield(){
-    const ct=4000,geo=new THREE.BufferGeometry(),p=new Float32Array(ct*3),c=new Float32Array(ct*3),sz=new Float32Array(ct);
+    const ct=GameState.isMobilePerf?1500:4000,geo=new THREE.BufferGeometry(),p=new Float32Array(ct*3),c=new Float32Array(ct*3),sz=new Float32Array(ct);
     // Star color palette: blue-white, yellow-white, white, faint red
     var starColors=[[0.7,0.8,1],[1,0.95,0.8],[1,1,1],[1,0.7,0.6],[0.6,0.9,1],[1,0.85,0.7]];
     for(let i=0;i<ct;i++){
@@ -1660,7 +1662,7 @@ function buildStarfield(){
     // Main stars layer
     GameState.scene.add(new THREE.Points(geo,new THREE.PointsMaterial({size:1.5,vertexColors:true,sizeAttenuation:false,transparent:true,opacity:0.9})));
     // Bright star clusters — sparse, bigger points for depth
-    var ct2=200,geo2=new THREE.BufferGeometry(),p2=new Float32Array(ct2*3),c2=new Float32Array(ct2*3);
+    var ct2=GameState.isMobilePerf?80:200,geo2=new THREE.BufferGeometry(),p2=new Float32Array(ct2*3),c2=new Float32Array(ct2*3);
     for(let i=0;i<ct2;i++){
         var th2=Math.random()*Math.PI*2,ph2=Math.acos(2*Math.random()-1),r2=350+Math.random()*60;
         p2[i*3]=r2*Math.sin(ph2)*Math.cos(th2);p2[i*3+1]=r2*Math.sin(ph2)*Math.sin(th2);p2[i*3+2]=r2*Math.cos(ph2);
@@ -5504,7 +5506,7 @@ function renderShop(){
             var stockEl=document.createElement('span');stockEl.style.cssText='position:absolute;top:1px;left:2px;font-size:8px;color:#8aa0b8;';stockEl.textContent='x'+stock;s.appendChild(stockEl);
         }
         s.addEventListener('mouseenter',e=>{showTooltip(e.clientX,e.clientY,def,'<div style="color:'+priceColor+';font-size:10px;margin-top:3px;">Click to buy ('+price+' Cr) | Stock: '+stock+'</div>');});
-        s.addEventListener('mousemove',e=>{if(tooltip.style.display!=='none'){tooltip.style.left=Math.min(e.clientX+12,window.innerWidth-260)+'px';tooltip.style.top=Math.min(e.clientY+12,window.innerHeight-tooltip.offsetHeight-10)+'px';}});
+        s.addEventListener('mousemove',e=>{if(tooltip.style.display!=='none'){var _tw=tooltip.offsetWidth,_th=tooltip.offsetHeight,_vw=window.innerWidth,_vh=window.innerHeight,_tx=e.clientX+12,_ty=e.clientY+12;if(_tx+_tw>_vw-8)_tx=Math.max(8,e.clientX-_tw-8);if(_ty+_th>_vh-8)_ty=Math.max(8,e.clientY-_th-8);tooltip.style.left=_tx+'px';tooltip.style.top=_ty+'px';}});
         s.addEventListener('mouseleave',()=>{hideTooltip();});
         if(!soldOut){s.addEventListener('click',()=>{hideTooltip();buyItem(item);});}
         si.appendChild(s);
@@ -5782,7 +5784,7 @@ function renderInventory(){
             var tooltipDef=def;
             if(inv.durability!==undefined){tooltipDef=Object.assign({},def);tooltipDef.durability=inv.durability;tooltipDef.maxDurability=inv.maxDurability;}
             slot.addEventListener('mouseenter',(function(td){return function(e){showTooltip(e.clientX,e.clientY,td);};})(tooltipDef));
-            slot.addEventListener('mousemove',e=>{if(tooltip.style.display!=='none'){tooltip.style.left=Math.min(e.clientX+12,window.innerWidth-260)+'px';tooltip.style.top=Math.min(e.clientY+12,window.innerHeight-tooltip.offsetHeight-10)+'px';}});
+            slot.addEventListener('mousemove',e=>{if(tooltip.style.display!=='none'){var _tw=tooltip.offsetWidth,_th=tooltip.offsetHeight,_vw=window.innerWidth,_vh=window.innerHeight,_tx=e.clientX+12,_ty=e.clientY+12;if(_tx+_tw>_vw-8)_tx=Math.max(8,e.clientX-_tw-8);if(_ty+_th>_vh-8)_ty=Math.max(8,e.clientY-_th-8);tooltip.style.left=_tx+'px';tooltip.style.top=_ty+'px';}});
             slot.addEventListener('mouseleave',()=>{hideTooltip();});
             slot.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();invSelectedSlot=-1;hideTooltip();showItemContextMenu(e.clientX,e.clientY,i,def);});
         }
@@ -5844,7 +5846,7 @@ function renderEquipment(){
             }
             el.innerHTML='<span class="item-icon">'+item.icon+'</span>'+durHTML;
             el.onmouseenter=function(e){showTooltip(e.clientX,e.clientY,item);};
-            el.onmousemove=function(e){if(tooltip.style.display!=='none'){tooltip.style.left=Math.min(e.clientX+12,window.innerWidth-260)+'px';tooltip.style.top=Math.min(e.clientY+12,window.innerHeight-tooltip.offsetHeight-10)+'px';}};
+            el.onmousemove=function(e){if(tooltip.style.display!=='none'){var _tw=tooltip.offsetWidth,_th=tooltip.offsetHeight,_vw=window.innerWidth,_vh=window.innerHeight,_tx=e.clientX+12,_ty=e.clientY+12;if(_tx+_tw>_vw-8)_tx=Math.max(8,e.clientX-_tw-8);if(_ty+_th>_vh-8)_ty=Math.max(8,e.clientY-_th-8);tooltip.style.left=_tx+'px';tooltip.style.top=_ty+'px';}};
             el.onmouseleave=function(){hideTooltip();};
             el.onclick=()=>{hideTooltip();unequipItem(sn);renderEquipment();renderInventory();};}
         else{el.classList.remove('has-item');el.textContent=sn.charAt(0).toUpperCase()+sn.slice(1);el.onmouseenter=null;el.onmouseleave=null;el.onmousemove=null;el.onclick=null;}
@@ -6772,6 +6774,7 @@ function setupUIEvents(){
 // ========================================
 const particles=[];
 function spawnParticles(position,color,count,speed,life,size){
+    if(GameState.isMobilePerf)count=Math.max(1,Math.floor(count*0.4));
     for(let i=0;i<count;i++){
         const geo=new THREE.BufferGeometry();
         const sz=size||0.08;
@@ -6787,6 +6790,7 @@ function spawnParticles(position,color,count,speed,life,size){
     }
 }
 function spawnDirectedParticles(from,to,color,count,speed,life){
+    if(GameState.isMobilePerf)count=Math.max(1,Math.floor(count*0.4));
     const dir=new THREE.Vector3().subVectors(to,from).normalize();
     for(let i=0;i<count;i++){
         const geo=new THREE.BufferGeometry();
@@ -7398,8 +7402,12 @@ function showTooltip(x,y,itemDef,extra){
     if(extra)html+=extra;
     tooltip.className=({1:'rarity-common',2:'rarity-uncommon',3:'rarity-rare',4:'rarity-duranium',5:'rarity-titanex',6:'rarity-epic',7:'rarity-quantum',8:'rarity-neutronium',9:'rarity-darkmatter',10:'rarity-legendary',11:'rarity-ascendant',12:'rarity-corrupted'})[itemDef.tier]||'';
     tooltip.innerHTML=html;tooltip.style.display='block';
-    tooltip.style.left=Math.min(x+12,window.innerWidth-260)+'px';
-    tooltip.style.top=Math.min(y+12,window.innerHeight-tooltip.offsetHeight-10)+'px';
+    var tw=tooltip.offsetWidth,th=tooltip.offsetHeight,vw=window.innerWidth,vh=window.innerHeight;
+    var tx=x+12,ty=y+12;
+    if(tx+tw>vw-8)tx=Math.max(8,x-tw-8);
+    if(ty+th>vh-8)ty=Math.max(8,y-th-8);
+    tooltip.style.left=tx+'px';
+    tooltip.style.top=ty+'px';
 }
 function hideTooltip(){tooltip.style.display='none';}
 
@@ -8352,23 +8360,36 @@ let minimapTimer=0;
 var minimapZoom=1.0; // 1.0 = default, higher = zoomed in, range 0.3-4.0
 
 function initRenderer(){
+    var isMobileDevice='ontouchstart' in window || navigator.maxTouchPoints > 0;
+    var isSmallScreen=window.innerWidth<=768;
+    var isMobilePerf=isMobileDevice&&isSmallScreen;
+    GameState.isMobile=isMobileDevice;
+    GameState.isMobilePerf=isMobilePerf;
     const canvas=document.getElementById('game-canvas');
-    const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
-    renderer.setSize(window.innerWidth,window.innerHeight);renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-    renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+    const renderer=new THREE.WebGLRenderer({canvas,antialias:!isMobilePerf});
+    renderer.setSize(window.innerWidth,window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,isMobilePerf?1.5:2));
+    renderer.shadowMap.enabled=true;
+    renderer.shadowMap.type=isMobilePerf?THREE.PCFShadowMap:THREE.PCFSoftShadowMap;
     renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
     GameState.renderer=renderer;
-    const scene=new THREE.Scene();scene.background=null;scene.fog=new THREE.FogExp2(0x020810,0.004);GameState.scene=scene;
-    const camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,0.1,1000);camera.position.set(0,25,30);camera.lookAt(0,0,0);GameState.camera=camera;
+    const scene=new THREE.Scene();scene.background=null;
+    scene.fog=new THREE.FogExp2(0x020810,isMobilePerf?0.006:0.004);
+    GameState.scene=scene;
+    const camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,0.1,isMobilePerf?500:1000);camera.position.set(0,25,30);camera.lookAt(0,0,0);GameState.camera=camera;
     GameState.clock=new THREE.Clock();
     GameState.ambientLight=new THREE.AmbientLight(0x1a2a4a,0.4);scene.add(GameState.ambientLight);
     // Hemisphere light for sky/ground color contrast
     var hemiLight=new THREE.HemisphereLight(0x2244aa,0x111122,0.35);scene.add(hemiLight);
-    const dl=new THREE.DirectionalLight(0xaaccff,0.8);dl.position.set(30,50,20);dl.castShadow=true;dl.shadow.mapSize.width=2048;dl.shadow.mapSize.height=2048;dl.shadow.camera.near=0.5;dl.shadow.camera.far=200;dl.shadow.camera.left=-60;dl.shadow.camera.right=60;dl.shadow.camera.top=60;dl.shadow.camera.bottom=-60;scene.add(dl);GameState.dirLight=dl;
+    var shadowRes=isMobilePerf?1024:2048;
+    const dl=new THREE.DirectionalLight(0xaaccff,0.8);dl.position.set(30,50,20);dl.castShadow=true;dl.shadow.mapSize.width=shadowRes;dl.shadow.mapSize.height=shadowRes;dl.shadow.camera.near=0.5;dl.shadow.camera.far=200;dl.shadow.camera.left=-60;dl.shadow.camera.right=60;dl.shadow.camera.top=60;dl.shadow.camera.bottom=-60;scene.add(dl);GameState.dirLight=dl;
     // Rim/back light for silhouette definition
     var rimLight=new THREE.DirectionalLight(0x4488cc,0.3);rimLight.position.set(-20,30,-30);scene.add(rimLight);
     const pl2=new THREE.PointLight(0x00c8ff,0.4,80);pl2.position.set(0,10,0);scene.add(pl2);
-    window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
+    // Resize + orientation change handler
+    function handleResize(){camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);}
+    window.addEventListener('resize',handleResize);
+    window.addEventListener('orientationchange',function(){setTimeout(handleResize,150);});
 }
 
 function initGame(){
@@ -8555,7 +8576,8 @@ const ambientParticles=[];
 let ambientTimer=0;
 function updateAmbientParticles(){
     ambientTimer+=GameState.deltaTime;
-    if(ambientTimer<0.25)return;ambientTimer=0;
+    var ambientInterval=GameState.isMobilePerf?0.6:0.25;
+    if(ambientTimer<ambientInterval)return;ambientTimer=0;
     var area=player.currentArea,pp=player.mesh.position;
     if(area==='station-hub'){
         var px=pp.x+(Math.random()-0.5)*20,pz=pp.z+(Math.random()-0.5)*20;

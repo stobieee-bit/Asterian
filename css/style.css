@@ -2741,6 +2741,8 @@ body.resizing-nesw, body.resizing-nesw * { cursor:nesw-resize !important; }
 }
 
 /* ── Mobile Responsive ──────────────────────────────── */
+
+/* Touch device base styles (tablets + phones) */
 @media (pointer: coarse) {
     .panel-btn {
         min-width: 44px;
@@ -2756,18 +2758,6 @@ body.resizing-nesw, body.resizing-nesw * { cursor:nesw-resize !important; }
         width: 48px;
         height: 48px;
     }
-    #minimap-container {
-        width: 140px;
-        height: 140px;
-    }
-    #minimap-canvas {
-        width: 140px;
-        height: 140px;
-    }
-    #chat-box {
-        max-height: 120px;
-        font-size: 11px;
-    }
     #chat-resize-handle {
         width: 20px;
         height: 20px;
@@ -2775,25 +2765,337 @@ body.resizing-nesw, body.resizing-nesw * { cursor:nesw-resize !important; }
     #game-canvas {
         touch-action: none;
     }
-    #tutorial-box {
-        bottom: 120px;
-        max-width: 320px;
-        padding: 14px 18px;
-    }
-    #tutorial-text {
-        font-size: 13px;
-    }
-    .game-panel {
-        max-height: 60vh;
-    }
     .bar-container {
         height: 18px;
+    }
+    /* Larger context menu items for touch */
+    #context-options li {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+}
+
+/* Tablet portrait + phone landscape (max-width: 768px) */
+@media (max-width: 768px) {
+    #minimap-container {
+        width: 140px;
+    }
+    #minimap-canvas {
+        width: 136px;
+        height: 136px;
+    }
+    #minimap-container.expanded {
+        width: 260px;
+    }
+    #minimap-container.expanded #minimap-canvas {
+        width: 256px;
+        height: 256px;
     }
     #player-bars {
         top: 8px;
         left: 8px;
     }
+    #chat-box {
+        max-height: 120px;
+        width: 280px;
+        font-size: 11px;
+    }
+    .game-panel {
+        max-height: 65vh;
+        max-width: calc(100vw - 16px) !important;
+    }
+    #tutorial-box {
+        bottom: 120px;
+        max-width: 340px;
+        padding: 14px 18px;
+    }
+    #tutorial-text {
+        font-size: 13px;
+    }
     #panel-buttons {
         gap: 3px;
+    }
+    /* Constrain wide panels */
+    #shop-panel, #dialogue-panel {
+        width: calc(100vw - 20px) !important;
+        max-width: 500px;
+    }
+    #world-map-panel {
+        left: 8px !important;
+        width: calc(100vw - 16px) !important;
+        max-width: 500px;
+    }
+    #bank-panel {
+        width: calc(100vw - 16px) !important;
+        max-width: 480px;
+    }
+    #crafting-panel {
+        width: calc(100vw - 20px) !important;
+        max-width: 400px;
+    }
+    #quest-panel {
+        width: calc(100vw - 16px) !important;
+        max-width: 380px;
+        right: 8px;
+    }
+    #board-panel {
+        width: calc(100vw - 16px) !important;
+        max-width: 340px;
+        left: 8px;
+    }
+    #skill-guide-panel {
+        width: calc(100vw - 16px) !important;
+        max-width: 360px;
+    }
+    #bestiary-panel {
+        right: 8px;
+        width: calc(100vw - 16px) !important;
+        max-width: 280px;
+    }
+    #prestige-panel, #prestige-shop-panel {
+        width: calc(100vw - 16px) !important;
+        max-width: 320px;
+    }
+    /* Bank grid responsive columns */
+    #bank-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+    #bank-inv-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+    /* Tooltip max-width constraint */
+    #tooltip {
+        max-width: 220px;
+    }
+}
+
+/* Phone portrait (max-width: 480px) */
+@media (max-width: 480px) {
+    /* Loading screen adjustments */
+    .game-title {
+        font-size: 40px;
+        letter-spacing: 4px;
+    }
+    .tagline {
+        font-size: 11px;
+        letter-spacing: 2px;
+    }
+    #loading-bar-container {
+        width: 260px;
+    }
+    /* Minimap smaller on phones */
+    #minimap-container {
+        width: 110px;
+        top: 8px;
+        right: 8px;
+    }
+    #minimap-canvas {
+        width: 106px;
+        height: 106px;
+    }
+    #area-name {
+        font-size: 9px;
+        padding: 2px 0;
+    }
+    #minimap-container.expanded {
+        width: 200px;
+    }
+    #minimap-container.expanded #minimap-canvas {
+        width: 196px;
+        height: 196px;
+    }
+    /* Compact player bars */
+    .bar-container {
+        width: 160px;
+        height: 16px;
+    }
+    .bar-label {
+        font-size: 10px;
+        width: 22px;
+    }
+    .bar-text {
+        font-size: 9px;
+    }
+    #target-info {
+        width: 180px;
+        top: 72px;
+        left: 8px;
+    }
+    #mp-status-hud {
+        top: 58px;
+        left: 8px;
+        font-size: 10px;
+    }
+    /* Panel buttons: wrap into 2 rows on tiny screens */
+    #panel-buttons {
+        bottom: 8px;
+        right: 8px;
+        flex-wrap: wrap;
+        max-width: 220px;
+        justify-content: flex-end;
+        gap: 2px;
+    }
+    .panel-btn {
+        width: 42px;
+        height: 34px;
+        font-size: 10px;
+    }
+    /* Chat box compact */
+    #chat-box {
+        bottom: 8px;
+        left: 8px;
+        width: 220px;
+        max-height: 100px;
+        font-size: 10px;
+    }
+    #chat-messages {
+        padding: 4px 6px;
+        font-size: 10px;
+    }
+    .chat-filter {
+        font-size: 8px;
+        padding: 1px 4px;
+    }
+    /* Mobile eat button repositioned */
+    #mobile-eat-btn {
+        bottom: 70px;
+        left: 8px;
+        width: 48px;
+        height: 48px;
+        font-size: 11px;
+    }
+    /* Game panels take near-full width */
+    .game-panel {
+        max-height: 55vh;
+        max-width: calc(100vw - 12px) !important;
+    }
+    /* Inventory/Equipment side-by-side impossible, stack them */
+    #inventory-panel {
+        right: 6px !important;
+        width: calc(100vw - 12px) !important;
+        max-width: 208px;
+    }
+    #equipment-panel {
+        right: 6px !important;
+        width: calc(100vw - 12px) !important;
+        max-width: 220px;
+    }
+    /* Shop grid: fewer columns */
+    #shop-items, #shop-player-inv {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    #shop-items .inv-slot, #shop-player-inv .inv-slot {
+        width: 46px;
+        height: 46px;
+    }
+    /* Bank grid compact */
+    #bank-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+    #bank-inv-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    /* Tutorial compact */
+    #tutorial-box {
+        bottom: 90px;
+        max-width: 280px;
+        min-width: 240px;
+        padding: 12px 14px;
+    }
+    #tutorial-text {
+        font-size: 12px;
+        line-height: 1.4;
+    }
+    .tutorial-btn {
+        padding: 6px 14px;
+        font-size: 11px;
+    }
+    /* Dialogue panel compact */
+    #dialogue-panel {
+        bottom: 60px;
+        width: calc(100vw - 16px) !important;
+        max-width: 360px;
+        padding: 10px 14px;
+    }
+    #dialogue-text {
+        font-size: 12px;
+    }
+    .dialogue-option {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+    /* Dungeon HUD compact */
+    #dungeon-hud {
+        top: 45px;
+        padding: 4px 10px;
+        gap: 8px;
+    }
+    #dungeon-floor-label {
+        font-size: 12px;
+    }
+    /* Level up text smaller on phone */
+    .level-up-text {
+        font-size: 36px;
+        letter-spacing: 4px;
+    }
+    .level-up-skill {
+        font-size: 18px;
+    }
+    /* Kill streak compact */
+    #kill-streak {
+        font-size: 20px;
+        right: 10px;
+    }
+    /* XP tracker repositioned */
+    #xp-tracker {
+        right: 125px;
+        font-size: 9px;
+    }
+    /* Tooltip narrower */
+    #tooltip {
+        max-width: 190px;
+        font-size: 11px;
+        padding: 6px 8px;
+    }
+    /* Context menu wider touch targets */
+    #context-menu {
+        min-width: 160px;
+    }
+    /* Loot toasts compact */
+    .loot-toast {
+        font-size: 11px;
+        padding: 3px 10px;
+    }
+    #loot-toasts {
+        bottom: 90px;
+    }
+    /* Prestige overlay text */
+    .prestige-text {
+        font-size: 40px;
+        letter-spacing: 4px;
+    }
+    .prestige-tier-text {
+        font-size: 28px;
+    }
+}
+
+/* Landscape phones (short viewport) */
+@media (max-height: 500px) and (pointer: coarse) {
+    .game-panel {
+        max-height: 70vh;
+    }
+    #chat-box {
+        max-height: 80px;
+    }
+    #tutorial-box {
+        bottom: 60px;
+    }
+    #loot-toasts {
+        bottom: 60px;
+    }
+    #mobile-eat-btn {
+        bottom: 50px;
+        width: 44px;
+        height: 44px;
     }
 }
