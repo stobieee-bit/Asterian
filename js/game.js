@@ -5015,12 +5015,28 @@ function spawnEnemies(){
         }
         return false;
     }
-    // Deterministic tiered layout: levels progress south→north (hub→abyss direction)
-    // Low levels spawn near the hub edge, high levels spawn far north
+    // Deterministic tiered layout: levels progress south→north (hub→abyss)
+    // Explicit spawn boundaries per area to avoid hub/mines overlap
     var bandKeys=Object.keys(bandMap);
+    var spawnZones={
+        'alien-wastes':{
+            zStart:-70,   // just past hub+mines safe zone
+            zEnd:-950,    // far north, short of abyss corridor
+            xCenter:0,
+            xHalfWidth:600 // wide horizontal spread
+        },
+        'the-abyss':{
+            zStart:-850,  // south edge of abyss
+            zEnd:-1550,   // far north
+            xCenter:0,
+            xHalfWidth:350
+        }
+    };
     var areaKeys=Object.keys(areaConfig);
     areaKeys.forEach(function(areaKey){
         var ac=areaConfig[areaKey];
+        var sz=spawnZones[areaKey];
+        if(!sz) return;
         var areaBands=[];
         for(var bi=0;bi<bandKeys.length;bi++){
             if(bandMap[bandKeys[bi]].area===areaKey) areaBands.push(bandKeys[bi]);
@@ -5028,59 +5044,51 @@ function spawnEnemies(){
         areaBands.sort(function(a,b){return bandMap[a].band-bandMap[b].band;});
         var n=areaBands.length;
         if(n===0) return;
-        // Layout: Z goes from near-hub edge to far edge, X spreads across available width
-        // For alien-wastes: south edge (z ~ -60) is low level, north edge (z ~ -1000) is high
-        // For the-abyss: south edge is low, north edge is high
-        var zStart=ac.cz+ac.radius*0.85;  // south edge (closest to hub)
-        var zEnd=ac.cz-ac.radius*0.85;    // north edge (farthest from hub)
-        // Use 3 columns per row, cycling left/center/right for spread
-        var colOffsets=[-0.55, 0, 0.55];
+        // Calculate rows: 5 columns per row for wide horizontal spread
+        var cols=5;
+        var numRows=Math.ceil(n/cols);
         areaBands.forEach(function(key,idx){
         var bg=bandMap[key];
-        // Z: linear progression from south to north based on level index
-        var t=n>1?(idx/(n-1)):0.5;
-        var bandZ=zStart+(zEnd-zStart)*t;
-        // X: cycle through columns, use available width at this Z
-        var dzFromCenter=bandZ-ac.cz;
-        var halfWidth=Math.sqrt(Math.max(0,ac.radius*ac.radius-dzFromCenter*dzFromCenter))*0.8;
-        halfWidth=Math.max(20,halfWidth);
-        var col=idx%3;
-        var bandX=ac.cx+colOffsets[col]*halfWidth;
-        // Deterministic jitter using seeded random
-        bandX+=seededRandom()*20-10;
-        bandZ+=seededRandom()*14-7;
+        var row=Math.floor(idx/cols);
+        var col=idx%cols;
+        var colsInRow=Math.min(cols,n-row*cols);
+        // Z: linear from zStart (low level, near hub) to zEnd (high level, far north)
+        var rowT=numRows>1?(row/(numRows-1)):0.5;
+        var bandZ=sz.zStart+(sz.zEnd-sz.zStart)*rowT;
+        // X: spread columns evenly across the full width
+        var colT=colsInRow>1?(col/(colsInRow-1)):0.5;
+        var bandX=sz.xCenter-sz.xHalfWidth+2*sz.xHalfWidth*colT;
+        // Deterministic jitter
+        bandX+=seededRandom()*24-12;
+        bandZ+=seededRandom()*16-8;
         // Clamp within area circle
         var cdx=bandX-ac.cx,cdz=bandZ-ac.cz;
         var cdist=Math.sqrt(cdx*cdx+cdz*cdz);
-        if(cdist>ac.radius*0.9){var s=ac.radius*0.9/cdist;bandX=ac.cx+cdx*s;bandZ=ac.cz+cdz*s;}
-        // If in safe zone, push further into the wastes (more negative Z)
+        if(cdist>ac.radius*0.92){var s2=ac.radius*0.92/cdist;bandX=ac.cx+cdx*s2;bandZ=ac.cz+cdz*s2;}
+        // Final safe zone check — push deeper if somehow still in one
         if(inSafeZone(bandX,bandZ)){
-            bandZ-=80;
-            if(inSafeZone(bandX,bandZ)){bandZ-=80;bandX=ac.cx;}
-            if(inSafeZone(bandX,bandZ)){bandZ=ac.cz;bandX=ac.cx;}
+            bandZ=sz.zStart+(sz.zEnd-sz.zStart)*0.3;
+            bandX=sz.xCenter;
         }
         // Spawn each enemy type in this band: 1-2 per type, max 4 total per group
-        var clusterSpread=8;
+        var clusterSpread=10;
         var groupCount=0;
         var maxPerGroup=4;
         bg.enemies.forEach(function(d){
             if(groupCount>=maxPerGroup) return;
             var td=ENEMY_TYPES[d.id];
-            var count=d.isBoss?1:(seededRandom()<0.5?1:2); // 1-2 regular, 1 boss
+            var count=d.isBoss?1:(seededRandom()<0.5?1:2);
             for(var i=0;i<count;i++){
                 if(groupCount>=maxPerGroup) break;
                 var a=seededRandom()*Math.PI*2;
                 var edist=d.isBoss?0:2+seededRandom()*clusterSpread;
                 var sx=bandX+Math.cos(a)*edist;
                 var sz2=bandZ+Math.sin(a)*edist;
-                // Verify within area radius
+                // Clamp within area circle
                 var ddx=sx-ac.cx,ddz=sz2-ac.cz;
-                if(Math.sqrt(ddx*ddx+ddz*ddz)>ac.radius*0.95){sx=bandX;sz2=bandZ;}
-                // Reject if in safe zone — push deeper
-                if(inSafeZone(sx,sz2)){
-                    sz2=bandZ-40;sx=bandX;
-                    if(inSafeZone(sx,sz2)){sx=ac.cx;sz2=ac.cz;}
-                }
+                if(Math.sqrt(ddx*ddx+ddz*ddz)>ac.radius*0.92){sx=bandX;sz2=bandZ;}
+                // Final safe zone rejection
+                if(inSafeZone(sx,sz2)){sx=bandX;sz2=bandZ;}
                 var mesh=buildEnemyMesh(d.id);mesh.position.set(sx,0,sz2);
                 var enemy={name:td.name,level:td.level,hp:td.hp,maxHp:td.maxHp,damage:td.damage,defense:td.defense,
                     attackSpeed:td.attackSpeed,aggroRange:td.aggroRange,leashRange:td.leashRange,
