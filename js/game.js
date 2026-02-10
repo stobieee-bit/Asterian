@@ -4981,19 +4981,19 @@ var enemyById = {}; // enemyId → enemy object for shared combat lookup
 
 function spawnEnemies(){
     enemyById = {};
-    // Data-driven: spawn enemies in level-band clusters (groups of 5 levels)
+    // Data-driven: spawn enemies in level-band clusters (groups of 1-2 levels)
     var areaConfig = {
         'alien-wastes': {cx:0, cz:-300, radius:350, levelRange:[1,99]},
         'the-abyss': {cx:0, cz:-650, radius:200, levelRange:[100,200]}
     };
-    // Group ENEMY_DEFS by area and level band (every 5 levels)
+    // Group ENEMY_DEFS by area and level band (every 2 levels)
     var bandMap={};
     for(var di=0;di<ENEMY_DEFS.length;di++){
         var d=ENEMY_DEFS[di];
         if(!ENEMY_TYPES[d.id])continue;
         var ac=areaConfig[d.area];
         if(!ac)continue;
-        var band=Math.floor((d.level-1)/5); // 0=lv1-5, 1=lv6-10, 2=lv11-15...
+        var band=Math.floor((d.level-1)/2); // 0=lv1-2, 1=lv3-4, 2=lv5-6...
         var key=d.area+'_'+band;
         if(!bandMap[key])bandMap[key]={area:d.area,band:band,enemies:[]};
         bandMap[key].enemies.push(d);
@@ -5017,30 +5017,34 @@ function spawnEnemies(){
         var bg=bandMap[key];
         var ac=areaConfig[bg.area];
         var minLvl=ac.levelRange[0],maxLvl=ac.levelRange[1];
-        var totalBands=Math.ceil((maxLvl-minLvl)/5);
-        var bandIdx=bg.band-Math.floor((minLvl-1)/5);
-        // Distribute bands across the area — use 0.75 spread so edges don't reach safe zones
+        var totalBands=Math.ceil((maxLvl-minLvl)/2);
+        var bandIdx=bg.band-Math.floor((minLvl-1)/2);
+        // Distribute bands across the area — use 0.7 spread so edges stay clear of safe zones
         var t=totalBands>1?(bandIdx/(totalBands-1)):0.5;
-        var bandZ=ac.cz+ac.radius*0.75*(1-2*t);
-        // Stagger X so adjacent bands don't overlap — alternate left/right
-        var xOffset=(bandIdx%2===0?-1:1)*(20+bandIdx*3);
+        var bandZ=ac.cz+ac.radius*0.7*(1-2*t);
+        // Wider stagger X since many more bands now — spiral outward
+        var xOffset=(bandIdx%2===0?-1:1)*(25+bandIdx*5);
         var bandX=ac.cx+xOffset;
         // Clamp within area circle
         var dzFromCenter=bandZ-ac.cz;
-        var maxX=Math.sqrt(Math.max(0,ac.radius*ac.radius-dzFromCenter*dzFromCenter))*0.7;
-        maxX=Math.max(10,maxX);
+        var maxX=Math.sqrt(Math.max(0,ac.radius*ac.radius-dzFromCenter*dzFromCenter))*0.8;
+        maxX=Math.max(15,maxX);
         if(Math.abs(bandX-ac.cx)>maxX)bandX=ac.cx+(bandX>ac.cx?1:-1)*maxX*0.8;
         // If band center lands in a safe zone, push it away
         if(inSafeZone(bandX,bandZ)){
-            bandZ=ac.cz; // fall back toward area center
+            bandZ=ac.cz;
             if(inSafeZone(bandX,bandZ)) bandZ=ac.cz-ac.radius*0.3;
         }
-        // Spawn each enemy type in this band: 2-3 per type, tightly clustered
-        var clusterSpread=12; // tight cluster radius
+        // Spawn each enemy type in this band: 1-2 per type, max 4 total per group
+        var clusterSpread=8;
+        var groupCount=0;
+        var maxPerGroup=4;
         bg.enemies.forEach(function(d){
+            if(groupCount>=maxPerGroup) return;
             var td=ENEMY_TYPES[d.id];
-            var count=d.isBoss?1:Math.floor(Math.random()*2)+2; // 2-3 regular, 1 boss
+            var count=d.isBoss?1:Math.floor(Math.random()*2)+1; // 1-2 regular, 1 boss
             for(var i=0;i<count;i++){
+                if(groupCount>=maxPerGroup) break;
                 var a=Math.random()*Math.PI*2;
                 var dist=d.isBoss?0:2+Math.random()*clusterSpread;
                 var sx=bandX+Math.cos(a)*dist;
@@ -5068,6 +5072,7 @@ function spawnEnemies(){
                 enemyById[enemy.enemyId]=enemy;
                 mesh.userData.entityType='enemy';mesh.userData.entity=enemy;
                 GameState.scene.add(mesh);GameState.enemies.push(enemy);
+                groupCount++;
             }
         });
     });
