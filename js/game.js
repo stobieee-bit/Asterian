@@ -8268,7 +8268,7 @@ function renderWorldMap(){
         // Show level label when zoomed in enough
         if(mapSc>0.15){
             ctx.fillStyle=e.isBoss?'#ff88aa':'#ffaaaa';
-            ctx.font=Math.min(10,Math.max(6,Math.round(7*mapSc)))+'px monospace';
+            ctx.font=Math.min(18,Math.max(8,Math.round(12*mapSc)))+'px monospace';
             ctx.textAlign='center';
             ctx.fillText(e.level,ex,ez+ts+8);
         }
