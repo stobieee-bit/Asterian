@@ -3566,7 +3566,7 @@ function useAbility(abilityId){
 function attackTarget(enemy){
     if(player.combatTarget===enemy&&player.inCombat)return;
     if(!player.inCombat){player.deathRecap={lastDamageSource:'',totalDamageTaken:0,combatDuration:0,killCount:0};}
-    player.combatTarget=enemy;player.autoAttackTimer=Math.min(player.autoAttackTimer,0.5);player.inCombat=true;EventBus.emit('targetChanged',enemy);
+    player.combatTarget=enemy;player.autoAttackTimer=Math.max(player.autoAttackTimer,0.6);player.inCombat=true;EventBus.emit('targetChanged',enemy);
     checkTutorialEvent('combatStarted');
 }
 
