@@ -5043,20 +5043,16 @@ function spawnEnemies(){
         var n=areaBands.length;
         if(n===0) return;
         // Each band gets its own Z position — evenly spaced across the full range
-        // X position cycles: left, center-left, center, center-right, right
-        var xSlots=[-0.8,-0.4,0,0.4,0.8];
         areaBands.forEach(function(key,idx){
         var bg=bandMap[key];
         // Z: each band gets unique Z, evenly distributed
         var t=n>1?(idx/(n-1)):0.5;
         var bandZ=sz.zStart+(sz.zEnd-sz.zStart)*t;
-        // X: cycle through 5 positions across available width at this Z
+        // X: seeded random across full available width at this Z
         var halfW=getHalfWidthAtZ(ac,bandZ);
-        var xSlot=xSlots[idx%5];
-        var bandX=ac.cx+xSlot*halfW;
-        // Deterministic jitter
-        bandX+=seededRandom()*30-15;
-        bandZ+=seededRandom()*8-4;
+        var bandX=ac.cx+(seededRandom()*2-1)*halfW*0.85;
+        // Z jitter so same-row bands don't align horizontally
+        bandZ+=seededRandom()*20-10;
         // Safe zone check
         if(inSafeZone(bandX,bandZ)){
             bandZ=sz.zStart+(sz.zEnd-sz.zStart)*0.25;
@@ -8272,7 +8268,7 @@ function renderWorldMap(){
         // Show level label when zoomed in enough
         if(mapSc>0.15){
             ctx.fillStyle=e.isBoss?'#ff88aa':'#ffaaaa';
-            ctx.font=Math.max(6,Math.round(7*mapSc/0.2))+'px monospace';
+            ctx.font=Math.min(10,Math.max(6,Math.round(7*mapSc)))+'px monospace';
             ctx.textAlign='center';
             ctx.fillText(e.level,ex,ez+ts+8);
         }
@@ -8747,7 +8743,7 @@ function updateEnemyHPBars(){
         activeIds.add(enemy);
         // Project 3D position to screen
         const pos=enemy.mesh.position.clone();
-        pos.y+=(enemy.isBoss?4:2.5); // offset above the mesh
+        pos.y+=(enemy.isBoss?12:8); // offset above the mesh (scaled for 4x enemy size)
         const projected=pos.project(cam);
         const sx=(projected.x*0.5+0.5)*w;
         const sy=(-projected.y*0.5+0.5)*h;
