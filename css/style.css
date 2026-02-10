@@ -1305,7 +1305,7 @@ body {
     background: rgba(0, 0, 0, 0.7);
     border: 1px solid #333;
     border-radius: 3px;
-    overflow: hidden;
+    overflow: visible;
     transform: translateX(-50%);
     pointer-events: none;
 }
@@ -1315,6 +1315,7 @@ body {
     background: linear-gradient(90deg, #ff2222, #ff4444);
     border-radius: 2px;
     transition: width 0.15s ease;
+    overflow: hidden;
 }
 
 .enemy-hp-bar .hp-fill.hp-high { background: linear-gradient(90deg, #22cc44, #44ff66); }
