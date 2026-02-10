@@ -532,6 +532,8 @@ const player = {
     panelSizes: {},
     minimapSize: { width: 180, height: 180 },
     chatSize: null,
+    chatPosition: null,
+    chatLocked: false,
     autoEat: false,
     autoEatThreshold: 0.5,
     autoRetaliate: true,
@@ -6468,6 +6470,51 @@ function setupChatResize(){
     var savedSize=player.chatSize||{width:340,height:160};
     chatBox.style.width=savedSize.width+'px';
     chatBox.style.height=savedSize.height+'px';
+    // Restore saved position
+    if(player.chatPosition){
+        chatBox.style.left=player.chatPosition.left+'px';
+        chatBox.style.top=player.chatPosition.top+'px';
+        chatBox.style.bottom='auto';
+    }
+    // Create lock button (top-left of chat filters bar)
+    var lockBtn=document.createElement('button');
+    lockBtn.id='chat-lock-btn';
+    lockBtn.className='panel-lock-btn';
+    lockBtn.textContent=player.chatLocked?'\uD83D\uDD12':'\uD83D\uDD13';
+    lockBtn.title=player.chatLocked?'Unlock chat':'Lock chat';
+    var filters=document.getElementById('chat-filters');
+    if(filters)filters.insertBefore(lockBtn,filters.firstChild);
+    lockBtn.addEventListener('click',function(e){
+        e.stopPropagation();
+        player.chatLocked=!player.chatLocked;
+        lockBtn.textContent=player.chatLocked?'\uD83D\uDD12':'\uD83D\uDD13';
+        lockBtn.title=player.chatLocked?'Unlock chat':'Lock chat';
+        EventBus.emit('chat',{type:'info',text:'Chat '+(player.chatLocked?'locked.':'unlocked.')});
+    });
+    // Chat dragging via filter bar
+    var dragging=false,dragSX,dragSY,dragPX,dragPY;
+    filters.addEventListener('mousedown',function(e){
+        if(e.target.tagName==='BUTTON')return;
+        if(player.chatLocked)return;
+        dragging=true;
+        var r=chatBox.getBoundingClientRect();
+        dragSX=e.clientX;dragSY=e.clientY;dragPX=r.left;dragPY=r.top;
+        chatBox.style.bottom='auto';
+        chatBox.style.right='auto';
+        e.preventDefault();
+    });
+    window.addEventListener('mousemove',function(e){
+        if(!dragging)return;
+        chatBox.style.left=(dragPX+e.clientX-dragSX)+'px';
+        chatBox.style.top=(dragPY+e.clientY-dragSY)+'px';
+    });
+    window.addEventListener('mouseup',function(){
+        if(dragging){
+            dragging=false;
+            var r=chatBox.getBoundingClientRect();
+            player.chatPosition={left:Math.round(r.left),top:Math.round(r.top)};
+        }
+    });
     // Create resize handle (top-right corner — chat is bottom-left anchored)
     var handle=document.createElement('div');
     handle.id='chat-resize-handle';
@@ -6475,6 +6522,7 @@ function setupChatResize(){
     var CHAT_MIN_W=250,CHAT_MIN_H=100,CHAT_MAX_W=700,CHAT_MAX_H=500;
     var resizing=false,startX,startY,startW,startH;
     function onStart(cx,cy){
+        if(player.chatLocked)return;
         resizing=true;startX=cx;startY=cy;
         var rect=chatBox.getBoundingClientRect();
         startW=rect.width;startH=rect.height;
@@ -6493,12 +6541,13 @@ function setupChatResize(){
         resizing=false;
         var rect=chatBox.getBoundingClientRect();
         player.chatSize={width:Math.round(rect.width),height:Math.round(rect.height)};
+        player.chatPosition={left:Math.round(rect.left),top:Math.round(rect.top)};
     }
     // Mouse events
     handle.addEventListener('mousedown',function(e){
         e.preventDefault();e.stopPropagation();
         onStart(e.clientX,e.clientY);
-        document.body.style.cursor='nesw-resize';
+        if(resizing)document.body.style.cursor='nesw-resize';
     });
     window.addEventListener('mousemove',function(e){onMove(e.clientX,e.clientY);});
     window.addEventListener('mouseup',function(){if(resizing){document.body.style.cursor='';onEnd();}});
@@ -8733,6 +8782,8 @@ function saveGame(){
                 panelSizes:player.panelSizes||{},
                 minimapSize:player.minimapSize||{width:180,height:180},
                 chatSize:player.chatSize||null,
+                chatPosition:player.chatPosition||null,
+                chatLocked:player.chatLocked||false,
                 minimapExpanded:player.minimapExpanded||false,
                 autoEat:player.autoEat||false,
                 autoRetaliate:player.autoRetaliate!==false,
@@ -8886,6 +8937,8 @@ function loadGame(){
         player.panelSizes=d.panelSizes||{};
         player.minimapSize=d.minimapSize||(d.minimapExpanded?{width:360,height:360}:{width:180,height:180});
         player.chatSize=d.chatSize||null;
+        player.chatPosition=d.chatPosition||null;
+        player.chatLocked=d.chatLocked||false;
         player.minimapExpanded=d.minimapExpanded||false;
         player.autoEat=d.autoEat||false;
         player.autoRetaliate=d.autoRetaliate!==false;

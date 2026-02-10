@@ -2191,7 +2191,9 @@ body {
 /* ========================================
    Chat Filters
    ======================================== */
-#chat-filters { display:flex; gap:2px; padding:2px 4px; border-bottom:1px solid #1a3050; }
+#chat-filters { display:flex; gap:2px; padding:2px 4px; border-bottom:1px solid #1a3050; cursor:grab; align-items:center; }
+#chat-lock-btn { background:none; border:none; font-size:11px; cursor:pointer; padding:1px 4px; opacity:0.6; transition:opacity 0.2s; }
+#chat-lock-btn:hover { opacity:1; }
 .chat-filter { background:rgba(20,30,50,0.6); border:1px solid #1a3050; border-radius:3px; color:#5a7a9a; font-size:9px; padding:2px 6px; cursor:pointer; }
 .chat-filter.active { background:rgba(0,100,200,0.3); color:#00c8ff; border-color:#0066aa; }
 .chat-filter:hover { background:rgba(0,100,200,0.2); }
