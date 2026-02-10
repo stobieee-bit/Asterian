@@ -1359,6 +1359,18 @@ function initInput(){
         if(e.key==='m'){toggleWorldMap();}
         // Quest log
         if(e.key==='q'){var qp=document.getElementById('quest-panel'),qb=document.getElementById('btn-quests');if(qp){var qVis=qp.style.display!=='none';qp.style.display=qVis?'none':'flex';if(qb)qb.classList.toggle('active',!qVis);if(!qVis)renderQuestPanel();}}
+        // Inventory
+        if(e.key==='i'){var ip=document.getElementById('inventory-panel'),ib=document.getElementById('btn-inventory');if(ip){var iVis=ip.style.display!=='none';if(iVis&&player.panelLocks['inventory-panel'])return;ip.style.display=iVis?'none':'flex';if(ib)ib.classList.toggle('active',!iVis);if(!iVis)renderInventory();}}
+        // Equipment
+        if(e.key==='e'){var ep=document.getElementById('equipment-panel'),eb=document.getElementById('btn-equipment');if(ep){var eVis=ep.style.display!=='none';if(eVis&&player.panelLocks['equipment-panel'])return;ep.style.display=eVis?'none':'flex';if(eb)eb.classList.toggle('active',!eVis);if(!eVis)renderEquipment();}}
+        // Skills
+        if(e.key==='k'){var kp=document.getElementById('skills-panel'),kb=document.getElementById('btn-skills');if(kp){var kVis=kp.style.display!=='none';if(kVis&&player.panelLocks['skills-panel'])return;kp.style.display=kVis?'none':'flex';if(kb)kb.classList.toggle('active',!kVis);if(!kVis)renderSkills();}}
+        // Bestiary
+        if(e.key==='b'){var bp=document.getElementById('bestiary-panel');if(bp){if(bp.style.display!=='none')bp.style.display='none';else openBestiary();}}
+        // Fullscreen
+        if(e.key==='F11'){e.preventDefault();toggleFullscreen();}
+        // Help/shortcuts
+        if(e.key==='?'||e.key==='/'){toggleHelpPanel();}
     });
     window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
     window.addEventListener('mousedown',e=>{if(e.button===1)e.preventDefault();});
@@ -6149,7 +6161,7 @@ function setupPanelButtons(){
             if(!vis){if(pid==='inventory-panel')renderInventory();if(pid==='equipment-panel')renderEquipment();if(pid==='skills-panel')renderSkills();if(pid==='quest-panel')renderQuestPanel();checkTutorialEvent('panelOpened');}
         });
     });
-    EventBus.on('escape',()=>{Object.entries(panels).forEach(([bid,pid])=>{if(!player.panelLocks[pid]){document.getElementById(pid).style.display='none';document.getElementById(bid).classList.remove('active');}});if(!player.panelLocks['crafting-panel']){document.getElementById('crafting-panel').style.display='none';craftingFromStation=false;}document.getElementById('board-panel').style.display='none';document.getElementById('skill-guide-panel').style.display='none';document.getElementById('bestiary-panel').style.display='none';document.getElementById('quest-panel').style.display='none';document.getElementById('world-map-panel').style.display='none';if(bankOpen)closeBank();if(activeShop)closeShop();if(activeNPC)closeDialogue();var ac=document.getElementById('audio-controls');if(ac)ac.style.display='none';});
+    EventBus.on('escape',()=>{Object.entries(panels).forEach(([bid,pid])=>{if(!player.panelLocks[pid]){document.getElementById(pid).style.display='none';document.getElementById(bid).classList.remove('active');}});if(!player.panelLocks['crafting-panel']){document.getElementById('crafting-panel').style.display='none';craftingFromStation=false;}document.getElementById('board-panel').style.display='none';document.getElementById('skill-guide-panel').style.display='none';document.getElementById('bestiary-panel').style.display='none';document.getElementById('quest-panel').style.display='none';document.getElementById('world-map-panel').style.display='none';document.getElementById('settings-panel').style.display='none';document.getElementById('help-panel').style.display='none';if(bankOpen)closeBank();if(activeShop)closeShop();if(activeNPC)closeDialogue();var ac=document.getElementById('audio-controls');if(ac)ac.style.display='none';});
     // Audio button — click opens volume popup, right-click toggles mute
     var audioBtn=document.getElementById('btn-audio');
     if(audioBtn){
@@ -6767,6 +6779,151 @@ function setupUIEvents(){
     pstBtn.textContent='PST';pstBtn.style.color='#ffd700';
     pstBtn.addEventListener('click',function(){openPrestigePanel();});
     document.getElementById('panel-buttons').appendChild(pstBtn);
+
+    // ── Fullscreen Toggle ──────────────────────────────
+    var fsBtn=document.getElementById('btn-fullscreen');
+    if(fsBtn)fsBtn.addEventListener('click',toggleFullscreen);
+
+    // ── Help Panel Toggle ──────────────────────────────
+    var helpBtn=document.getElementById('btn-help');
+    if(helpBtn)helpBtn.addEventListener('click',toggleHelpPanel);
+
+    // ── Settings Panel ─────────────────────────────────
+    var settingsBtn=document.getElementById('btn-settings');
+    if(settingsBtn)settingsBtn.addEventListener('click',toggleSettingsPanel);
+    initSettingsPanel();
+}
+
+// ========================================
+// Fullscreen
+// ========================================
+function toggleFullscreen(){
+    if(!document.fullscreenElement&&!document.webkitFullscreenElement){
+        var el=document.documentElement;
+        if(el.requestFullscreen)el.requestFullscreen();
+        else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();
+    }else{
+        if(document.exitFullscreen)document.exitFullscreen();
+        else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
+    }
+}
+document.addEventListener('fullscreenchange',updateFullscreenBtn);
+document.addEventListener('webkitfullscreenchange',updateFullscreenBtn);
+function updateFullscreenBtn(){
+    var btn=document.getElementById('btn-fullscreen');
+    if(btn)btn.textContent=(document.fullscreenElement||document.webkitFullscreenElement)?'⛶':'⛶';
+    if(btn)btn.classList.toggle('active',!!(document.fullscreenElement||document.webkitFullscreenElement));
+}
+
+// ========================================
+// Help Panel
+// ========================================
+function toggleHelpPanel(){
+    var p=document.getElementById('help-panel');
+    if(!p)return;
+    if(p.style.display!=='none')p.style.display='none';
+    else p.style.display='flex';
+}
+
+// ========================================
+// Settings Panel
+// ========================================
+function toggleSettingsPanel(){
+    var p=document.getElementById('settings-panel');
+    if(!p)return;
+    if(p.style.display!=='none')p.style.display='none';
+    else p.style.display='flex';
+}
+
+var gameSettings={quality:'high',shadows:'high',particles:'high',uiScale:100,panelOpacity:97,showFps:false};
+
+function initSettingsPanel(){
+    // Load saved settings
+    try{var saved=localStorage.getItem('asterian_settings');if(saved)gameSettings=Object.assign(gameSettings,JSON.parse(saved));}catch(e){}
+    applySettings();
+
+    // Quality
+    var qualSel=document.getElementById('settings-quality');
+    if(qualSel){qualSel.value=gameSettings.quality;qualSel.addEventListener('change',function(){gameSettings.quality=this.value;applySettings();saveSettings();});}
+
+    // Shadows
+    var shadSel=document.getElementById('settings-shadows');
+    if(shadSel){shadSel.value=gameSettings.shadows;shadSel.addEventListener('change',function(){gameSettings.shadows=this.value;applySettings();saveSettings();});}
+
+    // Particles
+    var partSel=document.getElementById('settings-particles');
+    if(partSel){partSel.value=gameSettings.particles;partSel.addEventListener('change',function(){gameSettings.particles=this.value;applySettings();saveSettings();});}
+
+    // UI Scale
+    var uiSlider=document.getElementById('settings-ui-scale');
+    var uiVal=document.getElementById('settings-ui-scale-val');
+    if(uiSlider){uiSlider.value=gameSettings.uiScale;if(uiVal)uiVal.textContent=gameSettings.uiScale+'%';
+        uiSlider.addEventListener('input',function(){gameSettings.uiScale=parseInt(this.value);if(uiVal)uiVal.textContent=this.value+'%';applySettings();saveSettings();});}
+
+    // Panel Opacity
+    var opSlider=document.getElementById('settings-panel-opacity');
+    var opVal=document.getElementById('settings-panel-opacity-val');
+    if(opSlider){opSlider.value=gameSettings.panelOpacity;if(opVal)opVal.textContent=gameSettings.panelOpacity+'%';
+        opSlider.addEventListener('input',function(){gameSettings.panelOpacity=parseInt(this.value);if(opVal)opVal.textContent=this.value+'%';applySettings();saveSettings();});}
+
+    // FPS toggle
+    var fpsBtn=document.getElementById('settings-fps-toggle');
+    if(fpsBtn){updateFpsToggle(fpsBtn);fpsBtn.addEventListener('click',function(){gameSettings.showFps=!gameSettings.showFps;updateFpsToggle(this);applySettings();saveSettings();});}
+}
+
+function updateFpsToggle(btn){
+    btn.textContent=gameSettings.showFps?'ON':'OFF';
+    btn.classList.toggle('active',gameSettings.showFps);
+}
+
+function saveSettings(){
+    try{localStorage.setItem('asterian_settings',JSON.stringify(gameSettings));}catch(e){}
+}
+
+function applySettings(){
+    // Graphics quality
+    var renderer=GameState.renderer;
+    if(renderer){
+        if(gameSettings.quality==='low'){renderer.setPixelRatio(1);}
+        else if(gameSettings.quality==='medium'){renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));}
+        else{renderer.setPixelRatio(Math.min(window.devicePixelRatio,GameState.isMobilePerf?1.5:2));}
+    }
+    // Shadows
+    if(renderer){
+        if(gameSettings.shadows==='off'){renderer.shadowMap.enabled=false;}
+        else{renderer.shadowMap.enabled=true;renderer.shadowMap.type=gameSettings.shadows==='low'?THREE.PCFShadowMap:THREE.PCFSoftShadowMap;}
+    }
+    // Particle multiplier (used by spawnParticles)
+    if(gameSettings.particles==='low')GameState.particleScale=0.3;
+    else if(gameSettings.particles==='medium')GameState.particleScale=0.6;
+    else GameState.particleScale=1.0;
+    // UI scale
+    var overlay=document.getElementById('ui-overlay');
+    if(overlay)overlay.style.fontSize=(gameSettings.uiScale/100)+'em';
+    // Panel opacity
+    document.querySelectorAll('.game-panel').forEach(function(p){
+        p.style.setProperty('--panel-opacity',gameSettings.panelOpacity/100);
+        p.style.background='rgba(10, 15, 25, '+(gameSettings.panelOpacity/100).toFixed(2)+')';
+    });
+    // FPS counter
+    var fpsEl=document.getElementById('fps-counter');
+    if(fpsEl)fpsEl.style.display=gameSettings.showFps?'block':'none';
+}
+
+// FPS counter update
+var fpsFrames=0,fpsTime=0;
+function updateFpsCounter(){
+    fpsFrames++;
+    fpsTime+=GameState.deltaTime;
+    if(fpsTime>=0.5){
+        var fps=Math.round(fpsFrames/fpsTime);
+        var el=document.getElementById('fps-counter');
+        if(el&&gameSettings.showFps){
+            el.textContent=fps+' FPS';
+            el.style.color=fps>=50?'#44ff88':fps>=30?'#ffcc44':'#ff4444';
+        }
+        fpsFrames=0;fpsTime=0;
+    }
 }
 
 // ========================================
@@ -6775,6 +6932,7 @@ function setupUIEvents(){
 const particles=[];
 function spawnParticles(position,color,count,speed,life,size){
     if(GameState.isMobilePerf)count=Math.max(1,Math.floor(count*0.4));
+    else if(GameState.particleScale&&GameState.particleScale<1)count=Math.max(1,Math.floor(count*GameState.particleScale));
     for(let i=0;i<count;i++){
         const geo=new THREE.BufferGeometry();
         const sz=size||0.08;
@@ -6791,6 +6949,7 @@ function spawnParticles(position,color,count,speed,life,size){
 }
 function spawnDirectedParticles(from,to,color,count,speed,life){
     if(GameState.isMobilePerf)count=Math.max(1,Math.floor(count*0.4));
+    else if(GameState.particleScale&&GameState.particleScale<1)count=Math.max(1,Math.floor(count*GameState.particleScale));
     const dir=new THREE.Vector3().subVectors(to,from).normalize();
     for(let i=0;i<count;i++){
         const geo=new THREE.BufferGeometry();
@@ -9145,6 +9304,8 @@ function gameLoop(){
     updateMusicLFO(GameState.deltaTime);
     // Multiplayer tick (if connected)
     if(window.AsterianMP)window.AsterianMP.tick(GameState.deltaTime);
+    // FPS counter
+    if(gameSettings.showFps)updateFpsCounter();
     // Render
     GameState.renderer.render(GameState.scene,GameState.camera);
 }

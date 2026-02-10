@@ -2713,6 +2713,211 @@ body.resizing-nesw, body.resizing-nesw * { cursor:nesw-resize !important; }
     50% { box-shadow: 0 0 20px rgba(0,200,255,0.6), inset 0 0 20px rgba(0,200,255,0.2); }
 }
 
+/* ── Panel Open/Close Animations ───────────────────── */
+.game-panel {
+    animation: panelOpen 0.2s ease-out;
+}
+@keyframes panelOpen {
+    from { opacity: 0; transform: scale(0.95) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.game-panel.panel-closing {
+    animation: panelClose 0.15s ease-in forwards;
+}
+@keyframes panelClose {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.95) translateY(8px); }
+}
+
+/* ── Active Panel Glow ────────────────────────────── */
+.game-panel:focus-within,
+.game-panel.panel-focused {
+    border-color: rgba(0, 200, 255, 0.3);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(0, 200, 255, 0.06), 0 0 1px rgba(0, 200, 255, 0.15), 0 0 12px rgba(0, 200, 255, 0.08);
+}
+
+/* ── Settings Panel ───────────────────────────────── */
+#settings-panel {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    z-index: 500;
+}
+#settings-content {
+    padding: 4px 0;
+}
+.settings-section {
+    padding: 4px 0;
+}
+.settings-section + .settings-section {
+    border-top: 1px solid #1a3050;
+}
+.settings-section-label {
+    padding: 6px 12px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #00c8ff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 12px;
+    font-size: 11px;
+    color: #8aa0b8;
+}
+.settings-row label {
+    min-width: 80px;
+}
+.settings-select {
+    background: rgba(10,15,25,0.9);
+    border: 1px solid #1a3050;
+    border-radius: 3px;
+    color: #8aa0b8;
+    padding: 3px 6px;
+    font-size: 11px;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+}
+.settings-select:focus {
+    border-color: rgba(0,200,255,0.4);
+}
+.settings-select option {
+    background: #0a1020;
+    color: #8aa0b8;
+}
+.settings-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 80px;
+    height: 4px;
+    background: rgba(80,90,120,0.5);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+.settings-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #00c8ff;
+    cursor: pointer;
+    border: none;
+}
+.settings-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #00c8ff;
+    cursor: pointer;
+    border: none;
+}
+.settings-toggle {
+    background: rgba(10,15,25,0.9);
+    border: 1px solid #1a3050;
+    border-radius: 3px;
+    color: #5a7a9a;
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.settings-toggle.active {
+    background: rgba(0,200,255,0.15);
+    border-color: rgba(0,200,255,0.4);
+    color: #00c8ff;
+}
+
+/* ── Keyboard Help Panel ──────────────────────────── */
+#help-panel {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 320px;
+    max-height: 70vh;
+    z-index: 500;
+}
+#help-content {
+    padding: 4px 0;
+    overflow-y: auto;
+    max-height: calc(70vh - 40px);
+}
+.help-section {
+    padding: 4px 0;
+}
+.help-section + .help-section {
+    border-top: 1px solid #1a3050;
+}
+.help-section-label {
+    padding: 6px 12px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #00c8ff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.help-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 12px;
+    font-size: 11px;
+    color: #8aa0b8;
+}
+.help-row kbd {
+    display: inline-block;
+    background: rgba(0,200,255,0.08);
+    border: 1px solid rgba(0,200,255,0.2);
+    border-radius: 3px;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-family: inherit;
+    color: #aac8e0;
+    min-width: 28px;
+    text-align: center;
+}
+
+/* ── FPS Counter ──────────────────────────────────── */
+#fps-counter {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.6);
+    border: 1px solid #1a3050;
+    border-radius: 3px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #44ff88;
+    pointer-events: none;
+    z-index: 300;
+    font-family: monospace;
+}
+
+/* ── Settings & Fullscreen & Help Button Styles ───── */
+#btn-settings {
+    font-size: 16px;
+    line-height: 1;
+}
+#btn-fullscreen {
+    font-size: 16px;
+    line-height: 1;
+}
+#btn-help {
+    font-size: 16px;
+    font-weight: 900;
+    line-height: 1;
+    color: #5a8aaa;
+}
+
 /* ── Mobile Controls ────────────────────────────────── */
 #mobile-eat-btn {
     position: absolute;
