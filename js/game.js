@@ -4973,8 +4973,8 @@ function buildEnemyMesh(type){
     var def=ENEMY_TYPES[type];
     if(def && def.meshTemplate && MESH_TEMPLATE_BUILDERS[def.meshTemplate]){
         var params=def.meshParams?Object.assign({},def.meshParams):{};
-        // Double all enemy sizes for visibility in expanded world
-        params.scale=(params.scale||1)*2;
+        // 4x all enemy sizes for visibility in expanded world
+        params.scale=(params.scale||1)*4;
         return MESH_TEMPLATE_BUILDERS[def.meshTemplate](params);
     }
     return buildChithariMesh('normal');
@@ -5019,13 +5019,12 @@ function spawnEnemies(){
         return false;
     }
     // Deterministic tiered layout: levels progress south→north (hub→abyss)
-    // Z boundaries per area, X computed from circle geometry at each Z
+    // Each band gets its own unique Z based on its index, X alternates across width
     var bandKeys=Object.keys(bandMap);
     var spawnZones={
         'alien-wastes':{ zStart:-100, zEnd:-920 },
         'the-abyss':{ zStart:-870, zEnd:-1520 }
     };
-    // Helper: get available X half-width at a given Z within area circle
     function getHalfWidthAtZ(ac,z){
         var dz=z-ac.cz;
         var w2=ac.radius*ac.radius-dz*dz;
@@ -5043,27 +5042,24 @@ function spawnEnemies(){
         areaBands.sort(function(a,b){return bandMap[a].band-bandMap[b].band;});
         var n=areaBands.length;
         if(n===0) return;
-        // Layout: rows of 5, Z progresses linearly, X fills available circle width per row
-        var cols=5;
-        var numRows=Math.ceil(n/cols);
+        // Each band gets its own Z position — evenly spaced across the full range
+        // X position cycles: left, center-left, center, center-right, right
+        var xSlots=[-0.8,-0.4,0,0.4,0.8];
         areaBands.forEach(function(key,idx){
         var bg=bandMap[key];
-        var row=Math.floor(idx/cols);
-        var col=idx%cols;
-        var colsInRow=Math.min(cols,n-row*cols);
-        // Z: linear from zStart (low level) to zEnd (high level)
-        var rowT=numRows>1?(row/(numRows-1)):0.5;
-        var bandZ=sz.zStart+(sz.zEnd-sz.zStart)*rowT;
-        // X: use actual circle width at this Z — no fixed width, fills naturally
+        // Z: each band gets unique Z, evenly distributed
+        var t=n>1?(idx/(n-1)):0.5;
+        var bandZ=sz.zStart+(sz.zEnd-sz.zStart)*t;
+        // X: cycle through 5 positions across available width at this Z
         var halfW=getHalfWidthAtZ(ac,bandZ);
-        var colT=colsInRow>1?(col/(colsInRow-1)):0.5;
-        var bandX=ac.cx-halfW+2*halfW*colT;
-        // Deterministic jitter (small, won't exceed bounds)
-        bandX+=seededRandom()*20-10;
-        bandZ+=seededRandom()*12-6;
-        // Safe zone check — skip to safe position if needed
+        var xSlot=xSlots[idx%5];
+        var bandX=ac.cx+xSlot*halfW;
+        // Deterministic jitter
+        bandX+=seededRandom()*30-15;
+        bandZ+=seededRandom()*8-4;
+        // Safe zone check
         if(inSafeZone(bandX,bandZ)){
-            bandZ=sz.zStart+(sz.zEnd-sz.zStart)*0.3;
+            bandZ=sz.zStart+(sz.zEnd-sz.zStart)*0.25;
             bandX=ac.cx+(seededRandom()>0.5?1:-1)*getHalfWidthAtZ(ac,bandZ)*0.5;
         }
         // Spawn each enemy type in this band: 1-2 per type, max 4 total per group
