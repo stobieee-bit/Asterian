@@ -393,6 +393,25 @@
                 banner.textContent='[UPDATE] New version detected! Game saved. Reloading in '+remaining+' seconds...';
             },1000);
         }
+        // After reload: show update message in chat once game is ready
+        function showPostUpdateMessage(){
+            try{
+                if(localStorage.getItem('asterian_updated')==='1'){
+                    localStorage.removeItem('asterian_updated');
+                    // Wait for game to initialize and chat to be ready
+                    var attempts=0;
+                    var tryShow=setInterval(function(){
+                        attempts++;
+                        if(typeof addChatMessage==='function'&&document.getElementById('chat-messages')){
+                            clearInterval(tryShow);
+                            addChatMessage('system','[UPDATE] Game updated to latest version! Your progress was saved automatically.');
+                        }
+                        if(attempts>50) clearInterval(tryShow); // give up after 5s
+                    },100);
+                }
+            }catch(e){}
+        }
+        showPostUpdateMessage();
         function checkVersion(){
             if(reloading) return;
             fetch('version.json?t='+Date.now())
@@ -405,6 +424,7 @@
                     if(typeof addChatMessage==='function'){
                         try{addChatMessage('system','[UPDATE] New version detected! Game saved. Reloading in 5 seconds...');}catch(e){}
                     }
+                    try{localStorage.setItem('asterian_updated','1');}catch(e){}
                     showUpdateBanner(5);
                     setTimeout(function(){location.reload(true);},5000);
                 }
