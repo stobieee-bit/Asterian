@@ -8760,7 +8760,7 @@ function updateEnemyHPBars(){
             // Create new HP bar element
             const el=document.createElement('div');
             el.className='enemy-hp-bar'+(enemy.isBoss?' boss':'');
-            el.innerHTML='<div class="hp-name"></div><div class="hp-fill"></div>';
+            el.innerHTML='<div class="hp-bar-inner"><div class="hp-fill"></div></div><div class="hp-name"></div>';
             enemyHPContainer.appendChild(el);
             bar={el,nameEl:el.querySelector('.hp-name'),fillEl:el.querySelector('.hp-fill')};
             enemyHPBars.set(enemy,bar);
