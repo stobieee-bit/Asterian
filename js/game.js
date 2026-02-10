@@ -5016,22 +5016,18 @@ function spawnEnemies(){
         return false;
     }
     // Deterministic tiered layout: levels progress south→north (hub→abyss)
-    // Explicit spawn boundaries per area to avoid hub/mines overlap
+    // Z boundaries per area, X computed from circle geometry at each Z
     var bandKeys=Object.keys(bandMap);
     var spawnZones={
-        'alien-wastes':{
-            zStart:-70,   // just past hub+mines safe zone
-            zEnd:-950,    // far north, short of abyss corridor
-            xCenter:0,
-            xHalfWidth:600 // wide horizontal spread
-        },
-        'the-abyss':{
-            zStart:-850,  // south edge of abyss
-            zEnd:-1550,   // far north
-            xCenter:0,
-            xHalfWidth:350
-        }
+        'alien-wastes':{ zStart:-100, zEnd:-920 },
+        'the-abyss':{ zStart:-870, zEnd:-1520 }
     };
+    // Helper: get available X half-width at a given Z within area circle
+    function getHalfWidthAtZ(ac,z){
+        var dz=z-ac.cz;
+        var w2=ac.radius*ac.radius-dz*dz;
+        return w2>0?Math.sqrt(w2)*0.85:20;
+    }
     var areaKeys=Object.keys(areaConfig);
     areaKeys.forEach(function(areaKey){
         var ac=areaConfig[areaKey];
@@ -5044,7 +5040,7 @@ function spawnEnemies(){
         areaBands.sort(function(a,b){return bandMap[a].band-bandMap[b].band;});
         var n=areaBands.length;
         if(n===0) return;
-        // Calculate rows: 5 columns per row for wide horizontal spread
+        // Layout: rows of 5, Z progresses linearly, X fills available circle width per row
         var cols=5;
         var numRows=Math.ceil(n/cols);
         areaBands.forEach(function(key,idx){
@@ -5052,23 +5048,20 @@ function spawnEnemies(){
         var row=Math.floor(idx/cols);
         var col=idx%cols;
         var colsInRow=Math.min(cols,n-row*cols);
-        // Z: linear from zStart (low level, near hub) to zEnd (high level, far north)
+        // Z: linear from zStart (low level) to zEnd (high level)
         var rowT=numRows>1?(row/(numRows-1)):0.5;
         var bandZ=sz.zStart+(sz.zEnd-sz.zStart)*rowT;
-        // X: spread columns evenly across the full width
+        // X: use actual circle width at this Z — no fixed width, fills naturally
+        var halfW=getHalfWidthAtZ(ac,bandZ);
         var colT=colsInRow>1?(col/(colsInRow-1)):0.5;
-        var bandX=sz.xCenter-sz.xHalfWidth+2*sz.xHalfWidth*colT;
-        // Deterministic jitter
-        bandX+=seededRandom()*24-12;
-        bandZ+=seededRandom()*16-8;
-        // Clamp within area circle
-        var cdx=bandX-ac.cx,cdz=bandZ-ac.cz;
-        var cdist=Math.sqrt(cdx*cdx+cdz*cdz);
-        if(cdist>ac.radius*0.92){var s2=ac.radius*0.92/cdist;bandX=ac.cx+cdx*s2;bandZ=ac.cz+cdz*s2;}
-        // Final safe zone check — push deeper if somehow still in one
+        var bandX=ac.cx-halfW+2*halfW*colT;
+        // Deterministic jitter (small, won't exceed bounds)
+        bandX+=seededRandom()*20-10;
+        bandZ+=seededRandom()*12-6;
+        // Safe zone check — skip to safe position if needed
         if(inSafeZone(bandX,bandZ)){
             bandZ=sz.zStart+(sz.zEnd-sz.zStart)*0.3;
-            bandX=sz.xCenter;
+            bandX=ac.cx+(seededRandom()>0.5?1:-1)*getHalfWidthAtZ(ac,bandZ)*0.5;
         }
         // Spawn each enemy type in this band: 1-2 per type, max 4 total per group
         var clusterSpread=10;
@@ -5084,10 +5077,11 @@ function spawnEnemies(){
                 var edist=d.isBoss?0:2+seededRandom()*clusterSpread;
                 var sx=bandX+Math.cos(a)*edist;
                 var sz2=bandZ+Math.sin(a)*edist;
-                // Clamp within area circle
-                var ddx=sx-ac.cx,ddz=sz2-ac.cz;
-                if(Math.sqrt(ddx*ddx+ddz*ddz)>ac.radius*0.92){sx=bandX;sz2=bandZ;}
-                // Final safe zone rejection
+                // Clamp X only — keep Z fixed, just limit X to circle width
+                var hw=getHalfWidthAtZ(ac,sz2);
+                if(sx<ac.cx-hw) sx=ac.cx-hw;
+                if(sx>ac.cx+hw) sx=ac.cx+hw;
+                // Safe zone rejection
                 if(inSafeZone(sx,sz2)){sx=bandX;sz2=bandZ;}
                 var mesh=buildEnemyMesh(d.id);mesh.position.set(sx,0,sz2);
                 var enemy={name:td.name,level:td.level,hp:td.hp,maxHp:td.maxHp,damage:td.damage,defense:td.defense,
