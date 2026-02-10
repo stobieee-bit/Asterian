@@ -6523,7 +6523,7 @@ function setupChatResize(){
     function onMove(cx,cy){
         if(!resizing)return;
         var dx=cx-startX;
-        var dy=startY-cy;
+        var dy=cy-startY; // drag down = taller
         var newW=Math.max(CHAT_MIN_W,Math.min(CHAT_MAX_W,startW+dx));
         var newH=Math.max(CHAT_MIN_H,Math.min(CHAT_MAX_H,startH+dy));
         chatBox.style.width=newW+'px';
