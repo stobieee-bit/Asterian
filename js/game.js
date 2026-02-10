@@ -503,7 +503,7 @@ function levelForXp(xp) {
 // ========================================
 // Player
 // ========================================
-const MOVE_SPEED = 8;
+const MOVE_SPEED = 24;
 const player = {
     mesh: null,
     hp: 100, maxHp: 100, energy: 100, maxEnergy: 100, credits: 500,
@@ -1476,14 +1476,14 @@ function smoothNoise(x,z,scale){
 const AREAS = {
     'station-hub':{name:'Station Hub',center:{x:0,z:0},radius:35,groundColor:0x1a2030,floorY:0},
     'asteroid-mines':{name:'Asteroid Mines',center:{x:300,z:0},radius:200,groundColor:0x2a1a10,floorY:-2},
-    'alien-wastes':{name:'Alien Wastes',center:{x:0,z:-300},radius:350,groundColor:0x0a1a10,floorY:-1},
+    'alien-wastes':{name:'Alien Wastes',center:{x:0,z:-300},radius:700,groundColor:0x0a1a10,floorY:-1},
     'bio-lab':{name:'Bio-Lab',center:{x:-20,z:20},radius:18,groundColor:0x0a2020,floorY:0},
-    'the-abyss':{name:'The Abyss',center:{x:0,z:-650},radius:200,groundColor:0x050510,floorY:-3},
+    'the-abyss':{name:'The Abyss',center:{x:0,z:-1200},radius:400,groundColor:0x050510,floorY:-3},
 };
 
 const CORRUPTED_AREAS = {
     'corrupted-mines':{name:'Corrupted Mines',base:'asteroid-mines',center:{x:300,z:280},radius:60,groundColor:0x3a0a0a,floorY:-2,fogColor:0x440000},
-    'corrupted-wastes':{name:'Corrupted Wastes',base:'alien-wastes',center:{x:280,z:-300},radius:60,groundColor:0x1a0808,floorY:-1,fogColor:0x330000},
+    'corrupted-wastes':{name:'Corrupted Wastes',base:'alien-wastes',center:{x:560,z:-300},radius:60,groundColor:0x1a0808,floorY:-1,fogColor:0x330000},
     'corrupted-lab':{name:'Corrupted Lab',base:'bio-lab',center:{x:-50,z:40},radius:25,groundColor:0x200a0a,floorY:0,fogColor:0x440000},
 };
 
@@ -1538,8 +1538,8 @@ const CORRIDORS = [
      minX:-6, maxX:6, minZ:-52, maxZ:-33, floorY:-0.5, groundColor:0x0a1518,
      label:'Alien Wastes \u2193', labelPos:{x:0,z:-42}},
     {id:'wastes-to-abyss', from:'alien-wastes', to:'the-abyss',
-     minX:-6, maxX:6, minZ:-560, maxZ:-452, floorY:-2, groundColor:0x0a0818,
-     label:'The Abyss \u2193', labelPos:{x:0,z:-500}},
+     minX:-6, maxX:6, minZ:-1010, maxZ:-800, floorY:-2, groundColor:0x0a0818,
+     label:'The Abyss \u2193', labelPos:{x:0,z:-900}},
 ];
 
 var AREA_LEVEL_RANGES = {
@@ -4983,8 +4983,8 @@ function spawnEnemies(){
     enemyById = {};
     // Data-driven: spawn enemies in level-band clusters (groups of 1-2 levels)
     var areaConfig = {
-        'alien-wastes': {cx:0, cz:-300, radius:350, levelRange:[1,99]},
-        'the-abyss': {cx:0, cz:-650, radius:200, levelRange:[100,200]}
+        'alien-wastes': {cx:0, cz:-300, radius:700, levelRange:[1,99]},
+        'the-abyss': {cx:0, cz:-1200, radius:400, levelRange:[100,200]}
     };
     // Group ENEMY_DEFS by area and level band (every 2 levels)
     var bandMap={};
