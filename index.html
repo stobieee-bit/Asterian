@@ -374,5 +374,22 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
     <script src="js/game.js"></script>
     <script src="js/multiplayer.js"></script>
+
+    <!-- Auto-reload on new deploy: polls version.json every 5s -->
+    <script>
+    (function(){
+        var currentVersion = null;
+        function checkVersion(){
+            fetch('version.json?t='+Date.now())
+            .then(function(r){return r.json();})
+            .then(function(data){
+                if(currentVersion===null){currentVersion=data.v;}
+                else if(data.v!==currentVersion){location.reload(true);}
+            }).catch(function(){});
+        }
+        setTimeout(checkVersion,5000);
+        setInterval(checkVersion,5000);
+    })();
+    </script>
 </body>
 </html>
