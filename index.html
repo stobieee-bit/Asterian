@@ -379,12 +379,24 @@
     <script>
     (function(){
         var currentVersion = null;
+        var reloading = false;
         function checkVersion(){
+            if(reloading) return;
             fetch('version.json?t='+Date.now())
             .then(function(r){return r.json();})
             .then(function(data){
                 if(currentVersion===null){currentVersion=data.v;}
-                else if(data.v!==currentVersion){location.reload(true);}
+                else if(data.v!==currentVersion){
+                    reloading=true;
+                    // Save game before reload
+                    if(typeof saveGame==='function'){try{saveGame();}catch(e){}}
+                    // Show warning in chat
+                    if(typeof addChatMessage==='function'){
+                        try{addChatMessage('system','[UPDATE] New version detected! Game saved. Reloading in 5 seconds...');}catch(e){}
+                    }
+                    // Reload after 5 seconds so player can see the message
+                    setTimeout(function(){location.reload(true);},5000);
+                }
             }).catch(function(){});
         }
         setTimeout(checkVersion,5000);
