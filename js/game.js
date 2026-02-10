@@ -4972,7 +4972,10 @@ function buildEnemyMesh(type){
     // Template-based routing for new enemies
     var def=ENEMY_TYPES[type];
     if(def && def.meshTemplate && MESH_TEMPLATE_BUILDERS[def.meshTemplate]){
-        return MESH_TEMPLATE_BUILDERS[def.meshTemplate](def.meshParams||{});
+        var params=def.meshParams?Object.assign({},def.meshParams):{};
+        // Enforce minimum scale — double the smallest sizes for visibility
+        if(params.scale && params.scale<0.6) params.scale=0.6;
+        return MESH_TEMPLATE_BUILDERS[def.meshTemplate](params);
     }
     return buildChithariMesh('normal');
 }
