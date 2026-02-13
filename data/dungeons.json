@@ -1,0 +1,524 @@
+{
+  "themes": {
+    "industrial": {
+      "name": "Industrial Sector",
+      "floorColor": 1709328,
+      "wallColor": 2760728,
+      "ceilingColor": 1380368,
+      "fogColor": 1379848,
+      "ambientColor": 3351057,
+      "ambientIntensity": 0.35,
+      "lightColors": {
+        "normal": 13404228,
+        "boss": 16729122,
+        "trap": 16755234,
+        "treasure": 16763972,
+        "shrine": 4491519,
+        "miniboss": 16737826,
+        "entrance": 2293606
+      },
+      "particleColor": 16755268,
+      "particleType": "steam"
+    },
+    "organic": {
+      "name": "Hive Tunnels",
+      "floorColor": 660744,
+      "wallColor": 1384464,
+      "ceilingColor": 659208,
+      "fogColor": 397320,
+      "ambientColor": 1127185,
+      "ambientIntensity": 0.3,
+      "lightColors": {
+        "normal": 4521830,
+        "boss": 16720452,
+        "trap": 11206434,
+        "treasure": 16763972,
+        "shrine": 4500223,
+        "miniboss": 16737826,
+        "entrance": 2293606
+      },
+      "particleColor": 4521830,
+      "particleType": "spore"
+    },
+    "crystalline": {
+      "name": "Crystal Caverns",
+      "floorColor": 527898,
+      "wallColor": 1054760,
+      "ceilingColor": 395796,
+      "fogColor": 264208,
+      "ambientColor": 1122884,
+      "ambientIntensity": 0.35,
+      "lightColors": {
+        "normal": 4491519,
+        "boss": 16720452,
+        "trap": 16755234,
+        "treasure": 4521949,
+        "shrine": 8930559,
+        "miniboss": 16737826,
+        "entrance": 2293606
+      },
+      "particleColor": 8969727,
+      "particleType": "prismatic"
+    },
+    "lab": {
+      "name": "Abandoned Lab",
+      "floorColor": 1315864,
+      "wallColor": 1973796,
+      "ceilingColor": 1052692,
+      "fogColor": 657936,
+      "ambientColor": 2236979,
+      "ambientIntensity": 0.4,
+      "lightColors": {
+        "normal": 8956620,
+        "boss": 16720452,
+        "trap": 16755234,
+        "treasure": 16763972,
+        "shrine": 4508927,
+        "miniboss": 16737826,
+        "entrance": 2293606
+      },
+      "particleColor": 4500223,
+      "particleType": "holographic"
+    },
+    "corrupted": {
+      "name": "Corrupted Depths",
+      "floorColor": 1378312,
+      "wallColor": 2232336,
+      "ceilingColor": 1050118,
+      "fogColor": 1049608,
+      "ambientColor": 3346705,
+      "ambientIntensity": 0.25,
+      "lightColors": {
+        "normal": 16729190,
+        "boss": 16711714,
+        "trap": 16746530,
+        "treasure": 16763972,
+        "shrine": 8921855,
+        "miniboss": 16729088,
+        "entrance": 2293606
+      },
+      "particleColor": 16720452,
+      "particleType": "glitch"
+    }
+  },
+  "area_theme_map": {
+    "station-hub": "industrial",
+    "asteroid-mines": "industrial",
+    "alien-wastes": "organic",
+    "gathering-grounds": "organic",
+    "the-abyss": "crystalline",
+    "bio-lab": "lab",
+    "corrupted-wastes": "corrupted",
+    "corrupted-mines": "corrupted",
+    "corrupted-abyss": "corrupted"
+  },
+  "modifiers": {
+    "vampiric": {
+      "name": "Vampiric",
+      "icon": "🧛",
+      "desc": "Enemies heal 10% of damage dealt to you.",
+      "color": "#ff4466"
+    },
+    "armored": {
+      "name": "Armored",
+      "icon": "🛡️",
+      "desc": "Enemies gain +30% defense.",
+      "color": "#8888aa"
+    },
+    "frenzied": {
+      "name": "Frenzied",
+      "icon": "⚡",
+      "desc": "Enemies attack 25% faster.",
+      "color": "#ffaa22"
+    },
+    "explosive": {
+      "name": "Explosive",
+      "icon": "💥",
+      "desc": "Enemies explode on death dealing AoE damage.",
+      "color": "#ff6622"
+    },
+    "regenerating": {
+      "name": "Regenerating",
+      "icon": "💚",
+      "desc": "Enemies regenerate 2% HP every 5 seconds.",
+      "color": "#44ff88"
+    },
+    "reflective": {
+      "name": "Reflective",
+      "icon": "🪞",
+      "desc": "Enemies reflect 10% of damage taken back to you.",
+      "color": "#aaaaff"
+    },
+    "berserker": {
+      "name": "Berserker",
+      "icon": "🔥",
+      "desc": "You deal +20% damage but take +15% more damage.",
+      "color": "#ff4400"
+    },
+    "treasure": {
+      "name": "Treasure",
+      "icon": "💰",
+      "desc": "Enemies drop 50% more credits.",
+      "color": "#ffcc44"
+    }
+  },
+  "config": {
+    "roomSize": 15,
+    "corridorWidth": 4,
+    "roomSpacing": 22
+  },
+  "trap_types": {
+    "fire": {
+      "name": "Fire Vent",
+      "color": 16729088,
+      "emissive": 8917248,
+      "dmg": 8,
+      "tick": 0.5,
+      "radius": 1.5,
+      "effect": "damage",
+      "scale": 1.15
+    },
+    "slow": {
+      "name": "Stasis Field",
+      "color": 4491519,
+      "emissive": 1122952,
+      "dmg": 3,
+      "tick": 0.8,
+      "radius": 2,
+      "effect": "slow",
+      "scale": 1.1
+    },
+    "poison": {
+      "name": "Toxic Puddle",
+      "color": 4521796,
+      "emissive": 1140241,
+      "dmg": 5,
+      "tick": 1,
+      "radius": 1.8,
+      "effect": "poison",
+      "scale": 1.12
+    }
+  },
+  "loot_tiers": [
+    {
+      "minFloor": 1,
+      "maxFloor": 3,
+      "enemyLoot": [
+        {
+          "itemId": "chitin_shard",
+          "chance": 0.6,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "itemId": "stellarite_ore",
+          "chance": 0.3,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "itemId": "space_lichen",
+          "chance": 0.25,
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "bossLoot": [
+        {
+          "itemId": "chitin_shard",
+          "chance": 1,
+          "min": 3,
+          "max": 6
+        },
+        {
+          "itemId": "ferrite_ore",
+          "chance": 0.5,
+          "min": 2,
+          "max": 4
+        },
+        {
+          "itemId": "ferrite_nanoblade",
+          "chance": 0.05,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "ferrite_coilgun",
+          "chance": 0.05,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "ferrite_voidstaff",
+          "chance": 0.05,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "ferrite_energy_shield",
+          "chance": 0.04,
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "minFloor": 4,
+      "maxFloor": 6,
+      "enemyLoot": [
+        {
+          "itemId": "cobaltium_ore",
+          "chance": 0.5,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "itemId": "jelly_membrane",
+          "chance": 0.4,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "itemId": "duranite_ore",
+          "chance": 0.2,
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "bossLoot": [
+        {
+          "itemId": "duranite_ore",
+          "chance": 1,
+          "min": 3,
+          "max": 6
+        },
+        {
+          "itemId": "jelly_membrane",
+          "chance": 0.6,
+          "min": 2,
+          "max": 4
+        },
+        {
+          "itemId": "duranium_nanoblade",
+          "chance": 0.04,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "duranium_coilgun",
+          "chance": 0.04,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "duranium_voidstaff",
+          "chance": 0.04,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "cobalt_helmet",
+          "chance": 0.03,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "cobalt_vest",
+          "chance": 0.03,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "duranium_capacitor",
+          "chance": 0.03,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "duranium_dark_orb",
+          "chance": 0.03,
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "minFloor": 7,
+      "maxFloor": 9,
+      "enemyLoot": [
+        {
+          "itemId": "titanex_ore",
+          "chance": 0.5,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "itemId": "spore_gland",
+          "chance": 0.4,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "itemId": "plasmite_ore",
+          "chance": 0.2,
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "bossLoot": [
+        {
+          "itemId": "plasmite_ore",
+          "chance": 1,
+          "min": 3,
+          "max": 5
+        },
+        {
+          "itemId": "spore_gland",
+          "chance": 0.6,
+          "min": 2,
+          "max": 4
+        },
+        {
+          "itemId": "titanex_nanoblade",
+          "chance": 0.04,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "titanex_coilgun",
+          "chance": 0.04,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "titanex_voidstaff",
+          "chance": 0.04,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "plasmite_helmet",
+          "chance": 0.03,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "plasmite_vest",
+          "chance": 0.03,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "titanex_energy_shield",
+          "chance": 0.03,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "plasmite_capacitor",
+          "chance": 0.03,
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "minFloor": 10,
+      "maxFloor": 999,
+      "enemyLoot": [
+        {
+          "itemId": "quantite_ore",
+          "chance": 0.5,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "itemId": "neutronium_ore",
+          "chance": 0.3,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "itemId": "gravity_residue",
+          "chance": 0.3,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "itemId": "neural_tissue",
+          "chance": 0.2,
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "bossLoot": [
+        {
+          "itemId": "neutronium_ore",
+          "chance": 1,
+          "min": 3,
+          "max": 6
+        },
+        {
+          "itemId": "neural_tissue",
+          "chance": 0.6,
+          "min": 2,
+          "max": 4
+        },
+        {
+          "itemId": "neutronium_nanoblade",
+          "chance": 0.03,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "neutronium_coilgun",
+          "chance": 0.03,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "neutronium_voidstaff",
+          "chance": 0.03,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "quantum_helmet",
+          "chance": 0.02,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "quantum_vest",
+          "chance": 0.02,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "neutronium_boots",
+          "chance": 0.02,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "neutronium_gloves",
+          "chance": 0.02,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "neutronium_dark_orb",
+          "chance": 0.02,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "itemId": "quantum_energy_shield",
+          "chance": 0.02,
+          "min": 1,
+          "max": 1
+        }
+      ]
+    }
+  ]
+}

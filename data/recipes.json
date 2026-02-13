@@ -1,0 +1,4752 @@
+{
+  "cook_lichen_wrap": {
+    "skill": "xenocook",
+    "level": 1,
+    "xp": 20,
+    "input": {
+      "space_lichen": 1
+    },
+    "output": {
+      "lichen_wrap": 1
+    },
+    "name": "Cook Lichen Wrap"
+  },
+  "cook_cryo_soup": {
+    "skill": "xenocook",
+    "level": 5,
+    "xp": 35,
+    "input": {
+      "cryo_kelp": 1
+    },
+    "output": {
+      "cryo_soup": 1
+    },
+    "name": "Cook Cryo Soup"
+  },
+  "cook_nebula_smoothie": {
+    "skill": "xenocook",
+    "level": 10,
+    "xp": 55,
+    "input": {
+      "nebula_fruit": 1
+    },
+    "output": {
+      "nebula_smoothie": 1
+    },
+    "name": "Blend Nebula Smoothie"
+  },
+  "cook_grain_bowl": {
+    "skill": "xenocook",
+    "level": 15,
+    "xp": 75,
+    "input": {
+      "solar_grain": 2
+    },
+    "output": {
+      "grain_bowl": 1
+    },
+    "name": "Toast Grain Bowl"
+  },
+  "cook_alien_burger": {
+    "skill": "xenocook",
+    "level": 25,
+    "xp": 115,
+    "input": {
+      "alien_steak": 1
+    },
+    "output": {
+      "alien_burger": 1
+    },
+    "name": "Grill Alien Burger"
+  },
+  "cook_spore_stew": {
+    "skill": "xenocook",
+    "level": 30,
+    "xp": 140,
+    "input": {
+      "spore_cap": 2,
+      "cryo_kelp": 1
+    },
+    "output": {
+      "spore_stew": 1
+    },
+    "name": "Cook Spore Stew"
+  },
+  "cook_fortified_wrap": {
+    "skill": "xenocook",
+    "level": 20,
+    "xp": 90,
+    "input": {
+      "space_lichen": 2,
+      "chitin_shard": 1
+    },
+    "output": {
+      "fortified_wrap": 1
+    },
+    "name": "Cook Fortified Wrap"
+  },
+  "cook_energized_smoothie": {
+    "skill": "xenocook",
+    "level": 28,
+    "xp": 120,
+    "input": {
+      "nebula_fruit": 2,
+      "solar_grain": 1
+    },
+    "output": {
+      "energized_smoothie": 1
+    },
+    "name": "Blend Energized Smoothie"
+  },
+  "cook_berserker_burger": {
+    "skill": "xenocook",
+    "level": 35,
+    "xp": 165,
+    "input": {
+      "alien_steak": 2,
+      "plasma_pepper": 1
+    },
+    "output": {
+      "berserker_burger": 1
+    },
+    "name": "Grill Berserker Burger"
+  },
+  "cook_plasma_curry": {
+    "skill": "xenocook",
+    "level": 45,
+    "xp": 220,
+    "input": {
+      "plasma_pepper": 1,
+      "alien_steak": 1
+    },
+    "output": {
+      "plasma_curry": 1
+    },
+    "name": "Cook Plasma Curry"
+  },
+  "cook_focused_curry": {
+    "skill": "xenocook",
+    "level": 50,
+    "xp": 270,
+    "input": {
+      "plasma_pepper": 2,
+      "crystal_honey": 1
+    },
+    "output": {
+      "focused_curry": 1
+    },
+    "name": "Cook Focused Curry"
+  },
+  "cook_crystal_glazed_steak": {
+    "skill": "xenocook",
+    "level": 55,
+    "xp": 320,
+    "input": {
+      "alien_steak": 1,
+      "crystal_honey": 1
+    },
+    "output": {
+      "crystal_glazed_steak": 1
+    },
+    "name": "Cook Crystal-Glazed Steak"
+  },
+  "cook_titan_steak": {
+    "skill": "xenocook",
+    "level": 60,
+    "xp": 370,
+    "input": {
+      "alien_steak": 2,
+      "crystal_honey": 2,
+      "spore_cap": 1
+    },
+    "output": {
+      "titan_steak": 1
+    },
+    "name": "Prepare Titan Steak"
+  },
+  "cook_void_feast": {
+    "skill": "xenocook",
+    "level": 65,
+    "xp": 400,
+    "input": {
+      "void_truffle": 1,
+      "plasma_pepper": 1
+    },
+    "output": {
+      "void_feast": 1
+    },
+    "name": "Prepare Void Feast"
+  },
+  "cook_void_elixir": {
+    "skill": "xenocook",
+    "level": 75,
+    "xp": 500,
+    "input": {
+      "void_truffle": 1,
+      "crystal_honey": 1,
+      "quantum_yeast": 1
+    },
+    "output": {
+      "void_elixir_food": 1
+    },
+    "name": "Brew Void Elixir"
+  },
+  "cook_explorers_lunchbox": {
+    "skill": "xenocook",
+    "level": 80,
+    "xp": 560,
+    "input": {
+      "alien_steak": 1,
+      "solar_grain": 2,
+      "nebula_fruit": 1,
+      "spore_cap": 1
+    },
+    "output": {
+      "explorers_lunchbox": 1
+    },
+    "name": "Pack Explorer's Lunchbox"
+  },
+  "cook_quantum_risotto": {
+    "skill": "xenocook",
+    "level": 85,
+    "xp": 630,
+    "input": {
+      "solar_grain": 2,
+      "quantum_yeast": 1,
+      "crystal_honey": 1
+    },
+    "output": {
+      "quantum_risotto": 1
+    },
+    "name": "Cook Quantum Risotto"
+  },
+  "cook_warlords_feast": {
+    "skill": "xenocook",
+    "level": 90,
+    "xp": 750,
+    "input": {
+      "alien_steak": 2,
+      "void_truffle": 1,
+      "plasma_pepper": 1,
+      "quantum_yeast": 1
+    },
+    "output": {
+      "warlords_feast": 1
+    },
+    "name": "Prepare Warlord's Feast"
+  },
+  "cook_cosmic_ambrosia": {
+    "skill": "xenocook",
+    "level": 95,
+    "xp": 950,
+    "input": {
+      "void_truffle": 2,
+      "quantum_yeast": 1,
+      "crystal_honey": 2
+    },
+    "output": {
+      "cosmic_ambrosia": 1
+    },
+    "name": "Cook Cosmic Ambrosia"
+  },
+  "craft_bio_pouch": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 25,
+    "input": {
+      "chitin_shard": 3
+    },
+    "output": {
+      "lichen_wrap": 1
+    },
+    "name": "Bioforge Lichen Wraps"
+  },
+  "craft_jelly_salve": {
+    "skill": "bioforge",
+    "level": 15,
+    "xp": 85,
+    "input": {
+      "jelly_membrane": 2
+    },
+    "output": {
+      "nebula_smoothie": 1
+    },
+    "name": "Bioforge Jelly Salve"
+  },
+  "craft_ferrite_mining_laser": {
+    "skill": "circuitry",
+    "level": 10,
+    "xp": 70,
+    "input": {
+      "ferrite_bar": 2,
+      "stellarite_bar": 1
+    },
+    "output": {
+      "ferrite_mining_laser": 1
+    },
+    "name": "Forge Ferrite Mining Laser"
+  },
+  "craft_ferrite_bio_scanner": {
+    "skill": "circuitry",
+    "level": 10,
+    "xp": 70,
+    "input": {
+      "ferrite_bar": 2,
+      "stellarite_bar": 1
+    },
+    "output": {
+      "ferrite_bio_scanner": 1
+    },
+    "name": "Forge Ferrite Bio Scanner"
+  },
+  "craft_cobalt_mining_laser": {
+    "skill": "circuitry",
+    "level": 20,
+    "xp": 130,
+    "input": {
+      "cobaltium_bar": 3,
+      "ferrite_bar": 1
+    },
+    "output": {
+      "cobalt_mining_laser": 1
+    },
+    "name": "Forge Cobalt Mining Laser"
+  },
+  "craft_cobalt_bio_scanner": {
+    "skill": "circuitry",
+    "level": 20,
+    "xp": 130,
+    "input": {
+      "cobaltium_bar": 3,
+      "ferrite_bar": 1
+    },
+    "output": {
+      "cobalt_bio_scanner": 1
+    },
+    "name": "Forge Cobalt Bio Scanner"
+  },
+  "smelt_scrap": {
+    "skill": "circuitry",
+    "level": 1,
+    "xp": 20,
+    "input": {
+      "stellarite_ore": 1
+    },
+    "output": {
+      "stellarite_bar": 1
+    },
+    "name": "Smelt Scrap"
+  },
+  "craft_scrap_nanoblade": {
+    "skill": "circuitry",
+    "level": 1,
+    "xp": 30,
+    "input": {
+      "stellarite_bar": 2
+    },
+    "output": {
+      "scrap_nanoblade": 1
+    },
+    "name": "Forge Scrap Nanoblade"
+  },
+  "craft_scrap_coilgun": {
+    "skill": "circuitry",
+    "level": 1,
+    "xp": 30,
+    "input": {
+      "stellarite_bar": 2
+    },
+    "output": {
+      "scrap_coilgun": 1
+    },
+    "name": "Forge Scrap Coilgun"
+  },
+  "craft_scrap_voidstaff": {
+    "skill": "circuitry",
+    "level": 1,
+    "xp": 30,
+    "input": {
+      "stellarite_bar": 2
+    },
+    "output": {
+      "scrap_voidstaff": 1
+    },
+    "name": "Forge Scrap Voidstaff"
+  },
+  "craft_scrap_helmet": {
+    "skill": "circuitry",
+    "level": 1,
+    "xp": 18,
+    "input": {
+      "stellarite_bar": 1
+    },
+    "output": {
+      "scrap_helmet": 1
+    },
+    "name": "Forge Scrap Helmet"
+  },
+  "craft_scrap_vest": {
+    "skill": "circuitry",
+    "level": 1,
+    "xp": 30,
+    "input": {
+      "stellarite_bar": 2
+    },
+    "output": {
+      "scrap_vest": 1
+    },
+    "name": "Forge Scrap Vest"
+  },
+  "craft_scrap_legs": {
+    "skill": "circuitry",
+    "level": 1,
+    "xp": 24,
+    "input": {
+      "stellarite_bar": 2
+    },
+    "output": {
+      "scrap_legs": 1
+    },
+    "name": "Forge Scrap Greaves"
+  },
+  "craft_scrap_boots": {
+    "skill": "circuitry",
+    "level": 1,
+    "xp": 12,
+    "input": {
+      "stellarite_bar": 1
+    },
+    "output": {
+      "scrap_boots": 1
+    },
+    "name": "Forge Scrap Boots"
+  },
+  "craft_scrap_gloves": {
+    "skill": "circuitry",
+    "level": 1,
+    "xp": 12,
+    "input": {
+      "stellarite_bar": 1
+    },
+    "output": {
+      "scrap_gloves": 1
+    },
+    "name": "Forge Scrap Gloves"
+  },
+  "craft_scrap_nano_helmet": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 20,
+    "input": {
+      "stellarite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "scrap_nano_helmet": 1
+    },
+    "name": "Bioforge Scrap Nano Helmet"
+  },
+  "craft_scrap_nano_vest": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 33,
+    "input": {
+      "stellarite_bar": 2,
+      "chitin_shard": 1
+    },
+    "output": {
+      "scrap_nano_vest": 1
+    },
+    "name": "Bioforge Scrap Nano Vest"
+  },
+  "craft_scrap_nano_legs": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 26,
+    "input": {
+      "stellarite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "scrap_nano_legs": 1
+    },
+    "name": "Bioforge Scrap Nano Greaves"
+  },
+  "craft_scrap_nano_boots": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 13,
+    "input": {
+      "stellarite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "scrap_nano_boots": 1
+    },
+    "name": "Bioforge Scrap Nano Boots"
+  },
+  "craft_scrap_nano_gloves": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 13,
+    "input": {
+      "stellarite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "scrap_nano_gloves": 1
+    },
+    "name": "Bioforge Scrap Nano Gloves"
+  },
+  "craft_scrap_tesla_helmet": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 20,
+    "input": {
+      "stellarite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "scrap_tesla_helmet": 1
+    },
+    "name": "Bioforge Scrap Tesla Helmet"
+  },
+  "craft_scrap_tesla_vest": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 33,
+    "input": {
+      "stellarite_bar": 2,
+      "chitin_shard": 1
+    },
+    "output": {
+      "scrap_tesla_vest": 1
+    },
+    "name": "Bioforge Scrap Tesla Vest"
+  },
+  "craft_scrap_tesla_legs": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 26,
+    "input": {
+      "stellarite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "scrap_tesla_legs": 1
+    },
+    "name": "Bioforge Scrap Tesla Greaves"
+  },
+  "craft_scrap_tesla_boots": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 13,
+    "input": {
+      "stellarite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "scrap_tesla_boots": 1
+    },
+    "name": "Bioforge Scrap Tesla Boots"
+  },
+  "craft_scrap_tesla_gloves": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 13,
+    "input": {
+      "stellarite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "scrap_tesla_gloves": 1
+    },
+    "name": "Bioforge Scrap Tesla Gloves"
+  },
+  "craft_scrap_void_helmet": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 20,
+    "input": {
+      "stellarite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "scrap_void_helmet": 1
+    },
+    "name": "Bioforge Scrap Void Helmet"
+  },
+  "craft_scrap_void_vest": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 33,
+    "input": {
+      "stellarite_bar": 2,
+      "chitin_shard": 1
+    },
+    "output": {
+      "scrap_void_vest": 1
+    },
+    "name": "Bioforge Scrap Void Vest"
+  },
+  "craft_scrap_void_legs": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 26,
+    "input": {
+      "stellarite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "scrap_void_legs": 1
+    },
+    "name": "Bioforge Scrap Void Greaves"
+  },
+  "craft_scrap_void_boots": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 13,
+    "input": {
+      "stellarite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "scrap_void_boots": 1
+    },
+    "name": "Bioforge Scrap Void Boots"
+  },
+  "craft_scrap_void_gloves": {
+    "skill": "bioforge",
+    "level": 1,
+    "xp": 13,
+    "input": {
+      "stellarite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "scrap_void_gloves": 1
+    },
+    "name": "Bioforge Scrap Void Gloves"
+  },
+  "smelt_ferrite": {
+    "skill": "circuitry",
+    "level": 10,
+    "xp": 45,
+    "input": {
+      "ferrite_ore": 1
+    },
+    "output": {
+      "ferrite_bar": 1
+    },
+    "name": "Smelt Ferrite"
+  },
+  "craft_ferrite_nanoblade": {
+    "skill": "circuitry",
+    "level": 10,
+    "xp": 65,
+    "input": {
+      "ferrite_bar": 3
+    },
+    "output": {
+      "ferrite_nanoblade": 1
+    },
+    "name": "Forge Ferrite Nanoblade"
+  },
+  "craft_ferrite_coilgun": {
+    "skill": "circuitry",
+    "level": 10,
+    "xp": 65,
+    "input": {
+      "ferrite_bar": 3
+    },
+    "output": {
+      "ferrite_coilgun": 1
+    },
+    "name": "Forge Ferrite Coilgun"
+  },
+  "craft_ferrite_voidstaff": {
+    "skill": "circuitry",
+    "level": 10,
+    "xp": 65,
+    "input": {
+      "ferrite_bar": 3
+    },
+    "output": {
+      "ferrite_voidstaff": 1
+    },
+    "name": "Forge Ferrite Voidstaff"
+  },
+  "craft_ferrite_helmet": {
+    "skill": "circuitry",
+    "level": 10,
+    "xp": 39,
+    "input": {
+      "ferrite_bar": 2
+    },
+    "output": {
+      "ferrite_helmet": 1
+    },
+    "name": "Forge Ferrite Helmet"
+  },
+  "craft_ferrite_vest": {
+    "skill": "circuitry",
+    "level": 10,
+    "xp": 65,
+    "input": {
+      "ferrite_bar": 3
+    },
+    "output": {
+      "ferrite_vest": 1
+    },
+    "name": "Forge Ferrite Vest"
+  },
+  "craft_ferrite_legs": {
+    "skill": "circuitry",
+    "level": 10,
+    "xp": 52,
+    "input": {
+      "ferrite_bar": 2
+    },
+    "output": {
+      "ferrite_legs": 1
+    },
+    "name": "Forge Ferrite Greaves"
+  },
+  "craft_ferrite_boots": {
+    "skill": "circuitry",
+    "level": 10,
+    "xp": 26,
+    "input": {
+      "ferrite_bar": 1
+    },
+    "output": {
+      "ferrite_boots": 1
+    },
+    "name": "Forge Ferrite Boots"
+  },
+  "craft_ferrite_gloves": {
+    "skill": "circuitry",
+    "level": 10,
+    "xp": 26,
+    "input": {
+      "ferrite_bar": 1
+    },
+    "output": {
+      "ferrite_gloves": 1
+    },
+    "name": "Forge Ferrite Gloves"
+  },
+  "craft_ferrite_nano_helmet": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 43,
+    "input": {
+      "ferrite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "ferrite_nano_helmet": 1
+    },
+    "name": "Bioforge Ferrite Nano Helmet"
+  },
+  "craft_ferrite_nano_vest": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 72,
+    "input": {
+      "ferrite_bar": 2,
+      "chitin_shard": 1
+    },
+    "output": {
+      "ferrite_nano_vest": 1
+    },
+    "name": "Bioforge Ferrite Nano Vest"
+  },
+  "craft_ferrite_nano_legs": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 57,
+    "input": {
+      "ferrite_bar": 2,
+      "chitin_shard": 1
+    },
+    "output": {
+      "ferrite_nano_legs": 1
+    },
+    "name": "Bioforge Ferrite Nano Greaves"
+  },
+  "craft_ferrite_nano_boots": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 29,
+    "input": {
+      "ferrite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "ferrite_nano_boots": 1
+    },
+    "name": "Bioforge Ferrite Nano Boots"
+  },
+  "craft_ferrite_nano_gloves": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 29,
+    "input": {
+      "ferrite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "ferrite_nano_gloves": 1
+    },
+    "name": "Bioforge Ferrite Nano Gloves"
+  },
+  "craft_ferrite_tesla_helmet": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 43,
+    "input": {
+      "ferrite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "ferrite_tesla_helmet": 1
+    },
+    "name": "Bioforge Ferrite Tesla Helmet"
+  },
+  "craft_ferrite_tesla_vest": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 72,
+    "input": {
+      "ferrite_bar": 2,
+      "chitin_shard": 1
+    },
+    "output": {
+      "ferrite_tesla_vest": 1
+    },
+    "name": "Bioforge Ferrite Tesla Vest"
+  },
+  "craft_ferrite_tesla_legs": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 57,
+    "input": {
+      "ferrite_bar": 2,
+      "chitin_shard": 1
+    },
+    "output": {
+      "ferrite_tesla_legs": 1
+    },
+    "name": "Bioforge Ferrite Tesla Greaves"
+  },
+  "craft_ferrite_tesla_boots": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 29,
+    "input": {
+      "ferrite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "ferrite_tesla_boots": 1
+    },
+    "name": "Bioforge Ferrite Tesla Boots"
+  },
+  "craft_ferrite_tesla_gloves": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 29,
+    "input": {
+      "ferrite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "ferrite_tesla_gloves": 1
+    },
+    "name": "Bioforge Ferrite Tesla Gloves"
+  },
+  "craft_ferrite_void_helmet": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 43,
+    "input": {
+      "ferrite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "ferrite_void_helmet": 1
+    },
+    "name": "Bioforge Ferrite Void Helmet"
+  },
+  "craft_ferrite_void_vest": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 72,
+    "input": {
+      "ferrite_bar": 2,
+      "chitin_shard": 1
+    },
+    "output": {
+      "ferrite_void_vest": 1
+    },
+    "name": "Bioforge Ferrite Void Vest"
+  },
+  "craft_ferrite_void_legs": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 57,
+    "input": {
+      "ferrite_bar": 2,
+      "chitin_shard": 1
+    },
+    "output": {
+      "ferrite_void_legs": 1
+    },
+    "name": "Bioforge Ferrite Void Greaves"
+  },
+  "craft_ferrite_void_boots": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 29,
+    "input": {
+      "ferrite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "ferrite_void_boots": 1
+    },
+    "name": "Bioforge Ferrite Void Boots"
+  },
+  "craft_ferrite_void_gloves": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 29,
+    "input": {
+      "ferrite_bar": 1,
+      "chitin_shard": 1
+    },
+    "output": {
+      "ferrite_void_gloves": 1
+    },
+    "name": "Bioforge Ferrite Void Gloves"
+  },
+  "smelt_cobalt": {
+    "skill": "circuitry",
+    "level": 20,
+    "xp": 75,
+    "input": {
+      "cobaltium_ore": 1
+    },
+    "output": {
+      "cobaltium_bar": 1
+    },
+    "name": "Smelt Cobalt"
+  },
+  "craft_cobalt_nanoblade": {
+    "skill": "circuitry",
+    "level": 20,
+    "xp": 105,
+    "input": {
+      "cobaltium_bar": 3
+    },
+    "output": {
+      "cobalt_nanoblade": 1
+    },
+    "name": "Forge Cobalt Nanoblade"
+  },
+  "craft_cobalt_coilgun": {
+    "skill": "circuitry",
+    "level": 20,
+    "xp": 105,
+    "input": {
+      "cobaltium_bar": 3
+    },
+    "output": {
+      "cobalt_coilgun": 1
+    },
+    "name": "Forge Cobalt Coilgun"
+  },
+  "craft_cobalt_voidstaff": {
+    "skill": "circuitry",
+    "level": 20,
+    "xp": 105,
+    "input": {
+      "cobaltium_bar": 3
+    },
+    "output": {
+      "cobalt_voidstaff": 1
+    },
+    "name": "Forge Cobalt Voidstaff"
+  },
+  "craft_cobalt_helmet": {
+    "skill": "circuitry",
+    "level": 20,
+    "xp": 63,
+    "input": {
+      "cobaltium_bar": 2
+    },
+    "output": {
+      "cobalt_helmet": 1
+    },
+    "name": "Forge Cobalt Helmet"
+  },
+  "craft_cobalt_vest": {
+    "skill": "circuitry",
+    "level": 20,
+    "xp": 105,
+    "input": {
+      "cobaltium_bar": 3
+    },
+    "output": {
+      "cobalt_vest": 1
+    },
+    "name": "Forge Cobalt Vest"
+  },
+  "craft_cobalt_legs": {
+    "skill": "circuitry",
+    "level": 20,
+    "xp": 84,
+    "input": {
+      "cobaltium_bar": 2
+    },
+    "output": {
+      "cobalt_legs": 1
+    },
+    "name": "Forge Cobalt Greaves"
+  },
+  "craft_cobalt_boots": {
+    "skill": "circuitry",
+    "level": 20,
+    "xp": 42,
+    "input": {
+      "cobaltium_bar": 1
+    },
+    "output": {
+      "cobalt_boots": 1
+    },
+    "name": "Forge Cobalt Boots"
+  },
+  "craft_cobalt_gloves": {
+    "skill": "circuitry",
+    "level": 20,
+    "xp": 42,
+    "input": {
+      "cobaltium_bar": 1
+    },
+    "output": {
+      "cobalt_gloves": 1
+    },
+    "name": "Forge Cobalt Gloves"
+  },
+  "craft_cobalt_nano_helmet": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 69,
+    "input": {
+      "cobaltium_bar": 1,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "cobalt_nano_helmet": 1
+    },
+    "name": "Bioforge Cobalt Nano Helmet"
+  },
+  "craft_cobalt_nano_vest": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 116,
+    "input": {
+      "cobaltium_bar": 2,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "cobalt_nano_vest": 1
+    },
+    "name": "Bioforge Cobalt Nano Vest"
+  },
+  "craft_cobalt_nano_legs": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 92,
+    "input": {
+      "cobaltium_bar": 2,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "cobalt_nano_legs": 1
+    },
+    "name": "Bioforge Cobalt Nano Greaves"
+  },
+  "craft_cobalt_nano_boots": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 46,
+    "input": {
+      "cobaltium_bar": 1,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "cobalt_nano_boots": 1
+    },
+    "name": "Bioforge Cobalt Nano Boots"
+  },
+  "craft_cobalt_nano_gloves": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 46,
+    "input": {
+      "cobaltium_bar": 1,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "cobalt_nano_gloves": 1
+    },
+    "name": "Bioforge Cobalt Nano Gloves"
+  },
+  "craft_cobalt_tesla_helmet": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 69,
+    "input": {
+      "cobaltium_bar": 1,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "cobalt_tesla_helmet": 1
+    },
+    "name": "Bioforge Cobalt Tesla Helmet"
+  },
+  "craft_cobalt_tesla_vest": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 116,
+    "input": {
+      "cobaltium_bar": 2,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "cobalt_tesla_vest": 1
+    },
+    "name": "Bioforge Cobalt Tesla Vest"
+  },
+  "craft_cobalt_tesla_legs": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 92,
+    "input": {
+      "cobaltium_bar": 2,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "cobalt_tesla_legs": 1
+    },
+    "name": "Bioforge Cobalt Tesla Greaves"
+  },
+  "craft_cobalt_tesla_boots": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 46,
+    "input": {
+      "cobaltium_bar": 1,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "cobalt_tesla_boots": 1
+    },
+    "name": "Bioforge Cobalt Tesla Boots"
+  },
+  "craft_cobalt_tesla_gloves": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 46,
+    "input": {
+      "cobaltium_bar": 1,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "cobalt_tesla_gloves": 1
+    },
+    "name": "Bioforge Cobalt Tesla Gloves"
+  },
+  "craft_cobalt_void_helmet": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 69,
+    "input": {
+      "cobaltium_bar": 1,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "cobalt_void_helmet": 1
+    },
+    "name": "Bioforge Cobalt Void Helmet"
+  },
+  "craft_cobalt_void_vest": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 116,
+    "input": {
+      "cobaltium_bar": 2,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "cobalt_void_vest": 1
+    },
+    "name": "Bioforge Cobalt Void Vest"
+  },
+  "craft_cobalt_void_legs": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 92,
+    "input": {
+      "cobaltium_bar": 2,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "cobalt_void_legs": 1
+    },
+    "name": "Bioforge Cobalt Void Greaves"
+  },
+  "craft_cobalt_void_boots": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 46,
+    "input": {
+      "cobaltium_bar": 1,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "cobalt_void_boots": 1
+    },
+    "name": "Bioforge Cobalt Void Boots"
+  },
+  "craft_cobalt_void_gloves": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 46,
+    "input": {
+      "cobaltium_bar": 1,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "cobalt_void_gloves": 1
+    },
+    "name": "Bioforge Cobalt Void Gloves"
+  },
+  "smelt_duranium": {
+    "skill": "circuitry",
+    "level": 30,
+    "xp": 115,
+    "input": {
+      "duranite_ore": 1
+    },
+    "output": {
+      "duranite_bar": 1
+    },
+    "name": "Smelt Duranium"
+  },
+  "craft_duranium_nanoblade": {
+    "skill": "circuitry",
+    "level": 30,
+    "xp": 155,
+    "input": {
+      "duranite_bar": 4
+    },
+    "output": {
+      "duranium_nanoblade": 1
+    },
+    "name": "Forge Duranium Nanoblade"
+  },
+  "craft_duranium_coilgun": {
+    "skill": "circuitry",
+    "level": 30,
+    "xp": 155,
+    "input": {
+      "duranite_bar": 4
+    },
+    "output": {
+      "duranium_coilgun": 1
+    },
+    "name": "Forge Duranium Coilgun"
+  },
+  "craft_duranium_voidstaff": {
+    "skill": "circuitry",
+    "level": 30,
+    "xp": 155,
+    "input": {
+      "duranite_bar": 4
+    },
+    "output": {
+      "duranium_voidstaff": 1
+    },
+    "name": "Forge Duranium Voidstaff"
+  },
+  "craft_duranium_helmet": {
+    "skill": "circuitry",
+    "level": 30,
+    "xp": 93,
+    "input": {
+      "duranite_bar": 2
+    },
+    "output": {
+      "duranium_helmet": 1
+    },
+    "name": "Forge Duranium Helmet"
+  },
+  "craft_duranium_vest": {
+    "skill": "circuitry",
+    "level": 30,
+    "xp": 155,
+    "input": {
+      "duranite_bar": 4
+    },
+    "output": {
+      "duranium_vest": 1
+    },
+    "name": "Forge Duranium Vest"
+  },
+  "craft_duranium_legs": {
+    "skill": "circuitry",
+    "level": 30,
+    "xp": 124,
+    "input": {
+      "duranite_bar": 3
+    },
+    "output": {
+      "duranium_legs": 1
+    },
+    "name": "Forge Duranium Greaves"
+  },
+  "craft_duranium_boots": {
+    "skill": "circuitry",
+    "level": 30,
+    "xp": 62,
+    "input": {
+      "duranite_bar": 2
+    },
+    "output": {
+      "duranium_boots": 1
+    },
+    "name": "Forge Duranium Boots"
+  },
+  "craft_duranium_gloves": {
+    "skill": "circuitry",
+    "level": 30,
+    "xp": 62,
+    "input": {
+      "duranite_bar": 2
+    },
+    "output": {
+      "duranium_gloves": 1
+    },
+    "name": "Forge Duranium Gloves"
+  },
+  "craft_duranium_nano_helmet": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 102,
+    "input": {
+      "duranite_bar": 2,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "duranium_nano_helmet": 1
+    },
+    "name": "Bioforge Duranium Nano Helmet"
+  },
+  "craft_duranium_nano_vest": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 171,
+    "input": {
+      "duranite_bar": 3,
+      "jelly_membrane": 2
+    },
+    "output": {
+      "duranium_nano_vest": 1
+    },
+    "name": "Bioforge Duranium Nano Vest"
+  },
+  "craft_duranium_nano_legs": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 136,
+    "input": {
+      "duranite_bar": 3,
+      "jelly_membrane": 2
+    },
+    "output": {
+      "duranium_nano_legs": 1
+    },
+    "name": "Bioforge Duranium Nano Greaves"
+  },
+  "craft_duranium_nano_boots": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 68,
+    "input": {
+      "duranite_bar": 1,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "duranium_nano_boots": 1
+    },
+    "name": "Bioforge Duranium Nano Boots"
+  },
+  "craft_duranium_nano_gloves": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 68,
+    "input": {
+      "duranite_bar": 1,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "duranium_nano_gloves": 1
+    },
+    "name": "Bioforge Duranium Nano Gloves"
+  },
+  "craft_duranium_tesla_helmet": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 102,
+    "input": {
+      "duranite_bar": 2,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "duranium_tesla_helmet": 1
+    },
+    "name": "Bioforge Duranium Tesla Helmet"
+  },
+  "craft_duranium_tesla_vest": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 171,
+    "input": {
+      "duranite_bar": 3,
+      "jelly_membrane": 2
+    },
+    "output": {
+      "duranium_tesla_vest": 1
+    },
+    "name": "Bioforge Duranium Tesla Vest"
+  },
+  "craft_duranium_tesla_legs": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 136,
+    "input": {
+      "duranite_bar": 3,
+      "jelly_membrane": 2
+    },
+    "output": {
+      "duranium_tesla_legs": 1
+    },
+    "name": "Bioforge Duranium Tesla Greaves"
+  },
+  "craft_duranium_tesla_boots": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 68,
+    "input": {
+      "duranite_bar": 1,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "duranium_tesla_boots": 1
+    },
+    "name": "Bioforge Duranium Tesla Boots"
+  },
+  "craft_duranium_tesla_gloves": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 68,
+    "input": {
+      "duranite_bar": 1,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "duranium_tesla_gloves": 1
+    },
+    "name": "Bioforge Duranium Tesla Gloves"
+  },
+  "craft_duranium_void_helmet": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 102,
+    "input": {
+      "duranite_bar": 2,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "duranium_void_helmet": 1
+    },
+    "name": "Bioforge Duranium Void Helmet"
+  },
+  "craft_duranium_void_vest": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 171,
+    "input": {
+      "duranite_bar": 3,
+      "jelly_membrane": 2
+    },
+    "output": {
+      "duranium_void_vest": 1
+    },
+    "name": "Bioforge Duranium Void Vest"
+  },
+  "craft_duranium_void_legs": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 136,
+    "input": {
+      "duranite_bar": 3,
+      "jelly_membrane": 2
+    },
+    "output": {
+      "duranium_void_legs": 1
+    },
+    "name": "Bioforge Duranium Void Greaves"
+  },
+  "craft_duranium_void_boots": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 68,
+    "input": {
+      "duranite_bar": 1,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "duranium_void_boots": 1
+    },
+    "name": "Bioforge Duranium Void Boots"
+  },
+  "craft_duranium_void_gloves": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 68,
+    "input": {
+      "duranite_bar": 1,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "duranium_void_gloves": 1
+    },
+    "name": "Bioforge Duranium Void Gloves"
+  },
+  "smelt_titanex": {
+    "skill": "circuitry",
+    "level": 40,
+    "xp": 160,
+    "input": {
+      "titanex_ore": 1
+    },
+    "output": {
+      "titanex_bar": 1
+    },
+    "name": "Smelt Titanex"
+  },
+  "craft_titanex_nanoblade": {
+    "skill": "circuitry",
+    "level": 40,
+    "xp": 220,
+    "input": {
+      "titanex_bar": 4
+    },
+    "output": {
+      "titanex_nanoblade": 1
+    },
+    "name": "Forge Titanex Nanoblade"
+  },
+  "craft_titanex_coilgun": {
+    "skill": "circuitry",
+    "level": 40,
+    "xp": 220,
+    "input": {
+      "titanex_bar": 4
+    },
+    "output": {
+      "titanex_coilgun": 1
+    },
+    "name": "Forge Titanex Coilgun"
+  },
+  "craft_titanex_voidstaff": {
+    "skill": "circuitry",
+    "level": 40,
+    "xp": 220,
+    "input": {
+      "titanex_bar": 4
+    },
+    "output": {
+      "titanex_voidstaff": 1
+    },
+    "name": "Forge Titanex Voidstaff"
+  },
+  "craft_titanex_helmet": {
+    "skill": "circuitry",
+    "level": 40,
+    "xp": 132,
+    "input": {
+      "titanex_bar": 2
+    },
+    "output": {
+      "titanex_helmet": 1
+    },
+    "name": "Forge Titanex Helmet"
+  },
+  "craft_titanex_vest": {
+    "skill": "circuitry",
+    "level": 40,
+    "xp": 220,
+    "input": {
+      "titanex_bar": 4
+    },
+    "output": {
+      "titanex_vest": 1
+    },
+    "name": "Forge Titanex Vest"
+  },
+  "craft_titanex_legs": {
+    "skill": "circuitry",
+    "level": 40,
+    "xp": 176,
+    "input": {
+      "titanex_bar": 3
+    },
+    "output": {
+      "titanex_legs": 1
+    },
+    "name": "Forge Titanex Greaves"
+  },
+  "craft_titanex_boots": {
+    "skill": "circuitry",
+    "level": 40,
+    "xp": 88,
+    "input": {
+      "titanex_bar": 2
+    },
+    "output": {
+      "titanex_boots": 1
+    },
+    "name": "Forge Titanex Boots"
+  },
+  "craft_titanex_gloves": {
+    "skill": "circuitry",
+    "level": 40,
+    "xp": 88,
+    "input": {
+      "titanex_bar": 2
+    },
+    "output": {
+      "titanex_gloves": 1
+    },
+    "name": "Forge Titanex Gloves"
+  },
+  "craft_titanex_nano_helmet": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 145,
+    "input": {
+      "titanex_bar": 2,
+      "spore_gland": 1
+    },
+    "output": {
+      "titanex_nano_helmet": 1
+    },
+    "name": "Bioforge Titanex Nano Helmet"
+  },
+  "craft_titanex_nano_vest": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 242,
+    "input": {
+      "titanex_bar": 3,
+      "spore_gland": 2
+    },
+    "output": {
+      "titanex_nano_vest": 1
+    },
+    "name": "Bioforge Titanex Nano Vest"
+  },
+  "craft_titanex_nano_legs": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 194,
+    "input": {
+      "titanex_bar": 3,
+      "spore_gland": 2
+    },
+    "output": {
+      "titanex_nano_legs": 1
+    },
+    "name": "Bioforge Titanex Nano Greaves"
+  },
+  "craft_titanex_nano_boots": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 97,
+    "input": {
+      "titanex_bar": 1,
+      "spore_gland": 1
+    },
+    "output": {
+      "titanex_nano_boots": 1
+    },
+    "name": "Bioforge Titanex Nano Boots"
+  },
+  "craft_titanex_nano_gloves": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 97,
+    "input": {
+      "titanex_bar": 1,
+      "spore_gland": 1
+    },
+    "output": {
+      "titanex_nano_gloves": 1
+    },
+    "name": "Bioforge Titanex Nano Gloves"
+  },
+  "craft_titanex_tesla_helmet": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 145,
+    "input": {
+      "titanex_bar": 2,
+      "spore_gland": 1
+    },
+    "output": {
+      "titanex_tesla_helmet": 1
+    },
+    "name": "Bioforge Titanex Tesla Helmet"
+  },
+  "craft_titanex_tesla_vest": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 242,
+    "input": {
+      "titanex_bar": 3,
+      "spore_gland": 2
+    },
+    "output": {
+      "titanex_tesla_vest": 1
+    },
+    "name": "Bioforge Titanex Tesla Vest"
+  },
+  "craft_titanex_tesla_legs": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 194,
+    "input": {
+      "titanex_bar": 3,
+      "spore_gland": 2
+    },
+    "output": {
+      "titanex_tesla_legs": 1
+    },
+    "name": "Bioforge Titanex Tesla Greaves"
+  },
+  "craft_titanex_tesla_boots": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 97,
+    "input": {
+      "titanex_bar": 1,
+      "spore_gland": 1
+    },
+    "output": {
+      "titanex_tesla_boots": 1
+    },
+    "name": "Bioforge Titanex Tesla Boots"
+  },
+  "craft_titanex_tesla_gloves": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 97,
+    "input": {
+      "titanex_bar": 1,
+      "spore_gland": 1
+    },
+    "output": {
+      "titanex_tesla_gloves": 1
+    },
+    "name": "Bioforge Titanex Tesla Gloves"
+  },
+  "craft_titanex_void_helmet": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 145,
+    "input": {
+      "titanex_bar": 2,
+      "spore_gland": 1
+    },
+    "output": {
+      "titanex_void_helmet": 1
+    },
+    "name": "Bioforge Titanex Void Helmet"
+  },
+  "craft_titanex_void_vest": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 242,
+    "input": {
+      "titanex_bar": 3,
+      "spore_gland": 2
+    },
+    "output": {
+      "titanex_void_vest": 1
+    },
+    "name": "Bioforge Titanex Void Vest"
+  },
+  "craft_titanex_void_legs": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 194,
+    "input": {
+      "titanex_bar": 3,
+      "spore_gland": 2
+    },
+    "output": {
+      "titanex_void_legs": 1
+    },
+    "name": "Bioforge Titanex Void Greaves"
+  },
+  "craft_titanex_void_boots": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 97,
+    "input": {
+      "titanex_bar": 1,
+      "spore_gland": 1
+    },
+    "output": {
+      "titanex_void_boots": 1
+    },
+    "name": "Bioforge Titanex Void Boots"
+  },
+  "craft_titanex_void_gloves": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 97,
+    "input": {
+      "titanex_bar": 1,
+      "spore_gland": 1
+    },
+    "output": {
+      "titanex_void_gloves": 1
+    },
+    "name": "Bioforge Titanex Void Gloves"
+  },
+  "smelt_plasmite": {
+    "skill": "circuitry",
+    "level": 50,
+    "xp": 220,
+    "input": {
+      "plasmite_ore": 1
+    },
+    "output": {
+      "plasmite_bar": 1
+    },
+    "name": "Smelt Plasmite"
+  },
+  "craft_plasmite_nanoblade": {
+    "skill": "circuitry",
+    "level": 50,
+    "xp": 300,
+    "input": {
+      "plasmite_bar": 5
+    },
+    "output": {
+      "plasmite_nanoblade": 1
+    },
+    "name": "Forge Plasmite Nanoblade"
+  },
+  "craft_plasmite_coilgun": {
+    "skill": "circuitry",
+    "level": 50,
+    "xp": 300,
+    "input": {
+      "plasmite_bar": 5
+    },
+    "output": {
+      "plasmite_coilgun": 1
+    },
+    "name": "Forge Plasmite Coilgun"
+  },
+  "craft_plasmite_voidstaff": {
+    "skill": "circuitry",
+    "level": 50,
+    "xp": 300,
+    "input": {
+      "plasmite_bar": 5
+    },
+    "output": {
+      "plasmite_voidstaff": 1
+    },
+    "name": "Forge Plasmite Voidstaff"
+  },
+  "craft_plasmite_helmet": {
+    "skill": "circuitry",
+    "level": 50,
+    "xp": 180,
+    "input": {
+      "plasmite_bar": 3
+    },
+    "output": {
+      "plasmite_helmet": 1
+    },
+    "name": "Forge Plasmite Helmet"
+  },
+  "craft_plasmite_vest": {
+    "skill": "circuitry",
+    "level": 50,
+    "xp": 300,
+    "input": {
+      "plasmite_bar": 5
+    },
+    "output": {
+      "plasmite_vest": 1
+    },
+    "name": "Forge Plasmite Vest"
+  },
+  "craft_plasmite_legs": {
+    "skill": "circuitry",
+    "level": 50,
+    "xp": 240,
+    "input": {
+      "plasmite_bar": 4
+    },
+    "output": {
+      "plasmite_legs": 1
+    },
+    "name": "Forge Plasmite Greaves"
+  },
+  "craft_plasmite_boots": {
+    "skill": "circuitry",
+    "level": 50,
+    "xp": 120,
+    "input": {
+      "plasmite_bar": 2
+    },
+    "output": {
+      "plasmite_boots": 1
+    },
+    "name": "Forge Plasmite Boots"
+  },
+  "craft_plasmite_gloves": {
+    "skill": "circuitry",
+    "level": 50,
+    "xp": 120,
+    "input": {
+      "plasmite_bar": 2
+    },
+    "output": {
+      "plasmite_gloves": 1
+    },
+    "name": "Forge Plasmite Gloves"
+  },
+  "craft_plasmite_nano_helmet": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 198,
+    "input": {
+      "plasmite_bar": 2,
+      "spore_gland": 1
+    },
+    "output": {
+      "plasmite_nano_helmet": 1
+    },
+    "name": "Bioforge Plasmite Nano Helmet"
+  },
+  "craft_plasmite_nano_vest": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 330,
+    "input": {
+      "plasmite_bar": 4,
+      "spore_gland": 2
+    },
+    "output": {
+      "plasmite_nano_vest": 1
+    },
+    "name": "Bioforge Plasmite Nano Vest"
+  },
+  "craft_plasmite_nano_legs": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 264,
+    "input": {
+      "plasmite_bar": 3,
+      "spore_gland": 2
+    },
+    "output": {
+      "plasmite_nano_legs": 1
+    },
+    "name": "Bioforge Plasmite Nano Greaves"
+  },
+  "craft_plasmite_nano_boots": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 132,
+    "input": {
+      "plasmite_bar": 2,
+      "spore_gland": 1
+    },
+    "output": {
+      "plasmite_nano_boots": 1
+    },
+    "name": "Bioforge Plasmite Nano Boots"
+  },
+  "craft_plasmite_nano_gloves": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 132,
+    "input": {
+      "plasmite_bar": 2,
+      "spore_gland": 1
+    },
+    "output": {
+      "plasmite_nano_gloves": 1
+    },
+    "name": "Bioforge Plasmite Nano Gloves"
+  },
+  "craft_plasmite_tesla_helmet": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 198,
+    "input": {
+      "plasmite_bar": 2,
+      "spore_gland": 1
+    },
+    "output": {
+      "plasmite_tesla_helmet": 1
+    },
+    "name": "Bioforge Plasmite Tesla Helmet"
+  },
+  "craft_plasmite_tesla_vest": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 330,
+    "input": {
+      "plasmite_bar": 4,
+      "spore_gland": 2
+    },
+    "output": {
+      "plasmite_tesla_vest": 1
+    },
+    "name": "Bioforge Plasmite Tesla Vest"
+  },
+  "craft_plasmite_tesla_legs": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 264,
+    "input": {
+      "plasmite_bar": 3,
+      "spore_gland": 2
+    },
+    "output": {
+      "plasmite_tesla_legs": 1
+    },
+    "name": "Bioforge Plasmite Tesla Greaves"
+  },
+  "craft_plasmite_tesla_boots": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 132,
+    "input": {
+      "plasmite_bar": 2,
+      "spore_gland": 1
+    },
+    "output": {
+      "plasmite_tesla_boots": 1
+    },
+    "name": "Bioforge Plasmite Tesla Boots"
+  },
+  "craft_plasmite_tesla_gloves": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 132,
+    "input": {
+      "plasmite_bar": 2,
+      "spore_gland": 1
+    },
+    "output": {
+      "plasmite_tesla_gloves": 1
+    },
+    "name": "Bioforge Plasmite Tesla Gloves"
+  },
+  "craft_plasmite_void_helmet": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 198,
+    "input": {
+      "plasmite_bar": 2,
+      "spore_gland": 1
+    },
+    "output": {
+      "plasmite_void_helmet": 1
+    },
+    "name": "Bioforge Plasmite Void Helmet"
+  },
+  "craft_plasmite_void_vest": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 330,
+    "input": {
+      "plasmite_bar": 4,
+      "spore_gland": 2
+    },
+    "output": {
+      "plasmite_void_vest": 1
+    },
+    "name": "Bioforge Plasmite Void Vest"
+  },
+  "craft_plasmite_void_legs": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 264,
+    "input": {
+      "plasmite_bar": 3,
+      "spore_gland": 2
+    },
+    "output": {
+      "plasmite_void_legs": 1
+    },
+    "name": "Bioforge Plasmite Void Greaves"
+  },
+  "craft_plasmite_void_boots": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 132,
+    "input": {
+      "plasmite_bar": 2,
+      "spore_gland": 1
+    },
+    "output": {
+      "plasmite_void_boots": 1
+    },
+    "name": "Bioforge Plasmite Void Boots"
+  },
+  "craft_plasmite_void_gloves": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 132,
+    "input": {
+      "plasmite_bar": 2,
+      "spore_gland": 1
+    },
+    "output": {
+      "plasmite_void_gloves": 1
+    },
+    "name": "Bioforge Plasmite Void Gloves"
+  },
+  "smelt_quantum": {
+    "skill": "circuitry",
+    "level": 60,
+    "xp": 290,
+    "input": {
+      "quantite_ore": 1
+    },
+    "output": {
+      "quantite_bar": 1
+    },
+    "name": "Smelt Quantum"
+  },
+  "craft_quantum_nanoblade": {
+    "skill": "circuitry",
+    "level": 60,
+    "xp": 390,
+    "input": {
+      "quantite_bar": 5
+    },
+    "output": {
+      "quantum_nanoblade": 1
+    },
+    "name": "Forge Quantum Nanoblade"
+  },
+  "craft_quantum_coilgun": {
+    "skill": "circuitry",
+    "level": 60,
+    "xp": 390,
+    "input": {
+      "quantite_bar": 5
+    },
+    "output": {
+      "quantum_coilgun": 1
+    },
+    "name": "Forge Quantum Coilgun"
+  },
+  "craft_quantum_voidstaff": {
+    "skill": "circuitry",
+    "level": 60,
+    "xp": 390,
+    "input": {
+      "quantite_bar": 5
+    },
+    "output": {
+      "quantum_voidstaff": 1
+    },
+    "name": "Forge Quantum Voidstaff"
+  },
+  "craft_quantum_helmet": {
+    "skill": "circuitry",
+    "level": 60,
+    "xp": 234,
+    "input": {
+      "quantite_bar": 3
+    },
+    "output": {
+      "quantum_helmet": 1
+    },
+    "name": "Forge Quantum Helmet"
+  },
+  "craft_quantum_vest": {
+    "skill": "circuitry",
+    "level": 60,
+    "xp": 390,
+    "input": {
+      "quantite_bar": 5
+    },
+    "output": {
+      "quantum_vest": 1
+    },
+    "name": "Forge Quantum Vest"
+  },
+  "craft_quantum_legs": {
+    "skill": "circuitry",
+    "level": 60,
+    "xp": 312,
+    "input": {
+      "quantite_bar": 4
+    },
+    "output": {
+      "quantum_legs": 1
+    },
+    "name": "Forge Quantum Greaves"
+  },
+  "craft_quantum_boots": {
+    "skill": "circuitry",
+    "level": 60,
+    "xp": 156,
+    "input": {
+      "quantite_bar": 2
+    },
+    "output": {
+      "quantum_boots": 1
+    },
+    "name": "Forge Quantum Boots"
+  },
+  "craft_quantum_gloves": {
+    "skill": "circuitry",
+    "level": 60,
+    "xp": 156,
+    "input": {
+      "quantite_bar": 2
+    },
+    "output": {
+      "quantum_gloves": 1
+    },
+    "name": "Forge Quantum Gloves"
+  },
+  "craft_quantum_nano_helmet": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 257,
+    "input": {
+      "quantite_bar": 2,
+      "gravity_residue": 1
+    },
+    "output": {
+      "quantum_nano_helmet": 1
+    },
+    "name": "Bioforge Quantum Nano Helmet"
+  },
+  "craft_quantum_nano_vest": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 429,
+    "input": {
+      "quantite_bar": 4,
+      "gravity_residue": 2
+    },
+    "output": {
+      "quantum_nano_vest": 1
+    },
+    "name": "Bioforge Quantum Nano Vest"
+  },
+  "craft_quantum_nano_legs": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 343,
+    "input": {
+      "quantite_bar": 3,
+      "gravity_residue": 2
+    },
+    "output": {
+      "quantum_nano_legs": 1
+    },
+    "name": "Bioforge Quantum Nano Greaves"
+  },
+  "craft_quantum_nano_boots": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 172,
+    "input": {
+      "quantite_bar": 2,
+      "gravity_residue": 1
+    },
+    "output": {
+      "quantum_nano_boots": 1
+    },
+    "name": "Bioforge Quantum Nano Boots"
+  },
+  "craft_quantum_nano_gloves": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 172,
+    "input": {
+      "quantite_bar": 2,
+      "gravity_residue": 1
+    },
+    "output": {
+      "quantum_nano_gloves": 1
+    },
+    "name": "Bioforge Quantum Nano Gloves"
+  },
+  "craft_quantum_tesla_helmet": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 257,
+    "input": {
+      "quantite_bar": 2,
+      "gravity_residue": 1
+    },
+    "output": {
+      "quantum_tesla_helmet": 1
+    },
+    "name": "Bioforge Quantum Tesla Helmet"
+  },
+  "craft_quantum_tesla_vest": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 429,
+    "input": {
+      "quantite_bar": 4,
+      "gravity_residue": 2
+    },
+    "output": {
+      "quantum_tesla_vest": 1
+    },
+    "name": "Bioforge Quantum Tesla Vest"
+  },
+  "craft_quantum_tesla_legs": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 343,
+    "input": {
+      "quantite_bar": 3,
+      "gravity_residue": 2
+    },
+    "output": {
+      "quantum_tesla_legs": 1
+    },
+    "name": "Bioforge Quantum Tesla Greaves"
+  },
+  "craft_quantum_tesla_boots": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 172,
+    "input": {
+      "quantite_bar": 2,
+      "gravity_residue": 1
+    },
+    "output": {
+      "quantum_tesla_boots": 1
+    },
+    "name": "Bioforge Quantum Tesla Boots"
+  },
+  "craft_quantum_tesla_gloves": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 172,
+    "input": {
+      "quantite_bar": 2,
+      "gravity_residue": 1
+    },
+    "output": {
+      "quantum_tesla_gloves": 1
+    },
+    "name": "Bioforge Quantum Tesla Gloves"
+  },
+  "craft_quantum_void_helmet": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 257,
+    "input": {
+      "quantite_bar": 2,
+      "gravity_residue": 1
+    },
+    "output": {
+      "quantum_void_helmet": 1
+    },
+    "name": "Bioforge Quantum Void Helmet"
+  },
+  "craft_quantum_void_vest": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 429,
+    "input": {
+      "quantite_bar": 4,
+      "gravity_residue": 2
+    },
+    "output": {
+      "quantum_void_vest": 1
+    },
+    "name": "Bioforge Quantum Void Vest"
+  },
+  "craft_quantum_void_legs": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 343,
+    "input": {
+      "quantite_bar": 3,
+      "gravity_residue": 2
+    },
+    "output": {
+      "quantum_void_legs": 1
+    },
+    "name": "Bioforge Quantum Void Greaves"
+  },
+  "craft_quantum_void_boots": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 172,
+    "input": {
+      "quantite_bar": 2,
+      "gravity_residue": 1
+    },
+    "output": {
+      "quantum_void_boots": 1
+    },
+    "name": "Bioforge Quantum Void Boots"
+  },
+  "craft_quantum_void_gloves": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 172,
+    "input": {
+      "quantite_bar": 2,
+      "gravity_residue": 1
+    },
+    "output": {
+      "quantum_void_gloves": 1
+    },
+    "name": "Bioforge Quantum Void Gloves"
+  },
+  "smelt_neutronium": {
+    "skill": "circuitry",
+    "level": 70,
+    "xp": 380,
+    "input": {
+      "neutronium_ore": 1
+    },
+    "output": {
+      "neutronium_bar": 1
+    },
+    "name": "Smelt Neutronium"
+  },
+  "craft_neutronium_nanoblade": {
+    "skill": "circuitry",
+    "level": 70,
+    "xp": 500,
+    "input": {
+      "neutronium_bar": 6
+    },
+    "output": {
+      "neutronium_nanoblade": 1
+    },
+    "name": "Forge Neutronium Nanoblade"
+  },
+  "craft_neutronium_coilgun": {
+    "skill": "circuitry",
+    "level": 70,
+    "xp": 500,
+    "input": {
+      "neutronium_bar": 6
+    },
+    "output": {
+      "neutronium_coilgun": 1
+    },
+    "name": "Forge Neutronium Coilgun"
+  },
+  "craft_neutronium_voidstaff": {
+    "skill": "circuitry",
+    "level": 70,
+    "xp": 500,
+    "input": {
+      "neutronium_bar": 6
+    },
+    "output": {
+      "neutronium_voidstaff": 1
+    },
+    "name": "Forge Neutronium Voidstaff"
+  },
+  "craft_neutronium_helmet": {
+    "skill": "circuitry",
+    "level": 70,
+    "xp": 300,
+    "input": {
+      "neutronium_bar": 4
+    },
+    "output": {
+      "neutronium_helmet": 1
+    },
+    "name": "Forge Neutronium Helmet"
+  },
+  "craft_neutronium_vest": {
+    "skill": "circuitry",
+    "level": 70,
+    "xp": 500,
+    "input": {
+      "neutronium_bar": 6
+    },
+    "output": {
+      "neutronium_vest": 1
+    },
+    "name": "Forge Neutronium Vest"
+  },
+  "craft_neutronium_legs": {
+    "skill": "circuitry",
+    "level": 70,
+    "xp": 400,
+    "input": {
+      "neutronium_bar": 5
+    },
+    "output": {
+      "neutronium_legs": 1
+    },
+    "name": "Forge Neutronium Greaves"
+  },
+  "craft_neutronium_boots": {
+    "skill": "circuitry",
+    "level": 70,
+    "xp": 200,
+    "input": {
+      "neutronium_bar": 2
+    },
+    "output": {
+      "neutronium_boots": 1
+    },
+    "name": "Forge Neutronium Boots"
+  },
+  "craft_neutronium_gloves": {
+    "skill": "circuitry",
+    "level": 70,
+    "xp": 200,
+    "input": {
+      "neutronium_bar": 2
+    },
+    "output": {
+      "neutronium_gloves": 1
+    },
+    "name": "Forge Neutronium Gloves"
+  },
+  "craft_neutronium_nano_helmet": {
+    "skill": "bioforge",
+    "level": 70,
+    "xp": 330,
+    "input": {
+      "neutronium_bar": 3,
+      "gravity_residue": 2
+    },
+    "output": {
+      "neutronium_nano_helmet": 1
+    },
+    "name": "Bioforge Neutronium Nano Helmet"
+  },
+  "craft_neutronium_nano_vest": {
+    "skill": "bioforge",
+    "level": 70,
+    "xp": 550,
+    "input": {
+      "neutronium_bar": 5,
+      "gravity_residue": 3
+    },
+    "output": {
+      "neutronium_nano_vest": 1
+    },
+    "name": "Bioforge Neutronium Nano Vest"
+  },
+  "craft_neutronium_nano_legs": {
+    "skill": "bioforge",
+    "level": 70,
+    "xp": 440,
+    "input": {
+      "neutronium_bar": 4,
+      "gravity_residue": 2
+    },
+    "output": {
+      "neutronium_nano_legs": 1
+    },
+    "name": "Bioforge Neutronium Nano Greaves"
+  },
+  "craft_neutronium_nano_boots": {
+    "skill": "bioforge",
+    "level": 70,
+    "xp": 220,
+    "input": {
+      "neutronium_bar": 2,
+      "gravity_residue": 1
+    },
+    "output": {
+      "neutronium_nano_boots": 1
+    },
+    "name": "Bioforge Neutronium Nano Boots"
+  },
+  "craft_neutronium_nano_gloves": {
+    "skill": "bioforge",
+    "level": 70,
+    "xp": 220,
+    "input": {
+      "neutronium_bar": 2,
+      "gravity_residue": 1
+    },
+    "output": {
+      "neutronium_nano_gloves": 1
+    },
+    "name": "Bioforge Neutronium Nano Gloves"
+  },
+  "craft_neutronium_tesla_helmet": {
+    "skill": "bioforge",
+    "level": 70,
+    "xp": 330,
+    "input": {
+      "neutronium_bar": 3,
+      "gravity_residue": 2
+    },
+    "output": {
+      "neutronium_tesla_helmet": 1
+    },
+    "name": "Bioforge Neutronium Tesla Helmet"
+  },
+  "craft_neutronium_tesla_vest": {
+    "skill": "bioforge",
+    "level": 70,
+    "xp": 550,
+    "input": {
+      "neutronium_bar": 5,
+      "gravity_residue": 3
+    },
+    "output": {
+      "neutronium_tesla_vest": 1
+    },
+    "name": "Bioforge Neutronium Tesla Vest"
+  },
+  "craft_neutronium_tesla_legs": {
+    "skill": "bioforge",
+    "level": 70,
+    "xp": 440,
+    "input": {
+      "neutronium_bar": 4,
+      "gravity_residue": 2
+    },
+    "output": {
+      "neutronium_tesla_legs": 1
+    },
+    "name": "Bioforge Neutronium Tesla Greaves"
+  },
+  "craft_neutronium_tesla_boots": {
+    "skill": "bioforge",
+    "level": 70,
+    "xp": 220,
+    "input": {
+      "neutronium_bar": 2,
+      "gravity_residue": 1
+    },
+    "output": {
+      "neutronium_tesla_boots": 1
+    },
+    "name": "Bioforge Neutronium Tesla Boots"
+  },
+  "craft_neutronium_tesla_gloves": {
+    "skill": "bioforge",
+    "level": 70,
+    "xp": 220,
+    "input": {
+      "neutronium_bar": 2,
+      "gravity_residue": 1
+    },
+    "output": {
+      "neutronium_tesla_gloves": 1
+    },
+    "name": "Bioforge Neutronium Tesla Gloves"
+  },
+  "craft_neutronium_void_helmet": {
+    "skill": "bioforge",
+    "level": 70,
+    "xp": 330,
+    "input": {
+      "neutronium_bar": 3,
+      "gravity_residue": 2
+    },
+    "output": {
+      "neutronium_void_helmet": 1
+    },
+    "name": "Bioforge Neutronium Void Helmet"
+  },
+  "craft_neutronium_void_vest": {
+    "skill": "bioforge",
+    "level": 70,
+    "xp": 550,
+    "input": {
+      "neutronium_bar": 5,
+      "gravity_residue": 3
+    },
+    "output": {
+      "neutronium_void_vest": 1
+    },
+    "name": "Bioforge Neutronium Void Vest"
+  },
+  "craft_neutronium_void_legs": {
+    "skill": "bioforge",
+    "level": 70,
+    "xp": 440,
+    "input": {
+      "neutronium_bar": 4,
+      "gravity_residue": 2
+    },
+    "output": {
+      "neutronium_void_legs": 1
+    },
+    "name": "Bioforge Neutronium Void Greaves"
+  },
+  "craft_neutronium_void_boots": {
+    "skill": "bioforge",
+    "level": 70,
+    "xp": 220,
+    "input": {
+      "neutronium_bar": 2,
+      "gravity_residue": 1
+    },
+    "output": {
+      "neutronium_void_boots": 1
+    },
+    "name": "Bioforge Neutronium Void Boots"
+  },
+  "craft_neutronium_void_gloves": {
+    "skill": "bioforge",
+    "level": 70,
+    "xp": 220,
+    "input": {
+      "neutronium_bar": 2,
+      "gravity_residue": 1
+    },
+    "output": {
+      "neutronium_void_gloves": 1
+    },
+    "name": "Bioforge Neutronium Void Gloves"
+  },
+  "smelt_darkmatter": {
+    "skill": "circuitry",
+    "level": 80,
+    "xp": 500,
+    "input": {
+      "darkmatter_shard": 1
+    },
+    "output": {
+      "darkmatter_bar": 1
+    },
+    "name": "Smelt Darkmatter"
+  },
+  "craft_darkmatter_nanoblade": {
+    "skill": "circuitry",
+    "level": 80,
+    "xp": 610,
+    "input": {
+      "darkmatter_bar": 6
+    },
+    "output": {
+      "darkmatter_nanoblade": 1
+    },
+    "name": "Forge Darkmatter Nanoblade"
+  },
+  "craft_darkmatter_coilgun": {
+    "skill": "circuitry",
+    "level": 80,
+    "xp": 610,
+    "input": {
+      "darkmatter_bar": 6
+    },
+    "output": {
+      "darkmatter_coilgun": 1
+    },
+    "name": "Forge Darkmatter Coilgun"
+  },
+  "craft_darkmatter_voidstaff": {
+    "skill": "circuitry",
+    "level": 80,
+    "xp": 610,
+    "input": {
+      "darkmatter_bar": 6
+    },
+    "output": {
+      "darkmatter_voidstaff": 1
+    },
+    "name": "Forge Darkmatter Voidstaff"
+  },
+  "craft_darkmatter_helmet": {
+    "skill": "circuitry",
+    "level": 80,
+    "xp": 366,
+    "input": {
+      "darkmatter_bar": 4
+    },
+    "output": {
+      "darkmatter_helmet": 1
+    },
+    "name": "Forge Darkmatter Helmet"
+  },
+  "craft_darkmatter_vest": {
+    "skill": "circuitry",
+    "level": 80,
+    "xp": 610,
+    "input": {
+      "darkmatter_bar": 6
+    },
+    "output": {
+      "darkmatter_vest": 1
+    },
+    "name": "Forge Darkmatter Vest"
+  },
+  "craft_darkmatter_legs": {
+    "skill": "circuitry",
+    "level": 80,
+    "xp": 488,
+    "input": {
+      "darkmatter_bar": 5
+    },
+    "output": {
+      "darkmatter_legs": 1
+    },
+    "name": "Forge Darkmatter Greaves"
+  },
+  "craft_darkmatter_boots": {
+    "skill": "circuitry",
+    "level": 80,
+    "xp": 244,
+    "input": {
+      "darkmatter_bar": 2
+    },
+    "output": {
+      "darkmatter_boots": 1
+    },
+    "name": "Forge Darkmatter Boots"
+  },
+  "craft_darkmatter_gloves": {
+    "skill": "circuitry",
+    "level": 80,
+    "xp": 244,
+    "input": {
+      "darkmatter_bar": 2
+    },
+    "output": {
+      "darkmatter_gloves": 1
+    },
+    "name": "Forge Darkmatter Gloves"
+  },
+  "craft_darkmatter_nano_helmet": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 403,
+    "input": {
+      "darkmatter_bar": 3,
+      "neural_tissue": 2
+    },
+    "output": {
+      "darkmatter_nano_helmet": 1
+    },
+    "name": "Bioforge Darkmatter Nano Helmet"
+  },
+  "craft_darkmatter_nano_vest": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 671,
+    "input": {
+      "darkmatter_bar": 5,
+      "neural_tissue": 3
+    },
+    "output": {
+      "darkmatter_nano_vest": 1
+    },
+    "name": "Bioforge Darkmatter Nano Vest"
+  },
+  "craft_darkmatter_nano_legs": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 537,
+    "input": {
+      "darkmatter_bar": 4,
+      "neural_tissue": 2
+    },
+    "output": {
+      "darkmatter_nano_legs": 1
+    },
+    "name": "Bioforge Darkmatter Nano Greaves"
+  },
+  "craft_darkmatter_nano_boots": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 268,
+    "input": {
+      "darkmatter_bar": 2,
+      "neural_tissue": 1
+    },
+    "output": {
+      "darkmatter_nano_boots": 1
+    },
+    "name": "Bioforge Darkmatter Nano Boots"
+  },
+  "craft_darkmatter_nano_gloves": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 268,
+    "input": {
+      "darkmatter_bar": 2,
+      "neural_tissue": 1
+    },
+    "output": {
+      "darkmatter_nano_gloves": 1
+    },
+    "name": "Bioforge Darkmatter Nano Gloves"
+  },
+  "craft_darkmatter_tesla_helmet": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 403,
+    "input": {
+      "darkmatter_bar": 3,
+      "neural_tissue": 2
+    },
+    "output": {
+      "darkmatter_tesla_helmet": 1
+    },
+    "name": "Bioforge Darkmatter Tesla Helmet"
+  },
+  "craft_darkmatter_tesla_vest": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 671,
+    "input": {
+      "darkmatter_bar": 5,
+      "neural_tissue": 3
+    },
+    "output": {
+      "darkmatter_tesla_vest": 1
+    },
+    "name": "Bioforge Darkmatter Tesla Vest"
+  },
+  "craft_darkmatter_tesla_legs": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 537,
+    "input": {
+      "darkmatter_bar": 4,
+      "neural_tissue": 2
+    },
+    "output": {
+      "darkmatter_tesla_legs": 1
+    },
+    "name": "Bioforge Darkmatter Tesla Greaves"
+  },
+  "craft_darkmatter_tesla_boots": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 268,
+    "input": {
+      "darkmatter_bar": 2,
+      "neural_tissue": 1
+    },
+    "output": {
+      "darkmatter_tesla_boots": 1
+    },
+    "name": "Bioforge Darkmatter Tesla Boots"
+  },
+  "craft_darkmatter_tesla_gloves": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 268,
+    "input": {
+      "darkmatter_bar": 2,
+      "neural_tissue": 1
+    },
+    "output": {
+      "darkmatter_tesla_gloves": 1
+    },
+    "name": "Bioforge Darkmatter Tesla Gloves"
+  },
+  "craft_darkmatter_void_helmet": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 403,
+    "input": {
+      "darkmatter_bar": 3,
+      "neural_tissue": 2
+    },
+    "output": {
+      "darkmatter_void_helmet": 1
+    },
+    "name": "Bioforge Darkmatter Void Helmet"
+  },
+  "craft_darkmatter_void_vest": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 671,
+    "input": {
+      "darkmatter_bar": 5,
+      "neural_tissue": 3
+    },
+    "output": {
+      "darkmatter_void_vest": 1
+    },
+    "name": "Bioforge Darkmatter Void Vest"
+  },
+  "craft_darkmatter_void_legs": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 537,
+    "input": {
+      "darkmatter_bar": 4,
+      "neural_tissue": 2
+    },
+    "output": {
+      "darkmatter_void_legs": 1
+    },
+    "name": "Bioforge Darkmatter Void Greaves"
+  },
+  "craft_darkmatter_void_boots": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 268,
+    "input": {
+      "darkmatter_bar": 2,
+      "neural_tissue": 1
+    },
+    "output": {
+      "darkmatter_void_boots": 1
+    },
+    "name": "Bioforge Darkmatter Void Boots"
+  },
+  "craft_darkmatter_void_gloves": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 268,
+    "input": {
+      "darkmatter_bar": 2,
+      "neural_tissue": 1
+    },
+    "output": {
+      "darkmatter_void_gloves": 1
+    },
+    "name": "Bioforge Darkmatter Void Gloves"
+  },
+  "smelt_voidsteel": {
+    "skill": "circuitry",
+    "level": 90,
+    "xp": 650,
+    "input": {
+      "voidsteel_ore": 1
+    },
+    "output": {
+      "voidsteel_bar": 1
+    },
+    "name": "Smelt Voidsteel"
+  },
+  "craft_voidsteel_nanoblade": {
+    "skill": "circuitry",
+    "level": 90,
+    "xp": 750,
+    "input": {
+      "voidsteel_bar": 7
+    },
+    "output": {
+      "voidsteel_nanoblade": 1
+    },
+    "name": "Forge Voidsteel Nanoblade"
+  },
+  "craft_voidsteel_coilgun": {
+    "skill": "circuitry",
+    "level": 90,
+    "xp": 750,
+    "input": {
+      "voidsteel_bar": 7
+    },
+    "output": {
+      "voidsteel_coilgun": 1
+    },
+    "name": "Forge Voidsteel Coilgun"
+  },
+  "craft_voidsteel_voidstaff": {
+    "skill": "circuitry",
+    "level": 90,
+    "xp": 750,
+    "input": {
+      "voidsteel_bar": 7
+    },
+    "output": {
+      "voidsteel_voidstaff": 1
+    },
+    "name": "Forge Voidsteel Voidstaff"
+  },
+  "craft_voidsteel_helmet": {
+    "skill": "circuitry",
+    "level": 90,
+    "xp": 450,
+    "input": {
+      "voidsteel_bar": 4
+    },
+    "output": {
+      "voidsteel_helmet": 1
+    },
+    "name": "Forge Voidsteel Helmet"
+  },
+  "craft_voidsteel_vest": {
+    "skill": "circuitry",
+    "level": 90,
+    "xp": 750,
+    "input": {
+      "voidsteel_bar": 7
+    },
+    "output": {
+      "voidsteel_vest": 1
+    },
+    "name": "Forge Voidsteel Vest"
+  },
+  "craft_voidsteel_legs": {
+    "skill": "circuitry",
+    "level": 90,
+    "xp": 600,
+    "input": {
+      "voidsteel_bar": 6
+    },
+    "output": {
+      "voidsteel_legs": 1
+    },
+    "name": "Forge Voidsteel Greaves"
+  },
+  "craft_voidsteel_boots": {
+    "skill": "circuitry",
+    "level": 90,
+    "xp": 300,
+    "input": {
+      "voidsteel_bar": 3
+    },
+    "output": {
+      "voidsteel_boots": 1
+    },
+    "name": "Forge Voidsteel Boots"
+  },
+  "craft_voidsteel_gloves": {
+    "skill": "circuitry",
+    "level": 90,
+    "xp": 300,
+    "input": {
+      "voidsteel_bar": 3
+    },
+    "output": {
+      "voidsteel_gloves": 1
+    },
+    "name": "Forge Voidsteel Gloves"
+  },
+  "craft_voidsteel_nano_helmet": {
+    "skill": "bioforge",
+    "level": 90,
+    "xp": 495,
+    "input": {
+      "voidsteel_bar": 3,
+      "neural_tissue": 2
+    },
+    "output": {
+      "voidsteel_nano_helmet": 1
+    },
+    "name": "Bioforge Voidsteel Nano Helmet"
+  },
+  "craft_voidsteel_nano_vest": {
+    "skill": "bioforge",
+    "level": 90,
+    "xp": 825,
+    "input": {
+      "voidsteel_bar": 6,
+      "neural_tissue": 3
+    },
+    "output": {
+      "voidsteel_nano_vest": 1
+    },
+    "name": "Bioforge Voidsteel Nano Vest"
+  },
+  "craft_voidsteel_nano_legs": {
+    "skill": "bioforge",
+    "level": 90,
+    "xp": 660,
+    "input": {
+      "voidsteel_bar": 4,
+      "neural_tissue": 2
+    },
+    "output": {
+      "voidsteel_nano_legs": 1
+    },
+    "name": "Bioforge Voidsteel Nano Greaves"
+  },
+  "craft_voidsteel_nano_boots": {
+    "skill": "bioforge",
+    "level": 90,
+    "xp": 330,
+    "input": {
+      "voidsteel_bar": 2,
+      "neural_tissue": 1
+    },
+    "output": {
+      "voidsteel_nano_boots": 1
+    },
+    "name": "Bioforge Voidsteel Nano Boots"
+  },
+  "craft_voidsteel_nano_gloves": {
+    "skill": "bioforge",
+    "level": 90,
+    "xp": 330,
+    "input": {
+      "voidsteel_bar": 2,
+      "neural_tissue": 1
+    },
+    "output": {
+      "voidsteel_nano_gloves": 1
+    },
+    "name": "Bioforge Voidsteel Nano Gloves"
+  },
+  "craft_voidsteel_tesla_helmet": {
+    "skill": "bioforge",
+    "level": 90,
+    "xp": 495,
+    "input": {
+      "voidsteel_bar": 3,
+      "neural_tissue": 2
+    },
+    "output": {
+      "voidsteel_tesla_helmet": 1
+    },
+    "name": "Bioforge Voidsteel Tesla Helmet"
+  },
+  "craft_voidsteel_tesla_vest": {
+    "skill": "bioforge",
+    "level": 90,
+    "xp": 825,
+    "input": {
+      "voidsteel_bar": 6,
+      "neural_tissue": 3
+    },
+    "output": {
+      "voidsteel_tesla_vest": 1
+    },
+    "name": "Bioforge Voidsteel Tesla Vest"
+  },
+  "craft_voidsteel_tesla_legs": {
+    "skill": "bioforge",
+    "level": 90,
+    "xp": 660,
+    "input": {
+      "voidsteel_bar": 4,
+      "neural_tissue": 2
+    },
+    "output": {
+      "voidsteel_tesla_legs": 1
+    },
+    "name": "Bioforge Voidsteel Tesla Greaves"
+  },
+  "craft_voidsteel_tesla_boots": {
+    "skill": "bioforge",
+    "level": 90,
+    "xp": 330,
+    "input": {
+      "voidsteel_bar": 2,
+      "neural_tissue": 1
+    },
+    "output": {
+      "voidsteel_tesla_boots": 1
+    },
+    "name": "Bioforge Voidsteel Tesla Boots"
+  },
+  "craft_voidsteel_tesla_gloves": {
+    "skill": "bioforge",
+    "level": 90,
+    "xp": 330,
+    "input": {
+      "voidsteel_bar": 2,
+      "neural_tissue": 1
+    },
+    "output": {
+      "voidsteel_tesla_gloves": 1
+    },
+    "name": "Bioforge Voidsteel Tesla Gloves"
+  },
+  "craft_voidsteel_void_helmet": {
+    "skill": "bioforge",
+    "level": 90,
+    "xp": 495,
+    "input": {
+      "voidsteel_bar": 3,
+      "neural_tissue": 2
+    },
+    "output": {
+      "voidsteel_void_helmet": 1
+    },
+    "name": "Bioforge Voidsteel Void Helmet"
+  },
+  "craft_voidsteel_void_vest": {
+    "skill": "bioforge",
+    "level": 90,
+    "xp": 825,
+    "input": {
+      "voidsteel_bar": 6,
+      "neural_tissue": 3
+    },
+    "output": {
+      "voidsteel_void_vest": 1
+    },
+    "name": "Bioforge Voidsteel Void Vest"
+  },
+  "craft_voidsteel_void_legs": {
+    "skill": "bioforge",
+    "level": 90,
+    "xp": 660,
+    "input": {
+      "voidsteel_bar": 4,
+      "neural_tissue": 2
+    },
+    "output": {
+      "voidsteel_void_legs": 1
+    },
+    "name": "Bioforge Voidsteel Void Greaves"
+  },
+  "craft_voidsteel_void_boots": {
+    "skill": "bioforge",
+    "level": 90,
+    "xp": 330,
+    "input": {
+      "voidsteel_bar": 2,
+      "neural_tissue": 1
+    },
+    "output": {
+      "voidsteel_void_boots": 1
+    },
+    "name": "Bioforge Voidsteel Void Boots"
+  },
+  "craft_voidsteel_void_gloves": {
+    "skill": "bioforge",
+    "level": 90,
+    "xp": 330,
+    "input": {
+      "voidsteel_bar": 2,
+      "neural_tissue": 1
+    },
+    "output": {
+      "voidsteel_void_gloves": 1
+    },
+    "name": "Bioforge Voidsteel Void Gloves"
+  },
+  "craft_ascendant_nanoblade": {
+    "skill": "circuitry",
+    "level": 91,
+    "xp": 910,
+    "input": {
+      "ascendant_alloy": 8
+    },
+    "output": {
+      "ascendant_nanoblade": 1
+    },
+    "name": "Forge Ascendant Nanoblade"
+  },
+  "craft_ascendant_coilgun": {
+    "skill": "circuitry",
+    "level": 91,
+    "xp": 910,
+    "input": {
+      "ascendant_alloy": 8
+    },
+    "output": {
+      "ascendant_coilgun": 1
+    },
+    "name": "Forge Ascendant Coilgun"
+  },
+  "craft_ascendant_voidstaff": {
+    "skill": "circuitry",
+    "level": 91,
+    "xp": 910,
+    "input": {
+      "ascendant_alloy": 8
+    },
+    "output": {
+      "ascendant_voidstaff": 1
+    },
+    "name": "Forge Ascendant Voidstaff"
+  },
+  "craft_ascendant_helmet": {
+    "skill": "circuitry",
+    "level": 91,
+    "xp": 546,
+    "input": {
+      "ascendant_alloy": 5
+    },
+    "output": {
+      "ascendant_helmet": 1
+    },
+    "name": "Forge Ascendant Helmet"
+  },
+  "craft_ascendant_vest": {
+    "skill": "circuitry",
+    "level": 91,
+    "xp": 910,
+    "input": {
+      "ascendant_alloy": 8
+    },
+    "output": {
+      "ascendant_vest": 1
+    },
+    "name": "Forge Ascendant Vest"
+  },
+  "craft_ascendant_legs": {
+    "skill": "circuitry",
+    "level": 91,
+    "xp": 728,
+    "input": {
+      "ascendant_alloy": 6
+    },
+    "output": {
+      "ascendant_legs": 1
+    },
+    "name": "Forge Ascendant Greaves"
+  },
+  "craft_ascendant_boots": {
+    "skill": "circuitry",
+    "level": 91,
+    "xp": 364,
+    "input": {
+      "ascendant_alloy": 3
+    },
+    "output": {
+      "ascendant_boots": 1
+    },
+    "name": "Forge Ascendant Boots"
+  },
+  "craft_ascendant_gloves": {
+    "skill": "circuitry",
+    "level": 91,
+    "xp": 364,
+    "input": {
+      "ascendant_alloy": 3
+    },
+    "output": {
+      "ascendant_gloves": 1
+    },
+    "name": "Forge Ascendant Gloves"
+  },
+  "craft_ascendant_nano_helmet": {
+    "skill": "bioforge",
+    "level": 91,
+    "xp": 601,
+    "input": {
+      "ascendant_alloy": 4,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "ascendant_nano_helmet": 1
+    },
+    "name": "Bioforge Ascendant Nano Helmet"
+  },
+  "craft_ascendant_nano_vest": {
+    "skill": "bioforge",
+    "level": 91,
+    "xp": 1001,
+    "input": {
+      "ascendant_alloy": 6,
+      "corrupted_essence": 3
+    },
+    "output": {
+      "ascendant_nano_vest": 1
+    },
+    "name": "Bioforge Ascendant Nano Vest"
+  },
+  "craft_ascendant_nano_legs": {
+    "skill": "bioforge",
+    "level": 91,
+    "xp": 801,
+    "input": {
+      "ascendant_alloy": 5,
+      "corrupted_essence": 3
+    },
+    "output": {
+      "ascendant_nano_legs": 1
+    },
+    "name": "Bioforge Ascendant Nano Greaves"
+  },
+  "craft_ascendant_nano_boots": {
+    "skill": "bioforge",
+    "level": 91,
+    "xp": 400,
+    "input": {
+      "ascendant_alloy": 3,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "ascendant_nano_boots": 1
+    },
+    "name": "Bioforge Ascendant Nano Boots"
+  },
+  "craft_ascendant_nano_gloves": {
+    "skill": "bioforge",
+    "level": 91,
+    "xp": 400,
+    "input": {
+      "ascendant_alloy": 3,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "ascendant_nano_gloves": 1
+    },
+    "name": "Bioforge Ascendant Nano Gloves"
+  },
+  "craft_ascendant_tesla_helmet": {
+    "skill": "bioforge",
+    "level": 91,
+    "xp": 601,
+    "input": {
+      "ascendant_alloy": 4,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "ascendant_tesla_helmet": 1
+    },
+    "name": "Bioforge Ascendant Tesla Helmet"
+  },
+  "craft_ascendant_tesla_vest": {
+    "skill": "bioforge",
+    "level": 91,
+    "xp": 1001,
+    "input": {
+      "ascendant_alloy": 6,
+      "corrupted_essence": 3
+    },
+    "output": {
+      "ascendant_tesla_vest": 1
+    },
+    "name": "Bioforge Ascendant Tesla Vest"
+  },
+  "craft_ascendant_tesla_legs": {
+    "skill": "bioforge",
+    "level": 91,
+    "xp": 801,
+    "input": {
+      "ascendant_alloy": 5,
+      "corrupted_essence": 3
+    },
+    "output": {
+      "ascendant_tesla_legs": 1
+    },
+    "name": "Bioforge Ascendant Tesla Greaves"
+  },
+  "craft_ascendant_tesla_boots": {
+    "skill": "bioforge",
+    "level": 91,
+    "xp": 400,
+    "input": {
+      "ascendant_alloy": 3,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "ascendant_tesla_boots": 1
+    },
+    "name": "Bioforge Ascendant Tesla Boots"
+  },
+  "craft_ascendant_tesla_gloves": {
+    "skill": "bioforge",
+    "level": 91,
+    "xp": 400,
+    "input": {
+      "ascendant_alloy": 3,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "ascendant_tesla_gloves": 1
+    },
+    "name": "Bioforge Ascendant Tesla Gloves"
+  },
+  "craft_ascendant_void_helmet": {
+    "skill": "bioforge",
+    "level": 91,
+    "xp": 601,
+    "input": {
+      "ascendant_alloy": 4,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "ascendant_void_helmet": 1
+    },
+    "name": "Bioforge Ascendant Void Helmet"
+  },
+  "craft_ascendant_void_vest": {
+    "skill": "bioforge",
+    "level": 91,
+    "xp": 1001,
+    "input": {
+      "ascendant_alloy": 6,
+      "corrupted_essence": 3
+    },
+    "output": {
+      "ascendant_void_vest": 1
+    },
+    "name": "Bioforge Ascendant Void Vest"
+  },
+  "craft_ascendant_void_legs": {
+    "skill": "bioforge",
+    "level": 91,
+    "xp": 801,
+    "input": {
+      "ascendant_alloy": 5,
+      "corrupted_essence": 3
+    },
+    "output": {
+      "ascendant_void_legs": 1
+    },
+    "name": "Bioforge Ascendant Void Greaves"
+  },
+  "craft_ascendant_void_boots": {
+    "skill": "bioforge",
+    "level": 91,
+    "xp": 400,
+    "input": {
+      "ascendant_alloy": 3,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "ascendant_void_boots": 1
+    },
+    "name": "Bioforge Ascendant Void Boots"
+  },
+  "craft_ascendant_void_gloves": {
+    "skill": "bioforge",
+    "level": 91,
+    "xp": 400,
+    "input": {
+      "ascendant_alloy": 3,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "ascendant_void_gloves": 1
+    },
+    "name": "Bioforge Ascendant Void Gloves"
+  },
+  "craft_corrupted_nanoblade": {
+    "skill": "circuitry",
+    "level": 93,
+    "xp": 1100,
+    "input": {
+      "corrupted_ingot": 8
+    },
+    "output": {
+      "corrupted_nanoblade": 1
+    },
+    "name": "Forge Corrupted Nanoblade"
+  },
+  "craft_corrupted_coilgun": {
+    "skill": "circuitry",
+    "level": 93,
+    "xp": 1100,
+    "input": {
+      "corrupted_ingot": 8
+    },
+    "output": {
+      "corrupted_coilgun": 1
+    },
+    "name": "Forge Corrupted Coilgun"
+  },
+  "craft_corrupted_voidstaff": {
+    "skill": "circuitry",
+    "level": 93,
+    "xp": 1100,
+    "input": {
+      "corrupted_ingot": 8
+    },
+    "output": {
+      "corrupted_voidstaff": 1
+    },
+    "name": "Forge Corrupted Voidstaff"
+  },
+  "craft_corrupted_helmet": {
+    "skill": "circuitry",
+    "level": 93,
+    "xp": 660,
+    "input": {
+      "corrupted_ingot": 5
+    },
+    "output": {
+      "corrupted_helmet": 1
+    },
+    "name": "Forge Corrupted Helmet"
+  },
+  "craft_corrupted_vest": {
+    "skill": "circuitry",
+    "level": 93,
+    "xp": 1100,
+    "input": {
+      "corrupted_ingot": 8
+    },
+    "output": {
+      "corrupted_vest": 1
+    },
+    "name": "Forge Corrupted Vest"
+  },
+  "craft_corrupted_legs": {
+    "skill": "circuitry",
+    "level": 93,
+    "xp": 880,
+    "input": {
+      "corrupted_ingot": 6
+    },
+    "output": {
+      "corrupted_legs": 1
+    },
+    "name": "Forge Corrupted Greaves"
+  },
+  "craft_corrupted_boots": {
+    "skill": "circuitry",
+    "level": 93,
+    "xp": 440,
+    "input": {
+      "corrupted_ingot": 3
+    },
+    "output": {
+      "corrupted_boots": 1
+    },
+    "name": "Forge Corrupted Boots"
+  },
+  "craft_corrupted_gloves": {
+    "skill": "circuitry",
+    "level": 93,
+    "xp": 440,
+    "input": {
+      "corrupted_ingot": 3
+    },
+    "output": {
+      "corrupted_gloves": 1
+    },
+    "name": "Forge Corrupted Gloves"
+  },
+  "craft_corrupted_nano_helmet": {
+    "skill": "bioforge",
+    "level": 93,
+    "xp": 726,
+    "input": {
+      "corrupted_ingot": 4,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "corrupted_nano_helmet": 1
+    },
+    "name": "Bioforge Corrupted Nano Helmet"
+  },
+  "craft_corrupted_nano_vest": {
+    "skill": "bioforge",
+    "level": 93,
+    "xp": 1210,
+    "input": {
+      "corrupted_ingot": 6,
+      "corrupted_essence": 3
+    },
+    "output": {
+      "corrupted_nano_vest": 1
+    },
+    "name": "Bioforge Corrupted Nano Vest"
+  },
+  "craft_corrupted_nano_legs": {
+    "skill": "bioforge",
+    "level": 93,
+    "xp": 968,
+    "input": {
+      "corrupted_ingot": 5,
+      "corrupted_essence": 3
+    },
+    "output": {
+      "corrupted_nano_legs": 1
+    },
+    "name": "Bioforge Corrupted Nano Greaves"
+  },
+  "craft_corrupted_nano_boots": {
+    "skill": "bioforge",
+    "level": 93,
+    "xp": 484,
+    "input": {
+      "corrupted_ingot": 3,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "corrupted_nano_boots": 1
+    },
+    "name": "Bioforge Corrupted Nano Boots"
+  },
+  "craft_corrupted_nano_gloves": {
+    "skill": "bioforge",
+    "level": 93,
+    "xp": 484,
+    "input": {
+      "corrupted_ingot": 3,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "corrupted_nano_gloves": 1
+    },
+    "name": "Bioforge Corrupted Nano Gloves"
+  },
+  "craft_corrupted_tesla_helmet": {
+    "skill": "bioforge",
+    "level": 93,
+    "xp": 726,
+    "input": {
+      "corrupted_ingot": 4,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "corrupted_tesla_helmet": 1
+    },
+    "name": "Bioforge Corrupted Tesla Helmet"
+  },
+  "craft_corrupted_tesla_vest": {
+    "skill": "bioforge",
+    "level": 93,
+    "xp": 1210,
+    "input": {
+      "corrupted_ingot": 6,
+      "corrupted_essence": 3
+    },
+    "output": {
+      "corrupted_tesla_vest": 1
+    },
+    "name": "Bioforge Corrupted Tesla Vest"
+  },
+  "craft_corrupted_tesla_legs": {
+    "skill": "bioforge",
+    "level": 93,
+    "xp": 968,
+    "input": {
+      "corrupted_ingot": 5,
+      "corrupted_essence": 3
+    },
+    "output": {
+      "corrupted_tesla_legs": 1
+    },
+    "name": "Bioforge Corrupted Tesla Greaves"
+  },
+  "craft_corrupted_tesla_boots": {
+    "skill": "bioforge",
+    "level": 93,
+    "xp": 484,
+    "input": {
+      "corrupted_ingot": 3,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "corrupted_tesla_boots": 1
+    },
+    "name": "Bioforge Corrupted Tesla Boots"
+  },
+  "craft_corrupted_tesla_gloves": {
+    "skill": "bioforge",
+    "level": 93,
+    "xp": 484,
+    "input": {
+      "corrupted_ingot": 3,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "corrupted_tesla_gloves": 1
+    },
+    "name": "Bioforge Corrupted Tesla Gloves"
+  },
+  "craft_corrupted_void_helmet": {
+    "skill": "bioforge",
+    "level": 93,
+    "xp": 726,
+    "input": {
+      "corrupted_ingot": 4,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "corrupted_void_helmet": 1
+    },
+    "name": "Bioforge Corrupted Void Helmet"
+  },
+  "craft_corrupted_void_vest": {
+    "skill": "bioforge",
+    "level": 93,
+    "xp": 1210,
+    "input": {
+      "corrupted_ingot": 6,
+      "corrupted_essence": 3
+    },
+    "output": {
+      "corrupted_void_vest": 1
+    },
+    "name": "Bioforge Corrupted Void Vest"
+  },
+  "craft_corrupted_void_legs": {
+    "skill": "bioforge",
+    "level": 93,
+    "xp": 968,
+    "input": {
+      "corrupted_ingot": 5,
+      "corrupted_essence": 3
+    },
+    "output": {
+      "corrupted_void_legs": 1
+    },
+    "name": "Bioforge Corrupted Void Greaves"
+  },
+  "craft_corrupted_void_boots": {
+    "skill": "bioforge",
+    "level": 93,
+    "xp": 484,
+    "input": {
+      "corrupted_ingot": 3,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "corrupted_void_boots": 1
+    },
+    "name": "Bioforge Corrupted Void Boots"
+  },
+  "craft_corrupted_void_gloves": {
+    "skill": "bioforge",
+    "level": 93,
+    "xp": 484,
+    "input": {
+      "corrupted_ingot": 3,
+      "corrupted_essence": 2
+    },
+    "output": {
+      "corrupted_void_gloves": 1
+    },
+    "name": "Bioforge Corrupted Void Gloves"
+  },
+  "craft_ascendant_alloy": {
+    "skill": "circuitry",
+    "level": 91,
+    "xp": 800,
+    "input": {
+      "neutronium_bar": 2,
+      "darkmatter_bar": 2,
+      "voidsteel_bar": 2
+    },
+    "output": {
+      "ascendant_alloy": 1
+    },
+    "name": "Forge Ascendant Alloy"
+  },
+  "craft_corrupted_ingot": {
+    "skill": "circuitry",
+    "level": 93,
+    "xp": 1200,
+    "input": {
+      "ascendant_alloy": 2,
+      "corrupted_essence": 1
+    },
+    "output": {
+      "corrupted_ingot": 1
+    },
+    "name": "Forge Corrupted Ingot"
+  },
+  "refine_chitin": {
+    "skill": "bioforge",
+    "level": 5,
+    "xp": 35,
+    "input": {
+      "chitin_shard": 3
+    },
+    "output": {
+      "refined_chitin": 1
+    },
+    "name": "Refine Chitin"
+  },
+  "refine_membrane": {
+    "skill": "bioforge",
+    "level": 15,
+    "xp": 80,
+    "input": {
+      "jelly_membrane": 3
+    },
+    "output": {
+      "refined_membrane": 1
+    },
+    "name": "Refine Membrane"
+  },
+  "refine_spore": {
+    "skill": "bioforge",
+    "level": 30,
+    "xp": 150,
+    "input": {
+      "spore_gland": 3
+    },
+    "output": {
+      "refined_spore": 1
+    },
+    "name": "Refine Spore Essence"
+  },
+  "refine_gravity": {
+    "skill": "bioforge",
+    "level": 45,
+    "xp": 240,
+    "input": {
+      "gravity_residue": 3
+    },
+    "output": {
+      "refined_gravity": 1
+    },
+    "name": "Refine Gravity Compound"
+  },
+  "refine_neural": {
+    "skill": "bioforge",
+    "level": 60,
+    "xp": 380,
+    "input": {
+      "neural_tissue": 3
+    },
+    "output": {
+      "refined_neural": 1
+    },
+    "name": "Extract Neural Fluid"
+  },
+  "craft_bio_catalyst": {
+    "skill": "bioforge",
+    "level": 80,
+    "xp": 600,
+    "input": {
+      "refined_neural": 1,
+      "refined_gravity": 1,
+      "refined_spore": 1
+    },
+    "output": {
+      "bio_catalyst": 1
+    },
+    "name": "Synthesize Bio Catalyst"
+  },
+  "craft_attack_serum": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 55,
+    "input": {
+      "refined_chitin": 1,
+      "chitin_shard": 2
+    },
+    "output": {
+      "attack_serum": 1
+    },
+    "name": "Brew Attack Serum"
+  },
+  "craft_defense_serum": {
+    "skill": "bioforge",
+    "level": 10,
+    "xp": 55,
+    "input": {
+      "refined_chitin": 1,
+      "chitin_shard": 2
+    },
+    "output": {
+      "defense_serum": 1
+    },
+    "name": "Brew Defense Serum"
+  },
+  "craft_antidote_serum": {
+    "skill": "bioforge",
+    "level": 20,
+    "xp": 85,
+    "input": {
+      "refined_chitin": 2,
+      "jelly_membrane": 1
+    },
+    "output": {
+      "antidote_serum": 1
+    },
+    "name": "Brew Antidote Serum"
+  },
+  "craft_speed_serum": {
+    "skill": "bioforge",
+    "level": 25,
+    "xp": 110,
+    "input": {
+      "refined_membrane": 1,
+      "jelly_membrane": 2
+    },
+    "output": {
+      "speed_serum": 1
+    },
+    "name": "Brew Speed Serum"
+  },
+  "craft_bio_shield_serum": {
+    "skill": "bioforge",
+    "level": 40,
+    "xp": 200,
+    "input": {
+      "refined_spore": 1,
+      "refined_membrane": 1
+    },
+    "output": {
+      "bio_shield_serum": 1
+    },
+    "name": "Brew Bio-Shield Serum"
+  },
+  "craft_adrenaline_serum": {
+    "skill": "bioforge",
+    "level": 50,
+    "xp": 280,
+    "input": {
+      "refined_spore": 1,
+      "refined_gravity": 1
+    },
+    "output": {
+      "adrenaline_serum": 1
+    },
+    "name": "Brew Adrenaline Shot"
+  },
+  "craft_regen_serum": {
+    "skill": "bioforge",
+    "level": 65,
+    "xp": 420,
+    "input": {
+      "refined_gravity": 1,
+      "refined_neural": 1
+    },
+    "output": {
+      "regen_serum": 1
+    },
+    "name": "Brew Regen Serum"
+  },
+  "craft_mega_serum": {
+    "skill": "bioforge",
+    "level": 85,
+    "xp": 700,
+    "input": {
+      "bio_catalyst": 1,
+      "refined_neural": 1
+    },
+    "output": {
+      "mega_serum": 1
+    },
+    "name": "Brew Mega Serum"
+  },
+  "craft_duranite_mining_laser": {
+    "skill": "circuitry",
+    "level": 30,
+    "xp": 170,
+    "input": {
+      "duranite_bar": 3,
+      "cobaltium_bar": 1
+    },
+    "output": {
+      "duranite_mining_laser": 1
+    },
+    "name": "Forge Duranite Mining Laser"
+  },
+  "craft_duranite_bio_scanner": {
+    "skill": "circuitry",
+    "level": 30,
+    "xp": 170,
+    "input": {
+      "duranite_bar": 3,
+      "cobaltium_bar": 1
+    },
+    "output": {
+      "duranite_bio_scanner": 1
+    },
+    "name": "Forge Duranite Bio Scanner"
+  },
+  "craft_duranite_circuit_welder": {
+    "skill": "circuitry",
+    "level": 30,
+    "xp": 170,
+    "input": {
+      "duranite_bar": 3,
+      "cobaltium_bar": 1
+    },
+    "output": {
+      "duranite_circuit_welder": 1
+    },
+    "name": "Forge Duranite Circuit Welder"
+  },
+  "craft_duranite_xeno_stove": {
+    "skill": "circuitry",
+    "level": 30,
+    "xp": 170,
+    "input": {
+      "duranite_bar": 3,
+      "cobaltium_bar": 1
+    },
+    "output": {
+      "duranite_xeno_stove": 1
+    },
+    "name": "Forge Duranite Xeno Stove"
+  },
+  "craft_titanex_mining_laser": {
+    "skill": "circuitry",
+    "level": 50,
+    "xp": 280,
+    "input": {
+      "titanex_bar": 4,
+      "duranite_bar": 2
+    },
+    "output": {
+      "titanex_mining_laser": 1
+    },
+    "name": "Forge Titanex Mining Laser"
+  },
+  "craft_titanex_bio_scanner": {
+    "skill": "circuitry",
+    "level": 50,
+    "xp": 280,
+    "input": {
+      "titanex_bar": 4,
+      "duranite_bar": 2
+    },
+    "output": {
+      "titanex_bio_scanner": 1
+    },
+    "name": "Forge Titanex Bio Scanner"
+  },
+  "craft_titanex_circuit_welder": {
+    "skill": "circuitry",
+    "level": 50,
+    "xp": 280,
+    "input": {
+      "titanex_bar": 4,
+      "duranite_bar": 2
+    },
+    "output": {
+      "titanex_circuit_welder": 1
+    },
+    "name": "Forge Titanex Circuit Welder"
+  },
+  "craft_titanex_xeno_stove": {
+    "skill": "circuitry",
+    "level": 50,
+    "xp": 280,
+    "input": {
+      "titanex_bar": 4,
+      "duranite_bar": 2
+    },
+    "output": {
+      "titanex_xeno_stove": 1
+    },
+    "name": "Forge Titanex Xeno Stove"
+  },
+  "craft_plasmite_mining_laser": {
+    "skill": "circuitry",
+    "level": 70,
+    "xp": 480,
+    "input": {
+      "plasmite_bar": 5,
+      "titanex_bar": 2
+    },
+    "output": {
+      "plasmite_mining_laser": 1
+    },
+    "name": "Forge Plasmite Mining Laser"
+  },
+  "craft_plasmite_bio_scanner": {
+    "skill": "circuitry",
+    "level": 70,
+    "xp": 480,
+    "input": {
+      "plasmite_bar": 5,
+      "titanex_bar": 2
+    },
+    "output": {
+      "plasmite_bio_scanner": 1
+    },
+    "name": "Forge Plasmite Bio Scanner"
+  },
+  "craft_plasmite_circuit_welder": {
+    "skill": "circuitry",
+    "level": 70,
+    "xp": 480,
+    "input": {
+      "plasmite_bar": 5,
+      "titanex_bar": 2
+    },
+    "output": {
+      "plasmite_circuit_welder": 1
+    },
+    "name": "Forge Plasmite Circuit Welder"
+  },
+  "craft_plasmite_xeno_stove": {
+    "skill": "circuitry",
+    "level": 70,
+    "xp": 480,
+    "input": {
+      "plasmite_bar": 5,
+      "titanex_bar": 2
+    },
+    "output": {
+      "plasmite_xeno_stove": 1
+    },
+    "name": "Forge Plasmite Xeno Stove"
+  },
+  "craft_repair_kit": {
+    "skill": "circuitry",
+    "level": 25,
+    "xp": 115,
+    "input": {
+      "ferrite_bar": 2,
+      "cobaltium_bar": 1
+    },
+    "output": {
+      "repair_kit": 1
+    },
+    "name": "Build Repair Kit"
+  },
+  "craft_signal_flare": {
+    "skill": "circuitry",
+    "level": 15,
+    "xp": 65,
+    "input": {
+      "stellarite_bar": 2,
+      "ferrite_bar": 1
+    },
+    "output": {
+      "signal_flare": 2
+    },
+    "name": "Build Signal Flares"
+  },
+  "craft_teleport_beacon": {
+    "skill": "circuitry",
+    "level": 35,
+    "xp": 170,
+    "input": {
+      "cobaltium_bar": 2,
+      "duranite_bar": 1
+    },
+    "output": {
+      "teleport_beacon": 1
+    },
+    "name": "Build Teleport Beacon"
+  },
+  "craft_shield_cell": {
+    "skill": "circuitry",
+    "level": 45,
+    "xp": 230,
+    "input": {
+      "duranite_bar": 2,
+      "titanex_bar": 1
+    },
+    "output": {
+      "shield_cell": 1
+    },
+    "name": "Build Shield Cell"
+  },
+  "craft_overclock_chip": {
+    "skill": "circuitry",
+    "level": 55,
+    "xp": 310,
+    "input": {
+      "titanex_bar": 2,
+      "plasmite_bar": 1
+    },
+    "output": {
+      "overclock_chip": 1
+    },
+    "name": "Build Overclock Chip"
+  },
+  "craft_emp_grenade": {
+    "skill": "circuitry",
+    "level": 65,
+    "xp": 400,
+    "input": {
+      "plasmite_bar": 3,
+      "quantite_bar": 1
+    },
+    "output": {
+      "emp_grenade": 1
+    },
+    "name": "Build EMP Grenade"
+  },
+  "cut_stellar_gem": {
+    "skill": "astromining",
+    "level": 25,
+    "xp": 85,
+    "input": {
+      "raw_stellargem": 1
+    },
+    "output": {
+      "cut_stellargem": 1
+    },
+    "name": "Cut Stellar Gem"
+  },
+  "cut_void_gem": {
+    "skill": "astromining",
+    "level": 50,
+    "xp": 210,
+    "input": {
+      "raw_voidgem": 1
+    },
+    "output": {
+      "cut_voidgem": 1
+    },
+    "name": "Cut Void Gem"
+  },
+  "cut_cosmic_gem": {
+    "skill": "astromining",
+    "level": 75,
+    "xp": 420,
+    "input": {
+      "raw_cosmicgem": 1
+    },
+    "output": {
+      "cut_cosmicgem": 1
+    },
+    "name": "Cut Cosmic Gem"
+  },
+  "refine_neural_fiber": {
+    "skill": "psionics",
+    "level": 1,
+    "xp": 30,
+    "input": {
+      "neural_tissue": 3
+    },
+    "output": {
+      "neural_fiber": 1
+    },
+    "name": "Refine Neural Fiber"
+  },
+  "craft_psi_weave_hood": {
+    "skill": "psionics",
+    "level": 10,
+    "xp": 60,
+    "input": {
+      "neural_fiber": 3,
+      "chitin_shard": 5
+    },
+    "output": {
+      "psi_weave_hood": 1
+    },
+    "name": "Craft Psi-Weave Hood"
+  },
+  "craft_focus_core": {
+    "skill": "psionics",
+    "level": 15,
+    "xp": 50,
+    "input": {
+      "neural_fiber": 1,
+      "psionic_crystal": 1
+    },
+    "output": {
+      "focus_core": 1
+    },
+    "name": "Craft Focus Core"
+  },
+  "craft_psi_weave_gloves": {
+    "skill": "psionics",
+    "level": 15,
+    "xp": 70,
+    "input": {
+      "neural_fiber": 2,
+      "psionic_crystal": 1
+    },
+    "output": {
+      "psi_weave_gloves": 1
+    },
+    "name": "Craft Psi-Weave Gloves"
+  },
+  "craft_psi_weave_boots": {
+    "skill": "psionics",
+    "level": 20,
+    "xp": 80,
+    "input": {
+      "neural_fiber": 3,
+      "psionic_crystal": 1
+    },
+    "output": {
+      "psi_weave_boots": 1
+    },
+    "name": "Craft Psi-Weave Boots"
+  },
+  "craft_psionic_conduit": {
+    "skill": "psionics",
+    "level": 20,
+    "xp": 80,
+    "input": {
+      "neural_fiber": 2,
+      "psionic_crystal": 1
+    },
+    "output": {
+      "psionic_conduit": 1
+    },
+    "name": "Craft Psionic Conduit"
+  },
+  "craft_power_core": {
+    "skill": "psionics",
+    "level": 30,
+    "xp": 70,
+    "input": {
+      "psionic_conduit": 1,
+      "neural_fiber": 1
+    },
+    "output": {
+      "power_core": 1
+    },
+    "name": "Craft Power Core"
+  },
+  "craft_neural_plating": {
+    "skill": "psionics",
+    "level": 35,
+    "xp": 150,
+    "input": {
+      "psionic_conduit": 3,
+      "neutronium_bar": 2
+    },
+    "output": {
+      "neural_plating": 1
+    },
+    "name": "Craft Neural Plating"
+  },
+  "craft_neural_greaves": {
+    "skill": "psionics",
+    "level": 40,
+    "xp": 170,
+    "input": {
+      "psionic_conduit": 3,
+      "neutronium_bar": 2
+    },
+    "output": {
+      "neural_greaves": 1
+    },
+    "name": "Craft Neural Greaves"
+  },
+  "craft_shield_core": {
+    "skill": "psionics",
+    "level": 45,
+    "xp": 90,
+    "input": {
+      "psionic_conduit": 1,
+      "psionic_crystal": 2
+    },
+    "output": {
+      "shield_core": 1
+    },
+    "name": "Craft Shield Core"
+  },
+  "craft_harmony_core": {
+    "skill": "psionics",
+    "level": 60,
+    "xp": 150,
+    "input": {
+      "psionic_conduit": 2,
+      "neural_fiber": 2,
+      "psionic_crystal": 2
+    },
+    "output": {
+      "harmony_core": 1
+    },
+    "name": "Craft Harmony Core"
+  },
+  "refine_chrono_essence": {
+    "skill": "chronomancy",
+    "level": 1,
+    "xp": 25,
+    "input": {
+      "temporal_dust": 3
+    },
+    "output": {
+      "chrono_essence": 1
+    },
+    "name": "Refine Chrono Essence"
+  },
+  "transmute_ferrite": {
+    "skill": "chronomancy",
+    "level": 5,
+    "xp": 40,
+    "input": {
+      "stellarite_bar": 5,
+      "chrono_essence": 1
+    },
+    "output": {
+      "ferrite_bar": 1
+    },
+    "name": "Transmute Ferrite Bar"
+  },
+  "transmute_cobaltium": {
+    "skill": "chronomancy",
+    "level": 15,
+    "xp": 65,
+    "input": {
+      "ferrite_bar": 5,
+      "chrono_essence": 1
+    },
+    "output": {
+      "cobaltium_bar": 1
+    },
+    "name": "Transmute Cobaltium Bar"
+  },
+  "craft_quantum_catalyst": {
+    "skill": "chronomancy",
+    "level": 20,
+    "xp": 80,
+    "input": {
+      "chrono_essence": 2,
+      "star_dust": 5
+    },
+    "output": {
+      "quantum_catalyst": 1
+    },
+    "name": "Craft Quantum Catalyst"
+  },
+  "transmute_duranite": {
+    "skill": "chronomancy",
+    "level": 25,
+    "xp": 90,
+    "input": {
+      "cobaltium_bar": 5,
+      "chrono_essence": 1
+    },
+    "output": {
+      "duranite_bar": 1
+    },
+    "name": "Transmute Duranite Bar"
+  },
+  "craft_temporal_elixir": {
+    "skill": "chronomancy",
+    "level": 30,
+    "xp": 80,
+    "input": {
+      "chrono_essence": 2,
+      "cryo_kelp": 2
+    },
+    "output": {
+      "temporal_elixir": 1
+    },
+    "name": "Brew Temporal Elixir"
+  },
+  "transmute_titanex": {
+    "skill": "chronomancy",
+    "level": 35,
+    "xp": 120,
+    "input": {
+      "duranite_bar": 5,
+      "chrono_essence": 2
+    },
+    "output": {
+      "titanex_bar": 1
+    },
+    "name": "Transmute Titanex Bar"
+  },
+  "craft_chrono_stim": {
+    "skill": "chronomancy",
+    "level": 45,
+    "xp": 120,
+    "input": {
+      "quantum_catalyst": 1,
+      "nebula_fruit": 2
+    },
+    "output": {
+      "chrono_stim": 1
+    },
+    "name": "Brew Chrono Stim"
+  },
+  "transmute_plasmite": {
+    "skill": "chronomancy",
+    "level": 45,
+    "xp": 160,
+    "input": {
+      "titanex_bar": 5,
+      "quantum_catalyst": 1
+    },
+    "output": {
+      "plasmite_bar": 1
+    },
+    "name": "Transmute Plasmite Bar"
+  },
+  "craft_quantum_charge": {
+    "skill": "chronomancy",
+    "level": 55,
+    "xp": 150,
+    "input": {
+      "quantum_catalyst": 1,
+      "star_dust": 5
+    },
+    "output": {
+      "quantum_charge": 1
+    },
+    "name": "Forge Quantum Charge"
+  },
+  "transmute_quantite": {
+    "skill": "chronomancy",
+    "level": 55,
+    "xp": 200,
+    "input": {
+      "plasmite_bar": 5,
+      "quantum_catalyst": 1
+    },
+    "output": {
+      "quantite_bar": 1
+    },
+    "name": "Transmute Quantite Bar"
+  },
+  "transmute_neutronium": {
+    "skill": "chronomancy",
+    "level": 65,
+    "xp": 250,
+    "input": {
+      "quantite_bar": 5,
+      "quantum_catalyst": 1
+    },
+    "output": {
+      "neutronium_bar": 1
+    },
+    "name": "Transmute Neutronium Bar"
+  },
+  "cut_voidcrystal": {
+    "skill": "chronomancy",
+    "level": 70,
+    "xp": 350,
+    "input": {
+      "raw_voidcrystal": 1,
+      "quantum_catalyst": 1
+    },
+    "output": {
+      "cut_voidcrystal": 1
+    },
+    "name": "Cut Void Crystal"
+  },
+  "transmute_darkmatter": {
+    "skill": "chronomancy",
+    "level": 75,
+    "xp": 320,
+    "input": {
+      "neutronium_bar": 5,
+      "quantum_catalyst": 2
+    },
+    "output": {
+      "darkmatter_bar": 1
+    },
+    "name": "Transmute Darkmatter Bar"
+  },
+  "transmute_voidsteel": {
+    "skill": "chronomancy",
+    "level": 85,
+    "xp": 400,
+    "input": {
+      "darkmatter_bar": 5,
+      "quantum_catalyst": 2
+    },
+    "output": {
+      "voidsteel_bar": 1
+    },
+    "name": "Transmute Voidsteel Bar"
+  }
+}

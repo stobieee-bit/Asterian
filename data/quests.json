@@ -1,0 +1,987 @@
+{
+  "quests": {
+    "first_blood": {
+      "name": "First Blood",
+      "desc": "Commander Vex wants you to prove yourself. Defeat 5 Chithari in the Alien Wastes.",
+      "giver": "commander_vex",
+      "steps": [
+        {
+          "type": "kill",
+          "target": "chithari",
+          "count": 5,
+          "desc": "Defeat Chithari (0/5)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "nano": 100,
+          "tesla": 100,
+          "void": 100
+        },
+        "credits": 200,
+        "items": [
+          "ferrite_nanoblade"
+        ]
+      },
+      "followUp": "gear_up"
+    },
+    "gear_up": {
+      "name": "Gear Up",
+      "desc": "Mine 5 Stellarite Ore and smelt them into bars at the Bio-Lab.",
+      "giver": "commander_vex",
+      "steps": [
+        {
+          "type": "gather",
+          "item": "stellarite_ore",
+          "count": 5,
+          "desc": "Mine Stellarite Ore (0/5)"
+        },
+        {
+          "type": "craft",
+          "recipe": "smelt_scrap",
+          "count": 3,
+          "desc": "Smelt Stellarite Bars (0/3)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "astromining": 150,
+          "circuitry": 150
+        },
+        "credits": 300,
+        "items": [
+          "ferrite_helmet"
+        ]
+      },
+      "followUp": "deep_cuts"
+    },
+    "deep_cuts": {
+      "name": "Deep Cuts",
+      "desc": "Commander Vex needs you to deal with the stronger Chithari and gather chitin for research.",
+      "giver": "commander_vex",
+      "steps": [
+        {
+          "type": "kill",
+          "target": "chithari_warrior",
+          "count": 3,
+          "desc": "Defeat Chithari Warriors (0/3)"
+        },
+        {
+          "type": "gather",
+          "item": "chitin_shard",
+          "count": 5,
+          "desc": "Gather Chitin Shards (0/5)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "nano": 200,
+          "tesla": 200
+        },
+        "credits": 400,
+        "items": [
+          "ferrite_coilgun"
+        ]
+      },
+      "followUp": "lab_rat"
+    },
+    "lab_rat": {
+      "name": "Lab Rat",
+      "desc": "Dr. Luma wants you to prove your production skills. Cook lichen wraps and craft scrap vests.",
+      "giver": "commander_vex",
+      "steps": [
+        {
+          "type": "craft",
+          "recipe": "cook_lichen_wrap",
+          "count": 5,
+          "desc": "Cook Lichen Wraps (0/5)"
+        },
+        {
+          "type": "craft",
+          "recipe": "craft_scrap_vest",
+          "count": 2,
+          "desc": "Craft Scrap Vests (0/2)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "xenocook": 250,
+          "bioforge": 250
+        },
+        "credits": 500,
+        "items": [
+          "cobalt_helmet"
+        ]
+      },
+      "followUp": "into_the_wastes"
+    },
+    "into_the_wastes": {
+      "name": "Into the Wastes",
+      "desc": "The Alien Wastes are overrun. Destroy the Voidjelly and take down a Sporeclaw.",
+      "giver": "commander_vex",
+      "steps": [
+        {
+          "type": "kill",
+          "target": "voidjelly",
+          "count": 5,
+          "desc": "Defeat Voidjelly (0/5)"
+        },
+        {
+          "type": "kill",
+          "target": "sporeclaw",
+          "count": 1,
+          "desc": "Defeat Sporeclaw (0/1)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "void": 500
+        },
+        "credits": 800,
+        "items": [
+          "cobalt_nanoblade"
+        ]
+      },
+      "followUp": null
+    },
+    "psi_discovery": {
+      "name": "Neural Discovery",
+      "desc": "Dr. Elara Voss needs Neural Tissue from Neuroworms to study neural energy patterns.",
+      "giver": "dr_elara_voss",
+      "steps": [
+        {
+          "type": "gather",
+          "item": "neural_tissue",
+          "count": 3,
+          "desc": "Collect Neural Tissue (0/3)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "void": 200
+        },
+        "credits": 300,
+        "items": []
+      },
+      "followUp": "psi_crystal"
+    },
+    "psi_crystal": {
+      "name": "The Neural Lattice",
+      "desc": "Elara needs Darkmatter materials to forge a neural focusing lattice.",
+      "giver": "dr_elara_voss",
+      "steps": [
+        {
+          "type": "gather",
+          "item": "darkmatter_shard",
+          "count": 5,
+          "desc": "Mine Darkmatter Shards (0/5)"
+        },
+        {
+          "type": "craft",
+          "recipe": "smelt_darkmatter",
+          "count": 3,
+          "desc": "Smelt Darkmatter Bars (0/3)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "astromining": 250,
+          "circuitry": 250
+        },
+        "credits": 400,
+        "items": []
+      },
+      "followUp": "psi_entity"
+    },
+    "psi_entity": {
+      "name": "Neural Confrontation",
+      "desc": "Clear the deep wastes so Elara can safely calibrate the neural lattice.",
+      "giver": "dr_elara_voss",
+      "steps": [
+        {
+          "type": "kill",
+          "target": "neuroworm",
+          "count": 2,
+          "desc": "Defeat Neuroworms (0/2)"
+        },
+        {
+          "type": "kill",
+          "target": "gravlurk",
+          "count": 1,
+          "desc": "Defeat Gravlurk (0/1)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "nano": 300,
+          "tesla": 300,
+          "void": 300
+        },
+        "credits": 600,
+        "items": []
+      },
+      "followUp": "psi_awakening"
+    },
+    "psi_awakening": {
+      "name": "Neural Awakening",
+      "desc": "The final step. Gather Gravity Residue to power the neural lattice activation.",
+      "giver": "dr_elara_voss",
+      "steps": [
+        {
+          "type": "gather",
+          "item": "gravity_residue",
+          "count": 5,
+          "desc": "Collect Gravity Residue (0/5)"
+        }
+      ],
+      "rewards": {
+        "xp": {},
+        "credits": 1000,
+        "items": []
+      },
+      "followUp": null,
+      "specialReward": "unlock_psionics"
+    },
+    "corrupted_scouts": {
+      "name": "Corrupted Scouts",
+      "desc": "Warden Krios needs you to eliminate hostile stalkers swarming the deep wastes.",
+      "giver": "warden_krios",
+      "steps": [
+        {
+          "type": "kill",
+          "target": "shadow_stalker",
+          "count": 5,
+          "desc": "Defeat Shadow Stalkers (0/5)"
+        },
+        {
+          "type": "kill",
+          "target": "night_stalker",
+          "count": 5,
+          "desc": "Defeat Night Stalkers (0/5)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "nano": 2500,
+          "tesla": 2500,
+          "void": 2500
+        },
+        "credits": 2000,
+        "items": []
+      },
+      "followUp": null
+    },
+    "corrupted_supplies": {
+      "name": "Supply Fortification",
+      "desc": "Gather titanex ore to reinforce the warden perimeter defenses.",
+      "giver": "warden_krios",
+      "steps": [
+        {
+          "type": "gather",
+          "item": "titanex_ore",
+          "count": 15,
+          "desc": "Gather Titanex Ore (0/15)"
+        },
+        {
+          "type": "craft",
+          "recipe": "smelt_titanex",
+          "count": 8,
+          "desc": "Smelt Titanex Bars (0/8)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "astromining": 3000,
+          "circuitry": 3000
+        },
+        "credits": 3000,
+        "items": [
+          "warden_shield"
+        ]
+      },
+      "followUp": null
+    },
+    "corrupted_lieutenant": {
+      "name": "The Lieutenant",
+      "desc": "A Phantom Stalker is coordinating the predator attacks. Eliminate it and 3 Death Worms.",
+      "giver": "warden_krios",
+      "steps": [
+        {
+          "type": "kill",
+          "target": "phantom_stalker",
+          "count": 1,
+          "desc": "Defeat Phantom Stalker (0/1)"
+        },
+        {
+          "type": "kill",
+          "target": "death_worm",
+          "count": 3,
+          "desc": "Defeat Death Worms (0/3)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "nano": 4000,
+          "void": 4000
+        },
+        "credits": 5000,
+        "items": []
+      },
+      "followUp": null
+    },
+    "corrupted_nexus": {
+      "name": "The Nexus",
+      "desc": "Descend into the dungeon and reach Floor 20 to locate the corruption nexus.",
+      "giver": "warden_krios",
+      "steps": [
+        {
+          "type": "dungeon_floor",
+          "floor": 20,
+          "count": 1,
+          "desc": "Reach Dungeon Floor 20 (0/1)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "nano": 5000,
+          "tesla": 5000
+        },
+        "credits": 6000,
+        "items": [
+          "warden_blade"
+        ]
+      },
+      "followUp": null
+    },
+    "corrupted_heart": {
+      "name": "Heart of Corruption",
+      "desc": "The Crystal Colossus is the corruption's living engine. Destroy it.",
+      "giver": "warden_krios",
+      "steps": [
+        {
+          "type": "boss_kill",
+          "target": "crystal_colossus",
+          "count": 1,
+          "desc": "Defeat Crystal Colossus (0/1)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "nano": 8000,
+          "tesla": 8000,
+          "void": 8000
+        },
+        "credits": 10000,
+        "items": [
+          "krios_medallion"
+        ]
+      },
+      "followUp": null
+    },
+    "lost_signal": {
+      "name": "Lost Signal",
+      "desc": "Reach The Abyss and establish contact with Signal Officer Mira.",
+      "giver": "signal_officer_mira",
+      "steps": [
+        {
+          "type": "talk",
+          "target": "signal_officer_mira",
+          "count": 1,
+          "desc": "Speak to Mira in The Abyss (0/1)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "void": 3000
+        },
+        "credits": 3000,
+        "items": []
+      },
+      "followUp": null,
+      "specialReward": "mira_contact"
+    },
+    "relay_repair": {
+      "name": "Relay Repair",
+      "desc": "Craft materials to rebuild Mira's signal relay equipment.",
+      "giver": "signal_officer_mira",
+      "steps": [
+        {
+          "type": "gather",
+          "item": "darkmatter_shard",
+          "count": 10,
+          "desc": "Mine Darkmatter Shards (0/10)"
+        },
+        {
+          "type": "craft",
+          "recipe": "craft_quantum_catalyst",
+          "count": 5,
+          "desc": "Craft Quantum Catalysts (0/5)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "circuitry": 5000,
+          "astromining": 5000
+        },
+        "credits": 5000,
+        "items": [
+          "signal_booster"
+        ]
+      },
+      "followUp": null
+    },
+    "abyssal_interference": {
+      "name": "Abyssal Interference",
+      "desc": "Clear abyssal creatures jamming Mira's relay signal.",
+      "giver": "signal_officer_mira",
+      "steps": [
+        {
+          "type": "kill_area",
+          "area": "the-abyss",
+          "count": 15,
+          "desc": "Defeat Abyssal Enemies (0/15)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "nano": 5000,
+          "tesla": 5000,
+          "void": 5000
+        },
+        "credits": 8000,
+        "items": []
+      },
+      "followUp": null
+    },
+    "source_of_silence": {
+      "name": "Source of Silence",
+      "desc": "Push deep into the dungeon to place a signal amplifier.",
+      "giver": "signal_officer_mira",
+      "steps": [
+        {
+          "type": "dungeon_floor",
+          "floor": 40,
+          "count": 1,
+          "desc": "Reach Dungeon Floor 40 (0/1)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "nano": 6000,
+          "tesla": 6000,
+          "void": 6000
+        },
+        "credits": 10000,
+        "items": [
+          "mira_comm_device"
+        ]
+      },
+      "followUp": null
+    },
+    "voice_of_the_void": {
+      "name": "Voice of the Void",
+      "desc": "The Formless One speaks through the void. Silence it permanently.",
+      "giver": "signal_officer_mira",
+      "steps": [
+        {
+          "type": "boss_kill",
+          "target": "the_formless_one",
+          "count": 1,
+          "desc": "Defeat The Formless One (0/1)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "nano": 10000,
+          "tesla": 10000,
+          "void": 10000
+        },
+        "credits": 15000,
+        "items": [
+          "abyssal_comm_array"
+        ]
+      },
+      "followUp": null
+    },
+    "convergence_signal": {
+      "name": "Convergence Signal",
+      "desc": "Coordinate with both Krios and Mira to begin the final operation.",
+      "giver": "warden_krios",
+      "steps": [
+        {
+          "type": "talk",
+          "target": "warden_krios",
+          "count": 1,
+          "desc": "Speak to Krios (0/1)"
+        },
+        {
+          "type": "talk",
+          "target": "signal_officer_mira",
+          "count": 1,
+          "desc": "Speak to Mira (0/1)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "nano": 5000,
+          "tesla": 5000,
+          "void": 5000
+        },
+        "credits": 10000,
+        "items": []
+      },
+      "followUp": null
+    },
+    "primordial_traces": {
+      "name": "Primordial Traces",
+      "desc": "Gather rare materials to build a convergence scanner.",
+      "giver": "signal_officer_mira",
+      "steps": [
+        {
+          "type": "gather",
+          "item": "formless_essence",
+          "count": 5,
+          "desc": "Gather Formless Essence (0/5)"
+        },
+        {
+          "type": "gather",
+          "item": "primordial_heart",
+          "count": 3,
+          "desc": "Gather Primordial Hearts (0/3)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "circuitry": 8000
+        },
+        "credits": 15000,
+        "items": [
+          "convergence_scanner"
+        ]
+      },
+      "followUp": null
+    },
+    "the_gathering_storm": {
+      "name": "The Gathering Storm",
+      "desc": "Prove your strength for the final confrontation.",
+      "giver": "signal_officer_mira",
+      "steps": [
+        {
+          "type": "dungeon_floor",
+          "floor": 75,
+          "count": 1,
+          "desc": "Reach Dungeon Floor 75 (0/1)"
+        },
+        {
+          "type": "boss_kill_total",
+          "count": 5,
+          "desc": "Defeat 5 Bosses Total (0/5)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "nano": 10000,
+          "tesla": 10000,
+          "void": 10000
+        },
+        "credits": 20000,
+        "items": []
+      },
+      "followUp": null
+    },
+    "primordial_reckoning": {
+      "name": "Primordial Reckoning",
+      "desc": "The Primordial awakens. Destroy it and save the sector.",
+      "giver": "signal_officer_mira",
+      "steps": [
+        {
+          "type": "boss_kill",
+          "target": "the_primordial",
+          "count": 1,
+          "desc": "Defeat The Primordial (0/1)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "nano": 15000,
+          "tesla": 15000,
+          "void": 15000
+        },
+        "credits": 30000,
+        "items": [
+          "primordial_sigil"
+        ]
+      },
+      "followUp": null,
+      "specialReward": "primordial_title"
+    }
+  },
+  "quest_chains": [
+    {
+      "key": "vex",
+      "name": "Commander Vex",
+      "color": "#ffcc44",
+      "quests": [
+        "first_blood",
+        "gear_up",
+        "deep_cuts",
+        "lab_rat",
+        "into_the_wastes"
+      ]
+    },
+    {
+      "key": "psionics",
+      "name": "Neural Awakening",
+      "color": "#bb88ff",
+      "quests": [
+        "psi_discovery",
+        "psi_crystal",
+        "psi_entity",
+        "psi_awakening"
+      ]
+    },
+    {
+      "key": "corrupted",
+      "name": "The Corrupted Incursion",
+      "color": "#ff6644",
+      "quests": [
+        "corrupted_scouts",
+        "corrupted_supplies",
+        "corrupted_lieutenant",
+        "corrupted_nexus",
+        "corrupted_heart"
+      ]
+    },
+    {
+      "key": "abyss",
+      "name": "Signals From The Abyss",
+      "color": "#44aaff",
+      "quests": [
+        "lost_signal",
+        "relay_repair",
+        "abyssal_interference",
+        "source_of_silence",
+        "voice_of_the_void"
+      ]
+    },
+    {
+      "key": "primordial",
+      "name": "The Primordial Convergence",
+      "color": "#ff44ff",
+      "quests": [
+        "convergence_signal",
+        "primordial_traces",
+        "the_gathering_storm",
+        "primordial_reckoning"
+      ]
+    }
+  ],
+  "board_quests": {
+    "board_pest_control": {
+      "name": "Pest Control",
+      "desc": "Clear out Chithari pests from the Alien Wastes.",
+      "steps": [
+        {
+          "type": "kill",
+          "target": "chithari",
+          "count": 5,
+          "desc": "Defeat Chithari (0/5)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "nano": 80
+        },
+        "credits": 150
+      }
+    },
+    "board_ore_rush": {
+      "name": "Ore Rush",
+      "desc": "Gather Stellarite Ore for the station supply.",
+      "steps": [
+        {
+          "type": "gather",
+          "item": "stellarite_ore",
+          "count": 10,
+          "desc": "Gather Stellarite Ore (0/10)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "astromining": 120
+        },
+        "credits": 200
+      }
+    },
+    "board_warrior_hunt": {
+      "name": "Warrior Hunt",
+      "desc": "Dangerous warriors and jellyfish need culling.",
+      "steps": [
+        {
+          "type": "kill",
+          "target": "chithari_warrior",
+          "count": 3,
+          "desc": "Defeat Chithari Warriors (0/3)"
+        },
+        {
+          "type": "kill",
+          "target": "voidjelly",
+          "count": 2,
+          "desc": "Defeat Voidjelly (0/2)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "tesla": 150,
+          "void": 150
+        },
+        "credits": 400
+      }
+    },
+    "board_deep_mining": {
+      "name": "Deep Mining",
+      "desc": "Mine and smelt Cobaltium for advanced projects.",
+      "steps": [
+        {
+          "type": "gather",
+          "item": "cobaltium_ore",
+          "count": 5,
+          "desc": "Gather Cobaltium Ore (0/5)"
+        },
+        {
+          "type": "craft",
+          "recipe": "smelt_cobalt",
+          "count": 3,
+          "desc": "Smelt Cobaltium Bars (0/3)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "astromining": 200,
+          "circuitry": 200
+        },
+        "credits": 500
+      }
+    },
+    "board_chef_challenge": {
+      "name": "Chef's Challenge",
+      "desc": "The station chef needs specialty food prepared.",
+      "steps": [
+        {
+          "type": "craft",
+          "recipe": "cook_nebula_smoothie",
+          "count": 5,
+          "desc": "Blend Nebula Smoothies (0/5)"
+        },
+        {
+          "type": "craft",
+          "recipe": "cook_alien_burger",
+          "count": 3,
+          "desc": "Grill Alien Burgers (0/3)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "xenocook": 250
+        },
+        "credits": 450
+      }
+    },
+    "board_supply_run": {
+      "name": "Supply Run",
+      "desc": "Deliver processed materials to the station stores.",
+      "steps": [
+        {
+          "type": "deliver",
+          "item": "stellarite_bar",
+          "count": 10,
+          "desc": "Deliver Stellarite Bars (0/10)"
+        },
+        {
+          "type": "deliver",
+          "item": "lichen_wrap",
+          "count": 5,
+          "desc": "Deliver Lichen Wraps (0/5)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "circuitry": 100
+        },
+        "credits": 350
+      }
+    },
+    "board_void_menace": {
+      "name": "Void Menace",
+      "desc": "Sporeclaws threaten expedition teams. Eliminate them.",
+      "steps": [
+        {
+          "type": "kill",
+          "target": "sporeclaw",
+          "count": 3,
+          "desc": "Defeat Sporeclaw (0/3)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "void": 300
+        },
+        "credits": 600
+      }
+    },
+    "board_master_smith": {
+      "name": "Master Smith",
+      "desc": "Prove your crafting mastery with ferrite equipment.",
+      "steps": [
+        {
+          "type": "craft",
+          "recipe": "craft_ferrite_nanoblade",
+          "count": 1,
+          "desc": "Forge Ferrite Nanoblade (0/1)"
+        },
+        {
+          "type": "craft",
+          "recipe": "craft_ferrite_vest",
+          "count": 1,
+          "desc": "Forge Ferrite Vest (0/1)"
+        }
+      ],
+      "rewards": {
+        "xp": {
+          "circuitry": 400
+        },
+        "credits": 700,
+        "items": [
+          "ferrite_boots"
+        ]
+      }
+    }
+  },
+  "slayer_shop": {
+    "extend_task": {
+      "name": "Task Extension",
+      "cost": 30,
+      "repeatable": true,
+      "desc": "+50% kills on current task for bonus XP."
+    },
+    "quick_task": {
+      "name": "Quick Reassignment",
+      "cost": 15,
+      "repeatable": true,
+      "desc": "Cancel task without breaking streak."
+    },
+    "xp_boost": {
+      "name": "Slayer XP Boost",
+      "cost": 50,
+      "repeatable": true,
+      "desc": "+25% combat XP for 10 minutes."
+    },
+    "prefer_task": {
+      "name": "Preferred Task",
+      "cost": 100,
+      "repeatable": true,
+      "desc": "Add enemy type to preferred list (higher chance)."
+    },
+    "block_task": {
+      "name": "Block Task",
+      "cost": 200,
+      "repeatable": true,
+      "desc": "Block an enemy type from being assigned."
+    },
+    "superior_unlock": {
+      "name": "Superior Slayer",
+      "cost": 300,
+      "repeatable": false,
+      "desc": "Unlock superior enemy spawns during slayer tasks."
+    },
+    "helm_unlock": {
+      "name": "Slayer Helm Recipe",
+      "cost": 500,
+      "repeatable": false,
+      "desc": "Unlock crafting recipe for the Slayer Helm."
+    },
+    "relic_unlock": {
+      "name": "Relic Crafting",
+      "cost": 750,
+      "repeatable": false,
+      "desc": "Unlock the Relic Forge and all relic recipes."
+    }
+  },
+  "relic_recipes": {
+    "relic_fury": {
+      "name": "Relic of Fury",
+      "level": 60,
+      "input": {
+        "queen_stinger": 1,
+        "superior_shard": 5
+      },
+      "output": "relic_fury"
+    },
+    "relic_fortitude": {
+      "name": "Relic of Fortitude",
+      "level": 65,
+      "input": {
+        "sentinel_core": 1,
+        "superior_shard": 5
+      },
+      "output": "relic_fortitude"
+    },
+    "relic_haste": {
+      "name": "Relic of Haste",
+      "level": 70,
+      "input": {
+        "prismatic_shard": 1,
+        "superior_shard": 8
+      },
+      "output": "relic_haste"
+    },
+    "relic_vampirism": {
+      "name": "Relic of Vampirism",
+      "level": 75,
+      "input": {
+        "formless_essence": 2,
+        "superior_shard": 10
+      },
+      "output": "relic_vampirism"
+    },
+    "relic_precision": {
+      "name": "Relic of Precision",
+      "level": 80,
+      "input": {
+        "primordial_heart": 1,
+        "superior_shard": 10
+      },
+      "output": "relic_precision"
+    },
+    "relic_elements": {
+      "name": "Relic of Elements",
+      "level": 85,
+      "input": {
+        "formless_essence": 1,
+        "primordial_heart": 1,
+        "superior_shard": 15
+      },
+      "output": "relic_elements"
+    },
+    "relic_undying": {
+      "name": "Relic of the Undying",
+      "level": 90,
+      "input": {
+        "sentinel_core": 1,
+        "formless_essence": 1,
+        "superior_shard": 20
+      },
+      "output": "relic_undying"
+    },
+    "relic_genesis": {
+      "name": "Relic of Genesis",
+      "level": 99,
+      "input": {
+        "genesis_fragment": 1,
+        "primordial_heart": 2,
+        "superior_shard": 30
+      },
+      "output": "relic_genesis"
+    }
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "config": {
+    "maxTier": 10,
+    "xpRatePerTier": 0.05,
+    "damagePerTier": 0.02,
+    "reductionPerTier": 0.01,
+    "pointsPerTotalLevel": 10,
+    "startingCredits": 500,
+    "minTotalLevel": 500
+  },
+  "passives": {
+    "1": {
+      "id": "echo_of_knowledge",
+      "name": "Echo of Knowledge",
+      "desc": "5% chance to gain double XP from any action",
+      "color": "#88ccff"
+    },
+    "2": {
+      "id": "hardened",
+      "name": "Hardened",
+      "desc": "Start with 120 max HP instead of 100",
+      "color": "#44ff88"
+    },
+    "3": {
+      "id": "efficient",
+      "name": "Efficient",
+      "desc": "10% faster gathering speed",
+      "color": "#ff8844"
+    },
+    "4": {
+      "id": "wealthy",
+      "name": "Wealthy",
+      "desc": "Enemies drop 15% more credits",
+      "color": "#ffcc44"
+    },
+    "5": {
+      "id": "corrupted_vision",
+      "name": "Corrupted Vision",
+      "desc": "Access to Corrupted Areas",
+      "color": "#ff4444"
+    },
+    "6": {
+      "id": "adrenaline_rush",
+      "name": "Adrenaline Rush",
+      "desc": "10% faster attack speed",
+      "color": "#ff44aa"
+    },
+    "7": {
+      "id": "fortunes_favor",
+      "name": "Fortune's Favor",
+      "desc": "10% better drop rates",
+      "color": "#44ffaa"
+    },
+    "8": {
+      "id": "undying",
+      "name": "Undying",
+      "desc": "Survive lethal hit once per 5 minutes (1 HP)",
+      "color": "#ffaaaa"
+    },
+    "9": {
+      "id": "transcendent",
+      "name": "Transcendent",
+      "desc": "All prestige bonuses enhanced by 20%",
+      "color": "#aa88ff"
+    },
+    "10": {
+      "id": "ascended",
+      "name": "Ascended",
+      "desc": "Golden aura, +50% XP, all prestige bonuses doubled",
+      "color": "#ffd700"
+    }
+  },
+  "shop_items": [
+    {
+      "id": "particle_red",
+      "name": "Red Aura Particles",
+      "cost": 50,
+      "type": "cosmetic",
+      "color": 16729156
+    },
+    {
+      "id": "particle_blue",
+      "name": "Blue Aura Particles",
+      "cost": 50,
+      "type": "cosmetic",
+      "color": 4474111
+    },
+    {
+      "id": "particle_green",
+      "name": "Green Aura Particles",
+      "cost": 50,
+      "type": "cosmetic",
+      "color": 4521796
+    },
+    {
+      "id": "particle_purple",
+      "name": "Purple Aura Particles",
+      "cost": 50,
+      "type": "cosmetic",
+      "color": 11158783
+    },
+    {
+      "id": "particle_white",
+      "name": "White Aura Particles",
+      "cost": 50,
+      "type": "cosmetic",
+      "color": 16777215
+    },
+    {
+      "id": "bank_slots",
+      "name": "Extra Bank Slots (+10)",
+      "cost": 100,
+      "type": "bank",
+      "value": 10,
+      "repeatable": true
+    },
+    {
+      "id": "credit_bonus",
+      "name": "Starting Credit Bonus (+100)",
+      "cost": 75,
+      "type": "credits",
+      "value": 100,
+      "repeatable": true
+    },
+    {
+      "id": "title_pioneer",
+      "name": "Title: Pioneer",
+      "cost": 30,
+      "type": "title",
+      "value": "Pioneer"
+    },
+    {
+      "id": "title_ascendant",
+      "name": "Title: Ascendant",
+      "cost": 150,
+      "type": "title",
+      "value": "Ascendant"
+    },
+    {
+      "id": "title_eternal",
+      "name": "Title: Eternal",
+      "cost": 300,
+      "type": "title",
+      "value": "Eternal"
+    },
+    {
+      "id": "xp_token",
+      "name": "XP Boost Token (2x, 10 min)",
+      "cost": 25,
+      "type": "xp_token",
+      "repeatable": true
+    }
+  ]
+}

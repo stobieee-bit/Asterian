@@ -1,0 +1,146 @@
+[
+  {
+    "id": "station_bot",
+    "name": "Station Bot",
+    "desc": "A helpful maintenance bot from the station.",
+    "rarity": "common",
+    "maxLevel": 20,
+    "buff": {
+      "type": "hp",
+      "baseValue": 10,
+      "perLevel": 5
+    },
+    "evolutionLevels": [
+      10,
+      20
+    ],
+    "meshBuilder": "buildPetStationBot",
+    "source": "Tutorial reward"
+  },
+  {
+    "id": "chitin_drone",
+    "name": "Chitin Drone",
+    "desc": "A small insectoid drone with razor-sharp wings.",
+    "rarity": "uncommon",
+    "maxLevel": 20,
+    "buff": {
+      "type": "damage",
+      "baseValue": 3,
+      "perLevel": 2
+    },
+    "evolutionLevels": [
+      10,
+      20
+    ],
+    "meshBuilder": "buildPetChitinDrone",
+    "source": "Hive Queen 5% drop"
+  },
+  {
+    "id": "spore_pup",
+    "name": "Spore Pup",
+    "desc": "A fungal creature that emits protective spores.",
+    "rarity": "uncommon",
+    "maxLevel": 20,
+    "buff": {
+      "type": "defense",
+      "baseValue": 4,
+      "perLevel": 2
+    },
+    "evolutionLevels": [
+      10,
+      20
+    ],
+    "meshBuilder": "buildPetSporePup",
+    "source": "Sporeclaw rare drop"
+  },
+  {
+    "id": "nebula_moth",
+    "name": "Nebula Moth",
+    "desc": "A shimmering moth born from cosmic dust.",
+    "rarity": "uncommon",
+    "maxLevel": 20,
+    "buff": {
+      "type": "speed",
+      "baseValue": 0.03,
+      "perLevel": 0.01
+    },
+    "evolutionLevels": [
+      10,
+      20
+    ],
+    "meshBuilder": "buildPetNebulaMoth",
+    "source": "Achievement: 500 kills"
+  },
+  {
+    "id": "void_wisp",
+    "name": "Void Wisp",
+    "desc": "A flickering wisp of pure void energy.",
+    "rarity": "rare",
+    "maxLevel": 20,
+    "buff": {
+      "type": "xp",
+      "baseValue": 0.03,
+      "perLevel": 0.01
+    },
+    "evolutionLevels": [
+      10,
+      20
+    ],
+    "meshBuilder": "buildPetVoidWisp",
+    "source": "Void Sentinel 5% drop"
+  },
+  {
+    "id": "crystal_sprite",
+    "name": "Crystal Sprite",
+    "desc": "A tiny elemental formed from living crystal.",
+    "rarity": "rare",
+    "maxLevel": 20,
+    "buff": {
+      "type": "gathering",
+      "baseValue": 0.05,
+      "perLevel": 0.02
+    },
+    "evolutionLevels": [
+      10,
+      20
+    ],
+    "meshBuilder": "buildPetCrystalSprite",
+    "source": "Crystal Colossus 5% drop"
+  },
+  {
+    "id": "quantum_orb",
+    "name": "Quantum Orb",
+    "desc": "An orb that exists in multiple states simultaneously.",
+    "rarity": "epic",
+    "maxLevel": 20,
+    "buff": {
+      "type": "xp",
+      "baseValue": 0.05,
+      "perLevel": 0.02
+    },
+    "evolutionLevels": [
+      10,
+      20
+    ],
+    "meshBuilder": "buildPetQuantumOrb",
+    "source": "Dungeon floor 10+ boss"
+  },
+  {
+    "id": "shadow_mote",
+    "name": "Shadow Mote",
+    "desc": "A fragment of living shadow with immense power.",
+    "rarity": "epic",
+    "maxLevel": 20,
+    "buff": {
+      "type": "all",
+      "baseValue": 3,
+      "perLevel": 2
+    },
+    "evolutionLevels": [
+      10,
+      20
+    ],
+    "meshBuilder": "buildPetShadowMote",
+    "source": "Formless One 3% drop"
+  }
+]

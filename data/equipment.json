@@ -1,0 +1,652 @@
+{
+  "weapon_stats": {
+    "1": {
+      "nanoDmg": 8,
+      "nanoAcc": 70,
+      "teslaDmg": 7,
+      "teslaAcc": 75,
+      "voidDmg": 9,
+      "voidAcc": 65,
+      "val": 50
+    },
+    "2": {
+      "nanoDmg": 14,
+      "nanoAcc": 74,
+      "teslaDmg": 12,
+      "teslaAcc": 78,
+      "voidDmg": 16,
+      "voidAcc": 70,
+      "val": 180
+    },
+    "3": {
+      "nanoDmg": 22,
+      "nanoAcc": 78,
+      "teslaDmg": 20,
+      "teslaAcc": 82,
+      "voidDmg": 24,
+      "voidAcc": 74,
+      "val": 400
+    },
+    "4": {
+      "nanoDmg": 32,
+      "nanoAcc": 82,
+      "teslaDmg": 28,
+      "teslaAcc": 86,
+      "voidDmg": 35,
+      "voidAcc": 78,
+      "val": 750
+    },
+    "5": {
+      "nanoDmg": 42,
+      "nanoAcc": 85,
+      "teslaDmg": 38,
+      "teslaAcc": 89,
+      "voidDmg": 46,
+      "voidAcc": 82,
+      "val": 1200
+    },
+    "6": {
+      "nanoDmg": 54,
+      "nanoAcc": 88,
+      "teslaDmg": 50,
+      "teslaAcc": 92,
+      "voidDmg": 58,
+      "voidAcc": 85,
+      "val": 1800
+    },
+    "7": {
+      "nanoDmg": 68,
+      "nanoAcc": 91,
+      "teslaDmg": 62,
+      "teslaAcc": 94,
+      "voidDmg": 72,
+      "voidAcc": 88,
+      "val": 2800
+    },
+    "8": {
+      "nanoDmg": 82,
+      "nanoAcc": 93,
+      "teslaDmg": 76,
+      "teslaAcc": 96,
+      "voidDmg": 88,
+      "voidAcc": 91,
+      "val": 4000
+    },
+    "9": {
+      "nanoDmg": 98,
+      "nanoAcc": 95,
+      "teslaDmg": 90,
+      "teslaAcc": 97,
+      "voidDmg": 105,
+      "voidAcc": 93,
+      "val": 5500
+    },
+    "10": {
+      "nanoDmg": 115,
+      "nanoAcc": 97,
+      "teslaDmg": 108,
+      "teslaAcc": 98,
+      "voidDmg": 120,
+      "voidAcc": 95,
+      "val": 7500
+    },
+    "11": {
+      "nanoDmg": 125,
+      "nanoAcc": 98,
+      "teslaDmg": 118,
+      "teslaAcc": 99,
+      "voidDmg": 132,
+      "voidAcc": 96,
+      "val": 10000
+    },
+    "12": {
+      "nanoDmg": 140,
+      "nanoAcc": 99,
+      "teslaDmg": 130,
+      "teslaAcc": 99,
+      "voidDmg": 148,
+      "voidAcc": 98,
+      "val": 15000
+    }
+  },
+  "armor_stats": {
+    "1": {
+      "head": 3,
+      "body": 5,
+      "legs": 4,
+      "boots": 2,
+      "gloves": 2
+    },
+    "2": {
+      "head": 6,
+      "body": 10,
+      "legs": 8,
+      "boots": 4,
+      "gloves": 4
+    },
+    "3": {
+      "head": 10,
+      "body": 16,
+      "legs": 13,
+      "boots": 7,
+      "gloves": 7
+    },
+    "4": {
+      "head": 14,
+      "body": 23,
+      "legs": 18,
+      "boots": 10,
+      "gloves": 10
+    },
+    "5": {
+      "head": 19,
+      "body": 31,
+      "legs": 24,
+      "boots": 14,
+      "gloves": 14
+    },
+    "6": {
+      "head": 25,
+      "body": 40,
+      "legs": 31,
+      "boots": 18,
+      "gloves": 18
+    },
+    "7": {
+      "head": 32,
+      "body": 50,
+      "legs": 39,
+      "boots": 23,
+      "gloves": 23
+    },
+    "8": {
+      "head": 39,
+      "body": 62,
+      "legs": 48,
+      "boots": 28,
+      "gloves": 28
+    },
+    "9": {
+      "head": 48,
+      "body": 75,
+      "legs": 58,
+      "boots": 34,
+      "gloves": 34
+    },
+    "10": {
+      "head": 57,
+      "body": 90,
+      "legs": 70,
+      "boots": 41,
+      "gloves": 41
+    },
+    "11": {
+      "head": 65,
+      "body": 102,
+      "legs": 79,
+      "boots": 46,
+      "gloves": 46
+    },
+    "12": {
+      "head": 75,
+      "body": 115,
+      "legs": 90,
+      "boots": 52,
+      "gloves": 52
+    }
+  },
+  "offhand_stats": {
+    "1": {
+      "shield": {
+        "armor": 4,
+        "damage": 2
+      },
+      "capacitor": {
+        "accuracy": 35,
+        "damage": 2
+      },
+      "orb": {
+        "damage": 5,
+        "accuracy": 30
+      },
+      "val": 40
+    },
+    "2": {
+      "shield": {
+        "armor": 8,
+        "damage": 4
+      },
+      "capacitor": {
+        "accuracy": 38,
+        "damage": 4
+      },
+      "orb": {
+        "damage": 9,
+        "accuracy": 34
+      },
+      "val": 140
+    },
+    "3": {
+      "shield": {
+        "armor": 13,
+        "damage": 7
+      },
+      "capacitor": {
+        "accuracy": 42,
+        "damage": 6
+      },
+      "orb": {
+        "damage": 14,
+        "accuracy": 38
+      },
+      "val": 320
+    },
+    "4": {
+      "shield": {
+        "armor": 18,
+        "damage": 10
+      },
+      "capacitor": {
+        "accuracy": 45,
+        "damage": 9
+      },
+      "orb": {
+        "damage": 20,
+        "accuracy": 42
+      },
+      "val": 600
+    },
+    "5": {
+      "shield": {
+        "armor": 24,
+        "damage": 14
+      },
+      "capacitor": {
+        "accuracy": 48,
+        "damage": 12
+      },
+      "orb": {
+        "damage": 26,
+        "accuracy": 45
+      },
+      "val": 960
+    },
+    "6": {
+      "shield": {
+        "armor": 31,
+        "damage": 18
+      },
+      "capacitor": {
+        "accuracy": 50,
+        "damage": 16
+      },
+      "orb": {
+        "damage": 33,
+        "accuracy": 48
+      },
+      "val": 1440
+    },
+    "7": {
+      "shield": {
+        "armor": 39,
+        "damage": 22
+      },
+      "capacitor": {
+        "accuracy": 52,
+        "damage": 20
+      },
+      "orb": {
+        "damage": 41,
+        "accuracy": 50
+      },
+      "val": 2240
+    },
+    "8": {
+      "shield": {
+        "armor": 48,
+        "damage": 27
+      },
+      "capacitor": {
+        "accuracy": 54,
+        "damage": 25
+      },
+      "orb": {
+        "damage": 50,
+        "accuracy": 52
+      },
+      "val": 3200
+    },
+    "9": {
+      "shield": {
+        "armor": 58,
+        "damage": 32
+      },
+      "capacitor": {
+        "accuracy": 56,
+        "damage": 30
+      },
+      "orb": {
+        "damage": 60,
+        "accuracy": 54
+      },
+      "val": 4400
+    },
+    "10": {
+      "shield": {
+        "armor": 68,
+        "damage": 38
+      },
+      "capacitor": {
+        "accuracy": 58,
+        "damage": 36
+      },
+      "orb": {
+        "damage": 70,
+        "accuracy": 56
+      },
+      "val": 6000
+    },
+    "11": {
+      "shield": {
+        "armor": 76,
+        "damage": 42
+      },
+      "capacitor": {
+        "accuracy": 59,
+        "damage": 40
+      },
+      "orb": {
+        "damage": 78,
+        "accuracy": 57
+      },
+      "val": 8000
+    },
+    "12": {
+      "shield": {
+        "armor": 86,
+        "damage": 48
+      },
+      "capacitor": {
+        "accuracy": 60,
+        "damage": 44
+      },
+      "orb": {
+        "damage": 88,
+        "accuracy": 58
+      },
+      "val": 12000
+    }
+  },
+  "tier_defs": [
+    {
+      "tier": 1,
+      "prefix": "scrap",
+      "name": "Scrap",
+      "lvl": 1
+    },
+    {
+      "tier": 2,
+      "prefix": "ferrite",
+      "name": "Ferrite",
+      "lvl": 10
+    },
+    {
+      "tier": 3,
+      "prefix": "cobalt",
+      "name": "Cobalt",
+      "lvl": 20
+    },
+    {
+      "tier": 4,
+      "prefix": "duranium",
+      "name": "Duranium",
+      "lvl": 30
+    },
+    {
+      "tier": 5,
+      "prefix": "titanex",
+      "name": "Titanex",
+      "lvl": 40
+    },
+    {
+      "tier": 6,
+      "prefix": "plasmite",
+      "name": "Plasmite",
+      "lvl": 50
+    },
+    {
+      "tier": 7,
+      "prefix": "quantum",
+      "name": "Quantum",
+      "lvl": 60
+    },
+    {
+      "tier": 8,
+      "prefix": "neutronium",
+      "name": "Neutronium",
+      "lvl": 70
+    },
+    {
+      "tier": 9,
+      "prefix": "darkmatter",
+      "name": "Darkmatter",
+      "lvl": 80
+    },
+    {
+      "tier": 10,
+      "prefix": "voidsteel",
+      "name": "Voidsteel",
+      "lvl": 90
+    },
+    {
+      "tier": 11,
+      "prefix": "ascendant",
+      "name": "Ascendant",
+      "lvl": 91
+    },
+    {
+      "tier": 12,
+      "prefix": "corrupted",
+      "name": "Corrupted",
+      "lvl": 93
+    }
+  ],
+  "slot_defs": [
+    {
+      "slot": "head",
+      "sname": "Helmet",
+      "icon": "icon_helmet",
+      "key": "helmet"
+    },
+    {
+      "slot": "body",
+      "sname": "Vest",
+      "icon": "icon_vest",
+      "key": "vest"
+    },
+    {
+      "slot": "legs",
+      "sname": "Greaves",
+      "icon": "icon_greaves",
+      "key": "legs"
+    },
+    {
+      "slot": "boots",
+      "sname": "Boots",
+      "icon": "icon_boots",
+      "key": "boots"
+    },
+    {
+      "slot": "gloves",
+      "sname": "Gloves",
+      "icon": "icon_gloves",
+      "key": "gloves"
+    }
+  ],
+  "style_names": {
+    "nano": "Nano",
+    "tesla": "Tesla",
+    "void": "Void"
+  },
+  "weapon_defs_gen": [
+    {
+      "suffix": "nanoblade",
+      "sname": "Nanoblade",
+      "icon": "icon_nanoblade",
+      "style": "nano",
+      "dmgKey": "nanoDmg",
+      "accKey": "nanoAcc",
+      "dsc": " blade infused with nanobot swarm."
+    },
+    {
+      "suffix": "coilgun",
+      "sname": "Coilgun",
+      "icon": "icon_coilgun",
+      "style": "tesla",
+      "dmgKey": "teslaDmg",
+      "accKey": "teslaAcc",
+      "dsc": " coilgun with tesla capacitors."
+    },
+    {
+      "suffix": "voidstaff",
+      "sname": "Voidstaff",
+      "icon": "icon_voidstaff",
+      "style": "void",
+      "dmgKey": "voidDmg",
+      "accKey": "voidAcc",
+      "dsc": " staff channeling dark energy."
+    }
+  ],
+  "offhand_defs_gen": [
+    {
+      "suffix": "energy_shield",
+      "sname": "Energy Shield",
+      "icon": "icon_shield",
+      "style": "nano",
+      "statKey": "shield",
+      "ohType": "shield",
+      "dsc": " energy barrier projector."
+    },
+    {
+      "suffix": "capacitor",
+      "sname": "Capacitor",
+      "icon": "icon_capacitor",
+      "style": "tesla",
+      "statKey": "capacitor",
+      "ohType": "capacitor",
+      "dsc": " tesla capacitor bank."
+    },
+    {
+      "suffix": "dark_orb",
+      "sname": "Dark Orb",
+      "icon": "icon_dark_orb",
+      "style": "void",
+      "statKey": "orb",
+      "ohType": "orb",
+      "dsc": " channeling orb of dark energy."
+    }
+  ],
+  "tiers": {
+    "1": {
+      "name": "Scrap",
+      "color": "#888888",
+      "levelReq": 1
+    },
+    "2": {
+      "name": "Ferrite",
+      "color": "#44cc66",
+      "levelReq": 10
+    },
+    "3": {
+      "name": "Cobalt",
+      "color": "#4488ff",
+      "levelReq": 20
+    },
+    "4": {
+      "name": "Duranium",
+      "color": "#66aacc",
+      "levelReq": 30
+    },
+    "5": {
+      "name": "Titanex",
+      "color": "#88cc44",
+      "levelReq": 40
+    },
+    "6": {
+      "name": "Plasmite",
+      "color": "#aa44ff",
+      "levelReq": 50
+    },
+    "7": {
+      "name": "Quantum",
+      "color": "#ff8844",
+      "levelReq": 60
+    },
+    "8": {
+      "name": "Neutronium",
+      "color": "#ff4488",
+      "levelReq": 70
+    },
+    "9": {
+      "name": "Darkmatter",
+      "color": "#cc44ff",
+      "levelReq": 80
+    },
+    "10": {
+      "name": "Voidsteel",
+      "color": "#ff8800",
+      "levelReq": 90
+    },
+    "11": {
+      "name": "Ascendant",
+      "color": "#44ffdd",
+      "levelReq": 91
+    },
+    "12": {
+      "name": "Corrupted",
+      "color": "#ff2266",
+      "levelReq": 93
+    }
+  },
+  "durability_by_tier": {
+    "1": 100,
+    "2": 150,
+    "3": 200,
+    "4": 300,
+    "5": 400,
+    "6": 500,
+    "7": 650,
+    "8": 800,
+    "9": 1000,
+    "10": 1200,
+    "11": 1500,
+    "12": 2000
+  },
+  "enums": {
+    "item_type": {
+      "WEAPON": "weapon",
+      "ARMOR": "armor",
+      "OFFHAND": "offhand",
+      "FOOD": "food",
+      "RESOURCE": "resource",
+      "MATERIAL": "material",
+      "TOOL": "tool",
+      "CONSUMABLE": "consumable",
+      "PET": "pet"
+    },
+    "equip_slot": {
+      "HEAD": "head",
+      "BODY": "body",
+      "LEGS": "legs",
+      "BOOTS": "boots",
+      "GLOVES": "gloves",
+      "WEAPON": "weapon",
+      "OFFHAND": "offhand"
+    },
+    "combat_style": {
+      "NANO": "nano",
+      "TESLA": "tesla",
+      "VOID": "void"
+    }
+  }
+}

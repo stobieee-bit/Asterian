@@ -1,0 +1,1820 @@
+[
+  {
+    "id": "chithari",
+    "name": "Chithari",
+    "level": 3,
+    "explicit": true,
+    "hp": 60,
+    "maxHp": 60,
+    "damage": 4,
+    "defense": 2,
+    "attackSpeed": 3.2,
+    "aggroRange": 6,
+    "leashRange": 18,
+    "combatStyle": "nano",
+    "respawnTime": 30,
+    "area": "alien-wastes",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 3824170,
+      "scale": 0.7,
+      "variant": "drone"
+    },
+    "desc": "Armored beetle swarm.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 5,
+        "max": 15
+      }
+    ]
+  },
+  {
+    "id": "chithari_warrior",
+    "name": "Chithari Warrior",
+    "level": 8,
+    "explicit": true,
+    "hp": 120,
+    "maxHp": 120,
+    "damage": 8,
+    "defense": 5,
+    "attackSpeed": 3,
+    "aggroRange": 7,
+    "leashRange": 20,
+    "combatStyle": "nano",
+    "respawnTime": 35,
+    "area": "alien-wastes",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 2771482,
+      "scale": 0.9,
+      "variant": "sentinel"
+    },
+    "desc": "Larger Chithari with reinforced chitin.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.8,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 15,
+        "max": 40
+      }
+    ]
+  },
+  {
+    "id": "voidjelly",
+    "name": "Voidjelly",
+    "level": 15,
+    "explicit": true,
+    "hp": 200,
+    "maxHp": 200,
+    "damage": 14,
+    "defense": 4,
+    "attackSpeed": 3.5,
+    "aggroRange": 8,
+    "leashRange": 22,
+    "combatStyle": "tesla",
+    "respawnTime": 40,
+    "area": "alien-wastes",
+    "meshTemplate": "jellyfish",
+    "meshParams": {
+      "color": 6697898,
+      "scale": 0.9,
+      "tentacles": 8
+    },
+    "desc": "Floating jellyfish that shocks.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.5,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 30,
+        "max": 80
+      },
+      {
+        "itemId": "ferrite_coilgun",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "ferrite_voidstaff",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "ferrite_capacitor",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      }
+    ]
+  },
+  {
+    "id": "sporeclaw",
+    "name": "Sporeclaw",
+    "level": 30,
+    "explicit": true,
+    "hp": 400,
+    "maxHp": 400,
+    "damage": 25,
+    "defense": 10,
+    "attackSpeed": 2.5,
+    "aggroRange": 9,
+    "leashRange": 25,
+    "combatStyle": "void",
+    "respawnTime": 45,
+    "area": "alien-wastes",
+    "meshTemplate": "scorpion",
+    "meshParams": {
+      "color": 4872762,
+      "scale": 1,
+      "stingerSize": 1.3
+    },
+    "desc": "Mantis-scorpion with toxic fungal growths.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.4,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 60,
+        "max": 160
+      },
+      {
+        "itemId": "cobalt_boots",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_dark_orb",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "pet_spore_pup",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      }
+    ]
+  },
+  {
+    "id": "gravlurk",
+    "name": "Gravlurk",
+    "level": 50,
+    "explicit": true,
+    "hp": 1200,
+    "maxHp": 1200,
+    "damage": 40,
+    "defense": 20,
+    "attackSpeed": 4,
+    "aggroRange": 12,
+    "leashRange": 18,
+    "combatStyle": "void",
+    "respawnTime": 120,
+    "isBoss": true,
+    "area": "alien-wastes",
+    "meshTemplate": "slug",
+    "meshParams": {
+      "color": 4864602,
+      "scale": 1.3,
+      "debris": 8
+    },
+    "desc": "Giant slug with gravity field.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 200,
+        "max": 600
+      },
+      {
+        "itemId": "titanex_vest",
+        "chance": 0.05,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_nanoblade",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_dark_orb",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidtouched_mining_laser",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      }
+    ]
+  },
+  {
+    "id": "neuroworm",
+    "name": "Neuroworm",
+    "level": 60,
+    "explicit": true,
+    "hp": 1500,
+    "maxHp": 1500,
+    "damage": 50,
+    "defense": 15,
+    "attackSpeed": 3,
+    "aggroRange": 12,
+    "leashRange": 20,
+    "combatStyle": "tesla",
+    "respawnTime": 120,
+    "isBoss": true,
+    "area": "alien-wastes",
+    "meshTemplate": "worm",
+    "meshParams": {
+      "color": 5913210,
+      "scale": 1.2,
+      "segments": 10
+    },
+    "desc": "Psionic segmented worm.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 1,
+        "min": 2,
+        "max": 4
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 300,
+        "max": 900
+      },
+      {
+        "itemId": "plasmite_helmet",
+        "chance": 0.05,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "plasmite_coilgun",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "plasmite_capacitor",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "plasmite_gloves",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidtouched_bio_scanner",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      }
+    ]
+  },
+  {
+    "id": "beetle_drone",
+    "name": "Beetle Drone",
+    "level": 1,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 5915936,
+      "scale": 0.65,
+      "variant": "drone"
+    },
+    "desc": "Tiny scuttling automaton beetle."
+  },
+  {
+    "id": "dust_mite",
+    "name": "Dust Mite",
+    "level": 1,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "swarm_bug",
+    "meshParams": {
+      "color": 10127968,
+      "scale": 0.6
+    },
+    "desc": "Near-invisible parasitic mite."
+  },
+  {
+    "id": "sand_crawler",
+    "name": "Sand Crawler",
+    "level": 2,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 8022592,
+      "scale": 0.7,
+      "variant": "crawler"
+    },
+    "desc": "Low-slung crawler with grinding mandibles."
+  },
+  {
+    "id": "spitting_ant",
+    "name": "Spitting Ant",
+    "level": 4,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 4868656,
+      "scale": 0.7,
+      "variant": "drone"
+    },
+    "desc": "Acid-spitting colonial insect."
+  },
+  {
+    "id": "glow_fly",
+    "name": "Glow Fly",
+    "level": 4,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "swarm_bug",
+    "meshParams": {
+      "color": 5622869,
+      "scale": 0.6
+    },
+    "desc": "Bioluminescent flying pest."
+  },
+  {
+    "id": "carapace_grub",
+    "name": "Carapace Grub",
+    "level": 5,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 9075280,
+      "scale": 0.75,
+      "variant": "crawler"
+    },
+    "desc": "Armored larva burrowing through soil."
+  },
+  {
+    "id": "barbed_tick",
+    "name": "Barbed Tick",
+    "level": 5,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "arachnid",
+    "meshParams": {
+      "color": 5915952,
+      "scale": 0.65
+    },
+    "desc": "Blood-sucking tick with barbed legs."
+  },
+  {
+    "id": "hive_drone",
+    "name": "Hive Drone",
+    "level": 6,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "swarm_bug",
+    "meshParams": {
+      "color": 8022576,
+      "scale": 0.7
+    },
+    "desc": "Mindless worker serving the hive."
+  },
+  {
+    "id": "plague_fly",
+    "name": "Plague Fly",
+    "level": 7,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "swarm_bug",
+    "meshParams": {
+      "color": 6978112,
+      "scale": 0.7
+    },
+    "desc": "Disease-carrying buzzing menace."
+  },
+  {
+    "id": "tunnel_spider",
+    "name": "Tunnel Spider",
+    "level": 7,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "arachnid",
+    "meshParams": {
+      "color": 4864544,
+      "scale": 0.75
+    },
+    "desc": "Ambush predator lurking in burrows."
+  },
+  {
+    "id": "razor_ant",
+    "name": "Razor Ant",
+    "level": 9,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 3815968,
+      "scale": 0.8,
+      "variant": "drone"
+    },
+    "desc": "Soldier ant with blade-like mandibles."
+  },
+  {
+    "id": "hive_queen",
+    "name": "Hive Queen",
+    "level": 10,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 10123824,
+      "scale": 1.4,
+      "variant": "queen"
+    },
+    "isBoss": true,
+    "desc": "Bloated queen commanding the swarm."
+  },
+  {
+    "id": "spark_beetle",
+    "name": "Spark Beetle",
+    "level": 10,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 4876938,
+      "scale": 0.8,
+      "variant": "drone"
+    },
+    "desc": "Beetle generating electrical discharges."
+  },
+  {
+    "id": "chitin_sentinel",
+    "name": "Chitin Sentinel",
+    "level": 11,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 6974016,
+      "scale": 0.9,
+      "variant": "sentinel"
+    },
+    "desc": "Guard insect with reinforced plates."
+  },
+  {
+    "id": "burrowing_horror",
+    "name": "Burrowing Horror",
+    "level": 12,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 3810592,
+      "scale": 0.85,
+      "variant": "crawler"
+    },
+    "desc": "Subterranean insect erupting from soil."
+  },
+  {
+    "id": "web_matriarch",
+    "name": "Web Matriarch",
+    "level": 14,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "arachnid",
+    "meshParams": {
+      "color": 6965866,
+      "scale": 0.9
+    },
+    "desc": "Massive spider commanding web territory."
+  },
+  {
+    "id": "stingwing_matriarch",
+    "name": "Stingwing Matriarch",
+    "level": 20,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "swarm_bug",
+    "meshParams": {
+      "color": 12294704,
+      "scale": 1.3
+    },
+    "isBoss": true,
+    "desc": "Giant wasp queen ruling the skies."
+  },
+  {
+    "id": "death_weaver",
+    "name": "Death Weaver",
+    "level": 20,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "arachnid",
+    "meshParams": {
+      "color": 2763338,
+      "scale": 0.95
+    },
+    "desc": "Master weaver of lethal trap webs."
+  },
+  {
+    "id": "drift_jelly",
+    "name": "Drift Jelly",
+    "level": 21,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "jellyfish",
+    "meshParams": {
+      "color": 5614284,
+      "scale": 0.8,
+      "tentacles": 6
+    },
+    "desc": "Small jellyfish drifting on air currents."
+  },
+  {
+    "id": "blade_mantis",
+    "name": "Blade Mantis",
+    "level": 21,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "mantis",
+    "meshParams": {
+      "color": 4880970,
+      "scale": 0.85
+    },
+    "desc": "Mantis with scythe-like forearms."
+  },
+  {
+    "id": "rock_scorpion",
+    "name": "Rock Scorpion",
+    "level": 22,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "scorpion",
+    "meshParams": {
+      "color": 6969920,
+      "scale": 0.85,
+      "stingerSize": 1
+    },
+    "desc": "Camouflaged scorpion in rocky terrain."
+  },
+  {
+    "id": "tidal_jelly",
+    "name": "Tidal Jelly",
+    "level": 24,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "jellyfish",
+    "meshParams": {
+      "color": 3381674,
+      "scale": 0.8,
+      "tentacles": 10
+    },
+    "desc": "Large jelly pulling in prey with tidal force."
+  },
+  {
+    "id": "tidal_jelly_monarch",
+    "name": "Tidal Jelly Monarch",
+    "level": 25,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "jellyfish",
+    "meshParams": {
+      "color": 2271948,
+      "scale": 1.4,
+      "tentacles": 14
+    },
+    "isBoss": true,
+    "desc": "Enormous jelly monarch ruling the tidal pools."
+  },
+  {
+    "id": "praying_stalker",
+    "name": "Praying Stalker",
+    "level": 25,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "mantis",
+    "meshParams": {
+      "color": 2775594,
+      "scale": 0.8
+    },
+    "desc": "Patient hunter striking with precision."
+  },
+  {
+    "id": "venom_scorpion",
+    "name": "Venom Scorpion",
+    "level": 26,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "scorpion",
+    "meshParams": {
+      "color": 4876858,
+      "scale": 0.8,
+      "stingerSize": 1.2
+    },
+    "desc": "Scorpion with highly toxic venom."
+  },
+  {
+    "id": "ghost_mantis",
+    "name": "Ghost Mantis",
+    "level": 27,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "mantis",
+    "meshParams": {
+      "color": 8026762,
+      "scale": 0.8
+    },
+    "desc": "Near-invisible mantis striking from nowhere."
+  },
+  {
+    "id": "current_jelly",
+    "name": "Current Jelly",
+    "level": 28,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "jellyfish",
+    "meshParams": {
+      "color": 3372987,
+      "scale": 0.9,
+      "tentacles": 12
+    },
+    "desc": "Jelly channeling electrical currents."
+  },
+  {
+    "id": "emperor_scorpion",
+    "name": "Emperor Scorpion",
+    "level": 29,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "scorpion",
+    "meshParams": {
+      "color": 2763322,
+      "scale": 0.95,
+      "stingerSize": 1.3
+    },
+    "desc": "Massive scorpion with crushing pincers."
+  },
+  {
+    "id": "war_mantis",
+    "name": "War Mantis",
+    "level": 31,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "mantis",
+    "meshParams": {
+      "color": 6957610,
+      "scale": 0.95
+    },
+    "desc": "Battle-hardened mantis covered in scars."
+  },
+  {
+    "id": "void_jelly",
+    "name": "Void Jelly",
+    "level": 32,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "jellyfish",
+    "meshParams": {
+      "color": 4465322,
+      "scale": 1,
+      "tentacles": 12
+    },
+    "desc": "Dark jelly phasing through dimensions."
+  },
+  {
+    "id": "deep_jelly",
+    "name": "Deep Jelly",
+    "level": 35,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "jellyfish",
+    "meshParams": {
+      "color": 2241416,
+      "scale": 1.05,
+      "tentacles": 14
+    },
+    "desc": "Deep-dwelling jelly adapted to crushing pressure."
+  },
+  {
+    "id": "plague_scorpion",
+    "name": "Plague Scorpion",
+    "level": 36,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "scorpion",
+    "meshParams": {
+      "color": 5917226,
+      "scale": 1,
+      "stingerSize": 1.3
+    },
+    "desc": "Disease-carrying scorpion spreading blight."
+  },
+  {
+    "id": "lightning_jelly",
+    "name": "Lightning Jelly",
+    "level": 38,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "jellyfish",
+    "meshParams": {
+      "color": 16768324,
+      "scale": 1,
+      "tentacles": 12
+    },
+    "desc": "Crackling jelly conducting pure lightning."
+  },
+  {
+    "id": "titan_scorpion",
+    "name": "Titan Scorpion",
+    "level": 39,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "scorpion",
+    "meshParams": {
+      "color": 3816010,
+      "scale": 1.15,
+      "stingerSize": 1.5
+    },
+    "desc": "Enormous scorpion of devastating power."
+  },
+  {
+    "id": "acid_mantis_alpha",
+    "name": "Acid Mantis Alpha",
+    "level": 40,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "mantis",
+    "meshParams": {
+      "color": 4893226,
+      "scale": 1.3
+    },
+    "isBoss": true,
+    "desc": "Alpha mantis spraying concentrated acid."
+  },
+  {
+    "id": "shadow_stalker",
+    "name": "Shadow Stalker",
+    "level": 41,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 2763322,
+      "scale": 0.8
+    },
+    "desc": "Quadruped lurking in shadows."
+  },
+  {
+    "id": "dust_worm",
+    "name": "Dust Worm",
+    "level": 41,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "worm",
+    "meshParams": {
+      "color": 9075280,
+      "scale": 0.8,
+      "segments": 6
+    },
+    "desc": "Burrowing worm erupting from dust."
+  },
+  {
+    "id": "acid_slug",
+    "name": "Acid Slug",
+    "level": 42,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "slug",
+    "meshParams": {
+      "color": 5933616,
+      "scale": 0.85,
+      "debris": 4
+    },
+    "desc": "Slow slug leaving corrosive trail."
+  },
+  {
+    "id": "tremor_worm",
+    "name": "Tremor Worm",
+    "level": 43,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "worm",
+    "meshParams": {
+      "color": 6969920,
+      "scale": 0.85,
+      "segments": 7
+    },
+    "desc": "Worm causing localized earthquakes."
+  },
+  {
+    "id": "blood_stalker",
+    "name": "Blood Stalker",
+    "level": 44,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 4856346,
+      "scale": 0.9
+    },
+    "desc": "Predator drawn to the scent of blood."
+  },
+  {
+    "id": "pack_howler_alpha",
+    "name": "Pack Howler Alpha",
+    "level": 45,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 5909034,
+      "scale": 1.3
+    },
+    "isBoss": true,
+    "desc": "Alpha predator commanding the hunting pack."
+  },
+  {
+    "id": "bore_worm",
+    "name": "Bore Worm",
+    "level": 45,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "worm",
+    "meshParams": {
+      "color": 5917232,
+      "scale": 0.9,
+      "segments": 8
+    },
+    "desc": "Worm boring through solid rock."
+  },
+  {
+    "id": "toxic_slug",
+    "name": "Toxic Slug",
+    "level": 46,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "slug",
+    "meshParams": {
+      "color": 3836474,
+      "scale": 0.8,
+      "debris": 6
+    },
+    "desc": "Slug oozing potent neurotoxin."
+  },
+  {
+    "id": "shock_worm",
+    "name": "Shock Worm",
+    "level": 47,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "worm",
+    "meshParams": {
+      "color": 3824250,
+      "scale": 0.8,
+      "segments": 8
+    },
+    "desc": "Worm discharging electrical shocks."
+  },
+  {
+    "id": "fang_stalker",
+    "name": "Fang Stalker",
+    "level": 48,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 3815978,
+      "scale": 0.95
+    },
+    "desc": "Predator with elongated saber fangs."
+  },
+  {
+    "id": "crystal_slug",
+    "name": "Crystal Slug",
+    "level": 49,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "slug",
+    "meshParams": {
+      "color": 5929610,
+      "scale": 0.9,
+      "debris": 7
+    },
+    "desc": "Slug with crystalline shell fragments."
+  },
+  {
+    "id": "thunder_worm",
+    "name": "Thunder Worm",
+    "level": 51,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "worm",
+    "meshParams": {
+      "color": 4868746,
+      "scale": 0.9,
+      "segments": 9
+    },
+    "desc": "Worm generating thunderous vibrations."
+  },
+  {
+    "id": "void_stalker",
+    "name": "Void Stalker",
+    "level": 52,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 1710666,
+      "scale": 1
+    },
+    "desc": "Predator phasing through void tears."
+  },
+  {
+    "id": "phantom_stalker",
+    "name": "Phantom Stalker",
+    "level": 55,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 3816026,
+      "scale": 1.05
+    },
+    "desc": "Semi-transparent predator fading in and out."
+  },
+  {
+    "id": "death_worm",
+    "name": "Death Worm",
+    "level": 55,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "worm",
+    "meshParams": {
+      "color": 4856346,
+      "scale": 1,
+      "segments": 10
+    },
+    "desc": "Legendary worm of devastating power."
+  },
+  {
+    "id": "omega_slug",
+    "name": "Omega Slug",
+    "level": 56,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "slug",
+    "meshParams": {
+      "color": 2767450,
+      "scale": 1.05,
+      "debris": 9
+    },
+    "desc": "Ultimate slug evolution, nearly indestructible."
+  },
+  {
+    "id": "doom_stalker",
+    "name": "Doom Stalker",
+    "level": 58,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 1706538,
+      "scale": 1.1
+    },
+    "desc": "Herald of destruction prowling the wastes."
+  },
+  {
+    "id": "apex_stalker",
+    "name": "Apex Stalker",
+    "level": 59,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 3807818,
+      "scale": 1.15
+    },
+    "desc": "Ultimate predator at the top of the food chain."
+  },
+  {
+    "id": "lesser_wraith",
+    "name": "Lesser Wraith",
+    "level": 61,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "void_wraith",
+    "meshParams": {
+      "color": 5921418,
+      "scale": 0.85
+    },
+    "desc": "Faint spectral entity from beyond."
+  },
+  {
+    "id": "shadow_wisp",
+    "name": "Shadow Wisp",
+    "level": 61,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "dark_entity",
+    "meshParams": {
+      "color": 3816026,
+      "scale": 0.8
+    },
+    "desc": "Flickering dark energy fragment."
+  },
+  {
+    "id": "stone_golem",
+    "name": "Stone Golem",
+    "level": 62,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 6974058,
+      "scale": 0.9
+    },
+    "desc": "Animated stone construct."
+  },
+  {
+    "id": "dark_blob",
+    "name": "Dark Blob",
+    "level": 63,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "dark_entity",
+    "meshParams": {
+      "color": 2763338,
+      "scale": 0.85
+    },
+    "desc": "Amorphous mass of dark energy."
+  },
+  {
+    "id": "wailing_wraith",
+    "name": "Wailing Wraith",
+    "level": 64,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "void_wraith",
+    "meshParams": {
+      "color": 6970010,
+      "scale": 0.9
+    },
+    "desc": "Wraith whose screams paralyze prey."
+  },
+  {
+    "id": "obsidian_golem",
+    "name": "Obsidian Golem",
+    "level": 65,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 1710634,
+      "scale": 0.9
+    },
+    "desc": "Volcanic glass golem of deadly sharpness."
+  },
+  {
+    "id": "chaos_blob",
+    "name": "Chaos Blob",
+    "level": 66,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "dark_entity",
+    "meshParams": {
+      "color": 4856394,
+      "scale": 0.8
+    },
+    "desc": "Chaotic mass warping reality nearby."
+  },
+  {
+    "id": "howling_wraith",
+    "name": "Howling Wraith",
+    "level": 67,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "void_wraith",
+    "meshParams": {
+      "color": 4864634,
+      "scale": 0.85
+    },
+    "desc": "Wraith emitting mind-shattering howls."
+  },
+  {
+    "id": "quartz_golem",
+    "name": "Quartz Golem",
+    "level": 68,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 9075354,
+      "scale": 0.95
+    },
+    "desc": "Translucent golem refracting light."
+  },
+  {
+    "id": "nightmare_mass",
+    "name": "Nightmare Mass",
+    "level": 69,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "dark_entity",
+    "meshParams": {
+      "color": 3803706,
+      "scale": 0.9
+    },
+    "desc": "Mass projecting horrific visions."
+  },
+  {
+    "id": "void_sentinel",
+    "name": "Void Sentinel",
+    "level": 70,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "void_wraith",
+    "meshParams": {
+      "color": 6965930,
+      "scale": 1.3
+    },
+    "isBoss": true,
+    "desc": "Ancient guardian of the void boundary."
+  },
+  {
+    "id": "diamond_golem",
+    "name": "Diamond Golem",
+    "level": 70,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 10132138,
+      "scale": 1
+    },
+    "desc": "Nearly indestructible diamond construct."
+  },
+  {
+    "id": "screaming_wraith",
+    "name": "Screaming Wraith",
+    "level": 71,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "void_wraith",
+    "meshParams": {
+      "color": 5913226,
+      "scale": 0.9
+    },
+    "desc": "Wraith whose screams rupture reality."
+  },
+  {
+    "id": "titan_golem",
+    "name": "Titan Golem",
+    "level": 72,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 4872810,
+      "scale": 1.1
+    },
+    "desc": "Colossal golem of staggering power."
+  },
+  {
+    "id": "ancient_golem",
+    "name": "Ancient Golem",
+    "level": 75,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 6969930,
+      "scale": 1.15
+    },
+    "desc": "Millennia-old construct of forgotten origin."
+  },
+  {
+    "id": "oblivion_wraith",
+    "name": "Oblivion Wraith",
+    "level": 75,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "void_wraith",
+    "meshParams": {
+      "color": 1706586,
+      "scale": 1
+    },
+    "desc": "Wraith from the edge of oblivion itself."
+  },
+  {
+    "id": "void_golem",
+    "name": "Void Golem",
+    "level": 76,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 2763354,
+      "scale": 1.15
+    },
+    "desc": "Golem infused with void energy."
+  },
+  {
+    "id": "eternal_wraith",
+    "name": "Eternal Wraith",
+    "level": 77,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "void_wraith",
+    "meshParams": {
+      "color": 5917338,
+      "scale": 1.05
+    },
+    "desc": "Immortal wraith existing since creation."
+  },
+  {
+    "id": "null_mass",
+    "name": "Null Mass",
+    "level": 77,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "dark_entity",
+    "meshParams": {
+      "color": 328976,
+      "scale": 1.05
+    },
+    "desc": "Mass of absolute nothingness."
+  },
+  {
+    "id": "prism_golem",
+    "name": "Prism Golem",
+    "level": 78,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 9071274,
+      "scale": 1.2
+    },
+    "desc": "Multi-faceted golem splitting light."
+  },
+  {
+    "id": "phantom_wraith",
+    "name": "Phantom Wraith",
+    "level": 78,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "void_wraith",
+    "meshParams": {
+      "color": 3816074,
+      "scale": 1.05
+    },
+    "desc": "Nearly imperceptible wraith."
+  },
+  {
+    "id": "omega_mass",
+    "name": "Omega Mass",
+    "level": 79,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "dark_entity",
+    "meshParams": {
+      "color": 1706554,
+      "scale": 1.1
+    },
+    "desc": "Final form of dark energy evolution."
+  },
+  {
+    "id": "crystal_colossus",
+    "name": "Crystal Colossus",
+    "level": 80,
+    "combatStyle": "nano",
+    "area": "alien-wastes",
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 8030890,
+      "scale": 1.6
+    },
+    "isBoss": true,
+    "desc": "Enormous crystalline titan guarding ancient secrets."
+  },
+  {
+    "id": "watcher_eye",
+    "name": "Watcher Eye",
+    "level": 81,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 6961770,
+      "scale": 0.7,
+      "irisColor": 16729156
+    },
+    "desc": "Floating eye observing all movement."
+  },
+  {
+    "id": "minor_warper",
+    "name": "Minor Warper",
+    "level": 81,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "reality_warper",
+    "meshParams": {
+      "color": 4868730,
+      "scale": 0.6
+    },
+    "desc": "Small anomaly bending local space."
+  },
+  {
+    "id": "doom_eye",
+    "name": "Doom Eye",
+    "level": 83,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 4856426,
+      "scale": 0.8,
+      "irisColor": 11149858
+    },
+    "desc": "Eye projecting beams of destruction."
+  },
+  {
+    "id": "gravity_warper",
+    "name": "Gravity Warper",
+    "level": 84,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "reality_warper",
+    "meshParams": {
+      "color": 2767482,
+      "scale": 0.7
+    },
+    "desc": "Anomaly distorting gravitational fields."
+  },
+  {
+    "id": "blight_eye",
+    "name": "Blight Eye",
+    "level": 85,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 3824186,
+      "scale": 0.85,
+      "irisColor": 4521796
+    },
+    "desc": "Eye spreading corruption with its gaze."
+  },
+  {
+    "id": "tyrant_eye",
+    "name": "Tyrant Eye",
+    "level": 86,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 6957642,
+      "scale": 0.85,
+      "irisColor": 16746564
+    },
+    "desc": "Commanding eye dominating lesser minds."
+  },
+  {
+    "id": "void_eye",
+    "name": "Void Eye",
+    "level": 87,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 2759274,
+      "scale": 0.9,
+      "irisColor": 8930559
+    },
+    "desc": "Eye peering from the void itself."
+  },
+  {
+    "id": "death_eye",
+    "name": "Death Eye",
+    "level": 88,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 4852298,
+      "scale": 0.9,
+      "irisColor": 16711748
+    },
+    "desc": "Eye whose gaze brings death."
+  },
+  {
+    "id": "reality_eater",
+    "name": "Reality Eater",
+    "level": 90,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 9058954,
+      "scale": 1.4,
+      "irisColor": 16729343
+    },
+    "isBoss": true,
+    "desc": "Enormous eye consuming reality itself."
+  },
+  {
+    "id": "elder_eye",
+    "name": "Elder Eye",
+    "level": 91,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 3811978,
+      "scale": 0.95,
+      "irisColor": 11158783
+    },
+    "desc": "Ancient eye of unfathomable wisdom."
+  },
+  {
+    "id": "cosmic_eye",
+    "name": "Cosmic Eye",
+    "level": 92,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 2767498,
+      "scale": 1,
+      "irisColor": 4491519
+    },
+    "desc": "Eye perceiving cosmic truths."
+  },
+  {
+    "id": "godseye",
+    "name": "God's Eye",
+    "level": 98,
+    "combatStyle": "void",
+    "area": "alien-wastes",
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 5921450,
+      "scale": 1.1,
+      "irisColor": 16777215
+    },
+    "desc": "Eye of a being beyond comprehension."
+  },
+  {
+    "id": "the_formless_one",
+    "name": "The Formless One",
+    "level": 99,
+    "combatStyle": "tesla",
+    "area": "alien-wastes",
+    "meshTemplate": "reality_warper",
+    "meshParams": {
+      "color": 9071274,
+      "scale": 1.5
+    },
+    "isBoss": true,
+    "desc": "Entity of pure unreality, a living paradox."
+  },
+  {
+    "id": "abyss_lurker",
+    "name": "Abyss Lurker",
+    "level": 100,
+    "combatStyle": "void",
+    "area": "the-abyss",
+    "meshTemplate": "abyssal_serpent",
+    "meshParams": {
+      "color": 657978,
+      "scale": 0.6
+    },
+    "desc": "First creature encountered in the abyss."
+  },
+  {
+    "id": "deep_shade",
+    "name": "Deep Shade",
+    "level": 102,
+    "combatStyle": "tesla",
+    "area": "the-abyss",
+    "meshTemplate": "abyssal_horror",
+    "meshParams": {
+      "color": 656672,
+      "scale": 0.6
+    },
+    "desc": "Shadow given form in the deep."
+  },
+  {
+    "id": "abyss_eel",
+    "name": "Abyss Eel",
+    "level": 104,
+    "combatStyle": "nano",
+    "area": "the-abyss",
+    "meshTemplate": "abyssal_serpent",
+    "meshParams": {
+      "color": 1710666,
+      "scale": 0.65
+    },
+    "desc": "Elongated predator of dark waters."
+  },
+  {
+    "id": "depth_serpent",
+    "name": "Depth Serpent",
+    "level": 108,
+    "combatStyle": "tesla",
+    "area": "the-abyss",
+    "meshTemplate": "abyssal_serpent",
+    "meshParams": {
+      "color": 662090,
+      "scale": 0.7
+    },
+    "desc": "Serpent adapted to crushing pressures."
+  },
+  {
+    "id": "abyssal_leviathan",
+    "name": "Abyssal Leviathan",
+    "level": 110,
+    "combatStyle": "void",
+    "area": "the-abyss",
+    "meshTemplate": "abyssal_serpent",
+    "meshParams": {
+      "color": 1706586,
+      "scale": 1.4
+    },
+    "isBoss": true,
+    "desc": "Massive serpent ruling the upper abyss."
+  },
+  {
+    "id": "shadow_angler",
+    "name": "Shadow Angler",
+    "level": 112,
+    "combatStyle": "nano",
+    "area": "the-abyss",
+    "meshTemplate": "abyssal_horror",
+    "meshParams": {
+      "color": 657962,
+      "scale": 0.7
+    },
+    "desc": "Lures prey with bioluminescent glow."
+  },
+  {
+    "id": "abyss_maw",
+    "name": "Abyss Maw",
+    "level": 116,
+    "combatStyle": "void",
+    "area": "the-abyss",
+    "meshTemplate": "abyssal_horror",
+    "meshParams": {
+      "color": 1706538,
+      "scale": 0.75
+    },
+    "desc": "All mouth and hunger from the deep."
+  },
+  {
+    "id": "void_kraken",
+    "name": "Void Kraken",
+    "level": 120,
+    "combatStyle": "void",
+    "area": "the-abyss",
+    "meshTemplate": "abyssal_horror",
+    "meshParams": {
+      "color": 657994,
+      "scale": 0.85
+    },
+    "desc": "Multi-tentacled terror of the void depths."
+  },
+  {
+    "id": "abyssal_devourer",
+    "name": "Abyssal Devourer",
+    "level": 125,
+    "combatStyle": "void",
+    "area": "the-abyss",
+    "meshTemplate": "abyssal_horror",
+    "meshParams": {
+      "color": 2755146,
+      "scale": 1.4
+    },
+    "isBoss": true,
+    "desc": "Insatiable hunger consuming all matter."
+  },
+  {
+    "id": "brine_serpent",
+    "name": "Brine Serpent",
+    "level": 122,
+    "combatStyle": "tesla",
+    "area": "the-abyss",
+    "meshTemplate": "abyssal_serpent",
+    "meshParams": {
+      "color": 1714746,
+      "scale": 0.85
+    },
+    "desc": "Serpent corroding with toxic brine."
+  },
+  {
+    "id": "elder_serpent",
+    "name": "Elder Serpent",
+    "level": 130,
+    "combatStyle": "nano",
+    "area": "the-abyss",
+    "meshTemplate": "abyssal_serpent",
+    "meshParams": {
+      "color": 1706554,
+      "scale": 0.95
+    },
+    "desc": "Ancient serpent of immense size and wisdom."
+  },
+  {
+    "id": "cosmic_drone",
+    "name": "Cosmic Drone",
+    "level": 142,
+    "combatStyle": "nano",
+    "area": "the-abyss",
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 2763354,
+      "scale": 0.7
+    },
+    "desc": "Automaton enforcing cosmic law."
+  },
+  {
+    "id": "cosmic_guard",
+    "name": "Cosmic Guard",
+    "level": 146,
+    "combatStyle": "void",
+    "area": "the-abyss",
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 3816042,
+      "scale": 0.75
+    },
+    "desc": "Sentinel guarding cosmic boundaries."
+  },
+  {
+    "id": "cosmic_warden",
+    "name": "Cosmic Warden",
+    "level": 150,
+    "combatStyle": "void",
+    "area": "the-abyss",
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 4868746,
+      "scale": 1.3
+    },
+    "isBoss": true,
+    "desc": "Warden of the cosmic barrier between realms."
+  },
+  {
+    "id": "nebula_knight",
+    "name": "Nebula Knight",
+    "level": 152,
+    "combatStyle": "nano",
+    "area": "the-abyss",
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 3820138,
+      "scale": 0.8
+    },
+    "desc": "Knight forged in nebula fire."
+  },
+  {
+    "id": "void_knight",
+    "name": "Void Knight",
+    "level": 156,
+    "combatStyle": "void",
+    "area": "the-abyss",
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 1710682,
+      "scale": 0.85
+    },
+    "desc": "Knight sworn to serve the void."
+  },
+  {
+    "id": "cosmic_champion",
+    "name": "Cosmic Champion",
+    "level": 160,
+    "combatStyle": "nano",
+    "area": "the-abyss",
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 5921418,
+      "scale": 0.9
+    },
+    "desc": "Elite warrior of cosmic origin."
+  },
+  {
+    "id": "stellar_guard",
+    "name": "Stellar Guard",
+    "level": 164,
+    "combatStyle": "void",
+    "area": "the-abyss",
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 4864634,
+      "scale": 0.9
+    },
+    "desc": "Guard drawn from stellar matter."
+  },
+  {
+    "id": "cosmic_juggernaut",
+    "name": "Cosmic Juggernaut",
+    "level": 166,
+    "combatStyle": "nano",
+    "area": "the-abyss",
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 3816026,
+      "scale": 0.95
+    },
+    "desc": "Unstoppable cosmic war machine."
+  },
+  {
+    "id": "cosmic_arbiter",
+    "name": "Cosmic Arbiter",
+    "level": 170,
+    "combatStyle": "void",
+    "area": "the-abyss",
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 5917338,
+      "scale": 0.95
+    },
+    "desc": "Judge of cosmic conflicts."
+  },
+  {
+    "id": "the_primordial",
+    "name": "The Primordial",
+    "level": 175,
+    "combatStyle": "nano",
+    "area": "the-abyss",
+    "meshTemplate": "cosmic_titan",
+    "meshParams": {
+      "color": 4864618,
+      "scale": 1.4
+    },
+    "isBoss": true,
+    "desc": "Being from before the dawn of creation."
+  },
+  {
+    "id": "entropy_incarnate",
+    "name": "Entropy Incarnate",
+    "level": 200,
+    "combatStyle": "void",
+    "area": "the-abyss",
+    "meshTemplate": "cosmic_titan",
+    "meshParams": {
+      "color": 657978,
+      "scale": 1.6
+    },
+    "isBoss": true,
+    "desc": "The living embodiment of entropy itself."
+  }
+]

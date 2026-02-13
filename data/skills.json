@@ -1,0 +1,920 @@
+{
+  "skill_defs": {
+    "nano": {
+      "name": "Nanotech",
+      "icon": "🔬",
+      "color": "#44ff88",
+      "type": "combat"
+    },
+    "tesla": {
+      "name": "Tesla",
+      "icon": "⚡",
+      "color": "#44aaff",
+      "type": "combat"
+    },
+    "void": {
+      "name": "Void",
+      "icon": "🌀",
+      "color": "#aa44ff",
+      "type": "combat"
+    },
+    "astromining": {
+      "name": "Astromining",
+      "icon": "⛏️",
+      "color": "#ff8844",
+      "type": "gathering"
+    },
+    "bioforge": {
+      "name": "Bioforge",
+      "icon": "🧬",
+      "color": "#44ffaa",
+      "type": "production"
+    },
+    "circuitry": {
+      "name": "Circuitry",
+      "icon": "🔧",
+      "color": "#ffaa44",
+      "type": "production"
+    },
+    "xenocook": {
+      "name": "Xenocook",
+      "icon": "🍳",
+      "color": "#ff4488",
+      "type": "production"
+    },
+    "psionics": {
+      "name": "Neural Engineering",
+      "icon": "🧠",
+      "color": "#ff44ff",
+      "type": "prestige",
+      "locked": true,
+      "lockText": "Complete the Neural Awakening quest chain."
+    },
+    "chronomancy": {
+      "name": "Quantum Synthesis",
+      "icon": "⏳",
+      "color": "#44ffff",
+      "type": "prestige",
+      "softGate": true,
+      "softGateText": "Requires Level 10 in any combat skill."
+    }
+  },
+  "synergies": [
+    {
+      "id": "double_ore",
+      "name": "Rich Veins",
+      "desc": "15% chance to mine double ores",
+      "requirement": "[function]",
+      "reqText": "Astromining 20+",
+      "type": "gathering_bonus",
+      "value": 0.15
+    },
+    {
+      "id": "weapon_durability",
+      "name": "Precision Forge",
+      "desc": "Crafted weapons get +5% durability",
+      "requirement": "[function]",
+      "reqText": "Circuitry 15+",
+      "type": "durability_bonus_weapon",
+      "value": 0.05
+    },
+    {
+      "id": "armor_durability",
+      "name": "Bio-Reinforcement",
+      "desc": "Crafted armor gets +5% durability",
+      "requirement": "[function]",
+      "reqText": "Bioforge 15+",
+      "type": "durability_bonus_armor",
+      "value": 0.05
+    },
+    {
+      "id": "food_heal_bonus",
+      "name": "Gourmet Touch",
+      "desc": "Food heals 10% more",
+      "requirement": "[function]",
+      "reqText": "Xenocook 10+",
+      "type": "heal_bonus",
+      "value": 0.1
+    },
+    {
+      "id": "combat_damage_nano",
+      "name": "Nano Mastery",
+      "desc": "+5% nano damage",
+      "requirement": "[function]",
+      "reqText": "Nanotech 20+",
+      "type": "combat_damage",
+      "value": 0.05,
+      "style": "nano"
+    },
+    {
+      "id": "combat_damage_tesla",
+      "name": "Tesla Mastery",
+      "desc": "+5% tesla damage",
+      "requirement": "[function]",
+      "reqText": "Tesla 20+",
+      "type": "combat_damage",
+      "value": 0.05,
+      "style": "tesla"
+    },
+    {
+      "id": "combat_damage_void",
+      "name": "Void Mastery",
+      "desc": "+5% void damage",
+      "requirement": "[function]",
+      "reqText": "Void 20+",
+      "type": "combat_damage",
+      "value": 0.05,
+      "style": "void"
+    },
+    {
+      "id": "cross_combat_accuracy",
+      "name": "Combat Versatility",
+      "desc": "+5% accuracy",
+      "requirement": "[function]",
+      "reqText": "2+ combat skills at 10+",
+      "type": "combat_accuracy",
+      "value": 0.05
+    },
+    {
+      "id": "smelting_xp_bonus",
+      "name": "Forge Synergy",
+      "desc": "Smelting gives +10% XP",
+      "requirement": "[function]",
+      "reqText": "Astromining 15+ AND Circuitry 15+",
+      "type": "xp_bonus",
+      "value": 0.1,
+      "skill": "circuitry"
+    },
+    {
+      "id": "neural_bio",
+      "name": "Neural Refinement",
+      "desc": "+5% Neural Engineering recipe XP",
+      "requirement": "[function]",
+      "reqText": "Neural Eng. 20+ AND Bioforge 20+",
+      "type": "xp_bonus",
+      "value": 0.05,
+      "skill": "psionics"
+    },
+    {
+      "id": "quantum_mining",
+      "name": "Quantum Extraction",
+      "desc": "+5% Quantum Synthesis recipe XP",
+      "requirement": "[function]",
+      "reqText": "Quantum Syn. 15+ AND Astromining 20+",
+      "type": "xp_bonus",
+      "value": 0.05,
+      "skill": "chronomancy"
+    },
+    {
+      "id": "quantum_forge",
+      "name": "Transmutation Mastery",
+      "desc": "+8% transmutation XP",
+      "requirement": "[function]",
+      "reqText": "Quantum Syn. 20+ AND Circuitry 20+",
+      "type": "xp_bonus",
+      "value": 0.08,
+      "skill": "chronomancy"
+    },
+    {
+      "id": "neural_quantum",
+      "name": "Prestige Resonance",
+      "desc": "+5% all prestige recipe XP",
+      "requirement": "[function]",
+      "reqText": "Neural Eng. 40+ AND Quantum Syn. 40+",
+      "type": "prestige_xp_bonus",
+      "value": 0.05
+    }
+  ],
+  "unlocks": {
+    "astromining": [
+      {
+        "level": 1,
+        "type": "item",
+        "desc": "Mine Stellarite Ore"
+      },
+      {
+        "level": 10,
+        "type": "item",
+        "desc": "Mine Ferrite Ore"
+      },
+      {
+        "level": 20,
+        "type": "item",
+        "desc": "Mine Cobaltium Ore"
+      },
+      {
+        "level": 25,
+        "type": "item",
+        "desc": "Cut Stellar Gems"
+      },
+      {
+        "level": 30,
+        "type": "item",
+        "desc": "Mine Duranite Ore"
+      },
+      {
+        "level": 40,
+        "type": "item",
+        "desc": "Mine Titanex Ore"
+      },
+      {
+        "level": 50,
+        "type": "item",
+        "desc": "Mine Plasmite Ore, Cut Void Gems"
+      },
+      {
+        "level": 60,
+        "type": "item",
+        "desc": "Mine Quantite Ore"
+      },
+      {
+        "level": 70,
+        "type": "item",
+        "desc": "Mine Neutronium Ore"
+      },
+      {
+        "level": 75,
+        "type": "item",
+        "desc": "Cut Cosmic Gems"
+      },
+      {
+        "level": 80,
+        "type": "item",
+        "desc": "Mine Darkmatter Shards"
+      },
+      {
+        "level": 90,
+        "type": "item",
+        "desc": "Mine Voidsteel Ore"
+      }
+    ],
+    "circuitry": [
+      {
+        "level": 1,
+        "type": "item",
+        "desc": "Smelt Stellarite Bar, Craft Scrap gear"
+      },
+      {
+        "level": 10,
+        "type": "item",
+        "desc": "Smelt Ferrite Bar, Craft Ferrite gear"
+      },
+      {
+        "level": 15,
+        "type": "item",
+        "desc": "Build Signal Flares (gadget)"
+      },
+      {
+        "level": 20,
+        "type": "item",
+        "desc": "Smelt Cobaltium Bar, Craft Cobalt gear"
+      },
+      {
+        "level": 25,
+        "type": "item",
+        "desc": "Build Repair Kit (gadget)"
+      },
+      {
+        "level": 30,
+        "type": "item",
+        "desc": "Smelt Duranite Bar, Forge Duranite tools"
+      },
+      {
+        "level": 35,
+        "type": "item",
+        "desc": "Build Teleport Beacon (gadget)"
+      },
+      {
+        "level": 40,
+        "type": "item",
+        "desc": "Smelt Titanex Bar, Craft Titanex gear"
+      },
+      {
+        "level": 45,
+        "type": "item",
+        "desc": "Build Shield Cell (gadget)"
+      },
+      {
+        "level": 50,
+        "type": "item",
+        "desc": "Smelt Plasmite Bar, Forge Titanex tools"
+      },
+      {
+        "level": 55,
+        "type": "item",
+        "desc": "Build Overclock Chip (gadget)"
+      },
+      {
+        "level": 60,
+        "type": "item",
+        "desc": "Smelt Quantite Bar, Craft Quantum gear"
+      },
+      {
+        "level": 65,
+        "type": "item",
+        "desc": "Build EMP Grenade (gadget)"
+      },
+      {
+        "level": 70,
+        "type": "item",
+        "desc": "Smelt Neutronium Bar, Forge Plasmite tools"
+      },
+      {
+        "level": 80,
+        "type": "item",
+        "desc": "Smelt Darkmatter Bar, Craft Darkmatter gear"
+      },
+      {
+        "level": 90,
+        "type": "item",
+        "desc": "Smelt Voidsteel Bar, Craft Voidsteel gear"
+      },
+      {
+        "level": 91,
+        "type": "item",
+        "desc": "Forge Ascendant Alloy, Craft Ascendant gear"
+      },
+      {
+        "level": 93,
+        "type": "item",
+        "desc": "Forge Corrupted Ingot, Craft Corrupted gear"
+      }
+    ],
+    "xenocook": [
+      {
+        "level": 1,
+        "type": "item",
+        "desc": "Cook Lichen Wrap"
+      },
+      {
+        "level": 5,
+        "type": "item",
+        "desc": "Cook Cryo Soup"
+      },
+      {
+        "level": 10,
+        "type": "item",
+        "desc": "Cook Nebula Smoothie"
+      },
+      {
+        "level": 15,
+        "type": "item",
+        "desc": "Cook Grain Bowl"
+      },
+      {
+        "level": 20,
+        "type": "item",
+        "desc": "Cook Fortified Wrap (buff food)"
+      },
+      {
+        "level": 25,
+        "type": "item",
+        "desc": "Cook Alien Burger"
+      },
+      {
+        "level": 28,
+        "type": "item",
+        "desc": "Blend Energized Smoothie (buff food)"
+      },
+      {
+        "level": 30,
+        "type": "item",
+        "desc": "Cook Spore Stew"
+      },
+      {
+        "level": 35,
+        "type": "item",
+        "desc": "Grill Berserker Burger (buff food)"
+      },
+      {
+        "level": 45,
+        "type": "item",
+        "desc": "Cook Plasma Curry"
+      },
+      {
+        "level": 50,
+        "type": "item",
+        "desc": "Cook Focused Curry (buff food)"
+      },
+      {
+        "level": 55,
+        "type": "item",
+        "desc": "Cook Crystal-Glazed Steak"
+      },
+      {
+        "level": 60,
+        "type": "item",
+        "desc": "Prepare Titan Steak (buff food)"
+      },
+      {
+        "level": 65,
+        "type": "item",
+        "desc": "Cook Void Feast"
+      },
+      {
+        "level": 80,
+        "type": "item",
+        "desc": "Pack Explorer's Lunchbox (combo meal)"
+      },
+      {
+        "level": 85,
+        "type": "item",
+        "desc": "Cook Quantum Risotto"
+      },
+      {
+        "level": 90,
+        "type": "item",
+        "desc": "Prepare Warlord's Feast (combo meal)"
+      },
+      {
+        "level": 95,
+        "type": "item",
+        "desc": "Cook Cosmic Ambrosia"
+      }
+    ],
+    "bioforge": [
+      {
+        "level": 1,
+        "type": "item",
+        "desc": "Craft Scrap style armor"
+      },
+      {
+        "level": 5,
+        "type": "item",
+        "desc": "Refine Chitin"
+      },
+      {
+        "level": 10,
+        "type": "item",
+        "desc": "Brew Attack & Defense Serums"
+      },
+      {
+        "level": 15,
+        "type": "item",
+        "desc": "Refine Membrane"
+      },
+      {
+        "level": 20,
+        "type": "item",
+        "desc": "Brew Antidote Serum"
+      },
+      {
+        "level": 25,
+        "type": "item",
+        "desc": "Brew Speed Serum"
+      },
+      {
+        "level": 30,
+        "type": "item",
+        "desc": "Refine Spore Essence"
+      },
+      {
+        "level": 40,
+        "type": "item",
+        "desc": "Brew Bio-Shield Serum"
+      },
+      {
+        "level": 45,
+        "type": "item",
+        "desc": "Refine Gravity Compound"
+      },
+      {
+        "level": 50,
+        "type": "item",
+        "desc": "Brew Adrenaline Shot"
+      },
+      {
+        "level": 60,
+        "type": "item",
+        "desc": "Extract Neural Fluid"
+      },
+      {
+        "level": 65,
+        "type": "item",
+        "desc": "Brew Regen Serum"
+      },
+      {
+        "level": 80,
+        "type": "item",
+        "desc": "Synthesize Bio Catalyst"
+      },
+      {
+        "level": 85,
+        "type": "item",
+        "desc": "Brew Mega Serum"
+      },
+      {
+        "level": 91,
+        "type": "item",
+        "desc": "Ascendant style armor recipes"
+      },
+      {
+        "level": 93,
+        "type": "item",
+        "desc": "Corrupted style armor recipes"
+      }
+    ],
+    "nano": [
+      {
+        "level": 1,
+        "type": "item",
+        "desc": "Equip Scrap Nanoblade & Nano armor"
+      },
+      {
+        "level": 10,
+        "type": "item",
+        "desc": "Equip Ferrite Nanoblade & Nano armor"
+      },
+      {
+        "level": 20,
+        "type": "item",
+        "desc": "Equip Cobalt Nanoblade & Nano armor"
+      },
+      {
+        "level": 30,
+        "type": "item",
+        "desc": "Equip Duranium Nanoblade & Nano armor"
+      },
+      {
+        "level": 40,
+        "type": "item",
+        "desc": "Equip Titanex Nanoblade & Nano armor"
+      },
+      {
+        "level": 50,
+        "type": "item",
+        "desc": "Equip Plasmite Nanoblade & Nano armor"
+      },
+      {
+        "level": 60,
+        "type": "item",
+        "desc": "Equip Quantum Nanoblade & Nano armor"
+      },
+      {
+        "level": 70,
+        "type": "item",
+        "desc": "Equip Neutronium Nanoblade & Nano armor"
+      },
+      {
+        "level": 80,
+        "type": "item",
+        "desc": "Equip Darkmatter Nanoblade & Nano armor"
+      },
+      {
+        "level": 90,
+        "type": "item",
+        "desc": "Equip Voidsteel Nanoblade & Nano armor"
+      },
+      {
+        "level": 91,
+        "type": "item",
+        "desc": "Equip Ascendant Nanoblade & Nano armor"
+      },
+      {
+        "level": 93,
+        "type": "item",
+        "desc": "Equip Corrupted Nanoblade & Nano armor"
+      }
+    ],
+    "tesla": [
+      {
+        "level": 1,
+        "type": "item",
+        "desc": "Equip Scrap Coilgun & Tesla armor"
+      },
+      {
+        "level": 10,
+        "type": "item",
+        "desc": "Equip Ferrite Coilgun & Tesla armor"
+      },
+      {
+        "level": 20,
+        "type": "item",
+        "desc": "Equip Cobalt Coilgun & Tesla armor"
+      },
+      {
+        "level": 30,
+        "type": "item",
+        "desc": "Equip Duranium Coilgun & Tesla armor"
+      },
+      {
+        "level": 40,
+        "type": "item",
+        "desc": "Equip Titanex Coilgun & Tesla armor"
+      },
+      {
+        "level": 50,
+        "type": "item",
+        "desc": "Equip Plasmite Coilgun & Tesla armor"
+      },
+      {
+        "level": 60,
+        "type": "item",
+        "desc": "Equip Quantum Coilgun & Tesla armor"
+      },
+      {
+        "level": 70,
+        "type": "item",
+        "desc": "Equip Neutronium Coilgun & Tesla armor"
+      },
+      {
+        "level": 80,
+        "type": "item",
+        "desc": "Equip Darkmatter Coilgun & Tesla armor"
+      },
+      {
+        "level": 90,
+        "type": "item",
+        "desc": "Equip Voidsteel Coilgun & Tesla armor"
+      },
+      {
+        "level": 91,
+        "type": "item",
+        "desc": "Equip Ascendant Coilgun & Tesla armor"
+      },
+      {
+        "level": 93,
+        "type": "item",
+        "desc": "Equip Corrupted Coilgun & Tesla armor"
+      }
+    ],
+    "void": [
+      {
+        "level": 1,
+        "type": "item",
+        "desc": "Equip Scrap Voidstaff & Void armor"
+      },
+      {
+        "level": 10,
+        "type": "item",
+        "desc": "Equip Ferrite Voidstaff & Void armor"
+      },
+      {
+        "level": 20,
+        "type": "item",
+        "desc": "Equip Cobalt Voidstaff & Void armor"
+      },
+      {
+        "level": 30,
+        "type": "item",
+        "desc": "Equip Duranium Voidstaff & Void armor"
+      },
+      {
+        "level": 40,
+        "type": "item",
+        "desc": "Equip Titanex Voidstaff & Void armor"
+      },
+      {
+        "level": 50,
+        "type": "item",
+        "desc": "Equip Plasmite Voidstaff & Void armor"
+      },
+      {
+        "level": 60,
+        "type": "item",
+        "desc": "Equip Quantum Voidstaff & Void armor"
+      },
+      {
+        "level": 70,
+        "type": "item",
+        "desc": "Equip Neutronium Voidstaff & Void armor"
+      },
+      {
+        "level": 80,
+        "type": "item",
+        "desc": "Equip Darkmatter Voidstaff & Void armor"
+      },
+      {
+        "level": 90,
+        "type": "item",
+        "desc": "Equip Voidsteel Voidstaff & Void armor"
+      },
+      {
+        "level": 91,
+        "type": "item",
+        "desc": "Equip Ascendant Voidstaff & Void armor"
+      },
+      {
+        "level": 93,
+        "type": "item",
+        "desc": "Equip Corrupted Voidstaff & Void armor"
+      }
+    ],
+    "psionics": [
+      {
+        "level": 1,
+        "type": "item",
+        "desc": "Refine Neural Fiber from Neural Tissue"
+      },
+      {
+        "level": 10,
+        "type": "item",
+        "desc": "Craft Psi-Weave Hood"
+      },
+      {
+        "level": 15,
+        "type": "item",
+        "desc": "Craft Psi-Weave Gloves, Focus Core"
+      },
+      {
+        "level": 20,
+        "type": "item",
+        "desc": "Craft Psi-Weave Boots, Psionic Conduit"
+      },
+      {
+        "level": 30,
+        "type": "item",
+        "desc": "Craft Power Core"
+      },
+      {
+        "level": 35,
+        "type": "item",
+        "desc": "Craft Neural Plating"
+      },
+      {
+        "level": 40,
+        "type": "item",
+        "desc": "Craft Neural Greaves"
+      },
+      {
+        "level": 45,
+        "type": "item",
+        "desc": "Craft Shield Core"
+      },
+      {
+        "level": 60,
+        "type": "item",
+        "desc": "Craft Harmony Core"
+      }
+    ],
+    "chronomancy": [
+      {
+        "level": 1,
+        "type": "item",
+        "desc": "Refine Chrono Essence from Temporal Dust"
+      },
+      {
+        "level": 5,
+        "type": "item",
+        "desc": "Transmute Stellarite to Ferrite Bars"
+      },
+      {
+        "level": 15,
+        "type": "item",
+        "desc": "Transmute Ferrite to Cobaltium Bars"
+      },
+      {
+        "level": 20,
+        "type": "item",
+        "desc": "Craft Quantum Catalyst"
+      },
+      {
+        "level": 25,
+        "type": "item",
+        "desc": "Transmute Cobaltium to Duranite"
+      },
+      {
+        "level": 30,
+        "type": "item",
+        "desc": "Brew Temporal Elixir"
+      },
+      {
+        "level": 35,
+        "type": "item",
+        "desc": "Transmute Duranite to Titanex"
+      },
+      {
+        "level": 45,
+        "type": "item",
+        "desc": "Transmute Titanex to Plasmite, Brew Chrono Stim"
+      },
+      {
+        "level": 55,
+        "type": "item",
+        "desc": "Transmute Plasmite to Quantite, Forge Quantum Charge"
+      },
+      {
+        "level": 65,
+        "type": "item",
+        "desc": "Transmute Quantite to Neutronium"
+      },
+      {
+        "level": 70,
+        "type": "item",
+        "desc": "Cut Void Crystals"
+      },
+      {
+        "level": 75,
+        "type": "item",
+        "desc": "Transmute Neutronium to Darkmatter"
+      },
+      {
+        "level": 85,
+        "type": "item",
+        "desc": "Transmute Darkmatter to Voidsteel"
+      }
+    ]
+  },
+  "xp_table": [
+    0,
+    83,
+    174,
+    275,
+    387,
+    511,
+    648,
+    799,
+    966,
+    1151,
+    1355,
+    1580,
+    1829,
+    2103,
+    2406,
+    2740,
+    3109,
+    3517,
+    3967,
+    4463,
+    5011,
+    5616,
+    6283,
+    7020,
+    7833,
+    8730,
+    9720,
+    10813,
+    12020,
+    13352,
+    14822,
+    16444,
+    18235,
+    20212,
+    22394,
+    24802,
+    27460,
+    30394,
+    33633,
+    37209,
+    41156,
+    45513,
+    50323,
+    55633,
+    61495,
+    67966,
+    75110,
+    82996,
+    91702,
+    101314,
+    111925,
+    123640,
+    136573,
+    150851,
+    166614,
+    184017,
+    203231,
+    224443,
+    247862,
+    273718,
+    302264,
+    333780,
+    368575,
+    406990,
+    449403,
+    496229,
+    547928,
+    605006,
+    668024,
+    737600,
+    814417,
+    899228,
+    992866,
+    1096249,
+    1210391,
+    1336413,
+    1475551,
+    1629170,
+    1798777,
+    1986037,
+    2192787,
+    2421055,
+    2673082,
+    2951341,
+    3258562,
+    3597759,
+    3972261,
+    4385743,
+    4842262,
+    5346298,
+    5902797,
+    6517219,
+    7195594,
+    7944579,
+    8771523,
+    9684541,
+    10692593,
+    11805570,
+    13034394,
+    14391123
+  ]
+}

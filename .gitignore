@@ -1,0 +1,21 @@
+# Godot 4 specific ignores
+.godot/
+*.import
+
+# Export builds
+export/
+*.pck
+*.zip
+
+# Debug files
+data/_debug_eval.js
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor backups
+*.swp
+*.swo
+*~

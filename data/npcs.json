@@ -1,0 +1,636 @@
+{
+  "commander_vex": {
+    "name": "Commander Vex",
+    "position": {
+      "x": 0,
+      "z": -25
+    },
+    "bodyColor": 2771562,
+    "headColor": 12883306,
+    "desc": "Station commander. Gives quests and advice.",
+    "dialogue": {
+      "greeting": {
+        "text": "Welcome to Nova Station, recruit. This sector is crawling with hostile invertebrate species. Gear up and stay sharp.",
+        "options": [
+          {
+            "label": "I'm ready for a mission.",
+            "next": "quest_check"
+          },
+          {
+            "label": "What should I do first?",
+            "next": "advice"
+          },
+          {
+            "label": "Tell me about combat.",
+            "next": "combat_info"
+          },
+          {
+            "label": "Customize my suit.",
+            "action": "openAppearanceEditor"
+          },
+          {
+            "label": "Goodbye.",
+            "next": null
+          }
+        ]
+      },
+      "quest_check": {
+        "text": "__QUEST_DYNAMIC__",
+        "options": []
+      },
+      "advice": {
+        "text": "Start by mining Stellarite in the Asteroid Mines (far east). Smelt it at the Bio-Lab (behind me, southwest corner) to craft equipment. Then head south to the Alien Wastes to train combat.",
+        "options": [
+          {
+            "label": "Thanks!",
+            "next": null
+          }
+        ]
+      },
+      "combat_info": {
+        "text": "Three combat disciplines: Nanotech (close swarm), Tesla (mid electricity), Void (long dark energy). Triangle: Nano beats Tesla, Tesla beats Void, Void beats Nano.",
+        "options": [
+          {
+            "label": "Got it.",
+            "next": null
+          }
+        ]
+      },
+      "alien_info": {
+        "text": "Chithari beetles for beginners. Voidjelly float and shock. Sporeclaws are fast and poisonous. Gravlurk and Neuroworm are dangerous bosses deep in the wastes.",
+        "options": [
+          {
+            "label": "I'll be careful.",
+            "next": null
+          }
+        ]
+      }
+    }
+  },
+  "zik_trader": {
+    "name": "Zik the Trader",
+    "position": {
+      "x": -5,
+      "z": -5
+    },
+    "bodyColor": 5917226,
+    "headColor": 8956518,
+    "desc": "General goods trader.",
+    "shop": {
+      "name": "Zik's General Store",
+      "specialty": "general",
+      "items": [
+        {
+          "itemId": "lichen_wrap",
+          "price": 20,
+          "stock": 50
+        },
+        {
+          "itemId": "nebula_smoothie",
+          "price": 60,
+          "stock": 30
+        },
+        {
+          "itemId": "alien_burger",
+          "price": 150,
+          "stock": 20
+        },
+        {
+          "itemId": "scrap_nanoblade",
+          "price": 80,
+          "stock": 5
+        },
+        {
+          "itemId": "scrap_coilgun",
+          "price": 80,
+          "stock": 5
+        },
+        {
+          "itemId": "scrap_voidstaff",
+          "price": 80,
+          "stock": 5
+        },
+        {
+          "itemId": "scrap_helmet",
+          "price": 50,
+          "stock": 5
+        },
+        {
+          "itemId": "scrap_vest",
+          "price": 80,
+          "stock": 5
+        },
+        {
+          "itemId": "scrap_legs",
+          "price": 65,
+          "stock": 5
+        },
+        {
+          "itemId": "scrap_boots",
+          "price": 35,
+          "stock": 5
+        },
+        {
+          "itemId": "scrap_gloves",
+          "price": 35,
+          "stock": 5
+        },
+        {
+          "itemId": "ferrite_nanoblade",
+          "price": 350,
+          "stock": 3
+        },
+        {
+          "itemId": "ferrite_coilgun",
+          "price": 350,
+          "stock": 3
+        },
+        {
+          "itemId": "ferrite_voidstaff",
+          "price": 350,
+          "stock": 3
+        },
+        {
+          "itemId": "ferrite_helmet",
+          "price": 200,
+          "stock": 3
+        },
+        {
+          "itemId": "ferrite_vest",
+          "price": 300,
+          "stock": 3
+        },
+        {
+          "itemId": "ferrite_legs",
+          "price": 250,
+          "stock": 3
+        },
+        {
+          "itemId": "scrap_energy_shield",
+          "price": 65,
+          "stock": 3
+        },
+        {
+          "itemId": "scrap_capacitor",
+          "price": 65,
+          "stock": 3
+        },
+        {
+          "itemId": "scrap_dark_orb",
+          "price": 65,
+          "stock": 3
+        },
+        {
+          "itemId": "ferrite_energy_shield",
+          "price": 250,
+          "stock": 2
+        },
+        {
+          "itemId": "ferrite_capacitor",
+          "price": 250,
+          "stock": 2
+        },
+        {
+          "itemId": "ferrite_dark_orb",
+          "price": 250,
+          "stock": 2
+        }
+      ]
+    },
+    "dialogue": {
+      "greeting": {
+        "text": "Welcome, friend! Want to browse my wares?",
+        "options": [
+          {
+            "label": "Let me see your stock.",
+            "action": "openShop"
+          },
+          {
+            "label": "No thanks.",
+            "next": null
+          }
+        ]
+      }
+    }
+  },
+  "dr_luma": {
+    "name": "Dr. Luma",
+    "position": {
+      "x": 5,
+      "z": -5
+    },
+    "bodyColor": 2775626,
+    "headColor": 11834746,
+    "desc": "Bioforge specialist.",
+    "shop": {
+      "name": "Dr. Luma's Bio Supplies",
+      "specialty": "bio",
+      "items": [
+        {
+          "itemId": "space_lichen",
+          "price": 8,
+          "stock": 100
+        },
+        {
+          "itemId": "nebula_fruit",
+          "price": 25,
+          "stock": 50
+        },
+        {
+          "itemId": "alien_steak",
+          "price": 60,
+          "stock": 30
+        },
+        {
+          "itemId": "chitin_shard",
+          "price": 15,
+          "stock": 30
+        },
+        {
+          "itemId": "jelly_membrane",
+          "price": 50,
+          "stock": 20
+        },
+        {
+          "itemId": "spore_gland",
+          "price": 120,
+          "stock": 10
+        },
+        {
+          "itemId": "bio_scanner",
+          "price": 40,
+          "stock": 3
+        },
+        {
+          "itemId": "xeno_stove",
+          "price": 40,
+          "stock": 3
+        }
+      ]
+    },
+    "dialogue": {
+      "greeting": {
+        "text": "I specialize in bioforge materials and xenocooking supplies. Interested?",
+        "options": [
+          {
+            "label": "Show me what you have.",
+            "action": "openShop"
+          },
+          {
+            "label": "Tell me about Bioforge.",
+            "next": "bioforge_info"
+          },
+          {
+            "label": "Tell me about Xenocooking.",
+            "next": "cook_info"
+          },
+          {
+            "label": "Not right now.",
+            "next": null
+          }
+        ]
+      },
+      "bioforge_info": {
+        "text": "Bioforge crafts organic items from creature parts. The Bio-Lab is just southwest of here in the hub.",
+        "options": [
+          {
+            "label": "Thanks!",
+            "next": null
+          }
+        ]
+      },
+      "cook_info": {
+        "text": "Xenocooking transforms alien ingredients into healing food. Use the cooking stations in the Bio-Lab corner of the hub.",
+        "options": [
+          {
+            "label": "I'll try it.",
+            "next": null
+          }
+        ]
+      }
+    }
+  },
+  "ori_miner": {
+    "name": "Ori the Miner",
+    "position": {
+      "x": -5,
+      "z": 5
+    },
+    "bodyColor": 5913114,
+    "headColor": 13931882,
+    "desc": "Veteran miner.",
+    "shop": {
+      "name": "Ori's Mining Supplies",
+      "specialty": "mining",
+      "items": [
+        {
+          "itemId": "mining_laser",
+          "price": 40,
+          "stock": 5
+        },
+        {
+          "itemId": "circuit_welder",
+          "price": 40,
+          "stock": 5
+        },
+        {
+          "itemId": "ferrite_mining_laser",
+          "price": 150,
+          "stock": 2
+        },
+        {
+          "itemId": "ferrite_bio_scanner",
+          "price": 150,
+          "stock": 2
+        },
+        {
+          "itemId": "stellarite_ore",
+          "price": 20,
+          "stock": 50
+        },
+        {
+          "itemId": "ferrite_ore",
+          "price": 50,
+          "stock": 30
+        },
+        {
+          "itemId": "cobaltium_ore",
+          "price": 100,
+          "stock": 20
+        },
+        {
+          "itemId": "stellarite_bar",
+          "price": 45,
+          "stock": 20
+        },
+        {
+          "itemId": "ferrite_bar",
+          "price": 100,
+          "stock": 15
+        }
+      ]
+    },
+    "dialogue": {
+      "greeting": {
+        "text": "Another greenhorn? I sell mining tools. Asteroid Mines are far east through the corridor!",
+        "options": [
+          {
+            "label": "Let me see your tools.",
+            "action": "openShop"
+          },
+          {
+            "label": "Tell me about mining.",
+            "next": "mining_info"
+          },
+          {
+            "label": "Maybe later.",
+            "next": null
+          }
+        ]
+      },
+      "mining_info": {
+        "text": "Find ore nodes, click them. Higher nodes need higher Astromining. Smelt ore into bars at the Bio-Lab in the hub with Circuitry, then craft gear!",
+        "options": [
+          {
+            "label": "Got it!",
+            "next": null
+          }
+        ]
+      }
+    }
+  },
+  "kael_armorer": {
+    "name": "Kael the Armorer",
+    "position": {
+      "x": 5,
+      "z": 5
+    },
+    "bodyColor": 4860506,
+    "headColor": 12884586,
+    "desc": "Master armorer specializing in cobalt and duranium gear.",
+    "shop": {
+      "name": "Kael's Armory",
+      "specialty": "equipment",
+      "items": [
+        {
+          "itemId": "cobalt_nanoblade",
+          "price": 600,
+          "stock": 2
+        },
+        {
+          "itemId": "cobalt_coilgun",
+          "price": 600,
+          "stock": 2
+        },
+        {
+          "itemId": "cobalt_voidstaff",
+          "price": 600,
+          "stock": 2
+        },
+        {
+          "itemId": "cobalt_helmet",
+          "price": 350,
+          "stock": 3
+        },
+        {
+          "itemId": "cobalt_vest",
+          "price": 500,
+          "stock": 2
+        },
+        {
+          "itemId": "cobalt_legs",
+          "price": 450,
+          "stock": 3
+        },
+        {
+          "itemId": "cobalt_boots",
+          "price": 250,
+          "stock": 3
+        },
+        {
+          "itemId": "cobalt_gloves",
+          "price": 250,
+          "stock": 3
+        },
+        {
+          "itemId": "duranium_helmet",
+          "price": 600,
+          "stock": 2
+        },
+        {
+          "itemId": "duranium_vest",
+          "price": 900,
+          "stock": 2
+        },
+        {
+          "itemId": "cobalt_energy_shield",
+          "price": 480,
+          "stock": 2
+        },
+        {
+          "itemId": "cobalt_capacitor",
+          "price": 480,
+          "stock": 2
+        },
+        {
+          "itemId": "cobalt_dark_orb",
+          "price": 480,
+          "stock": 2
+        }
+      ]
+    },
+    "dialogue": {
+      "greeting": {
+        "text": "Looking for the best gear credits can buy? I forge cobalt and duranium-grade equipment. Expensive, but worth every credit.",
+        "options": [
+          {
+            "label": "Show me your armory.",
+            "action": "openShop"
+          },
+          {
+            "label": "How do you make composite gear?",
+            "next": "craft_info"
+          },
+          {
+            "label": "Not right now.",
+            "next": null
+          }
+        ]
+      },
+      "craft_info": {
+        "text": "Cobalt gear requires Cobaltium Bars. Mine Cobaltium Ore in the deep mines, smelt it with level 20 Circuitry, then forge equipment. Or just buy from me if you have the credits.",
+        "options": [
+          {
+            "label": "Interesting!",
+            "next": null
+          }
+        ]
+      }
+    }
+  },
+  "slayer_grax": {
+    "name": "Slayer Master Grax",
+    "position": {
+      "x": -5,
+      "z": -25
+    },
+    "bodyColor": 5909034,
+    "headColor": 11567200,
+    "desc": "Assigns dangerous hunting tasks with escalating rewards.",
+    "dialogue": {
+      "greeting": {
+        "text": "__SLAYER_DYNAMIC__",
+        "options": []
+      }
+    }
+  },
+  "dr_elara_voss": {
+    "name": "Dr. Elara Voss",
+    "position": {
+      "x": -8,
+      "z": 20
+    },
+    "bodyColor": 4860522,
+    "headColor": 12884602,
+    "desc": "Neural engineering researcher studying latent neural energy from deep-space organisms.",
+    "dialogue": {
+      "greeting": {
+        "text": "__PSIONICS_DYNAMIC__",
+        "options": []
+      },
+      "about_psionics": {
+        "text": "Neural Engineering harnesses the bio-electric patterns found in deep-space organisms. The tissue from Neuroworms can be refined into powerful fibers and conduits for crafting advanced gear.",
+        "options": [
+          {
+            "label": "Fascinating.",
+            "next": null
+          }
+        ]
+      }
+    }
+  },
+  "the_archivist": {
+    "name": "The Archivist",
+    "position": {
+      "x": 8,
+      "z": 20
+    },
+    "bodyColor": 2759226,
+    "headColor": 12888186,
+    "desc": "An ancient figure who can reset your skills for permanent power.",
+    "dialogue": {
+      "greeting": {
+        "text": "__PRESTIGE_DYNAMIC__",
+        "options": []
+      }
+    }
+  },
+  "warden_krios": {
+    "name": "Warden Krios",
+    "position": {
+      "x": -60,
+      "z": -350
+    },
+    "bodyColor": 3811866,
+    "headColor": 11833456,
+    "desc": "Military warden stationed at the Corrupted Wastes perimeter. Commands the anti-corruption task force.",
+    "dialogue": {
+      "greeting": {
+        "text": "__KRIOS_DYNAMIC__",
+        "options": []
+      },
+      "about_corruption": {
+        "text": "The corruption spreads from deep within the wastes. Crystal formations twist living matter into abominations. We must find the source and destroy it before it reaches the station.",
+        "options": [
+          {
+            "label": "I'll help.",
+            "next": null
+          }
+        ]
+      },
+      "about_mira": {
+        "text": "Signal Officer Mira is stationed in The Abyss monitoring deep-space transmissions. She detected anomalous signals that correlate with the corruption. Complete my assignments first, then seek her out.",
+        "options": [
+          {
+            "label": "Understood.",
+            "next": null
+          }
+        ]
+      }
+    }
+  },
+  "signal_officer_mira": {
+    "name": "Signal Officer Mira",
+    "position": {
+      "x": 30,
+      "z": -1100
+    },
+    "bodyColor": 1718874,
+    "headColor": 12883322,
+    "desc": "Communications specialist stationed in The Abyss. Monitors deep-space signal anomalies.",
+    "dialogue": {
+      "greeting": {
+        "text": "__MIRA_DYNAMIC__",
+        "options": []
+      },
+      "about_signals": {
+        "text": "The signals emanate from something ancient buried in the abyss. Each transmission carries encoded data that defies known physics. I need specialized equipment and protection to trace them to their source.",
+        "options": [
+          {
+            "label": "Fascinating.",
+            "next": null
+          }
+        ]
+      },
+      "about_krios": {
+        "text": "Warden Krios is a good man. He fights the corruption on the surface while I track its origin from down here. Together we might actually stand a chance against whatever is causing this.",
+        "options": [
+          {
+            "label": "I see.",
+            "next": null
+          }
+        ]
+      }
+    }
+  }
+}

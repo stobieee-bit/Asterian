@@ -1,0 +1,5723 @@
+{
+  "chithari": {
+    "name": "Chithari",
+    "level": 3,
+    "hp": 60,
+    "maxHp": 60,
+    "damage": 4,
+    "defense": 2,
+    "attackSpeed": 3.2,
+    "aggroRange": 6,
+    "leashRange": 18,
+    "combatStyle": "nano",
+    "respawnTime": 30,
+    "area": "alien-wastes",
+    "desc": "Armored beetle swarm.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 5,
+        "max": 15
+      }
+    ],
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 3824170,
+      "scale": 0.7,
+      "variant": "drone"
+    }
+  },
+  "chithari_warrior": {
+    "name": "Chithari Warrior",
+    "level": 8,
+    "hp": 120,
+    "maxHp": 120,
+    "damage": 8,
+    "defense": 5,
+    "attackSpeed": 3,
+    "aggroRange": 7,
+    "leashRange": 20,
+    "combatStyle": "nano",
+    "respawnTime": 35,
+    "area": "alien-wastes",
+    "desc": "Larger Chithari with reinforced chitin.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.8,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 15,
+        "max": 40
+      }
+    ],
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 2771482,
+      "scale": 0.9,
+      "variant": "sentinel"
+    }
+  },
+  "voidjelly": {
+    "name": "Voidjelly",
+    "level": 15,
+    "hp": 200,
+    "maxHp": 200,
+    "damage": 14,
+    "defense": 4,
+    "attackSpeed": 3.5,
+    "aggroRange": 8,
+    "leashRange": 22,
+    "combatStyle": "tesla",
+    "respawnTime": 40,
+    "area": "alien-wastes",
+    "desc": "Floating jellyfish that shocks.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.5,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 30,
+        "max": 80
+      },
+      {
+        "itemId": "ferrite_coilgun",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "ferrite_voidstaff",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "ferrite_capacitor",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "jellyfish",
+    "meshParams": {
+      "color": 6697898,
+      "scale": 0.9,
+      "tentacles": 8
+    }
+  },
+  "sporeclaw": {
+    "name": "Sporeclaw",
+    "level": 30,
+    "hp": 400,
+    "maxHp": 400,
+    "damage": 25,
+    "defense": 10,
+    "attackSpeed": 2.5,
+    "aggroRange": 9,
+    "leashRange": 25,
+    "combatStyle": "void",
+    "respawnTime": 45,
+    "area": "alien-wastes",
+    "desc": "Mantis-scorpion with toxic fungal growths.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.4,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 60,
+        "max": 160
+      },
+      {
+        "itemId": "cobalt_boots",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_dark_orb",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "pet_spore_pup",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "scorpion",
+    "meshParams": {
+      "color": 4872762,
+      "scale": 1,
+      "stingerSize": 1.3
+    }
+  },
+  "gravlurk": {
+    "name": "Gravlurk",
+    "level": 50,
+    "hp": 1200,
+    "maxHp": 1200,
+    "damage": 40,
+    "defense": 20,
+    "attackSpeed": 4,
+    "aggroRange": 12,
+    "leashRange": 18,
+    "combatStyle": "void",
+    "respawnTime": 120,
+    "area": "alien-wastes",
+    "desc": "Giant slug with gravity field.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 200,
+        "max": 600
+      },
+      {
+        "itemId": "titanex_vest",
+        "chance": 0.05,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_nanoblade",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_dark_orb",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidtouched_mining_laser",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "slug",
+    "isBoss": true,
+    "meshParams": {
+      "color": 4864602,
+      "scale": 1.3,
+      "debris": 8
+    }
+  },
+  "neuroworm": {
+    "name": "Neuroworm",
+    "level": 60,
+    "hp": 1500,
+    "maxHp": 1500,
+    "damage": 50,
+    "defense": 15,
+    "attackSpeed": 3,
+    "aggroRange": 12,
+    "leashRange": 20,
+    "combatStyle": "tesla",
+    "respawnTime": 120,
+    "area": "alien-wastes",
+    "desc": "Psionic segmented worm.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 1,
+        "min": 2,
+        "max": 4
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 300,
+        "max": 900
+      },
+      {
+        "itemId": "plasmite_helmet",
+        "chance": 0.05,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "plasmite_coilgun",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "plasmite_capacitor",
+        "chance": 0.03,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "plasmite_gloves",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidtouched_bio_scanner",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "worm",
+    "isBoss": true,
+    "meshParams": {
+      "color": 5913210,
+      "scale": 1.2,
+      "segments": 10
+    }
+  },
+  "beetle_drone": {
+    "name": "Beetle Drone",
+    "level": 1,
+    "hp": 25,
+    "maxHp": 25,
+    "damage": 3,
+    "defense": 0,
+    "attackSpeed": 3.49,
+    "aggroRange": 5.05,
+    "leashRange": 15.05,
+    "combatStyle": "nano",
+    "respawnTime": 20,
+    "area": "alien-wastes",
+    "desc": "Tiny scuttling automaton beetle.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 3,
+        "max": 10
+      },
+      {
+        "itemId": "scrap_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "scrap_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 5915936,
+      "scale": 0.65,
+      "variant": "drone"
+    }
+  },
+  "dust_mite": {
+    "name": "Dust Mite",
+    "level": 1,
+    "hp": 25,
+    "maxHp": 25,
+    "damage": 3,
+    "defense": 0,
+    "attackSpeed": 3.49,
+    "aggroRange": 5.05,
+    "leashRange": 15.05,
+    "combatStyle": "tesla",
+    "respawnTime": 20,
+    "area": "alien-wastes",
+    "desc": "Near-invisible parasitic mite.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 3,
+        "max": 10
+      },
+      {
+        "itemId": "scrap_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "scrap_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "swarm_bug",
+    "meshParams": {
+      "color": 10127968,
+      "scale": 0.6
+    }
+  },
+  "sand_crawler": {
+    "name": "Sand Crawler",
+    "level": 2,
+    "hp": 30,
+    "maxHp": 30,
+    "damage": 4,
+    "defense": 1,
+    "attackSpeed": 3.48,
+    "aggroRange": 5.1,
+    "leashRange": 15.1,
+    "combatStyle": "void",
+    "respawnTime": 21,
+    "area": "alien-wastes",
+    "desc": "Low-slung crawler with grinding mandibles.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 6,
+        "max": 16
+      },
+      {
+        "itemId": "scrap_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "scrap_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 8022592,
+      "scale": 0.7,
+      "variant": "crawler"
+    }
+  },
+  "spitting_ant": {
+    "name": "Spitting Ant",
+    "level": 4,
+    "hp": 42,
+    "maxHp": 42,
+    "damage": 5,
+    "defense": 2,
+    "attackSpeed": 3.46,
+    "aggroRange": 5.2,
+    "leashRange": 15.2,
+    "combatStyle": "tesla",
+    "respawnTime": 21,
+    "area": "alien-wastes",
+    "desc": "Acid-spitting colonial insect.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 12,
+        "max": 32
+      },
+      {
+        "itemId": "scrap_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "scrap_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 4868656,
+      "scale": 0.7,
+      "variant": "drone"
+    }
+  },
+  "glow_fly": {
+    "name": "Glow Fly",
+    "level": 4,
+    "hp": 42,
+    "maxHp": 42,
+    "damage": 5,
+    "defense": 2,
+    "attackSpeed": 3.46,
+    "aggroRange": 5.2,
+    "leashRange": 15.2,
+    "combatStyle": "void",
+    "respawnTime": 21,
+    "area": "alien-wastes",
+    "desc": "Bioluminescent flying pest.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 12,
+        "max": 32
+      },
+      {
+        "itemId": "scrap_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "scrap_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "swarm_bug",
+    "meshParams": {
+      "color": 5622869,
+      "scale": 0.6
+    }
+  },
+  "carapace_grub": {
+    "name": "Carapace Grub",
+    "level": 5,
+    "hp": 49,
+    "maxHp": 49,
+    "damage": 6,
+    "defense": 2,
+    "attackSpeed": 3.45,
+    "aggroRange": 5.25,
+    "leashRange": 15.25,
+    "combatStyle": "nano",
+    "respawnTime": 22,
+    "area": "alien-wastes",
+    "desc": "Armored larva burrowing through soil.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 15,
+        "max": 40
+      },
+      {
+        "itemId": "scrap_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "scrap_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 9075280,
+      "scale": 0.75,
+      "variant": "crawler"
+    }
+  },
+  "barbed_tick": {
+    "name": "Barbed Tick",
+    "level": 5,
+    "hp": 49,
+    "maxHp": 49,
+    "damage": 6,
+    "defense": 2,
+    "attackSpeed": 3.45,
+    "aggroRange": 5.25,
+    "leashRange": 15.25,
+    "combatStyle": "tesla",
+    "respawnTime": 22,
+    "area": "alien-wastes",
+    "desc": "Blood-sucking tick with barbed legs.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 15,
+        "max": 40
+      },
+      {
+        "itemId": "scrap_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "scrap_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "arachnid",
+    "meshParams": {
+      "color": 5915952,
+      "scale": 0.65
+    }
+  },
+  "hive_drone": {
+    "name": "Hive Drone",
+    "level": 6,
+    "hp": 57,
+    "maxHp": 57,
+    "damage": 7,
+    "defense": 3,
+    "attackSpeed": 3.44,
+    "aggroRange": 5.3,
+    "leashRange": 15.3,
+    "combatStyle": "nano",
+    "respawnTime": 22,
+    "area": "alien-wastes",
+    "desc": "Mindless worker serving the hive.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 18,
+        "max": 48
+      },
+      {
+        "itemId": "scrap_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "scrap_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "swarm_bug",
+    "meshParams": {
+      "color": 8022576,
+      "scale": 0.7
+    }
+  },
+  "plague_fly": {
+    "name": "Plague Fly",
+    "level": 7,
+    "hp": 65,
+    "maxHp": 65,
+    "damage": 8,
+    "defense": 4,
+    "attackSpeed": 3.43,
+    "aggroRange": 5.35,
+    "leashRange": 15.35,
+    "combatStyle": "tesla",
+    "respawnTime": 22,
+    "area": "alien-wastes",
+    "desc": "Disease-carrying buzzing menace.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 21,
+        "max": 56
+      },
+      {
+        "itemId": "scrap_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "scrap_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "swarm_bug",
+    "meshParams": {
+      "color": 6978112,
+      "scale": 0.7
+    }
+  },
+  "tunnel_spider": {
+    "name": "Tunnel Spider",
+    "level": 7,
+    "hp": 65,
+    "maxHp": 65,
+    "damage": 8,
+    "defense": 4,
+    "attackSpeed": 3.43,
+    "aggroRange": 5.35,
+    "leashRange": 15.35,
+    "combatStyle": "void",
+    "respawnTime": 22,
+    "area": "alien-wastes",
+    "desc": "Ambush predator lurking in burrows.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 21,
+        "max": 56
+      },
+      {
+        "itemId": "scrap_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "scrap_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "arachnid",
+    "meshParams": {
+      "color": 4864544,
+      "scale": 0.75
+    }
+  },
+  "razor_ant": {
+    "name": "Razor Ant",
+    "level": 9,
+    "hp": 82,
+    "maxHp": 82,
+    "damage": 10,
+    "defense": 5,
+    "attackSpeed": 3.41,
+    "aggroRange": 5.45,
+    "leashRange": 15.45,
+    "combatStyle": "nano",
+    "respawnTime": 23,
+    "area": "alien-wastes",
+    "desc": "Soldier ant with blade-like mandibles.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 27,
+        "max": 72
+      },
+      {
+        "itemId": "scrap_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "scrap_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 3815968,
+      "scale": 0.8,
+      "variant": "drone"
+    }
+  },
+  "hive_queen": {
+    "name": "Hive Queen",
+    "level": 10,
+    "hp": 228,
+    "maxHp": 228,
+    "damage": 17,
+    "defense": 8,
+    "attackSpeed": 3.4,
+    "aggroRange": 14,
+    "leashRange": 25,
+    "combatStyle": "nano",
+    "respawnTime": 130,
+    "area": "alien-wastes",
+    "desc": "Bloated queen commanding the swarm.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 30,
+        "max": 80
+      },
+      {
+        "itemId": "ferrite_nanoblade",
+        "chance": 0.08,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "ferrite_energy_shield",
+        "chance": 0.06,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "ferrite_helmet",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "ferrite_vest",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "ferrite_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "insectoid",
+    "isBoss": true,
+    "meshParams": {
+      "color": 10123824,
+      "scale": 1.4,
+      "variant": "queen"
+    }
+  },
+  "spark_beetle": {
+    "name": "Spark Beetle",
+    "level": 10,
+    "hp": 91,
+    "maxHp": 91,
+    "damage": 11,
+    "defense": 6,
+    "attackSpeed": 3.4,
+    "aggroRange": 5.5,
+    "leashRange": 15.5,
+    "combatStyle": "tesla",
+    "respawnTime": 23,
+    "area": "alien-wastes",
+    "desc": "Beetle generating electrical discharges.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 30,
+        "max": 80
+      },
+      {
+        "itemId": "ferrite_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "ferrite_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 4876938,
+      "scale": 0.8,
+      "variant": "drone"
+    }
+  },
+  "chitin_sentinel": {
+    "name": "Chitin Sentinel",
+    "level": 11,
+    "hp": 101,
+    "maxHp": 101,
+    "damage": 12,
+    "defense": 6,
+    "attackSpeed": 3.39,
+    "aggroRange": 5.55,
+    "leashRange": 15.55,
+    "combatStyle": "nano",
+    "respawnTime": 23,
+    "area": "alien-wastes",
+    "desc": "Guard insect with reinforced plates.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 33,
+        "max": 88
+      },
+      {
+        "itemId": "ferrite_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "ferrite_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 6974016,
+      "scale": 0.9,
+      "variant": "sentinel"
+    }
+  },
+  "burrowing_horror": {
+    "name": "Burrowing Horror",
+    "level": 12,
+    "hp": 111,
+    "maxHp": 111,
+    "damage": 12,
+    "defense": 7,
+    "attackSpeed": 3.38,
+    "aggroRange": 5.6,
+    "leashRange": 15.6,
+    "combatStyle": "void",
+    "respawnTime": 24,
+    "area": "alien-wastes",
+    "desc": "Subterranean insect erupting from soil.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 36,
+        "max": 96
+      },
+      {
+        "itemId": "ferrite_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "ferrite_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 3810592,
+      "scale": 0.85,
+      "variant": "crawler"
+    }
+  },
+  "web_matriarch": {
+    "name": "Web Matriarch",
+    "level": 14,
+    "hp": 132,
+    "maxHp": 132,
+    "damage": 14,
+    "defense": 8,
+    "attackSpeed": 3.36,
+    "aggroRange": 5.7,
+    "leashRange": 15.7,
+    "combatStyle": "void",
+    "respawnTime": 24,
+    "area": "alien-wastes",
+    "desc": "Massive spider commanding web territory.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 42,
+        "max": 112
+      },
+      {
+        "itemId": "ferrite_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "ferrite_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "arachnid",
+    "meshParams": {
+      "color": 6965866,
+      "scale": 0.9
+    }
+  },
+  "stingwing_matriarch": {
+    "name": "Stingwing Matriarch",
+    "level": 20,
+    "hp": 510,
+    "maxHp": 510,
+    "damage": 30,
+    "defense": 17,
+    "attackSpeed": 3.3,
+    "aggroRange": 14,
+    "leashRange": 25,
+    "combatStyle": "tesla",
+    "respawnTime": 140,
+    "area": "alien-wastes",
+    "desc": "Giant wasp queen ruling the skies.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 60,
+        "max": 160
+      },
+      {
+        "itemId": "cobalt_coilgun",
+        "chance": 0.08,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_capacitor",
+        "chance": 0.06,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_helmet",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_vest",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "swarm_bug",
+    "isBoss": true,
+    "meshParams": {
+      "color": 12294704,
+      "scale": 1.3
+    }
+  },
+  "death_weaver": {
+    "name": "Death Weaver",
+    "level": 20,
+    "hp": 204,
+    "maxHp": 204,
+    "damage": 20,
+    "defense": 13,
+    "attackSpeed": 3.3,
+    "aggroRange": 6,
+    "leashRange": 16,
+    "combatStyle": "void",
+    "respawnTime": 26,
+    "area": "alien-wastes",
+    "desc": "Master weaver of lethal trap webs.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 60,
+        "max": 160
+      },
+      {
+        "itemId": "cobalt_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "arachnid",
+    "meshParams": {
+      "color": 2763338,
+      "scale": 0.95
+    }
+  },
+  "drift_jelly": {
+    "name": "Drift Jelly",
+    "level": 21,
+    "hp": 217,
+    "maxHp": 217,
+    "damage": 21,
+    "defense": 14,
+    "attackSpeed": 3.29,
+    "aggroRange": 6.05,
+    "leashRange": 16.05,
+    "combatStyle": "tesla",
+    "respawnTime": 26,
+    "area": "alien-wastes",
+    "desc": "Small jellyfish drifting on air currents.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 63,
+        "max": 168
+      },
+      {
+        "itemId": "cobalt_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "jellyfish",
+    "meshParams": {
+      "color": 5614284,
+      "scale": 0.8,
+      "tentacles": 6
+    }
+  },
+  "blade_mantis": {
+    "name": "Blade Mantis",
+    "level": 21,
+    "hp": 217,
+    "maxHp": 217,
+    "damage": 21,
+    "defense": 14,
+    "attackSpeed": 3.29,
+    "aggroRange": 6.05,
+    "leashRange": 16.05,
+    "combatStyle": "nano",
+    "respawnTime": 26,
+    "area": "alien-wastes",
+    "desc": "Mantis with scythe-like forearms.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 63,
+        "max": 168
+      },
+      {
+        "itemId": "cobalt_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "mantis",
+    "meshParams": {
+      "color": 4880970,
+      "scale": 0.85
+    }
+  },
+  "rock_scorpion": {
+    "name": "Rock Scorpion",
+    "level": 22,
+    "hp": 231,
+    "maxHp": 231,
+    "damage": 22,
+    "defense": 14,
+    "attackSpeed": 3.28,
+    "aggroRange": 6.1,
+    "leashRange": 16.1,
+    "combatStyle": "void",
+    "respawnTime": 27,
+    "area": "alien-wastes",
+    "desc": "Camouflaged scorpion in rocky terrain.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 66,
+        "max": 176
+      },
+      {
+        "itemId": "cobalt_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "scorpion",
+    "meshParams": {
+      "color": 6969920,
+      "scale": 0.85,
+      "stingerSize": 1
+    }
+  },
+  "tidal_jelly": {
+    "name": "Tidal Jelly",
+    "level": 24,
+    "hp": 259,
+    "maxHp": 259,
+    "damage": 24,
+    "defense": 16,
+    "attackSpeed": 3.26,
+    "aggroRange": 6.2,
+    "leashRange": 16.2,
+    "combatStyle": "tesla",
+    "respawnTime": 27,
+    "area": "alien-wastes",
+    "desc": "Large jelly pulling in prey with tidal force.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 72,
+        "max": 192
+      },
+      {
+        "itemId": "cobalt_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "jellyfish",
+    "meshParams": {
+      "color": 3381674,
+      "scale": 0.8,
+      "tentacles": 10
+    }
+  },
+  "tidal_jelly_monarch": {
+    "name": "Tidal Jelly Monarch",
+    "level": 25,
+    "hp": 685,
+    "maxHp": 685,
+    "damage": 38,
+    "defense": 22,
+    "attackSpeed": 3.25,
+    "aggroRange": 14,
+    "leashRange": 25,
+    "combatStyle": "tesla",
+    "respawnTime": 145,
+    "area": "alien-wastes",
+    "desc": "Enormous jelly monarch ruling the tidal pools.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 75,
+        "max": 200
+      },
+      {
+        "itemId": "cobalt_coilgun",
+        "chance": 0.08,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_capacitor",
+        "chance": 0.06,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_helmet",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_vest",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "jellyfish",
+    "isBoss": true,
+    "meshParams": {
+      "color": 2271948,
+      "scale": 1.4,
+      "tentacles": 14
+    }
+  },
+  "praying_stalker": {
+    "name": "Praying Stalker",
+    "level": 25,
+    "hp": 274,
+    "maxHp": 274,
+    "damage": 25,
+    "defense": 17,
+    "attackSpeed": 3.25,
+    "aggroRange": 6.25,
+    "leashRange": 16.25,
+    "combatStyle": "nano",
+    "respawnTime": 28,
+    "area": "alien-wastes",
+    "desc": "Patient hunter striking with precision.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 75,
+        "max": 200
+      },
+      {
+        "itemId": "cobalt_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "mantis",
+    "meshParams": {
+      "color": 2775594,
+      "scale": 0.8
+    }
+  },
+  "venom_scorpion": {
+    "name": "Venom Scorpion",
+    "level": 26,
+    "hp": 289,
+    "maxHp": 289,
+    "damage": 26,
+    "defense": 17,
+    "attackSpeed": 3.24,
+    "aggroRange": 6.3,
+    "leashRange": 16.3,
+    "combatStyle": "void",
+    "respawnTime": 28,
+    "area": "alien-wastes",
+    "desc": "Scorpion with highly toxic venom.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 78,
+        "max": 208
+      },
+      {
+        "itemId": "cobalt_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "scorpion",
+    "meshParams": {
+      "color": 4876858,
+      "scale": 0.8,
+      "stingerSize": 1.2
+    }
+  },
+  "ghost_mantis": {
+    "name": "Ghost Mantis",
+    "level": 27,
+    "hp": 304,
+    "maxHp": 304,
+    "damage": 27,
+    "defense": 18,
+    "attackSpeed": 3.23,
+    "aggroRange": 6.35,
+    "leashRange": 16.35,
+    "combatStyle": "void",
+    "respawnTime": 28,
+    "area": "alien-wastes",
+    "desc": "Near-invisible mantis striking from nowhere.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 81,
+        "max": 216
+      },
+      {
+        "itemId": "cobalt_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "mantis",
+    "meshParams": {
+      "color": 8026762,
+      "scale": 0.8
+    }
+  },
+  "current_jelly": {
+    "name": "Current Jelly",
+    "level": 28,
+    "hp": 319,
+    "maxHp": 319,
+    "damage": 28,
+    "defense": 19,
+    "attackSpeed": 3.2199999999999998,
+    "aggroRange": 6.4,
+    "leashRange": 16.4,
+    "combatStyle": "tesla",
+    "respawnTime": 28,
+    "area": "alien-wastes",
+    "desc": "Jelly channeling electrical currents.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 84,
+        "max": 224
+      },
+      {
+        "itemId": "cobalt_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "jellyfish",
+    "meshParams": {
+      "color": 3372987,
+      "scale": 0.9,
+      "tentacles": 12
+    }
+  },
+  "emperor_scorpion": {
+    "name": "Emperor Scorpion",
+    "level": 29,
+    "hp": 335,
+    "maxHp": 335,
+    "damage": 29,
+    "defense": 20,
+    "attackSpeed": 3.21,
+    "aggroRange": 6.45,
+    "leashRange": 16.45,
+    "combatStyle": "void",
+    "respawnTime": 29,
+    "area": "alien-wastes",
+    "desc": "Massive scorpion with crushing pincers.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 87,
+        "max": 232
+      },
+      {
+        "itemId": "cobalt_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "cobalt_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "scorpion",
+    "meshParams": {
+      "color": 2763322,
+      "scale": 0.95,
+      "stingerSize": 1.3
+    }
+  },
+  "war_mantis": {
+    "name": "War Mantis",
+    "level": 31,
+    "hp": 368,
+    "maxHp": 368,
+    "damage": 31,
+    "defense": 22,
+    "attackSpeed": 3.19,
+    "aggroRange": 6.55,
+    "leashRange": 16.55,
+    "combatStyle": "nano",
+    "respawnTime": 29,
+    "area": "alien-wastes",
+    "desc": "Battle-hardened mantis covered in scars.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 93,
+        "max": 248
+      },
+      {
+        "itemId": "duranium_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "duranium_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "mantis",
+    "meshParams": {
+      "color": 6957610,
+      "scale": 0.95
+    }
+  },
+  "void_jelly": {
+    "name": "Void Jelly",
+    "level": 32,
+    "hp": 385,
+    "maxHp": 385,
+    "damage": 32,
+    "defense": 22,
+    "attackSpeed": 3.18,
+    "aggroRange": 6.6,
+    "leashRange": 16.6,
+    "combatStyle": "tesla",
+    "respawnTime": 30,
+    "area": "alien-wastes",
+    "desc": "Dark jelly phasing through dimensions.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 96,
+        "max": 256
+      },
+      {
+        "itemId": "duranium_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "duranium_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "jellyfish",
+    "meshParams": {
+      "color": 4465322,
+      "scale": 1,
+      "tentacles": 12
+    }
+  },
+  "deep_jelly": {
+    "name": "Deep Jelly",
+    "level": 35,
+    "hp": 437,
+    "maxHp": 437,
+    "damage": 35,
+    "defense": 25,
+    "attackSpeed": 3.15,
+    "aggroRange": 6.75,
+    "leashRange": 16.75,
+    "combatStyle": "tesla",
+    "respawnTime": 31,
+    "area": "alien-wastes",
+    "desc": "Deep-dwelling jelly adapted to crushing pressure.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 105,
+        "max": 280
+      },
+      {
+        "itemId": "duranium_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "duranium_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "jellyfish",
+    "meshParams": {
+      "color": 2241416,
+      "scale": 1.05,
+      "tentacles": 14
+    }
+  },
+  "plague_scorpion": {
+    "name": "Plague Scorpion",
+    "level": 36,
+    "hp": 455,
+    "maxHp": 455,
+    "damage": 36,
+    "defense": 26,
+    "attackSpeed": 3.14,
+    "aggroRange": 6.8,
+    "leashRange": 16.8,
+    "combatStyle": "void",
+    "respawnTime": 31,
+    "area": "alien-wastes",
+    "desc": "Disease-carrying scorpion spreading blight.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 108,
+        "max": 288
+      },
+      {
+        "itemId": "duranium_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "duranium_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "scorpion",
+    "meshParams": {
+      "color": 5917226,
+      "scale": 1,
+      "stingerSize": 1.3
+    }
+  },
+  "lightning_jelly": {
+    "name": "Lightning Jelly",
+    "level": 38,
+    "hp": 492,
+    "maxHp": 492,
+    "damage": 38,
+    "defense": 28,
+    "attackSpeed": 3.12,
+    "aggroRange": 6.9,
+    "leashRange": 16.9,
+    "combatStyle": "tesla",
+    "respawnTime": 31,
+    "area": "alien-wastes",
+    "desc": "Crackling jelly conducting pure lightning.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 114,
+        "max": 304
+      },
+      {
+        "itemId": "duranium_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "duranium_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "jellyfish",
+    "meshParams": {
+      "color": 16768324,
+      "scale": 1,
+      "tentacles": 12
+    }
+  },
+  "titan_scorpion": {
+    "name": "Titan Scorpion",
+    "level": 39,
+    "hp": 511,
+    "maxHp": 511,
+    "damage": 39,
+    "defense": 28,
+    "attackSpeed": 3.11,
+    "aggroRange": 6.95,
+    "leashRange": 16.95,
+    "combatStyle": "void",
+    "respawnTime": 32,
+    "area": "alien-wastes",
+    "desc": "Enormous scorpion of devastating power.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 117,
+        "max": 312
+      },
+      {
+        "itemId": "duranium_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "duranium_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "scorpion",
+    "meshParams": {
+      "color": 3816010,
+      "scale": 1.15,
+      "stingerSize": 1.5
+    }
+  },
+  "acid_mantis_alpha": {
+    "name": "Acid Mantis Alpha",
+    "level": 40,
+    "hp": 1325,
+    "maxHp": 1325,
+    "damage": 60,
+    "defense": 38,
+    "attackSpeed": 3.1,
+    "aggroRange": 14,
+    "leashRange": 25,
+    "combatStyle": "nano",
+    "respawnTime": 160,
+    "area": "alien-wastes",
+    "desc": "Alpha mantis spraying concentrated acid.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 120,
+        "max": 320
+      },
+      {
+        "itemId": "titanex_nanoblade",
+        "chance": 0.08,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_energy_shield",
+        "chance": 0.06,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_helmet",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_vest",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "mantis",
+    "isBoss": true,
+    "meshParams": {
+      "color": 4893226,
+      "scale": 1.3
+    }
+  },
+  "shadow_stalker": {
+    "name": "Shadow Stalker",
+    "level": 41,
+    "hp": 549,
+    "maxHp": 549,
+    "damage": 41,
+    "defense": 30,
+    "attackSpeed": 3.09,
+    "aggroRange": 7.050000000000001,
+    "leashRange": 17.05,
+    "combatStyle": "void",
+    "respawnTime": 32,
+    "area": "alien-wastes",
+    "desc": "Quadruped lurking in shadows.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 123,
+        "max": 328
+      },
+      {
+        "itemId": "titanex_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 2763322,
+      "scale": 0.8
+    }
+  },
+  "dust_worm": {
+    "name": "Dust Worm",
+    "level": 41,
+    "hp": 549,
+    "maxHp": 549,
+    "damage": 41,
+    "defense": 30,
+    "attackSpeed": 3.09,
+    "aggroRange": 7.050000000000001,
+    "leashRange": 17.05,
+    "combatStyle": "tesla",
+    "respawnTime": 32,
+    "area": "alien-wastes",
+    "desc": "Burrowing worm erupting from dust.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 123,
+        "max": 328
+      },
+      {
+        "itemId": "titanex_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "worm",
+    "meshParams": {
+      "color": 9075280,
+      "scale": 0.8,
+      "segments": 6
+    }
+  },
+  "acid_slug": {
+    "name": "Acid Slug",
+    "level": 42,
+    "hp": 569,
+    "maxHp": 569,
+    "damage": 42,
+    "defense": 31,
+    "attackSpeed": 3.08,
+    "aggroRange": 7.1,
+    "leashRange": 17.1,
+    "combatStyle": "nano",
+    "respawnTime": 33,
+    "area": "alien-wastes",
+    "desc": "Slow slug leaving corrosive trail.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 126,
+        "max": 336
+      },
+      {
+        "itemId": "titanex_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "slug",
+    "meshParams": {
+      "color": 5933616,
+      "scale": 0.85,
+      "debris": 4
+    }
+  },
+  "tremor_worm": {
+    "name": "Tremor Worm",
+    "level": 43,
+    "hp": 589,
+    "maxHp": 589,
+    "damage": 43,
+    "defense": 32,
+    "attackSpeed": 3.07,
+    "aggroRange": 7.15,
+    "leashRange": 17.15,
+    "combatStyle": "tesla",
+    "respawnTime": 33,
+    "area": "alien-wastes",
+    "desc": "Worm causing localized earthquakes.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 129,
+        "max": 344
+      },
+      {
+        "itemId": "titanex_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "worm",
+    "meshParams": {
+      "color": 6969920,
+      "scale": 0.85,
+      "segments": 7
+    }
+  },
+  "blood_stalker": {
+    "name": "Blood Stalker",
+    "level": 44,
+    "hp": 609,
+    "maxHp": 609,
+    "damage": 44,
+    "defense": 33,
+    "attackSpeed": 3.06,
+    "aggroRange": 7.2,
+    "leashRange": 17.2,
+    "combatStyle": "void",
+    "respawnTime": 33,
+    "area": "alien-wastes",
+    "desc": "Predator drawn to the scent of blood.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 132,
+        "max": 352
+      },
+      {
+        "itemId": "titanex_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 4856346,
+      "scale": 0.9
+    }
+  },
+  "pack_howler_alpha": {
+    "name": "Pack Howler Alpha",
+    "level": 45,
+    "hp": 1575,
+    "maxHp": 1575,
+    "damage": 68,
+    "defense": 44,
+    "attackSpeed": 3.05,
+    "aggroRange": 14,
+    "leashRange": 25,
+    "combatStyle": "void",
+    "respawnTime": 165,
+    "area": "alien-wastes",
+    "desc": "Alpha predator commanding the hunting pack.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 135,
+        "max": 360
+      },
+      {
+        "itemId": "titanex_voidstaff",
+        "chance": 0.08,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_dark_orb",
+        "chance": 0.06,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_helmet",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_vest",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "stalker",
+    "isBoss": true,
+    "meshParams": {
+      "color": 5909034,
+      "scale": 1.3
+    }
+  },
+  "bore_worm": {
+    "name": "Bore Worm",
+    "level": 45,
+    "hp": 630,
+    "maxHp": 630,
+    "damage": 45,
+    "defense": 34,
+    "attackSpeed": 3.05,
+    "aggroRange": 7.25,
+    "leashRange": 17.25,
+    "combatStyle": "tesla",
+    "respawnTime": 34,
+    "area": "alien-wastes",
+    "desc": "Worm boring through solid rock.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 135,
+        "max": 360
+      },
+      {
+        "itemId": "titanex_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "worm",
+    "meshParams": {
+      "color": 5917232,
+      "scale": 0.9,
+      "segments": 8
+    }
+  },
+  "toxic_slug": {
+    "name": "Toxic Slug",
+    "level": 46,
+    "hp": 651,
+    "maxHp": 651,
+    "damage": 46,
+    "defense": 35,
+    "attackSpeed": 3.04,
+    "aggroRange": 7.300000000000001,
+    "leashRange": 17.3,
+    "combatStyle": "nano",
+    "respawnTime": 34,
+    "area": "alien-wastes",
+    "desc": "Slug oozing potent neurotoxin.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 138,
+        "max": 368
+      },
+      {
+        "itemId": "titanex_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "slug",
+    "meshParams": {
+      "color": 3836474,
+      "scale": 0.8,
+      "debris": 6
+    }
+  },
+  "shock_worm": {
+    "name": "Shock Worm",
+    "level": 47,
+    "hp": 672,
+    "maxHp": 672,
+    "damage": 47,
+    "defense": 36,
+    "attackSpeed": 3.03,
+    "aggroRange": 7.35,
+    "leashRange": 17.35,
+    "combatStyle": "tesla",
+    "respawnTime": 34,
+    "area": "alien-wastes",
+    "desc": "Worm discharging electrical shocks.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 141,
+        "max": 376
+      },
+      {
+        "itemId": "titanex_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "worm",
+    "meshParams": {
+      "color": 3824250,
+      "scale": 0.8,
+      "segments": 8
+    }
+  },
+  "fang_stalker": {
+    "name": "Fang Stalker",
+    "level": 48,
+    "hp": 693,
+    "maxHp": 693,
+    "damage": 48,
+    "defense": 36,
+    "attackSpeed": 3.02,
+    "aggroRange": 7.4,
+    "leashRange": 17.4,
+    "combatStyle": "void",
+    "respawnTime": 34,
+    "area": "alien-wastes",
+    "desc": "Predator with elongated saber fangs.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 144,
+        "max": 384
+      },
+      {
+        "itemId": "titanex_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 3815978,
+      "scale": 0.95
+    }
+  },
+  "crystal_slug": {
+    "name": "Crystal Slug",
+    "level": 49,
+    "hp": 715,
+    "maxHp": 715,
+    "damage": 49,
+    "defense": 37,
+    "attackSpeed": 3.01,
+    "aggroRange": 7.45,
+    "leashRange": 17.45,
+    "combatStyle": "nano",
+    "respawnTime": 35,
+    "area": "alien-wastes",
+    "desc": "Slug with crystalline shell fragments.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 147,
+        "max": 392
+      },
+      {
+        "itemId": "titanex_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "slug",
+    "meshParams": {
+      "color": 5929610,
+      "scale": 0.9,
+      "debris": 7
+    }
+  },
+  "thunder_worm": {
+    "name": "Thunder Worm",
+    "level": 51,
+    "hp": 759,
+    "maxHp": 759,
+    "damage": 51,
+    "defense": 39,
+    "attackSpeed": 2.99,
+    "aggroRange": 7.550000000000001,
+    "leashRange": 17.55,
+    "combatStyle": "tesla",
+    "respawnTime": 35,
+    "area": "alien-wastes",
+    "desc": "Worm generating thunderous vibrations.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 153,
+        "max": 408
+      },
+      {
+        "itemId": "plasmite_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "plasmite_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "worm",
+    "meshParams": {
+      "color": 4868746,
+      "scale": 0.9,
+      "segments": 9
+    }
+  },
+  "void_stalker": {
+    "name": "Void Stalker",
+    "level": 52,
+    "hp": 782,
+    "maxHp": 782,
+    "damage": 52,
+    "defense": 40,
+    "attackSpeed": 2.98,
+    "aggroRange": 7.6,
+    "leashRange": 17.6,
+    "combatStyle": "void",
+    "respawnTime": 36,
+    "area": "alien-wastes",
+    "desc": "Predator phasing through void tears.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 156,
+        "max": 416
+      },
+      {
+        "itemId": "plasmite_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "plasmite_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 1710666,
+      "scale": 1
+    }
+  },
+  "phantom_stalker": {
+    "name": "Phantom Stalker",
+    "level": 55,
+    "hp": 851,
+    "maxHp": 851,
+    "damage": 55,
+    "defense": 43,
+    "attackSpeed": 2.95,
+    "aggroRange": 7.75,
+    "leashRange": 17.75,
+    "combatStyle": "void",
+    "respawnTime": 37,
+    "area": "alien-wastes",
+    "desc": "Semi-transparent predator fading in and out.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 165,
+        "max": 440
+      },
+      {
+        "itemId": "plasmite_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "plasmite_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 3816026,
+      "scale": 1.05
+    }
+  },
+  "death_worm": {
+    "name": "Death Worm",
+    "level": 55,
+    "hp": 851,
+    "maxHp": 851,
+    "damage": 55,
+    "defense": 43,
+    "attackSpeed": 2.95,
+    "aggroRange": 7.75,
+    "leashRange": 17.75,
+    "combatStyle": "tesla",
+    "respawnTime": 37,
+    "area": "alien-wastes",
+    "desc": "Legendary worm of devastating power.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 165,
+        "max": 440
+      },
+      {
+        "itemId": "plasmite_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "plasmite_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "worm",
+    "meshParams": {
+      "color": 4856346,
+      "scale": 1,
+      "segments": 10
+    }
+  },
+  "omega_slug": {
+    "name": "Omega Slug",
+    "level": 56,
+    "hp": 875,
+    "maxHp": 875,
+    "damage": 56,
+    "defense": 44,
+    "attackSpeed": 2.94,
+    "aggroRange": 7.800000000000001,
+    "leashRange": 17.8,
+    "combatStyle": "nano",
+    "respawnTime": 37,
+    "area": "alien-wastes",
+    "desc": "Ultimate slug evolution, nearly indestructible.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 168,
+        "max": 448
+      },
+      {
+        "itemId": "plasmite_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "plasmite_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "slug",
+    "meshParams": {
+      "color": 2767450,
+      "scale": 1.05,
+      "debris": 9
+    }
+  },
+  "doom_stalker": {
+    "name": "Doom Stalker",
+    "level": 58,
+    "hp": 922,
+    "maxHp": 922,
+    "damage": 58,
+    "defense": 46,
+    "attackSpeed": 2.92,
+    "aggroRange": 7.9,
+    "leashRange": 17.9,
+    "combatStyle": "void",
+    "respawnTime": 37,
+    "area": "alien-wastes",
+    "desc": "Herald of destruction prowling the wastes.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 174,
+        "max": 464
+      },
+      {
+        "itemId": "plasmite_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "plasmite_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 1706538,
+      "scale": 1.1
+    }
+  },
+  "apex_stalker": {
+    "name": "Apex Stalker",
+    "level": 59,
+    "hp": 947,
+    "maxHp": 947,
+    "damage": 59,
+    "defense": 47,
+    "attackSpeed": 2.91,
+    "aggroRange": 7.95,
+    "leashRange": 17.95,
+    "combatStyle": "void",
+    "respawnTime": 38,
+    "area": "alien-wastes",
+    "desc": "Ultimate predator at the top of the food chain.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 177,
+        "max": 472
+      },
+      {
+        "itemId": "plasmite_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "plasmite_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 3807818,
+      "scale": 1.15
+    }
+  },
+  "lesser_wraith": {
+    "name": "Lesser Wraith",
+    "level": 61,
+    "hp": 996,
+    "maxHp": 996,
+    "damage": 61,
+    "defense": 49,
+    "attackSpeed": 2.89,
+    "aggroRange": 8.05,
+    "leashRange": 18.05,
+    "combatStyle": "void",
+    "respawnTime": 38,
+    "area": "alien-wastes",
+    "desc": "Faint spectral entity from beyond.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 183,
+        "max": 488
+      },
+      {
+        "itemId": "quantum_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "quantum_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "void_wraith",
+    "meshParams": {
+      "color": 5921418,
+      "scale": 0.85
+    }
+  },
+  "shadow_wisp": {
+    "name": "Shadow Wisp",
+    "level": 61,
+    "hp": 996,
+    "maxHp": 996,
+    "damage": 61,
+    "defense": 49,
+    "attackSpeed": 2.89,
+    "aggroRange": 8.05,
+    "leashRange": 18.05,
+    "combatStyle": "tesla",
+    "respawnTime": 38,
+    "area": "alien-wastes",
+    "desc": "Flickering dark energy fragment.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 183,
+        "max": 488
+      },
+      {
+        "itemId": "quantum_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "quantum_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "dark_entity",
+    "meshParams": {
+      "color": 3816026,
+      "scale": 0.8
+    }
+  },
+  "stone_golem": {
+    "name": "Stone Golem",
+    "level": 62,
+    "hp": 1021,
+    "maxHp": 1021,
+    "damage": 63,
+    "defense": 50,
+    "attackSpeed": 2.88,
+    "aggroRange": 8.1,
+    "leashRange": 18.1,
+    "combatStyle": "nano",
+    "respawnTime": 39,
+    "area": "alien-wastes",
+    "desc": "Animated stone construct.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 186,
+        "max": 496
+      },
+      {
+        "itemId": "quantum_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "quantum_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 6974058,
+      "scale": 0.9
+    }
+  },
+  "dark_blob": {
+    "name": "Dark Blob",
+    "level": 63,
+    "hp": 1047,
+    "maxHp": 1047,
+    "damage": 64,
+    "defense": 50,
+    "attackSpeed": 2.87,
+    "aggroRange": 8.15,
+    "leashRange": 18.15,
+    "combatStyle": "tesla",
+    "respawnTime": 39,
+    "area": "alien-wastes",
+    "desc": "Amorphous mass of dark energy.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 189,
+        "max": 504
+      },
+      {
+        "itemId": "quantum_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "quantum_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "dark_entity",
+    "meshParams": {
+      "color": 2763338,
+      "scale": 0.85
+    }
+  },
+  "wailing_wraith": {
+    "name": "Wailing Wraith",
+    "level": 64,
+    "hp": 1072,
+    "maxHp": 1072,
+    "damage": 65,
+    "defense": 51,
+    "attackSpeed": 2.86,
+    "aggroRange": 8.2,
+    "leashRange": 18.2,
+    "combatStyle": "void",
+    "respawnTime": 39,
+    "area": "alien-wastes",
+    "desc": "Wraith whose screams paralyze prey.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 192,
+        "max": 512
+      },
+      {
+        "itemId": "quantum_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "quantum_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "void_wraith",
+    "meshParams": {
+      "color": 6970010,
+      "scale": 0.9
+    }
+  },
+  "obsidian_golem": {
+    "name": "Obsidian Golem",
+    "level": 65,
+    "hp": 1098,
+    "maxHp": 1098,
+    "damage": 66,
+    "defense": 52,
+    "attackSpeed": 2.85,
+    "aggroRange": 8.25,
+    "leashRange": 18.25,
+    "combatStyle": "nano",
+    "respawnTime": 40,
+    "area": "alien-wastes",
+    "desc": "Volcanic glass golem of deadly sharpness.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 195,
+        "max": 520
+      },
+      {
+        "itemId": "quantum_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "quantum_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 1710634,
+      "scale": 0.9
+    }
+  },
+  "chaos_blob": {
+    "name": "Chaos Blob",
+    "level": 66,
+    "hp": 1125,
+    "maxHp": 1125,
+    "damage": 67,
+    "defense": 53,
+    "attackSpeed": 2.84,
+    "aggroRange": 8.3,
+    "leashRange": 18.3,
+    "combatStyle": "tesla",
+    "respawnTime": 40,
+    "area": "alien-wastes",
+    "desc": "Chaotic mass warping reality nearby.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 198,
+        "max": 528
+      },
+      {
+        "itemId": "quantum_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "quantum_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "dark_entity",
+    "meshParams": {
+      "color": 4856394,
+      "scale": 0.8
+    }
+  },
+  "howling_wraith": {
+    "name": "Howling Wraith",
+    "level": 67,
+    "hp": 1151,
+    "maxHp": 1151,
+    "damage": 68,
+    "defense": 54,
+    "attackSpeed": 2.83,
+    "aggroRange": 8.35,
+    "leashRange": 18.35,
+    "combatStyle": "void",
+    "respawnTime": 40,
+    "area": "alien-wastes",
+    "desc": "Wraith emitting mind-shattering howls.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 201,
+        "max": 536
+      },
+      {
+        "itemId": "quantum_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "quantum_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "void_wraith",
+    "meshParams": {
+      "color": 4864634,
+      "scale": 0.85
+    }
+  },
+  "quartz_golem": {
+    "name": "Quartz Golem",
+    "level": 68,
+    "hp": 1178,
+    "maxHp": 1178,
+    "damage": 69,
+    "defense": 55,
+    "attackSpeed": 2.82,
+    "aggroRange": 8.4,
+    "leashRange": 18.4,
+    "combatStyle": "nano",
+    "respawnTime": 40,
+    "area": "alien-wastes",
+    "desc": "Translucent golem refracting light.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 204,
+        "max": 544
+      },
+      {
+        "itemId": "quantum_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "quantum_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 9075354,
+      "scale": 0.95
+    }
+  },
+  "nightmare_mass": {
+    "name": "Nightmare Mass",
+    "level": 69,
+    "hp": 1205,
+    "maxHp": 1205,
+    "damage": 70,
+    "defense": 56,
+    "attackSpeed": 2.81,
+    "aggroRange": 8.45,
+    "leashRange": 18.45,
+    "combatStyle": "tesla",
+    "respawnTime": 41,
+    "area": "alien-wastes",
+    "desc": "Mass projecting horrific visions.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 207,
+        "max": 552
+      },
+      {
+        "itemId": "quantum_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "quantum_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "dark_entity",
+    "meshParams": {
+      "color": 3803706,
+      "scale": 0.9
+    }
+  },
+  "void_sentinel": {
+    "name": "Void Sentinel",
+    "level": 70,
+    "hp": 3080,
+    "maxHp": 3080,
+    "damage": 107,
+    "defense": 74,
+    "attackSpeed": 2.8,
+    "aggroRange": 14,
+    "leashRange": 25,
+    "combatStyle": "void",
+    "respawnTime": 190,
+    "area": "alien-wastes",
+    "desc": "Ancient guardian of the void boundary.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 210,
+        "max": 560
+      },
+      {
+        "itemId": "neutronium_voidstaff",
+        "chance": 0.08,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "neutronium_dark_orb",
+        "chance": 0.06,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "neutronium_helmet",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "neutronium_vest",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "neutronium_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "void_wraith",
+    "isBoss": true,
+    "meshParams": {
+      "color": 6965930,
+      "scale": 1.3
+    }
+  },
+  "diamond_golem": {
+    "name": "Diamond Golem",
+    "level": 70,
+    "hp": 1232,
+    "maxHp": 1232,
+    "damage": 71,
+    "defense": 57,
+    "attackSpeed": 2.8,
+    "aggroRange": 8.5,
+    "leashRange": 18.5,
+    "combatStyle": "nano",
+    "respawnTime": 41,
+    "area": "alien-wastes",
+    "desc": "Nearly indestructible diamond construct.",
+    "lootTable": [
+      {
+        "itemId": "gravity_residue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 210,
+        "max": 560
+      },
+      {
+        "itemId": "neutronium_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "neutronium_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 10132138,
+      "scale": 1
+    }
+  },
+  "screaming_wraith": {
+    "name": "Screaming Wraith",
+    "level": 71,
+    "hp": 1259,
+    "maxHp": 1259,
+    "damage": 72,
+    "defense": 58,
+    "attackSpeed": 2.79,
+    "aggroRange": 8.55,
+    "leashRange": 18.55,
+    "combatStyle": "void",
+    "respawnTime": 41,
+    "area": "alien-wastes",
+    "desc": "Wraith whose screams rupture reality.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 213,
+        "max": 568
+      },
+      {
+        "itemId": "neutronium_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "neutronium_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "void_wraith",
+    "meshParams": {
+      "color": 5913226,
+      "scale": 0.9
+    }
+  },
+  "titan_golem": {
+    "name": "Titan Golem",
+    "level": 72,
+    "hp": 1287,
+    "maxHp": 1287,
+    "damage": 73,
+    "defense": 59,
+    "attackSpeed": 2.7800000000000002,
+    "aggroRange": 8.6,
+    "leashRange": 18.6,
+    "combatStyle": "nano",
+    "respawnTime": 42,
+    "area": "alien-wastes",
+    "desc": "Colossal golem of staggering power.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 216,
+        "max": 576
+      },
+      {
+        "itemId": "neutronium_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "neutronium_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 4872810,
+      "scale": 1.1
+    }
+  },
+  "ancient_golem": {
+    "name": "Ancient Golem",
+    "level": 75,
+    "hp": 1371,
+    "maxHp": 1371,
+    "damage": 76,
+    "defense": 62,
+    "attackSpeed": 2.75,
+    "aggroRange": 8.75,
+    "leashRange": 18.75,
+    "combatStyle": "nano",
+    "respawnTime": 43,
+    "area": "alien-wastes",
+    "desc": "Millennia-old construct of forgotten origin.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 225,
+        "max": 600
+      },
+      {
+        "itemId": "neutronium_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "neutronium_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 6969930,
+      "scale": 1.15
+    }
+  },
+  "oblivion_wraith": {
+    "name": "Oblivion Wraith",
+    "level": 75,
+    "hp": 1371,
+    "maxHp": 1371,
+    "damage": 76,
+    "defense": 62,
+    "attackSpeed": 2.75,
+    "aggroRange": 8.75,
+    "leashRange": 18.75,
+    "combatStyle": "void",
+    "respawnTime": 43,
+    "area": "alien-wastes",
+    "desc": "Wraith from the edge of oblivion itself.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 225,
+        "max": 600
+      },
+      {
+        "itemId": "neutronium_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "neutronium_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "void_wraith",
+    "meshParams": {
+      "color": 1706586,
+      "scale": 1
+    }
+  },
+  "void_golem": {
+    "name": "Void Golem",
+    "level": 76,
+    "hp": 1400,
+    "maxHp": 1400,
+    "damage": 77,
+    "defense": 63,
+    "attackSpeed": 2.74,
+    "aggroRange": 8.8,
+    "leashRange": 18.8,
+    "combatStyle": "nano",
+    "respawnTime": 43,
+    "area": "alien-wastes",
+    "desc": "Golem infused with void energy.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 228,
+        "max": 608
+      },
+      {
+        "itemId": "neutronium_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "neutronium_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 2763354,
+      "scale": 1.15
+    }
+  },
+  "eternal_wraith": {
+    "name": "Eternal Wraith",
+    "level": 77,
+    "hp": 1429,
+    "maxHp": 1429,
+    "damage": 79,
+    "defense": 64,
+    "attackSpeed": 2.73,
+    "aggroRange": 8.85,
+    "leashRange": 18.85,
+    "combatStyle": "void",
+    "respawnTime": 43,
+    "area": "alien-wastes",
+    "desc": "Immortal wraith existing since creation.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 231,
+        "max": 616
+      },
+      {
+        "itemId": "neutronium_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "neutronium_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "void_wraith",
+    "meshParams": {
+      "color": 5917338,
+      "scale": 1.05
+    }
+  },
+  "null_mass": {
+    "name": "Null Mass",
+    "level": 77,
+    "hp": 1429,
+    "maxHp": 1429,
+    "damage": 79,
+    "defense": 64,
+    "attackSpeed": 2.73,
+    "aggroRange": 8.85,
+    "leashRange": 18.85,
+    "combatStyle": "tesla",
+    "respawnTime": 43,
+    "area": "alien-wastes",
+    "desc": "Mass of absolute nothingness.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 231,
+        "max": 616
+      },
+      {
+        "itemId": "neutronium_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "neutronium_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "dark_entity",
+    "meshParams": {
+      "color": 328976,
+      "scale": 1.05
+    }
+  },
+  "prism_golem": {
+    "name": "Prism Golem",
+    "level": 78,
+    "hp": 1458,
+    "maxHp": 1458,
+    "damage": 80,
+    "defense": 65,
+    "attackSpeed": 2.7199999999999998,
+    "aggroRange": 8.9,
+    "leashRange": 18.9,
+    "combatStyle": "nano",
+    "respawnTime": 43,
+    "area": "alien-wastes",
+    "desc": "Multi-faceted golem splitting light.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 234,
+        "max": 624
+      },
+      {
+        "itemId": "neutronium_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "neutronium_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "crystal_golem",
+    "meshParams": {
+      "color": 9071274,
+      "scale": 1.2
+    }
+  },
+  "phantom_wraith": {
+    "name": "Phantom Wraith",
+    "level": 78,
+    "hp": 1458,
+    "maxHp": 1458,
+    "damage": 80,
+    "defense": 65,
+    "attackSpeed": 2.7199999999999998,
+    "aggroRange": 8.9,
+    "leashRange": 18.9,
+    "combatStyle": "void",
+    "respawnTime": 43,
+    "area": "alien-wastes",
+    "desc": "Nearly imperceptible wraith.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 234,
+        "max": 624
+      },
+      {
+        "itemId": "neutronium_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "neutronium_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "void_wraith",
+    "meshParams": {
+      "color": 3816074,
+      "scale": 1.05
+    }
+  },
+  "omega_mass": {
+    "name": "Omega Mass",
+    "level": 79,
+    "hp": 1487,
+    "maxHp": 1487,
+    "damage": 81,
+    "defense": 66,
+    "attackSpeed": 2.71,
+    "aggroRange": 8.95,
+    "leashRange": 18.95,
+    "combatStyle": "tesla",
+    "respawnTime": 44,
+    "area": "alien-wastes",
+    "desc": "Final form of dark energy evolution.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 237,
+        "max": 632
+      },
+      {
+        "itemId": "neutronium_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "neutronium_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "dark_entity",
+    "meshParams": {
+      "color": 1706554,
+      "scale": 1.1
+    }
+  },
+  "crystal_colossus": {
+    "name": "Crystal Colossus",
+    "level": 80,
+    "hp": 3793,
+    "maxHp": 3793,
+    "damage": 123,
+    "defense": 87,
+    "attackSpeed": 2.7,
+    "aggroRange": 14,
+    "leashRange": 25,
+    "combatStyle": "nano",
+    "respawnTime": 200,
+    "area": "alien-wastes",
+    "desc": "Enormous crystalline titan guarding ancient secrets.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 240,
+        "max": 640
+      },
+      {
+        "itemId": "darkmatter_nanoblade",
+        "chance": 0.08,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "darkmatter_energy_shield",
+        "chance": 0.06,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "darkmatter_helmet",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "darkmatter_vest",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "darkmatter_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "crystal_golem",
+    "isBoss": true,
+    "meshParams": {
+      "color": 8030890,
+      "scale": 1.6
+    }
+  },
+  "watcher_eye": {
+    "name": "Watcher Eye",
+    "level": 81,
+    "hp": 1547,
+    "maxHp": 1547,
+    "damage": 83,
+    "defense": 68,
+    "attackSpeed": 2.69,
+    "aggroRange": 9.05,
+    "leashRange": 19.05,
+    "combatStyle": "void",
+    "respawnTime": 44,
+    "area": "alien-wastes",
+    "desc": "Floating eye observing all movement.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 243,
+        "max": 648
+      },
+      {
+        "itemId": "darkmatter_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "darkmatter_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 6961770,
+      "scale": 0.7,
+      "irisColor": 16729156
+    }
+  },
+  "minor_warper": {
+    "name": "Minor Warper",
+    "level": 81,
+    "hp": 1547,
+    "maxHp": 1547,
+    "damage": 83,
+    "defense": 68,
+    "attackSpeed": 2.69,
+    "aggroRange": 9.05,
+    "leashRange": 19.05,
+    "combatStyle": "tesla",
+    "respawnTime": 44,
+    "area": "alien-wastes",
+    "desc": "Small anomaly bending local space.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 243,
+        "max": 648
+      },
+      {
+        "itemId": "darkmatter_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "darkmatter_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "reality_warper",
+    "meshParams": {
+      "color": 4868730,
+      "scale": 0.6
+    }
+  },
+  "doom_eye": {
+    "name": "Doom Eye",
+    "level": 83,
+    "hp": 1607,
+    "maxHp": 1607,
+    "damage": 85,
+    "defense": 70,
+    "attackSpeed": 2.67,
+    "aggroRange": 9.15,
+    "leashRange": 19.15,
+    "combatStyle": "void",
+    "respawnTime": 45,
+    "area": "alien-wastes",
+    "desc": "Eye projecting beams of destruction.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 249,
+        "max": 664
+      },
+      {
+        "itemId": "darkmatter_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "darkmatter_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 4856426,
+      "scale": 0.8,
+      "irisColor": 11149858
+    }
+  },
+  "gravity_warper": {
+    "name": "Gravity Warper",
+    "level": 84,
+    "hp": 1638,
+    "maxHp": 1638,
+    "damage": 86,
+    "defense": 71,
+    "attackSpeed": 2.66,
+    "aggroRange": 9.2,
+    "leashRange": 19.2,
+    "combatStyle": "tesla",
+    "respawnTime": 45,
+    "area": "alien-wastes",
+    "desc": "Anomaly distorting gravitational fields.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 252,
+        "max": 672
+      },
+      {
+        "itemId": "darkmatter_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "darkmatter_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "reality_warper",
+    "meshParams": {
+      "color": 2767482,
+      "scale": 0.7
+    }
+  },
+  "blight_eye": {
+    "name": "Blight Eye",
+    "level": 85,
+    "hp": 1669,
+    "maxHp": 1669,
+    "damage": 87,
+    "defense": 72,
+    "attackSpeed": 2.65,
+    "aggroRange": 9.25,
+    "leashRange": 19.25,
+    "combatStyle": "void",
+    "respawnTime": 46,
+    "area": "alien-wastes",
+    "desc": "Eye spreading corruption with its gaze.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 255,
+        "max": 680
+      },
+      {
+        "itemId": "darkmatter_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "darkmatter_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 3824186,
+      "scale": 0.85,
+      "irisColor": 4521796
+    }
+  },
+  "tyrant_eye": {
+    "name": "Tyrant Eye",
+    "level": 86,
+    "hp": 1700,
+    "maxHp": 1700,
+    "damage": 88,
+    "defense": 73,
+    "attackSpeed": 2.64,
+    "aggroRange": 9.3,
+    "leashRange": 19.3,
+    "combatStyle": "void",
+    "respawnTime": 46,
+    "area": "alien-wastes",
+    "desc": "Commanding eye dominating lesser minds.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 258,
+        "max": 688
+      },
+      {
+        "itemId": "darkmatter_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "darkmatter_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 6957642,
+      "scale": 0.85,
+      "irisColor": 16746564
+    }
+  },
+  "void_eye": {
+    "name": "Void Eye",
+    "level": 87,
+    "hp": 1731,
+    "maxHp": 1731,
+    "damage": 89,
+    "defense": 74,
+    "attackSpeed": 2.63,
+    "aggroRange": 9.350000000000001,
+    "leashRange": 19.35,
+    "combatStyle": "void",
+    "respawnTime": 46,
+    "area": "alien-wastes",
+    "desc": "Eye peering from the void itself.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 261,
+        "max": 696
+      },
+      {
+        "itemId": "darkmatter_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "darkmatter_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 2759274,
+      "scale": 0.9,
+      "irisColor": 8930559
+    }
+  },
+  "death_eye": {
+    "name": "Death Eye",
+    "level": 88,
+    "hp": 1763,
+    "maxHp": 1763,
+    "damage": 91,
+    "defense": 75,
+    "attackSpeed": 2.62,
+    "aggroRange": 9.4,
+    "leashRange": 19.4,
+    "combatStyle": "void",
+    "respawnTime": 46,
+    "area": "alien-wastes",
+    "desc": "Eye whose gaze brings death.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 264,
+        "max": 704
+      },
+      {
+        "itemId": "darkmatter_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "darkmatter_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 4852298,
+      "scale": 0.9,
+      "irisColor": 16711748
+    }
+  },
+  "reality_eater": {
+    "name": "Reality Eater",
+    "level": 90,
+    "hp": 4565,
+    "maxHp": 4565,
+    "damage": 140,
+    "defense": 100,
+    "attackSpeed": 2.6,
+    "aggroRange": 14,
+    "leashRange": 25,
+    "combatStyle": "void",
+    "respawnTime": 210,
+    "area": "alien-wastes",
+    "desc": "Enormous eye consuming reality itself.",
+    "lootTable": [
+      {
+        "itemId": "neural_tissue",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 270,
+        "max": 720
+      },
+      {
+        "itemId": "voidsteel_voidstaff",
+        "chance": 0.08,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_dark_orb",
+        "chance": 0.06,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_helmet",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_vest",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "eldritch_eye",
+    "isBoss": true,
+    "meshParams": {
+      "color": 9058954,
+      "scale": 1.4,
+      "irisColor": 16729343
+    }
+  },
+  "elder_eye": {
+    "name": "Elder Eye",
+    "level": 91,
+    "hp": 1859,
+    "maxHp": 1859,
+    "damage": 94,
+    "defense": 79,
+    "attackSpeed": 2.59,
+    "aggroRange": 9.55,
+    "leashRange": 19.55,
+    "combatStyle": "void",
+    "respawnTime": 47,
+    "area": "alien-wastes",
+    "desc": "Ancient eye of unfathomable wisdom.",
+    "lootTable": [
+      {
+        "itemId": "corrupted_essence",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 273,
+        "max": 728
+      },
+      {
+        "itemId": "voidsteel_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 3811978,
+      "scale": 0.95,
+      "irisColor": 11158783
+    }
+  },
+  "cosmic_eye": {
+    "name": "Cosmic Eye",
+    "level": 92,
+    "hp": 1891,
+    "maxHp": 1891,
+    "damage": 95,
+    "defense": 80,
+    "attackSpeed": 2.58,
+    "aggroRange": 9.600000000000001,
+    "leashRange": 19.6,
+    "combatStyle": "void",
+    "respawnTime": 48,
+    "area": "alien-wastes",
+    "desc": "Eye perceiving cosmic truths.",
+    "lootTable": [
+      {
+        "itemId": "corrupted_essence",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 276,
+        "max": 736
+      },
+      {
+        "itemId": "voidsteel_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 2767498,
+      "scale": 1,
+      "irisColor": 4491519
+    }
+  },
+  "godseye": {
+    "name": "God's Eye",
+    "level": 98,
+    "hp": 2091,
+    "maxHp": 2091,
+    "damage": 102,
+    "defense": 86,
+    "attackSpeed": 2.52,
+    "aggroRange": 9.9,
+    "leashRange": 19.9,
+    "combatStyle": "void",
+    "respawnTime": 49,
+    "area": "alien-wastes",
+    "desc": "Eye of a being beyond comprehension.",
+    "lootTable": [
+      {
+        "itemId": "corrupted_essence",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 294,
+        "max": 784
+      },
+      {
+        "itemId": "voidsteel_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "eldritch_eye",
+    "meshParams": {
+      "color": 5921450,
+      "scale": 1.1,
+      "irisColor": 16777215
+    }
+  },
+  "the_formless_one": {
+    "name": "The Formless One",
+    "level": 99,
+    "hp": 5313,
+    "maxHp": 5313,
+    "damage": 155,
+    "defense": 113,
+    "attackSpeed": 2.51,
+    "aggroRange": 14,
+    "leashRange": 25,
+    "combatStyle": "tesla",
+    "respawnTime": 219,
+    "area": "alien-wastes",
+    "desc": "Entity of pure unreality, a living paradox.",
+    "lootTable": [
+      {
+        "itemId": "corrupted_essence",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 297,
+        "max": 792
+      },
+      {
+        "itemId": "voidsteel_coilgun",
+        "chance": 0.08,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_capacitor",
+        "chance": 0.06,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_helmet",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_vest",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "reality_warper",
+    "isBoss": true,
+    "meshParams": {
+      "color": 9071274,
+      "scale": 1.5
+    }
+  },
+  "abyss_lurker": {
+    "name": "Abyss Lurker",
+    "level": 100,
+    "hp": 2167,
+    "maxHp": 2167,
+    "damage": 105,
+    "defense": 88,
+    "attackSpeed": 2.5,
+    "aggroRange": 10,
+    "leashRange": 20,
+    "combatStyle": "void",
+    "respawnTime": 50,
+    "area": "the-abyss",
+    "desc": "First creature encountered in the abyss.",
+    "lootTable": [
+      {
+        "itemId": "abyssal_ichor",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 300,
+        "max": 800
+      },
+      {
+        "itemId": "voidsteel_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "abyssal_serpent",
+    "meshParams": {
+      "color": 657978,
+      "scale": 0.6
+    }
+  },
+  "deep_shade": {
+    "name": "Deep Shade",
+    "level": 102,
+    "hp": 2261,
+    "maxHp": 2261,
+    "damage": 108,
+    "defense": 90,
+    "attackSpeed": 2.48,
+    "aggroRange": 10.100000000000001,
+    "leashRange": 20.1,
+    "combatStyle": "tesla",
+    "respawnTime": 51,
+    "area": "the-abyss",
+    "desc": "Shadow given form in the deep.",
+    "lootTable": [
+      {
+        "itemId": "abyssal_ichor",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 306,
+        "max": 816
+      },
+      {
+        "itemId": "voidsteel_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "abyssal_horror",
+    "meshParams": {
+      "color": 656672,
+      "scale": 0.6
+    }
+  },
+  "abyss_eel": {
+    "name": "Abyss Eel",
+    "level": 104,
+    "hp": 2368,
+    "maxHp": 2368,
+    "damage": 112,
+    "defense": 92,
+    "attackSpeed": 2.46,
+    "aggroRange": 10.2,
+    "leashRange": 20.2,
+    "combatStyle": "nano",
+    "respawnTime": 51,
+    "area": "the-abyss",
+    "desc": "Elongated predator of dark waters.",
+    "lootTable": [
+      {
+        "itemId": "abyssal_ichor",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 312,
+        "max": 832
+      },
+      {
+        "itemId": "voidsteel_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "abyssal_serpent",
+    "meshParams": {
+      "color": 1710666,
+      "scale": 0.65
+    }
+  },
+  "depth_serpent": {
+    "name": "Depth Serpent",
+    "level": 108,
+    "hp": 2615,
+    "maxHp": 2615,
+    "damage": 121,
+    "defense": 96,
+    "attackSpeed": 2.42,
+    "aggroRange": 10.4,
+    "leashRange": 20.4,
+    "combatStyle": "tesla",
+    "respawnTime": 52,
+    "area": "the-abyss",
+    "desc": "Serpent adapted to crushing pressures.",
+    "lootTable": [
+      {
+        "itemId": "abyssal_ichor",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 324,
+        "max": 864
+      },
+      {
+        "itemId": "voidsteel_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "abyssal_serpent",
+    "meshParams": {
+      "color": 662090,
+      "scale": 0.7
+    }
+  },
+  "abyssal_leviathan": {
+    "name": "Abyssal Leviathan",
+    "level": 110,
+    "hp": 6888,
+    "maxHp": 6888,
+    "damage": 188,
+    "defense": 127,
+    "attackSpeed": 2.4,
+    "aggroRange": 14,
+    "leashRange": 25,
+    "combatStyle": "void",
+    "respawnTime": 230,
+    "area": "the-abyss",
+    "desc": "Massive serpent ruling the upper abyss.",
+    "lootTable": [
+      {
+        "itemId": "abyssal_ichor",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 330,
+        "max": 880
+      },
+      {
+        "itemId": "voidsteel_voidstaff",
+        "chance": 0.08,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_dark_orb",
+        "chance": 0.06,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_helmet",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_vest",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "abyssal_serpent",
+    "isBoss": true,
+    "meshParams": {
+      "color": 1706586,
+      "scale": 1.4
+    }
+  },
+  "shadow_angler": {
+    "name": "Shadow Angler",
+    "level": 112,
+    "hp": 2907,
+    "maxHp": 2907,
+    "damage": 130,
+    "defense": 100,
+    "attackSpeed": 2.38,
+    "aggroRange": 10.600000000000001,
+    "leashRange": 20.6,
+    "combatStyle": "nano",
+    "respawnTime": 54,
+    "area": "the-abyss",
+    "desc": "Lures prey with bioluminescent glow.",
+    "lootTable": [
+      {
+        "itemId": "abyssal_ichor",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 336,
+        "max": 896
+      },
+      {
+        "itemId": "voidsteel_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "abyssal_horror",
+    "meshParams": {
+      "color": 657962,
+      "scale": 0.7
+    }
+  },
+  "abyss_maw": {
+    "name": "Abyss Maw",
+    "level": 116,
+    "hp": 3240,
+    "maxHp": 3240,
+    "damage": 139,
+    "defense": 105,
+    "attackSpeed": 2.34,
+    "aggroRange": 10.8,
+    "leashRange": 20.8,
+    "combatStyle": "void",
+    "respawnTime": 55,
+    "area": "the-abyss",
+    "desc": "All mouth and hunger from the deep.",
+    "lootTable": [
+      {
+        "itemId": "abyssal_ichor",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 348,
+        "max": 928
+      },
+      {
+        "itemId": "voidsteel_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "abyssal_horror",
+    "meshParams": {
+      "color": 1706538,
+      "scale": 0.75
+    }
+  },
+  "void_kraken": {
+    "name": "Void Kraken",
+    "level": 120,
+    "hp": 3615,
+    "maxHp": 3615,
+    "damage": 149,
+    "defense": 109,
+    "attackSpeed": 2.3,
+    "aggroRange": 11,
+    "leashRange": 21,
+    "combatStyle": "void",
+    "respawnTime": 56,
+    "area": "the-abyss",
+    "desc": "Multi-tentacled terror of the void depths.",
+    "lootTable": [
+      {
+        "itemId": "abyssal_ichor",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 360,
+        "max": 960
+      },
+      {
+        "itemId": "voidsteel_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "abyssal_horror",
+    "meshParams": {
+      "color": 657994,
+      "scale": 0.85
+    }
+  },
+  "abyssal_devourer": {
+    "name": "Abyssal Devourer",
+    "level": 125,
+    "hp": 10353,
+    "maxHp": 10353,
+    "damage": 243,
+    "defense": 150,
+    "attackSpeed": 2.25,
+    "aggroRange": 14,
+    "leashRange": 25,
+    "combatStyle": "void",
+    "respawnTime": 245,
+    "area": "the-abyss",
+    "desc": "Insatiable hunger consuming all matter.",
+    "lootTable": [
+      {
+        "itemId": "abyssal_ichor",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 375,
+        "max": 1000
+      },
+      {
+        "itemId": "voidsteel_voidstaff",
+        "chance": 0.08,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_dark_orb",
+        "chance": 0.06,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_helmet",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_vest",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "abyssal_horror",
+    "isBoss": true,
+    "meshParams": {
+      "color": 2755146,
+      "scale": 1.4
+    }
+  },
+  "brine_serpent": {
+    "name": "Brine Serpent",
+    "level": 122,
+    "hp": 3818,
+    "maxHp": 3818,
+    "damage": 154,
+    "defense": 111,
+    "attackSpeed": 2.2800000000000002,
+    "aggroRange": 11.100000000000001,
+    "leashRange": 21.1,
+    "combatStyle": "tesla",
+    "respawnTime": 57,
+    "area": "the-abyss",
+    "desc": "Serpent corroding with toxic brine.",
+    "lootTable": [
+      {
+        "itemId": "abyssal_ichor",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 366,
+        "max": 976
+      },
+      {
+        "itemId": "voidsteel_coilgun",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_capacitor",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "abyssal_serpent",
+    "meshParams": {
+      "color": 1714746,
+      "scale": 0.85
+    }
+  },
+  "elder_serpent": {
+    "name": "Elder Serpent",
+    "level": 130,
+    "hp": 4728,
+    "maxHp": 4728,
+    "damage": 175,
+    "defense": 120,
+    "attackSpeed": 2.2,
+    "aggroRange": 11.5,
+    "leashRange": 21.5,
+    "combatStyle": "nano",
+    "respawnTime": 59,
+    "area": "the-abyss",
+    "desc": "Ancient serpent of immense size and wisdom.",
+    "lootTable": [
+      {
+        "itemId": "abyssal_ichor",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 390,
+        "max": 1040
+      },
+      {
+        "itemId": "voidsteel_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "abyssal_serpent",
+    "meshParams": {
+      "color": 1706554,
+      "scale": 0.95
+    }
+  },
+  "cosmic_drone": {
+    "name": "Cosmic Drone",
+    "level": 142,
+    "hp": 6384,
+    "maxHp": 6384,
+    "damage": 210,
+    "defense": 135,
+    "attackSpeed": 2.08,
+    "aggroRange": 12,
+    "leashRange": 22.1,
+    "combatStyle": "nano",
+    "respawnTime": 63,
+    "area": "the-abyss",
+    "desc": "Automaton enforcing cosmic law.",
+    "lootTable": [
+      {
+        "itemId": "primordial_fragment",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 426,
+        "max": 1136
+      },
+      {
+        "itemId": "voidsteel_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 2763354,
+      "scale": 0.7
+    }
+  },
+  "cosmic_guard": {
+    "name": "Cosmic Guard",
+    "level": 146,
+    "hp": 7011,
+    "maxHp": 7011,
+    "damage": 222,
+    "defense": 140,
+    "attackSpeed": 2.04,
+    "aggroRange": 12,
+    "leashRange": 22.3,
+    "combatStyle": "void",
+    "respawnTime": 64,
+    "area": "the-abyss",
+    "desc": "Sentinel guarding cosmic boundaries.",
+    "lootTable": [
+      {
+        "itemId": "primordial_fragment",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 438,
+        "max": 1168
+      },
+      {
+        "itemId": "voidsteel_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 3816042,
+      "scale": 0.75
+    }
+  },
+  "cosmic_warden": {
+    "name": "Cosmic Warden",
+    "level": 150,
+    "hp": 19190,
+    "maxHp": 19190,
+    "damage": 351,
+    "defense": 187,
+    "attackSpeed": 2,
+    "aggroRange": 14,
+    "leashRange": 25,
+    "combatStyle": "void",
+    "respawnTime": 270,
+    "area": "the-abyss",
+    "desc": "Warden of the cosmic barrier between realms.",
+    "lootTable": [
+      {
+        "itemId": "primordial_fragment",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 450,
+        "max": 1200
+      },
+      {
+        "itemId": "voidsteel_voidstaff",
+        "chance": 0.08,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_dark_orb",
+        "chance": 0.06,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_helmet",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_vest",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "cosmic_sentinel",
+    "isBoss": true,
+    "meshParams": {
+      "color": 4868746,
+      "scale": 1.3
+    }
+  },
+  "nebula_knight": {
+    "name": "Nebula Knight",
+    "level": 152,
+    "hp": 8022,
+    "maxHp": 8022,
+    "damage": 240,
+    "defense": 147,
+    "attackSpeed": 1.98,
+    "aggroRange": 12,
+    "leashRange": 22.6,
+    "combatStyle": "nano",
+    "respawnTime": 66,
+    "area": "the-abyss",
+    "desc": "Knight forged in nebula fire.",
+    "lootTable": [
+      {
+        "itemId": "primordial_fragment",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 456,
+        "max": 1216
+      },
+      {
+        "itemId": "voidsteel_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 3820138,
+      "scale": 0.8
+    }
+  },
+  "void_knight": {
+    "name": "Void Knight",
+    "level": 156,
+    "hp": 8742,
+    "maxHp": 8742,
+    "damage": 253,
+    "defense": 152,
+    "attackSpeed": 1.94,
+    "aggroRange": 12,
+    "leashRange": 22.8,
+    "combatStyle": "void",
+    "respawnTime": 67,
+    "area": "the-abyss",
+    "desc": "Knight sworn to serve the void.",
+    "lootTable": [
+      {
+        "itemId": "primordial_fragment",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 468,
+        "max": 1248
+      },
+      {
+        "itemId": "voidsteel_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 1710682,
+      "scale": 0.85
+    }
+  },
+  "cosmic_champion": {
+    "name": "Cosmic Champion",
+    "level": 160,
+    "hp": 9499,
+    "maxHp": 9499,
+    "damage": 266,
+    "defense": 157,
+    "attackSpeed": 1.9,
+    "aggroRange": 12,
+    "leashRange": 23,
+    "combatStyle": "nano",
+    "respawnTime": 68,
+    "area": "the-abyss",
+    "desc": "Elite warrior of cosmic origin.",
+    "lootTable": [
+      {
+        "itemId": "primordial_fragment",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 480,
+        "max": 1280
+      },
+      {
+        "itemId": "voidsteel_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 5921418,
+      "scale": 0.9
+    }
+  },
+  "stellar_guard": {
+    "name": "Stellar Guard",
+    "level": 164,
+    "hp": 10291,
+    "maxHp": 10291,
+    "damage": 279,
+    "defense": 162,
+    "attackSpeed": 1.8599999999999999,
+    "aggroRange": 12,
+    "leashRange": 23.200000000000003,
+    "combatStyle": "void",
+    "respawnTime": 69,
+    "area": "the-abyss",
+    "desc": "Guard drawn from stellar matter.",
+    "lootTable": [
+      {
+        "itemId": "primordial_fragment",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 492,
+        "max": 1312
+      },
+      {
+        "itemId": "voidsteel_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 4864634,
+      "scale": 0.9
+    }
+  },
+  "cosmic_juggernaut": {
+    "name": "Cosmic Juggernaut",
+    "level": 166,
+    "hp": 10701,
+    "maxHp": 10701,
+    "damage": 286,
+    "defense": 164,
+    "attackSpeed": 1.8399999999999999,
+    "aggroRange": 12,
+    "leashRange": 23.3,
+    "combatStyle": "nano",
+    "respawnTime": 70,
+    "area": "the-abyss",
+    "desc": "Unstoppable cosmic war machine.",
+    "lootTable": [
+      {
+        "itemId": "primordial_fragment",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 498,
+        "max": 1328
+      },
+      {
+        "itemId": "voidsteel_nanoblade",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_energy_shield",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 3816026,
+      "scale": 0.95
+    }
+  },
+  "cosmic_arbiter": {
+    "name": "Cosmic Arbiter",
+    "level": 170,
+    "hp": 11548,
+    "maxHp": 11548,
+    "damage": 299,
+    "defense": 169,
+    "attackSpeed": 1.8,
+    "aggroRange": 12,
+    "leashRange": 23.5,
+    "combatStyle": "void",
+    "respawnTime": 71,
+    "area": "the-abyss",
+    "desc": "Judge of cosmic conflicts.",
+    "lootTable": [
+      {
+        "itemId": "primordial_fragment",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 510,
+        "max": 1360
+      },
+      {
+        "itemId": "voidsteel_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "cosmic_sentinel",
+    "meshParams": {
+      "color": 5917338,
+      "scale": 0.95
+    }
+  },
+  "the_primordial": {
+    "name": "The Primordial",
+    "level": 175,
+    "hp": 31643,
+    "maxHp": 31643,
+    "damage": 474,
+    "defense": 229,
+    "attackSpeed": 1.75,
+    "aggroRange": 14,
+    "leashRange": 25,
+    "combatStyle": "nano",
+    "respawnTime": 295,
+    "area": "the-abyss",
+    "desc": "Being from before the dawn of creation.",
+    "lootTable": [
+      {
+        "itemId": "primordial_fragment",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 525,
+        "max": 1400
+      },
+      {
+        "itemId": "voidsteel_nanoblade",
+        "chance": 0.08,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_energy_shield",
+        "chance": 0.06,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_helmet",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_vest",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "cosmic_titan",
+    "isBoss": true,
+    "meshParams": {
+      "color": 4864618,
+      "scale": 1.4
+    }
+  },
+  "entropy_incarnate": {
+    "name": "Entropy Incarnate",
+    "level": 200,
+    "hp": 47563,
+    "maxHp": 47563,
+    "damage": 611,
+    "defense": 270,
+    "attackSpeed": 1.5,
+    "aggroRange": 14,
+    "leashRange": 25,
+    "combatStyle": "void",
+    "respawnTime": 320,
+    "area": "the-abyss",
+    "desc": "The living embodiment of entropy itself.",
+    "lootTable": [
+      {
+        "itemId": "primordial_fragment",
+        "chance": 1,
+        "min": 2,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.7,
+        "min": 600,
+        "max": 1600
+      },
+      {
+        "itemId": "voidsteel_voidstaff",
+        "chance": 0.08,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_dark_orb",
+        "chance": 0.06,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_helmet",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_vest",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "voidsteel_legs",
+        "chance": 0.04,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "cosmic_titan",
+    "isBoss": true,
+    "meshParams": {
+      "color": 657978,
+      "scale": 1.6
+    }
+  }
+}

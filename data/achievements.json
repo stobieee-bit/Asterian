@@ -1,0 +1,243 @@
+[
+  {
+    "id": "first_blood",
+    "name": "First Blood",
+    "desc": "Defeat your first enemy.",
+    "category": "combat",
+    "points": 5,
+    "check": "[function]"
+  },
+  {
+    "id": "centurion",
+    "name": "Centurion",
+    "desc": "Defeat 100 enemies.",
+    "category": "combat",
+    "points": 10,
+    "check": "[function]"
+  },
+  {
+    "id": "slayer_1k",
+    "name": "Thousand Slain",
+    "desc": "Defeat 1,000 enemies.",
+    "category": "combat",
+    "points": 25,
+    "check": "[function]"
+  },
+  {
+    "id": "boss_hunter",
+    "name": "Boss Hunter",
+    "desc": "Defeat any boss.",
+    "category": "combat",
+    "points": 15,
+    "check": "[function]"
+  },
+  {
+    "id": "boss_master",
+    "name": "Boss Master",
+    "desc": "Defeat all 5 major bosses.",
+    "category": "combat",
+    "points": 50,
+    "check": "[function]",
+    "title": "Boss Master"
+  },
+  {
+    "id": "ability_user",
+    "name": "Ability Novice",
+    "desc": "Use 50 combat abilities.",
+    "category": "combat",
+    "points": 10,
+    "check": "[function]"
+  },
+  {
+    "id": "ultimate_power",
+    "name": "Ultimate Power",
+    "desc": "Use 10 ultimate abilities.",
+    "category": "combat",
+    "points": 15,
+    "check": "[function]"
+  },
+  {
+    "id": "first_craft",
+    "name": "Apprentice Crafter",
+    "desc": "Craft your first item.",
+    "category": "skilling",
+    "points": 5,
+    "check": "[function]"
+  },
+  {
+    "id": "master_crafter",
+    "name": "Master Crafter",
+    "desc": "Craft 500 items.",
+    "category": "skilling",
+    "points": 25,
+    "check": "[function]"
+  },
+  {
+    "id": "level_50",
+    "name": "Halfway There",
+    "desc": "Reach level 50 in any skill.",
+    "category": "skilling",
+    "points": 20,
+    "check": "[function]"
+  },
+  {
+    "id": "level_99",
+    "name": "Mastery",
+    "desc": "Reach level 99 in any skill.",
+    "category": "skilling",
+    "points": 50,
+    "check": "[function]",
+    "title": "Master"
+  },
+  {
+    "id": "all_skills_50",
+    "name": "Well-Rounded",
+    "desc": "Reach level 50 in all skills.",
+    "category": "skilling",
+    "points": 75,
+    "check": "[function]",
+    "title": "The Scholar"
+  },
+  {
+    "id": "all_skills_99",
+    "name": "Completionist",
+    "desc": "Max all skills.",
+    "category": "skilling",
+    "points": 200,
+    "check": "[function]",
+    "title": "Completionist"
+  },
+  {
+    "id": "synergy_first",
+    "name": "Synergist",
+    "desc": "Unlock your first skill synergy.",
+    "category": "skilling",
+    "points": 10,
+    "check": "[function]"
+  },
+  {
+    "id": "quest_1",
+    "name": "Adventurer",
+    "desc": "Complete your first quest.",
+    "category": "quests",
+    "points": 5,
+    "check": "[function]"
+  },
+  {
+    "id": "quest_all",
+    "name": "Loremaster",
+    "desc": "Complete all quests.",
+    "category": "quests",
+    "points": 100,
+    "check": "[function]",
+    "title": "Loremaster"
+  },
+  {
+    "id": "explore_all",
+    "name": "Explorer",
+    "desc": "Visit all 7 areas.",
+    "category": "explore",
+    "points": 20,
+    "check": "[function]"
+  },
+  {
+    "id": "dungeon_floor_10",
+    "name": "Dungeon Diver",
+    "desc": "Reach dungeon floor 10.",
+    "category": "explore",
+    "points": 15,
+    "check": "[function]"
+  },
+  {
+    "id": "dungeon_floor_50",
+    "name": "Abyssal Explorer",
+    "desc": "Reach dungeon floor 50.",
+    "category": "explore",
+    "points": 40,
+    "check": "[function]",
+    "title": "Abyssal"
+  },
+  {
+    "id": "prestige_1",
+    "name": "Rebirth",
+    "desc": "Prestige for the first time.",
+    "category": "prestige",
+    "points": 15,
+    "check": "[function]"
+  },
+  {
+    "id": "prestige_5",
+    "name": "Ascended",
+    "desc": "Reach prestige tier 5.",
+    "category": "prestige",
+    "points": 30,
+    "check": "[function]"
+  },
+  {
+    "id": "prestige_10",
+    "name": "Transcendent",
+    "desc": "Reach prestige tier 10.",
+    "category": "prestige",
+    "points": 100,
+    "check": "[function]",
+    "title": "Transcendent"
+  },
+  {
+    "id": "credits_10k",
+    "name": "Wealthy",
+    "desc": "Accumulate 10,000 credits.",
+    "category": "economy",
+    "points": 10,
+    "check": "[function]"
+  },
+  {
+    "id": "credits_1m",
+    "name": "Millionaire",
+    "desc": "Accumulate 1,000,000 credits.",
+    "category": "economy",
+    "points": 50,
+    "check": "[function]",
+    "title": "Tycoon"
+  },
+  {
+    "id": "bestiary_25",
+    "name": "Zoologist",
+    "desc": "Discover 25 unique enemies.",
+    "category": "collection",
+    "points": 15,
+    "check": "[function]"
+  },
+  {
+    "id": "bestiary_100",
+    "name": "Encyclopedist",
+    "desc": "Discover 100 unique enemies.",
+    "category": "collection",
+    "points": 50,
+    "check": "[function]",
+    "title": "Encyclopedist"
+  },
+  {
+    "id": "collect_50_items",
+    "name": "Hoarder",
+    "desc": "Collect 50 unique item types.",
+    "category": "collection",
+    "points": 20,
+    "check": "[function]"
+  },
+  {
+    "id": "slayer_streak_10",
+    "name": "On a Roll",
+    "desc": "Reach a 10 slayer task streak.",
+    "category": "combat",
+    "points": 15,
+    "check": "[function]"
+  },
+  {
+    "id": "full_equipment",
+    "name": "Fully Geared",
+    "desc": "Equip items in all 7 gear slots.",
+    "category": "combat",
+    "points": 15,
+    "check": "[function]"
+  }
+]
