@@ -83,261 +83,279 @@ func _build_mesh_for_tier() -> void:
 	else:
 		_build_star_core()        # Neutronium — dense intersecting star
 
-# ── Tier 1: Stellarite — Low, wide rock mound ──
+# ── Tier 1: Stellarite — Small scattered boulders ──
 func _build_rock_mound() -> void:
-	# Wide flat base rock
-	var base: CSGCylinder3D = CSGCylinder3D.new()
-	base.radius = 0.9
-	base.height = 0.6
-	base.sides = 6
-	base.position.y = 0.3
-	add_child(base)
-	_mesh_parts.append(base)
+	# Three boulders of different sizes clustered together
+	var b1: CSGSphere3D = CSGSphere3D.new()
+	b1.radius = 0.6
+	b1.radial_segments = 6
+	b1.rings = 4
+	b1.position = Vector3(0.0, 0.5, 0.0)
+	add_child(b1)
+	_mesh_parts.append(b1)
 
-	# Small bump on top
-	var bump: CSGSphere3D = CSGSphere3D.new()
-	bump.radius = 0.45
-	bump.radial_segments = 6
-	bump.rings = 4
-	bump.position.y = 0.7
-	add_child(bump)
-	bump.name = "Accent1"
-	_mesh_parts.append(bump)
+	var b2: CSGSphere3D = CSGSphere3D.new()
+	b2.radius = 0.4
+	b2.radial_segments = 5
+	b2.rings = 3
+	b2.position = Vector3(0.5, 0.35, 0.3)
+	add_child(b2)
+	b2.name = "Accent1"
+	_mesh_parts.append(b2)
 
-	# Glow ring
+	var b3: CSGSphere3D = CSGSphere3D.new()
+	b3.radius = 0.3
+	b3.radial_segments = 5
+	b3.rings = 3
+	b3.position = Vector3(-0.4, 0.25, 0.2)
+	add_child(b3)
+	b3.name = "Accent2"
+	_mesh_parts.append(b3)
+
 	_add_glow_ring(0.7, 0.9)
 
-# ── Tier 2: Ferrite — Chunky rock with flat crystal slab ──
+# ── Tier 2: Ferrite — Blocky anvil-shaped rock ──
 func _build_flat_crystal() -> void:
-	# Pentagonal rock body
-	var body: CSGCylinder3D = CSGCylinder3D.new()
-	body.radius = 0.7
-	body.height = 0.9
-	body.sides = 5
-	body.position.y = 0.45
-	add_child(body)
-	_mesh_parts.append(body)
-
-	# Flat crystal slab on top (wide, thin box)
-	var slab: CSGBox3D = CSGBox3D.new()
-	slab.size = Vector3(1.0, 0.15, 0.6)
-	slab.position.y = 1.05
-	slab.rotation.y = 0.4
-	add_child(slab)
-	slab.name = "Accent1"
-	_mesh_parts.append(slab)
-
-	# Small shard poking out at angle
-	var shard: CSGBox3D = CSGBox3D.new()
-	shard.size = Vector3(0.15, 0.5, 0.12)
-	shard.position = Vector3(0.3, 1.1, 0.1)
-	shard.rotation.z = -0.3
-	add_child(shard)
-	shard.name = "Accent2"
-	_mesh_parts.append(shard)
-
-	_add_glow_ring(0.6, 0.8)
-
-# ── Tier 3: Cobaltium — Crystal cluster (3 angled spikes) ──
-func _build_crystal_cluster() -> void:
-	# Low rocky base
-	var base: CSGCylinder3D = CSGCylinder3D.new()
-	base.radius = 0.5
-	base.height = 0.5
-	base.sides = 5
+	# Wide flat base
+	var base: CSGBox3D = CSGBox3D.new()
+	base.size = Vector3(1.4, 0.5, 1.0)
 	base.position.y = 0.25
 	add_child(base)
 	_mesh_parts.append(base)
 
-	# Three crystal spikes at different angles
-	for i in range(3):
+	# Narrower top block (anvil)
+	var top: CSGBox3D = CSGBox3D.new()
+	top.size = Vector3(0.8, 0.6, 0.6)
+	top.position.y = 0.8
+	add_child(top)
+	top.name = "Accent1"
+	_mesh_parts.append(top)
+
+	# Crystal shard poking up from top
+	var shard: CSGCylinder3D = CSGCylinder3D.new()
+	shard.radius = 0.15
+	shard.height = 0.7
+	shard.sides = 4
+	shard.cone = true
+	shard.position = Vector3(0.15, 1.45, 0.0)
+	shard.rotation.z = 0.15
+	add_child(shard)
+	shard.name = "Accent2"
+	_mesh_parts.append(shard)
+
+	_add_glow_ring(0.8, 1.0)
+
+# ── Tier 3: Cobaltium — Tall crystal spire cluster ──
+func _build_crystal_cluster() -> void:
+	# Central tall spire
+	var main_spire: CSGCylinder3D = CSGCylinder3D.new()
+	main_spire.radius = 0.2
+	main_spire.height = 2.5
+	main_spire.sides = 4
+	main_spire.cone = true
+	main_spire.position.y = 1.25
+	add_child(main_spire)
+	main_spire.name = "Accent1"
+	_mesh_parts.append(main_spire)
+
+	# Four surrounding shorter spires
+	for i in range(4):
 		var spike: CSGCylinder3D = CSGCylinder3D.new()
-		spike.radius = 0.12
-		spike.height = 1.0 + i * 0.25
+		spike.radius = 0.14
+		spike.height = 1.2 + randf_range(0.0, 0.8)
 		spike.sides = 4
 		spike.cone = true
-
-		var angle: float = i * TAU / 3.0
-		spike.position = Vector3(cos(angle) * 0.15, 0.7 + i * 0.15, sin(angle) * 0.15)
-		spike.rotation.x = sin(angle) * 0.25
-		spike.rotation.z = cos(angle) * 0.25
+		var a: float = i * TAU / 4.0 + 0.4
+		var dist: float = 0.4
+		spike.position = Vector3(cos(a) * dist, spike.height * 0.5, sin(a) * dist)
+		spike.rotation.x = sin(a) * 0.2
+		spike.rotation.z = -cos(a) * 0.2
 		add_child(spike)
-		spike.name = "Accent%d" % (i + 1)
+		spike.name = "Accent%d" % (i + 2)
 		_mesh_parts.append(spike)
 
-	_add_glow_ring(0.4, 0.6)
+	# Low rocky base that spires grow from
+	var base: CSGCylinder3D = CSGCylinder3D.new()
+	base.radius = 0.6
+	base.height = 0.4
+	base.sides = 5
+	base.position.y = 0.2
+	add_child(base)
+	_mesh_parts.append(base)
 
-# ── Tier 4: Duranite — Layered cube deposit (stacked boxes) ──
+	_add_glow_ring(0.5, 0.7)
+
+# ── Tier 4: Duranite — Stacked slab staircase ──
 func _build_layered_deposit() -> void:
-	# Bottom layer — wide
-	var layer1: CSGBox3D = CSGBox3D.new()
-	layer1.size = Vector3(1.2, 0.35, 1.0)
-	layer1.position.y = 0.175
-	add_child(layer1)
-	_mesh_parts.append(layer1)
+	# 4 slabs stacked like tectonic plates, each offset
+	var widths: Array[float] = [1.6, 1.3, 1.0, 0.7]
+	var depths: Array[float] = [1.2, 1.0, 0.8, 0.6]
+	for i in range(4):
+		var slab: CSGBox3D = CSGBox3D.new()
+		slab.size = Vector3(widths[i], 0.3, depths[i])
+		slab.position.y = 0.15 + i * 0.32
+		slab.position.x = i * 0.1 - 0.15
+		slab.rotation.y = i * 0.2
+		add_child(slab)
+		if i > 0:
+			slab.name = "Accent%d" % i
+		_mesh_parts.append(slab)
 
-	# Middle layer — offset and rotated
-	var layer2: CSGBox3D = CSGBox3D.new()
-	layer2.size = Vector3(0.9, 0.35, 0.75)
-	layer2.position.y = 0.525
-	layer2.rotation.y = 0.3
-	add_child(layer2)
-	layer2.name = "Accent1"
-	_mesh_parts.append(layer2)
+	_add_glow_ring(0.9, 1.1)
 
-	# Top layer — smallest, tilted
-	var layer3: CSGBox3D = CSGBox3D.new()
-	layer3.size = Vector3(0.6, 0.3, 0.5)
-	layer3.position.y = 0.85
-	layer3.rotation.y = -0.2
-	layer3.rotation.z = 0.1
-	add_child(layer3)
-	layer3.name = "Accent2"
-	_mesh_parts.append(layer3)
-
-	_add_glow_ring(0.7, 0.9)
-
-# ── Tier 5: Titanex — Tall hexagonal obelisk ──
+# ── Tier 5: Titanex — Tall hexagonal obelisk with runes ──
 func _build_obelisk() -> void:
 	# Tall hexagonal pillar
 	var pillar: CSGCylinder3D = CSGCylinder3D.new()
-	pillar.radius = 0.4
-	pillar.height = 2.0
+	pillar.radius = 0.5
+	pillar.height = 3.0
 	pillar.sides = 6
-	pillar.position.y = 1.0
+	pillar.position.y = 1.5
 	add_child(pillar)
 	_mesh_parts.append(pillar)
 
-	# Pointed cap
+	# Pointed pyramid cap
 	var cap: CSGCylinder3D = CSGCylinder3D.new()
-	cap.radius = 0.35
-	cap.height = 0.6
+	cap.radius = 0.45
+	cap.height = 0.9
 	cap.sides = 6
 	cap.cone = true
-	cap.position.y = 2.3
+	cap.position.y = 3.45
 	add_child(cap)
 	cap.name = "Accent1"
 	_mesh_parts.append(cap)
 
-	# Small ledge / collar near base
-	var collar: CSGTorus3D = CSGTorus3D.new()
-	collar.inner_radius = 0.35
-	collar.outer_radius = 0.55
-	collar.ring_sides = 6
-	collar.sides = 6
-	collar.position.y = 0.4
-	add_child(collar)
-	collar.name = "Accent2"
-	_mesh_parts.append(collar)
+	# Decorative collar rings at two heights
+	for i in range(2):
+		var collar: CSGTorus3D = CSGTorus3D.new()
+		collar.inner_radius = 0.45
+		collar.outer_radius = 0.7
+		collar.ring_sides = 6
+		collar.sides = 6
+		collar.position.y = 0.8 + i * 1.4
+		add_child(collar)
+		collar.name = "Accent%d" % (i + 2)
+		_mesh_parts.append(collar)
 
-	_add_glow_ring(0.5, 0.7)
+	_add_glow_ring(0.6, 0.85)
 
-# ── Tier 6: Plasmite — Floating sphere with energy ring ──
+# ── Tier 6: Plasmite — Large floating orb with double rings ──
 func _build_floating_orb() -> void:
-	# Hovering sphere
+	# Large hovering sphere
 	var orb: CSGSphere3D = CSGSphere3D.new()
-	orb.radius = 0.55
-	orb.radial_segments = 12
-	orb.rings = 8
-	orb.position.y = 1.2
+	orb.radius = 0.8
+	orb.radial_segments = 14
+	orb.rings = 10
+	orb.position.y = 1.8
 	add_child(orb)
 	_mesh_parts.append(orb)
 
-	# Orbiting ring (tilted torus)
-	var ring: CSGTorus3D = CSGTorus3D.new()
-	ring.inner_radius = 0.65
-	ring.outer_radius = 0.8
-	ring.ring_sides = 6
-	ring.sides = 16
-	ring.position.y = 1.2
-	ring.rotation.x = 0.5
-	ring.rotation.z = 0.3
-	add_child(ring)
-	ring.name = "Accent1"
-	_mesh_parts.append(ring)
+	# Horizontal ring
+	var ring1: CSGTorus3D = CSGTorus3D.new()
+	ring1.inner_radius = 0.9
+	ring1.outer_radius = 1.1
+	ring1.ring_sides = 6
+	ring1.sides = 16
+	ring1.position.y = 1.8
+	add_child(ring1)
+	ring1.name = "Accent1"
+	_mesh_parts.append(ring1)
 
-	# Small ground anchor pebble
-	var anchor: CSGCylinder3D = CSGCylinder3D.new()
-	anchor.radius = 0.25
-	anchor.height = 0.2
-	anchor.sides = 6
-	anchor.position.y = 0.1
-	add_child(anchor)
-	anchor.name = "Accent2"
-	_mesh_parts.append(anchor)
+	# Tilted vertical ring
+	var ring2: CSGTorus3D = CSGTorus3D.new()
+	ring2.inner_radius = 1.0
+	ring2.outer_radius = 1.15
+	ring2.ring_sides = 6
+	ring2.sides = 16
+	ring2.position.y = 1.8
+	ring2.rotation.x = PI / 2.0
+	ring2.rotation.y = 0.5
+	add_child(ring2)
+	ring2.name = "Accent2"
+	_mesh_parts.append(ring2)
 
-	_add_glow_ring(0.5, 0.7)
+	# Small ground pedestal
+	var pedestal: CSGCylinder3D = CSGCylinder3D.new()
+	pedestal.radius = 0.35
+	pedestal.height = 0.3
+	pedestal.sides = 8
+	pedestal.position.y = 0.15
+	add_child(pedestal)
+	pedestal.name = "Accent3"
+	_mesh_parts.append(pedestal)
 
-# ── Tier 7: Quantite — Multi-faceted gem (rotated cube = diamond) ──
+	_add_glow_ring(0.6, 0.85)
+
+# ── Tier 7: Quantite — Huge diamond gem with orbiting fragments ──
 func _build_gem_formation() -> void:
-	# Rotated cube standing on corner (diamond shape)
+	# Large rotated cube (diamond) standing on vertex
 	var gem: CSGBox3D = CSGBox3D.new()
-	gem.size = Vector3(0.8, 0.8, 0.8)
-	gem.position.y = 1.0
+	gem.size = Vector3(1.2, 1.2, 1.2)
+	gem.position.y = 1.5
 	gem.rotation.x = PI / 4.0
 	gem.rotation.z = PI / 4.0
 	add_child(gem)
 	_mesh_parts.append(gem)
 
-	# Second smaller gem floating nearby
-	var gem2: CSGBox3D = CSGBox3D.new()
-	gem2.size = Vector3(0.4, 0.4, 0.4)
-	gem2.position = Vector3(0.5, 0.7, 0.3)
-	gem2.rotation.x = PI / 4.0
-	gem2.rotation.y = PI / 6.0
-	gem2.rotation.z = PI / 4.0
-	add_child(gem2)
-	gem2.name = "Accent1"
-	_mesh_parts.append(gem2)
+	# Three orbiting fragment shards at different heights/positions
+	var frag_data: Array = [
+		{"size": 0.4, "pos": Vector3(0.9, 1.0, 0.5), "rot_y": 0.5},
+		{"size": 0.35, "pos": Vector3(-0.8, 1.8, -0.4), "rot_y": 1.2},
+		{"size": 0.3, "pos": Vector3(0.3, 2.4, -0.7), "rot_y": 2.5},
+	]
+	for i in range(frag_data.size()):
+		var fd: Dictionary = frag_data[i]
+		var frag: CSGBox3D = CSGBox3D.new()
+		var s: float = fd["size"]
+		frag.size = Vector3(s, s, s)
+		frag.position = fd["pos"]
+		frag.rotation.x = PI / 4.0
+		frag.rotation.y = fd["rot_y"]
+		frag.rotation.z = PI / 4.0
+		add_child(frag)
+		frag.name = "Accent%d" % (i + 1)
+		_mesh_parts.append(frag)
 
-	# Tiny third shard
-	var gem3: CSGBox3D = CSGBox3D.new()
-	gem3.size = Vector3(0.25, 0.25, 0.25)
-	gem3.position = Vector3(-0.4, 0.5, -0.2)
-	gem3.rotation.x = PI / 3.0
-	gem3.rotation.z = PI / 5.0
-	add_child(gem3)
-	gem3.name = "Accent2"
-	_mesh_parts.append(gem3)
+	_add_glow_ring(0.8, 1.05)
 
-	_add_glow_ring(0.6, 0.8)
-
-# ── Tier 8: Neutronium — Dense star core (intersecting shapes + sphere) ──
+# ── Tier 8: Neutronium — Massive star core with radiating arms ──
 func _build_star_core() -> void:
-	# Central glowing sphere
+	# Large central glowing sphere
 	var core: CSGSphere3D = CSGSphere3D.new()
-	core.radius = 0.4
-	core.radial_segments = 10
-	core.rings = 6
-	core.position.y = 1.0
+	core.radius = 0.7
+	core.radial_segments = 12
+	core.rings = 8
+	core.position.y = 1.5
 	add_child(core)
 	_mesh_parts.append(core)
 
-	# Three intersecting boxes forming a star burst
-	for i in range(3):
+	# Six radiating crystal arms in a starburst pattern
+	for i in range(6):
 		var arm: CSGBox3D = CSGBox3D.new()
-		arm.size = Vector3(0.2, 1.4, 0.2)
-		arm.position.y = 1.0
-		var rot_angle: float = i * PI / 3.0
-		arm.rotation.z = rot_angle
-		arm.rotation.x = i * 0.3
+		arm.size = Vector3(0.18, 1.8, 0.18)
+		arm.position.y = 1.5
+		var rot_a: float = i * PI / 3.0
+		arm.rotation.z = rot_a
+		arm.rotation.x = fmod(i * 0.45, PI)
 		add_child(arm)
 		arm.name = "Accent%d" % (i + 1)
 		_mesh_parts.append(arm)
 
-	# Outer energy ring
-	var ring: CSGTorus3D = CSGTorus3D.new()
-	ring.inner_radius = 0.75
-	ring.outer_radius = 0.9
-	ring.ring_sides = 6
-	ring.sides = 16
-	ring.position.y = 1.0
-	ring.rotation.x = PI / 2.0
-	add_child(ring)
-	ring.name = "Ring"
-	_mesh_parts.append(ring)
+	# Two crossing energy rings
+	for i in range(2):
+		var ring: CSGTorus3D = CSGTorus3D.new()
+		ring.inner_radius = 1.1
+		ring.outer_radius = 1.25
+		ring.ring_sides = 6
+		ring.sides = 16
+		ring.position.y = 1.5
+		ring.rotation.x = PI / 2.0 * i
+		ring.rotation.y = 0.6 * i
+		add_child(ring)
+		ring.name = "Ring%d" % (i + 1)
+		_mesh_parts.append(ring)
 
-	_add_glow_ring(0.6, 0.85)
+	_add_glow_ring(0.9, 1.15)
 
 # ── Shared: glow ring at base ──
 func _add_glow_ring(inner_r: float, outer_r: float) -> void:
@@ -365,7 +383,7 @@ func _apply_visuals() -> void:
 	body_mat.roughness = 0.6 - skill_level * 0.004  # Higher tiers smoother
 	body_mat.emission_enabled = true
 	body_mat.emission = _node_color.lightened(0.2)
-	body_mat.emission_energy_multiplier = 0.5 + skill_level * 0.02
+	body_mat.emission_energy_multiplier = 0.8 + skill_level * 0.025
 
 	# Accent material — brighter crystal/highlight parts
 	var accent_mat: StandardMaterial3D = StandardMaterial3D.new()
@@ -374,7 +392,7 @@ func _apply_visuals() -> void:
 	accent_mat.roughness = 0.25
 	accent_mat.emission_enabled = true
 	accent_mat.emission = _node_color.lightened(0.5)
-	accent_mat.emission_energy_multiplier = 2.0 + skill_level * 0.02
+	accent_mat.emission_energy_multiplier = 2.5 + skill_level * 0.03
 
 	# Glow ring material
 	var ring_mat: StandardMaterial3D = StandardMaterial3D.new()
@@ -385,7 +403,7 @@ func _apply_visuals() -> void:
 
 	# Apply materials to mesh parts
 	for part in _mesh_parts:
-		if part.name.begins_with("Accent") or part.name == "Ring":
+		if part.name.begins_with("Accent") or part.name.begins_with("Ring"):
 			part.material = accent_mat
 		elif part.name == "GlowRing":
 			part.material = ring_mat
