@@ -115,21 +115,23 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	ground.add_child(static_body)
 	add_child(ground)
 
-	# ── Edge ring — bright glowing border ──
+	# ── Edge ring — subtle glowing border ──
 	var edge_ring: CSGTorus3D = CSGTorus3D.new()
 	edge_ring.name = "Edge_%s" % area_id
-	edge_ring.inner_radius = radius - 0.6
-	edge_ring.outer_radius = radius + 0.6
+	edge_ring.inner_radius = radius - 0.3
+	edge_ring.outer_radius = radius + 0.3
 	edge_ring.ring_sides = 8
 	edge_ring.sides = 64 if radius > 100 else 48
 	edge_ring.position = Vector3(center_x, GROUND_Y + 0.15 + visual_y_bump, center_z)
 	var edge_mat: StandardMaterial3D = StandardMaterial3D.new()
-	edge_mat.albedo_color = base_color.lightened(0.5)
+	edge_mat.albedo_color = base_color.lightened(0.2)
+	edge_mat.albedo_color.a = 0.3
 	edge_mat.emission_enabled = true
-	edge_mat.emission = base_color.lightened(0.6)
-	edge_mat.emission_energy_multiplier = 2.5
-	edge_mat.metallic = 0.6
-	edge_mat.roughness = 0.15
+	edge_mat.emission = base_color.lightened(0.3)
+	edge_mat.emission_energy_multiplier = 0.5
+	edge_mat.metallic = 0.3
+	edge_mat.roughness = 0.4
+	edge_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	edge_ring.material = edge_mat
 	add_child(edge_ring)
 
@@ -148,6 +150,8 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	var y_base: float = GROUND_Y + 0.1 + visual_y_bump
 
 	# ── Build all detail layers ──
+	_add_ground_variation(area_id, center_x, center_z, radius, base_color, y_base)
+	_add_terrain_bumps(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_concentric_rings(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_grid_lines(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_rocks_and_boulders(area_id, center_x, center_z, radius, base_color, y_base)
@@ -165,6 +169,96 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 # ═══════════════════════════════════════════════════════════════════════════════
 #  DETAIL LAYERS
 # ═══════════════════════════════════════════════════════════════════════════════
+
+## Ground variation — inner and outer color bands for visual depth
+func _add_ground_variation(_area_id: String, cx: float, cz: float, radius: float,
+		base_color: Color, y_base: float) -> void:
+	# Inner ring at 70% radius with lighter color
+	var inner_ring: CSGCylinder3D = CSGCylinder3D.new()
+	inner_ring.radius = radius * 0.7
+	inner_ring.height = 0.05
+	inner_ring.sides = 32 if radius < 80 else 48
+	inner_ring.position = Vector3(cx, y_base + 0.01, cz)
+	var inner_mat: StandardMaterial3D = StandardMaterial3D.new()
+	inner_mat.albedo_color = base_color.lightened(0.08)
+	inner_mat.albedo_color.a = 0.4
+	inner_mat.roughness = 0.55
+	inner_mat.metallic = 0.3
+	inner_mat.emission_enabled = true
+	inner_mat.emission = base_color.lightened(0.1)
+	inner_mat.emission_energy_multiplier = 0.15
+	inner_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	inner_ring.material = inner_mat
+	add_child(inner_ring)
+
+	# Outer band at 85% radius, darker
+	var outer_band: CSGCylinder3D = CSGCylinder3D.new()
+	outer_band.radius = radius * 0.85
+	outer_band.height = 0.04
+	outer_band.sides = 32 if radius < 80 else 48
+	outer_band.position = Vector3(cx, y_base + 0.005, cz)
+	var outer_mat: StandardMaterial3D = StandardMaterial3D.new()
+	outer_mat.albedo_color = base_color.darkened(0.1)
+	outer_mat.albedo_color.a = 0.3
+	outer_mat.roughness = 0.6
+	outer_mat.metallic = 0.2
+	outer_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	outer_band.material = outer_mat
+	add_child(outer_band)
+
+## Terrain bumps and craters — purely visual height variation
+func _add_terrain_bumps(area_id: String, cx: float, cz: float, radius: float,
+		base_color: Color, y_base: float) -> void:
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	rng.seed = area_id.hash()
+
+	# Raised bumps (3-8 per area depending on radius)
+	var bump_count: int = clampi(int(radius / 15.0) + 2, 3, 8)
+	for i in range(bump_count):
+		var angle: float = rng.randf() * TAU
+		var dist: float = rng.randf_range(0.2, 0.75) * radius
+		var bx: float = cx + cos(angle) * dist
+		var bz: float = cz + sin(angle) * dist
+		var bump_radius: float = rng.randf_range(2.0, 5.0)
+		var bump_height: float = rng.randf_range(0.2, 0.6)
+
+		var bump: CSGCylinder3D = CSGCylinder3D.new()
+		bump.radius = bump_radius
+		bump.height = bump_height
+		bump.sides = 12
+		bump.position = Vector3(bx, y_base + bump_height * 0.5, bz)
+		var bump_mat: StandardMaterial3D = StandardMaterial3D.new()
+		bump_mat.albedo_color = base_color.lightened(rng.randf_range(-0.05, 0.05))
+		bump_mat.roughness = 0.5
+		bump_mat.metallic = 0.35
+		bump_mat.emission_enabled = true
+		bump_mat.emission = base_color
+		bump_mat.emission_energy_multiplier = 0.1
+		bump.material = bump_mat
+		add_child(bump)
+
+	# Crater depressions (2-5 per area)
+	var crater_count: int = clampi(int(radius / 25.0) + 1, 2, 5)
+	for i in range(crater_count):
+		var angle: float = rng.randf() * TAU
+		var dist: float = rng.randf_range(0.3, 0.65) * radius
+		var crx: float = cx + cos(angle) * dist
+		var crz: float = cz + sin(angle) * dist
+
+		var crater: CSGCylinder3D = CSGCylinder3D.new()
+		crater.radius = rng.randf_range(1.5, 4.0)
+		crater.height = 0.06
+		crater.sides = 12
+		crater.position = Vector3(crx, y_base - 0.02, crz)
+		var cr_mat: StandardMaterial3D = StandardMaterial3D.new()
+		cr_mat.albedo_color = base_color.darkened(0.15)
+		cr_mat.roughness = 0.65
+		cr_mat.metallic = 0.2
+		cr_mat.emission_enabled = true
+		cr_mat.emission = base_color.darkened(0.1)
+		cr_mat.emission_energy_multiplier = 0.08
+		crater.material = cr_mat
+		add_child(crater)
 
 ## Concentric accent rings — glowing circuit-like rings on the ground
 func _add_concentric_rings(area_id: String, cx: float, cz: float, radius: float,

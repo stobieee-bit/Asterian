@@ -42,6 +42,7 @@ const COMBAT_EXIT_DELAY: float = 8.0 ## Seconds without combat to start regen
 
 # ── Target highlight ──
 var _target_indicator: CSGCylinder3D = null
+var _target_indicator_ready: bool = false  ## Gates visibility until after first frame
 
 func _ready() -> void:
 	_player = get_parent()
@@ -66,11 +67,18 @@ func _ready() -> void:
 	_target_indicator.material = ring_mat
 	_target_indicator.visible = false
 	_target_indicator.top_level = true
+	# Start far below world to prevent single-frame flash at origin on login
+	_target_indicator.position = Vector3(0, -100, 0)
 	_player.add_child(_target_indicator)
+	# Wait one frame before allowing visibility (prevents CSG compile flash)
+	await get_tree().process_frame
+	_target_indicator_ready = true
 
 func _process(delta: float) -> void:
-	# Update target indicator position
-	if target and is_instance_valid(target) and target.state != target.State.DEAD:
+	# Update target indicator position (gated until after first frame)
+	if not _target_indicator_ready:
+		pass
+	elif target and is_instance_valid(target) and target.state != target.State.DEAD:
 		_target_indicator.visible = true
 		_target_indicator.global_position = target.global_position
 		_target_indicator.global_position.y = target.global_position.y + 0.05
@@ -221,6 +229,10 @@ func _do_attack() -> void:
 	var is_crit: bool = randf() < 0.10
 	if is_crit:
 		total_damage = int(float(total_damage) * 1.5)
+		# Screen shake on crit
+		var cam_rig: Node = _player.get_node_or_null("CameraRig")
+		if cam_rig and cam_rig.has_method("shake"):
+			cam_rig.shake(0.3)
 
 	# Capture position BEFORE damage — target may die and get cleared
 	var target_pos: Vector3 = (target as Node3D).global_position
@@ -439,6 +451,18 @@ func use_ability(ability_slot: int) -> bool:
 		ability_color
 	)
 
+	# Screen shake for threshold/ultimate abilities
+	if ability_slot >= 2:
+		var cam_rig: Node = _player.get_node_or_null("CameraRig")
+		if cam_rig and cam_rig.has_method("shake"):
+			match ability_slot:
+				2: cam_rig.shake(0.4)   # Threshold
+				3: cam_rig.shake(0.7)   # Ultimate
+
+	# Impact ring for threshold/ultimate abilities
+	if ability_slot >= 2:
+		_spawn_impact_ring(target_pos, ability_color, ability_slot)
+
 	# Reset attack timer and start GCD (ability replaces auto-attack tick)
 	attack_timer = base_attack_speed
 	_gcd_timer = GCD_TIME
@@ -538,6 +562,34 @@ func _player_death() -> void:
 	GameState.player["energy"] = GameState.player["max_energy"]
 	EventBus.player_respawned.emit()
 	EventBus.float_text_requested.emit("Respawned!", _player.global_position + Vector3(0, 3.0, 0), Color(0.3, 1.0, 0.5))
+
+## Spawn an expanding ring at target position for ability impact feedback
+func _spawn_impact_ring(pos: Vector3, color: Color, slot: int) -> void:
+	var ring: CSGTorus3D = CSGTorus3D.new()
+	ring.inner_radius = 0.3
+	ring.outer_radius = 0.5
+	ring.ring_sides = 6
+	ring.sides = 24
+	ring.rotation_degrees.x = 90.0  # Lay flat on ground
+	ring.top_level = true
+	ring.global_position = Vector3(pos.x, 0.1, pos.z)
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	mat.albedo_color = Color(color.r, color.g, color.b, 0.8)
+	mat.emission_enabled = true
+	mat.emission = color
+	mat.emission_energy_multiplier = 2.0
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.no_depth_test = true
+	ring.material = mat
+	_player.get_tree().root.add_child(ring)
+	# Expand and fade
+	var max_radius: float = 2.0 if slot == 2 else 3.5
+	var tween: Tween = ring.create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(ring, "inner_radius", max_radius - 0.2, 0.4)
+	tween.tween_property(ring, "outer_radius", max_radius, 0.4)
+	tween.tween_property(mat, "albedo_color:a", 0.0, 0.4)
+	tween.chain().tween_callback(ring.queue_free)
 
 ## Handle enemy death — clear target if it was our target, handle dungeon logic
 func _on_enemy_killed(eid: String, _etype: String) -> void:

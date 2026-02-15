@@ -108,17 +108,17 @@ func _create_slot(index: int) -> PanelContainer:
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(label)
 
-	# Quantity label (top-right corner)
+	# Quantity label (bottom-right corner, separated from icon symbol)
 	var qty_label: Label = Label.new()
 	qty_label.name = "QtyLabel"
 	qty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	qty_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+	qty_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	qty_label.add_theme_font_size_override("font_size", 9)
 	qty_label.add_theme_color_override("font_color", Color(1.0, 1.0, 0.6))
 	qty_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
 	qty_label.add_theme_constant_override("shadow_offset_x", 1)
 	qty_label.add_theme_constant_override("shadow_offset_y", 1)
-	qty_label.position = Vector2(0, 0)
+	qty_label.position = Vector2(0, SLOT_SIZE - 16)
 	qty_label.size = Vector2(SLOT_SIZE, 16)
 	qty_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(qty_label)
@@ -152,14 +152,18 @@ func refresh() -> void:
 			var tier: int = int(item_data.get("tier", 1))
 			var tier_col: Color = _tier_color(tier)
 
-			# Show icon background colored by item type
+			# Show icon background colored by item type (strong opacity for clear icon block)
 			icon_rect.color = _type_icon_color(item_type)
-			icon_rect.color.a = 0.7
+			icon_rect.color.a = 0.85
 
 			# Show icon symbol from item's icon field (or fallback to type)
 			var icon_id: String = str(item_data.get("icon", ""))
 			icon_sym.text = _item_icon_symbol(icon_id, item_type)
-			icon_sym.add_theme_color_override("font_color", tier_col.lightened(0.3))
+			# Pure white text with dark shadow for maximum readability
+			icon_sym.add_theme_color_override("font_color", Color.WHITE)
+			icon_sym.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
+			icon_sym.add_theme_constant_override("shadow_offset_x", 1)
+			icon_sym.add_theme_constant_override("shadow_offset_y", 1)
 
 			# Store name for tooltip reference (not displayed)
 			item_label.text = item_name

@@ -44,6 +44,9 @@ var _sfx_enabled: bool = true
 ## Whether ambient / music playback is enabled
 var _music_enabled: bool = true
 
+## Whether all audio is globally muted
+var _is_muted: bool = false
+
 # ── SFX pool ──────────────────────────────────────────────────────────────────
 
 ## Pool of AudioStreamPlayer nodes for SFX
@@ -164,6 +167,20 @@ func toggle_music(enabled: bool) -> void:
 		## Resume ambient for the current area
 		if _current_ambient_area != "":
 			_start_ambient(_current_ambient_area)
+
+
+## Check if all audio is globally muted.
+func is_muted() -> bool:
+	return _is_muted
+
+
+## Toggle global mute on/off. Persists in GameState.settings.
+func toggle_mute() -> void:
+	_is_muted = not _is_muted
+	toggle_sfx(not _is_muted)
+	toggle_music(not _is_muted)
+	GameState.settings["muted"] = _is_muted
+	EventBus.settings_changed.emit("muted", _is_muted)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -869,3 +886,8 @@ func _apply_initial_volumes() -> void:
 		music_volume = float(GameState.settings["music_volume"])
 	if GameState.settings.has("sfx_volume"):
 		sfx_volume = float(GameState.settings["sfx_volume"])
+	# Restore global mute state
+	if GameState.settings.has("muted") and bool(GameState.settings["muted"]):
+		_is_muted = true
+		toggle_sfx(false)
+		toggle_music(false)

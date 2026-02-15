@@ -147,12 +147,14 @@ func _ready() -> void:
 
 	# Build minimap
 	_build_minimap()
+	_build_mute_button()
 
 	# Build QoL overlays
 	_build_low_hp_vignette()
 	_build_area_toast()
 	_build_levelup_flash()
 	_build_combat_indicator()
+	_build_slayer_display()
 	_build_loot_toast()
 	_build_target_info_panel()
 	_build_gather_label()
@@ -702,7 +704,7 @@ func _build_action_bar() -> void:
 	bg_style.content_margin_right = 8
 	bar_bg.add_theme_stylebox_override("panel", bg_style)
 	var vp_init: Vector2 = _get_viewport_size()
-	bar_bg.position = Vector2(vp_init.x / 2.0 - 380, vp_init.y - 52)
+	bar_bg.position = Vector2(vp_init.x / 2.0 - 460, vp_init.y - 52)
 	add_child(bar_bg)
 
 	var bar: HBoxContainer = HBoxContainer.new()
@@ -762,7 +764,17 @@ func _build_action_bar() -> void:
 	pet_btn.pressed.connect(func(): _toggle_panel(_pet_panel, "pets"))
 	bar.add_child(pet_btn)
 
-	# (MP button removed — multiplayer is in Settings panel now)
+	# Bank button
+	var bank_btn: Button = _make_sci_btn("Bank [B]", 68, gold)
+	bank_btn.tooltip_text = "Bank (B)"
+	bank_btn.pressed.connect(func(): _toggle_panel(_bank_panel, "bank"))
+	bar.add_child(bank_btn)
+
+	# Craft button
+	var craft_btn: Button = _make_sci_btn("Craft", 56, Color(0.3, 0.8, 0.9))
+	craft_btn.tooltip_text = "Crafting Recipes"
+	craft_btn.pressed.connect(func(): _toggle_panel(_crafting_panel, "crafting"))
+	bar.add_child(craft_btn)
 
 	# Settings button
 	var set_btn: Button = _make_sci_btn("Settings", 68, Color(0.5, 0.5, 0.6))
@@ -1216,6 +1228,7 @@ func _eat_food() -> void:
 
 var _low_hp_vignette: ColorRect = null
 var _low_hp_time: float = 0.0
+var _damage_flash: ColorRect = null
 
 func _build_low_hp_vignette() -> void:
 	_low_hp_vignette = ColorRect.new()
@@ -1228,6 +1241,17 @@ func _build_low_hp_vignette() -> void:
 	_low_hp_vignette.color = Color(0.8, 0.0, 0.0, 0.0)  # Start invisible
 	_low_hp_vignette.visible = false
 	add_child(_low_hp_vignette)
+
+	# Damage flash overlay — brief red flash on taking damage
+	_damage_flash = ColorRect.new()
+	_damage_flash.name = "DamageFlash"
+	_damage_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_damage_flash.position = Vector2.ZERO
+	_damage_flash.size = vp_size
+	_damage_flash.color = Color(1.0, 0.1, 0.0, 0.0)
+	_damage_flash.visible = false
+	_damage_flash.z_index = 90
+	add_child(_damage_flash)
 
 func _update_low_hp_vignette(delta: float) -> void:
 	if _low_hp_vignette == null:
@@ -1380,6 +1404,47 @@ func _build_combat_indicator() -> void:
 	_combat_label.visible = false
 	add_child(_combat_label)
 
+# ── Slayer task display ──
+var _slayer_label: Label = null
+
+func _build_slayer_display() -> void:
+	_slayer_label = Label.new()
+	_slayer_label.name = "SlayerTask"
+	_slayer_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_slayer_label.add_theme_font_size_override("font_size", 11)
+	_slayer_label.add_theme_color_override("font_color", Color(1.0, 0.5, 0.2))
+	_slayer_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.8))
+	_slayer_label.add_theme_constant_override("shadow_offset_x", 1)
+	_slayer_label.add_theme_constant_override("shadow_offset_y", 1)
+	_slayer_label.position = Vector2(12, 108)
+	_slayer_label.size = Vector2(250, 16)
+	_slayer_label.visible = false
+	add_child(_slayer_label)
+	# Connect to enemy killed to update
+	EventBus.enemy_killed.connect(_on_slayer_enemy_killed)
+	# Show initial state (if save had an active task)
+	call_deferred("_update_slayer_display")
+
+func _on_slayer_enemy_killed(_eid: String, _etype: String) -> void:
+	_update_slayer_display()
+
+func _update_slayer_display() -> void:
+	if _slayer_label == null:
+		return
+	var task: Dictionary = GameState.slayer_task
+	if task.is_empty() or not task.has("remaining"):
+		_slayer_label.visible = false
+		return
+	var remaining: int = int(task.get("remaining", 0))
+	if remaining <= 0:
+		_slayer_label.visible = false
+		return
+	var enemy_type: String = str(task.get("enemy_type", ""))
+	var enemy_data: Dictionary = DataManager.get_enemy(enemy_type)
+	var enemy_name: String = str(enemy_data.get("name", enemy_type))
+	_slayer_label.text = "Slayer: %s (%d left)" % [enemy_name, remaining]
+	_slayer_label.visible = true
+
 func _on_combat_started(_enemy_id: String) -> void:
 	_in_combat_state = true
 
@@ -1480,6 +1545,13 @@ func _on_player_damaged(_amount: int, _source: String) -> void:
 		var tween: Tween = create_tween()
 		hp_bar.modulate = Color(2.0, 0.3, 0.3, 1.0)
 		tween.tween_property(hp_bar, "modulate", Color(1, 1, 1, 1), 0.3)
+	# Screen-edge damage flash
+	if _damage_flash:
+		_damage_flash.visible = true
+		_damage_flash.color = Color(1.0, 0.1, 0.0, 0.15)
+		var flash_tween: Tween = create_tween()
+		flash_tween.tween_property(_damage_flash, "color:a", 0.0, 0.25)
+		flash_tween.tween_callback(func(): _damage_flash.visible = false)
 
 func _on_player_healed(_amount: int) -> void:
 	# Flash HP bar green briefly
@@ -2665,6 +2737,10 @@ var _minimap_camera: Camera3D = null
 var _minimap_player_dot: ColorRect = null
 var _minimap_area_label: Label = null
 var _minimap_tex_rect: TextureRect = null
+var _minimap_enemy_dots: Array[ColorRect] = []
+var _minimap_npc_dots: Array[ColorRect] = []
+var _minimap_dot_container: Control = null
+const MINIMAP_DOT_POOL_SIZE: int = 30
 
 # ── Full map panel ──
 var _full_map_panel: PanelContainer = null
@@ -2743,7 +2819,34 @@ func _build_minimap() -> void:
 	_minimap_player_dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	dot_container.add_child(_minimap_player_dot)
 
-	# Bottom row: area label + map button
+	# Entity dot overlay container (for enemies and NPCs)
+	_minimap_dot_container = Control.new()
+	_minimap_dot_container.name = "DotOverlay"
+	_minimap_dot_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_minimap_dot_container.custom_minimum_size = Vector2(map_size - 6, 0)
+	dot_container.add_child(_minimap_dot_container)
+
+	# Pre-create enemy dots (red)
+	for _i in range(MINIMAP_DOT_POOL_SIZE):
+		var edot: ColorRect = ColorRect.new()
+		edot.color = Color(1.0, 0.2, 0.1, 0.9)
+		edot.size = Vector2(4, 4)
+		edot.visible = false
+		edot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_minimap_dot_container.add_child(edot)
+		_minimap_enemy_dots.append(edot)
+
+	# Pre-create NPC dots (cyan)
+	for _i in range(8):
+		var ndot: ColorRect = ColorRect.new()
+		ndot.color = Color(0.2, 0.9, 1.0, 0.9)
+		ndot.size = Vector2(5, 5)
+		ndot.visible = false
+		ndot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_minimap_dot_container.add_child(ndot)
+		_minimap_npc_dots.append(ndot)
+
+	# Bottom row: area label + legend + map button
 	var bottom_row: HBoxContainer = HBoxContainer.new()
 	bottom_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(bottom_row)
@@ -2773,6 +2876,70 @@ func _build_minimap() -> void:
 	map_btn.add_theme_color_override("font_color", Color(0.5, 0.8, 1.0))
 	map_btn.pressed.connect(_toggle_full_map)
 	bottom_row.add_child(map_btn)
+
+	# Legend row: colored dots with labels
+	var legend: HBoxContainer = HBoxContainer.new()
+	legend.add_theme_constant_override("separation", 3)
+	legend.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(legend)
+
+	var legend_items: Array = [
+		{"color": Color(0.1, 1.0, 0.3), "label": "You"},
+		{"color": Color(1.0, 0.2, 0.1), "label": "Foe"},
+		{"color": Color(0.2, 0.9, 1.0), "label": "NPC"},
+	]
+	for item in legend_items:
+		var ldot: ColorRect = ColorRect.new()
+		ldot.custom_minimum_size = Vector2(5, 5)
+		ldot.color = item["color"]
+		ldot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		legend.add_child(ldot)
+		var lbl: Label = Label.new()
+		lbl.text = item["label"]
+		lbl.add_theme_font_size_override("font_size", 7)
+		lbl.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		legend.add_child(lbl)
+
+# ── Mute button ──
+var _mute_btn: Button = null
+
+func _build_mute_button() -> void:
+	_mute_btn = Button.new()
+	_mute_btn.name = "MuteBtn"
+	_mute_btn.add_theme_font_size_override("font_size", 10)
+	_mute_btn.custom_minimum_size = Vector2(44, 20)
+	# Position below minimap
+	var vp_size: Vector2 = _get_viewport_size()
+	_mute_btn.position = Vector2(vp_size.x - 60, 172)
+	_mute_btn.z_index = 50
+	var btn_style: StyleBoxFlat = StyleBoxFlat.new()
+	btn_style.bg_color = Color(0.08, 0.1, 0.18, 0.9)
+	btn_style.border_color = Color(0.2, 0.4, 0.5, 0.6)
+	btn_style.set_border_width_all(1)
+	btn_style.set_corner_radius_all(3)
+	btn_style.set_content_margin_all(2)
+	_mute_btn.add_theme_stylebox_override("normal", btn_style)
+	var btn_hover: StyleBoxFlat = btn_style.duplicate()
+	btn_hover.bg_color = Color(0.12, 0.16, 0.25, 0.9)
+	_mute_btn.add_theme_stylebox_override("hover", btn_hover)
+	_mute_btn.pressed.connect(_on_mute_pressed)
+	_update_mute_button_text()
+	add_child(_mute_btn)
+
+func _on_mute_pressed() -> void:
+	AudioManager.toggle_mute()
+	_update_mute_button_text()
+
+func _update_mute_button_text() -> void:
+	if _mute_btn == null:
+		return
+	if AudioManager.is_muted():
+		_mute_btn.text = "[MUTE]"
+		_mute_btn.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
+	else:
+		_mute_btn.text = "[VOL]"
+		_mute_btn.add_theme_color_override("font_color", Color(0.3, 0.9, 0.7))
 
 ## Handle click on minimap — convert to world position and walk there
 func _on_minimap_click(event: InputEvent) -> void:
@@ -2929,6 +3096,67 @@ func _update_minimap() -> void:
 		var area_data: Dictionary = DataManager.get_area(GameState.current_area)
 		_minimap_area_label.text = str(area_data.get("name", GameState.current_area)) if not area_data.is_empty() else GameState.current_area
 
+	# Update entity dots on minimap
+	_update_minimap_dots()
+
 	# Update full map camera if visible
 	if _full_map_panel and _full_map_panel.visible and _full_map_camera:
 		_full_map_camera.global_position = Vector3(_player.global_position.x, 200.0, _player.global_position.z)
+
+## Update enemy/NPC dot positions on minimap overlay
+func _update_minimap_dots() -> void:
+	if _minimap_camera == null or _minimap_tex_rect == null or _player == null:
+		return
+	if _minimap_dot_container == null:
+		return
+
+	var cam_size: float = _minimap_camera.size
+	var tex_size: Vector2 = _minimap_tex_rect.size
+	var player_pos: Vector3 = _player.global_position
+	var cam_rot_y: float = _minimap_camera.global_rotation.y
+	var cos_r: float = cos(-cam_rot_y)
+	var sin_r: float = sin(-cam_rot_y)
+
+	# Hide all dots first
+	for dot in _minimap_enemy_dots:
+		dot.visible = false
+	for dot in _minimap_npc_dots:
+		dot.visible = false
+
+	# Plot enemies (red dots)
+	var idx: int = 0
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		if idx >= _minimap_enemy_dots.size():
+			break
+		if not is_instance_valid(enemy):
+			continue
+		if "state" in enemy and enemy.state == enemy.State.DEAD:
+			continue
+		var dx: float = enemy.global_position.x - player_pos.x
+		var dz: float = enemy.global_position.z - player_pos.z
+		var rx: float = dx * cos_r - dz * sin_r
+		var rz: float = dx * sin_r + dz * cos_r
+		var px: float = (rx / cam_size) * tex_size.x + tex_size.x * 0.5
+		var py: float = (rz / cam_size) * tex_size.y + tex_size.y * 0.5
+		if px >= 0 and px < tex_size.x and py >= 0 and py < tex_size.y:
+			_minimap_enemy_dots[idx].position = Vector2(px - 2, -(tex_size.y) + py - 2)
+			_minimap_enemy_dots[idx].visible = true
+			idx += 1
+
+	# Plot NPCs (cyan dots)
+	idx = 0
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if idx >= _minimap_npc_dots.size():
+			break
+		if not is_instance_valid(npc):
+			continue
+		var dx: float = npc.global_position.x - player_pos.x
+		var dz: float = npc.global_position.z - player_pos.z
+		var rx: float = dx * cos_r - dz * sin_r
+		var rz: float = dx * sin_r + dz * cos_r
+		var px: float = (rx / cam_size) * tex_size.x + tex_size.x * 0.5
+		var py: float = (rz / cam_size) * tex_size.y + tex_size.y * 0.5
+		if px >= 0 and px < tex_size.x and py >= 0 and py < tex_size.y:
+			_minimap_npc_dots[idx].position = Vector2(px - 2, -(tex_size.y) + py - 2)
+			_minimap_npc_dots[idx].visible = true
+			idx += 1

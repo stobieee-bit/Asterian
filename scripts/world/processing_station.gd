@@ -97,7 +97,23 @@ func _apply_visuals() -> void:
 		_glow_light.light_color = color
 
 	if _label:
-		_label.text = station_name
+		# Show station name + skill name for discoverability
+		var skill_data: Dictionary = DataManager.get_skill(skill_id)
+		var skill_name: String = str(skill_data.get("name", skill_id.capitalize()))
+		_label.text = "%s\n[%s]" % [station_name, skill_name]
+		_label.font_size = 16
+		_label.outline_size = 5
+
+	# Add "Click to craft" hint label
+	var hint_label: Label3D = Label3D.new()
+	hint_label.position = Vector3(0, 1.1, 0)
+	hint_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	hint_label.no_depth_test = true
+	hint_label.font_size = 10
+	hint_label.outline_size = 3
+	hint_label.modulate = Color(0.6, 0.6, 0.6, 0.7)
+	hint_label.text = "Click to craft"
+	add_child(hint_label)
 
 ## Show tooltip — called by InteractionController on hover
 func show_hover_tooltip() -> void:

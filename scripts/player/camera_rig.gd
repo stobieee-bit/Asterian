@@ -22,6 +22,10 @@ var _distance: float = 25.0         # Current zoom distance
 var _target_distance: float = 25.0  # Smoothed zoom target
 var _is_rotating: bool = false       # Is middle mouse held?
 
+# ── Screen shake ──
+var _shake_intensity: float = 0.0   # Current shake strength (decays to 0)
+var _shake_decay: float = 8.0       # How fast shake decays per second
+
 # ── References ──
 @onready var camera: Camera3D = $Camera3D
 var _follow_target: Node3D = null    # The player node to follow
@@ -46,6 +50,20 @@ func _process(delta: float) -> void:
 
 	# Update camera position from orbit angles
 	_update_camera_transform()
+
+	# Apply screen shake offset
+	if _shake_intensity > 0.01 and camera:
+		var shake_offset: Vector3 = Vector3(
+			randf_range(-1.0, 1.0) * _shake_intensity,
+			randf_range(-1.0, 1.0) * _shake_intensity * 0.5,
+			randf_range(-1.0, 1.0) * _shake_intensity
+		)
+		camera.position += shake_offset
+		_shake_intensity = move_toward(_shake_intensity, 0.0, _shake_decay * delta)
+
+## Trigger screen shake with given intensity (0.1 = subtle, 0.7 = heavy)
+func shake(intensity: float) -> void:
+	_shake_intensity = maxf(_shake_intensity, intensity)
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Middle mouse button: start/stop rotating
