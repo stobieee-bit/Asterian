@@ -48,6 +48,11 @@ var _attack_timer: float = 0.0
 var _dead_timer: float = 0.0
 var _return_speed_mult: float = 2.0  # Move faster when returning
 
+# ── Debuffs & Stun ──
+var _debuffs: Dictionary = {}  # { "defense": {value, duration, timer}, "damage": {value, duration, timer} }
+var _stun_timer: float = 0.0
+var _active_dots: Array = []   # Array of { damage_per_tick, tick_interval, ticks_remaining, tick_timer, from_style }
+
 # ── Loot ──
 var loot_table: Array = []
 
@@ -143,6 +148,27 @@ func _physics_process(delta: float) -> void:
 	# Find player if not cached
 	if _player == null:
 		_player = get_tree().get_first_node_in_group("player")
+
+	# ── Process stun ──
+	if _stun_timer > 0:
+		_stun_timer -= delta
+		velocity = Vector3.ZERO
+		# Apply gravity even when stunned
+		if not is_on_floor():
+			velocity.y -= 20.0 * delta
+		move_and_slide()
+		_update_hp_bar()
+		# Process DoTs even while stunned
+		_process_dots(delta)
+		# Process debuff timers
+		_process_debuffs(delta)
+		return
+
+	# ── Process debuff timers ──
+	_process_debuffs(delta)
+
+	# ── Process DoTs ──
+	_process_dots(delta)
 
 	match state:
 		State.IDLE:
@@ -338,8 +364,9 @@ func _process_dead(delta: float) -> void:
 func _do_attack() -> void:
 	if _player == null:
 		return
-	# Emit attack signal — combat system will handle damage calc
-	EventBus.hit_landed.emit(_player, damage, false)
+	# Emit attack signal with effective damage (reduced by debuffs)
+	var eff_damage: int = get_effective_damage()
+	EventBus.hit_landed.emit(_player, eff_damage, false)
 
 ## Take damage from player. Returns actual damage dealt.
 func take_damage(amount: int, from_style: String = "") -> int:
@@ -351,8 +378,9 @@ func take_damage(amount: int, from_style: String = "") -> int:
 	if from_style != "" and combat_style != "":
 		style_mult = _get_style_multiplier(from_style, combat_style)
 
-	# Apply defense reduction
-	var actual: int = maxi(1, int(amount * style_mult) - defense / 2)
+	# Apply effective defense (reduced by defense debuff)
+	var eff_defense: int = get_effective_defense()
+	var actual: int = maxi(1, int(amount * style_mult) - eff_defense / 2)
 	hp -= actual
 	hp = maxi(0, hp)
 
@@ -410,6 +438,10 @@ func _respawn() -> void:
 	global_position = spawn_position
 	state = State.IDLE
 	wander_target = spawn_position
+	# Clear all status effects
+	_debuffs.clear()
+	_stun_timer = 0.0
+	_active_dots.clear()
 
 	# Reset template mesh after death animation
 	if _mesh_root != null:
@@ -473,6 +505,107 @@ func _get_style_multiplier(attacker_style: String, defender_style: String) -> fl
 	if attacker_style == "void" and defender_style == "tesla":
 		return 0.85
 	return 1.0
+
+# ══════════════════════════════════════════════════════════════════
+# DEBUFF / STUN / DOT SYSTEM
+# ══════════════════════════════════════════════════════════════════
+
+## Apply a stun effect (pauses attack timer and movement)
+func apply_stun(duration: float) -> void:
+	if state == State.DEAD:
+		return
+	_stun_timer = maxf(_stun_timer, duration)
+	# Visual feedback — brief color tint
+	EventBus.float_text_requested.emit("Stunned!", global_position + Vector3(0, 2.8, 0), Color(1.0, 0.9, 0.2))
+
+## Apply a debuff (defense or damage reduction)
+func apply_debuff(debuff_type: String, value: float, duration: float) -> void:
+	if state == State.DEAD:
+		return
+	_debuffs[debuff_type] = { "value": value, "duration": duration, "timer": duration }
+	var debuff_text: String = ""
+	match debuff_type:
+		"defense":
+			debuff_text = "DEF -%d%%" % int(value * 100)
+		"damage":
+			debuff_text = "DMG -%d%%" % int(value * 100)
+	if debuff_text != "":
+		EventBus.float_text_requested.emit(debuff_text, global_position + Vector3(0, 2.5, 0), Color(0.8, 0.3, 1.0))
+
+## Apply a damage-over-time effect
+func apply_dot(damage_per_tick: int, ticks: int, duration: float, from_style: String = "") -> void:
+	if state == State.DEAD:
+		return
+	var tick_interval: float = duration / float(ticks) if ticks > 0 else 2.0
+	_active_dots.append({
+		"damage_per_tick": damage_per_tick,
+		"tick_interval": tick_interval,
+		"ticks_remaining": ticks,
+		"tick_timer": tick_interval,  # First tick after one interval
+		"from_style": from_style,
+	})
+
+## Get defense after debuffs
+func get_effective_defense() -> int:
+	var eff: int = defense
+	if _debuffs.has("defense"):
+		var reduction: float = float(_debuffs["defense"].get("value", 0.0))
+		eff = int(float(eff) * (1.0 - reduction))
+	return maxi(0, eff)
+
+## Get damage after debuffs
+func get_effective_damage() -> int:
+	var eff: int = damage
+	if _debuffs.has("damage"):
+		var reduction: float = float(_debuffs["damage"].get("value", 0.0))
+		eff = int(float(eff) * (1.0 - reduction))
+	return maxi(1, eff)
+
+## Process debuff timers (called each physics frame)
+func _process_debuffs(delta: float) -> void:
+	var expired: Array = []
+	for debuff_type in _debuffs:
+		_debuffs[debuff_type]["timer"] = float(_debuffs[debuff_type]["timer"]) - delta
+		if float(_debuffs[debuff_type]["timer"]) <= 0:
+			expired.append(debuff_type)
+	for debuff_type in expired:
+		_debuffs.erase(debuff_type)
+
+## Process DoT effects (called each physics frame)
+func _process_dots(delta: float) -> void:
+	if state == State.DEAD:
+		_active_dots.clear()
+		return
+
+	var finished: Array = []
+	for i in range(_active_dots.size()):
+		var dot: Dictionary = _active_dots[i]
+		dot["tick_timer"] = float(dot["tick_timer"]) - delta
+		if float(dot["tick_timer"]) <= 0:
+			# Apply tick damage
+			var tick_dmg: int = int(dot["damage_per_tick"])
+			var style: String = str(dot.get("from_style", ""))
+			var style_mult: float = 1.0
+			if style != "" and combat_style != "":
+				style_mult = _get_style_multiplier(style, combat_style)
+			var eff_def: int = get_effective_defense()
+			var actual: int = maxi(1, int(float(tick_dmg) * style_mult) - eff_def / 4)
+			hp -= actual
+			hp = maxi(0, hp)
+			# Float text for DoT damage
+			EventBus.float_text_requested.emit(str(actual), global_position + Vector3(randf_range(-0.3, 0.3), 2.3, 0), Color(0.6, 0.9, 0.3))
+			dot["ticks_remaining"] = int(dot["ticks_remaining"]) - 1
+			dot["tick_timer"] = float(dot["tick_interval"])
+			if int(dot["ticks_remaining"]) <= 0:
+				finished.append(i)
+			if hp <= 0:
+				_die()
+				return
+
+	# Remove finished DoTs (iterate backwards)
+	finished.reverse()
+	for idx in finished:
+		_active_dots.remove_at(idx)
 
 ## Build enemy mesh from the template system (replaces placeholder CSG)
 func _build_template_mesh() -> void:

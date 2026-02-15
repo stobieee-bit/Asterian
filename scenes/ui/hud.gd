@@ -5,13 +5,13 @@
 ## Keybinds: I = inventory, E = equipment, K = skills
 extends CanvasLayer
 
-@onready var area_label: Label = $TopBar/AreaLabel
-@onready var level_label: Label = $TopBar/LevelLabel
-@onready var hp_bar: ProgressBar = $TopBar/HPBar
-@onready var energy_bar: ProgressBar = $TopBar/EnergyBar
-@onready var credits_label: Label = $TopBar/CreditsLabel
-@onready var fps_label: Label = $BottomBar/FPSLabel
-@onready var pos_label: Label = $BottomBar/PosLabel
+# ── Stat bars & labels (built in code, absolute positioned) ──
+var hp_bar: ProgressBar = null
+var energy_bar: ProgressBar = null
+var level_label: Label = null
+var credits_label: Label = null
+var fps_label: Label = null
+var pos_label: Label = null
 
 var _player: Node3D = null
 
@@ -119,12 +119,10 @@ func _ready() -> void:
 	# Window resize — reposition minimap and action bar
 	get_tree().root.size_changed.connect(_on_window_resized)
 
-	# Style the top and bottom bars
-	_style_top_bar()
-	_style_bottom_bar()
+	# Build stat bars (HP, EN, ADR, level, credits) — absolute positioned
+	_build_stat_bars()
 
 	# Initial display
-	_update_area_display(GameState.current_area)
 	_update_credits_display(GameState.player["credits"])
 	_update_level_display()
 
@@ -167,111 +165,128 @@ func _ready() -> void:
 	_build_combat_style_indicator()
 	_build_hover_label()
 
-## Style the TopBar: dark background, colored HP/energy bars with text overlays
-func _style_top_bar() -> void:
-	var top_bar: HBoxContainer = $TopBar
-	if top_bar == null:
-		return
-	# Let mouse events pass through the top bar to the 3D world
-	top_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+## Build stat bars + info labels with absolute positioning (no TopBar/BottomBar containers)
+func _build_stat_bars() -> void:
+	# ── HP Bar — top-left ──
+	hp_bar = ProgressBar.new()
+	hp_bar.name = "HPBar"
+	hp_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hp_bar.position = Vector2(10, 6)
+	hp_bar.custom_minimum_size = Vector2(200, 16)
+	hp_bar.size = Vector2(200, 16)
+	hp_bar.max_value = 100.0
+	hp_bar.value = 100.0
+	hp_bar.show_percentage = false
 
-	# (top bar background removed — cleaner look)
+	var hp_bg: StyleBoxFlat = StyleBoxFlat.new()
+	hp_bg.bg_color = Color(0.08, 0.02, 0.02, 0.7)
+	hp_bg.set_corner_radius_all(3)
+	hp_bg.border_color = Color(0.3, 0.08, 0.08, 0.4)
+	hp_bg.set_border_width_all(1)
+	hp_bar.add_theme_stylebox_override("background", hp_bg)
 
-	# (accent line removed — cleaner look)
+	var hp_fill: StyleBoxFlat = StyleBoxFlat.new()
+	hp_fill.bg_color = Color(0.65, 0.12, 0.08, 0.9)
+	hp_fill.set_corner_radius_all(3)
+	hp_bar.add_theme_stylebox_override("fill", hp_fill)
+	add_child(hp_bar)
 
-	# Let all TopBar children pass through mouse events
-	if hp_bar:
-		hp_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if energy_bar:
-		energy_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if area_label:
-		area_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if level_label:
-		level_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if credits_label:
-		credits_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hp_text = Label.new()
+	_hp_text.name = "HPText"
+	_hp_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hp_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_hp_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_hp_text.add_theme_font_size_override("font_size", 10)
+	_hp_text.add_theme_color_override("font_color", Color(1.0, 0.95, 0.95, 0.95))
+	_hp_text.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.6))
+	_hp_text.add_theme_constant_override("shadow_offset_x", 1)
+	_hp_text.add_theme_constant_override("shadow_offset_y", 1)
+	_hp_text.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	hp_bar.add_child(_hp_text)
 
-	# ── Style HP Bar ──
-	if hp_bar:
-		var hp_bg: StyleBoxFlat = StyleBoxFlat.new()
-		hp_bg.bg_color = Color(0.08, 0.02, 0.02, 0.7)
-		hp_bg.set_corner_radius_all(3)
-		hp_bg.border_color = Color(0.3, 0.08, 0.08, 0.4)
-		hp_bg.set_border_width_all(1)
-		hp_bar.add_theme_stylebox_override("background", hp_bg)
+	# ── Energy Bar — below HP ──
+	energy_bar = ProgressBar.new()
+	energy_bar.name = "EnergyBar"
+	energy_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	energy_bar.position = Vector2(10, 24)
+	energy_bar.custom_minimum_size = Vector2(160, 14)
+	energy_bar.size = Vector2(160, 14)
+	energy_bar.max_value = 100.0
+	energy_bar.value = 100.0
+	energy_bar.show_percentage = false
 
-		var hp_fill: StyleBoxFlat = StyleBoxFlat.new()
-		hp_fill.bg_color = Color(0.65, 0.12, 0.08, 0.9)
-		hp_fill.set_corner_radius_all(3)
-		hp_bar.add_theme_stylebox_override("fill", hp_fill)
+	var en_bg: StyleBoxFlat = StyleBoxFlat.new()
+	en_bg.bg_color = Color(0.02, 0.04, 0.1, 0.7)
+	en_bg.set_corner_radius_all(3)
+	en_bg.border_color = Color(0.06, 0.1, 0.3, 0.4)
+	en_bg.set_border_width_all(1)
+	energy_bar.add_theme_stylebox_override("background", en_bg)
 
-		_hp_text = Label.new()
-		_hp_text.name = "HPText"
-		_hp_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_hp_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_hp_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		_hp_text.add_theme_font_size_override("font_size", 10)
-		_hp_text.add_theme_color_override("font_color", Color(1.0, 0.95, 0.95, 0.95))
-		_hp_text.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.6))
-		_hp_text.add_theme_constant_override("shadow_offset_x", 1)
-		_hp_text.add_theme_constant_override("shadow_offset_y", 1)
-		_hp_text.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		hp_bar.add_child(_hp_text)
+	var en_fill: StyleBoxFlat = StyleBoxFlat.new()
+	en_fill.bg_color = Color(0.12, 0.35, 0.75, 0.9)
+	en_fill.set_corner_radius_all(3)
+	energy_bar.add_theme_stylebox_override("fill", en_fill)
+	add_child(energy_bar)
 
-	# ── Style Energy Bar ──
-	if energy_bar:
-		var en_bg: StyleBoxFlat = StyleBoxFlat.new()
-		en_bg.bg_color = Color(0.02, 0.04, 0.1, 0.7)
-		en_bg.set_corner_radius_all(3)
-		en_bg.border_color = Color(0.06, 0.1, 0.3, 0.4)
-		en_bg.set_border_width_all(1)
-		energy_bar.add_theme_stylebox_override("background", en_bg)
+	_energy_text = Label.new()
+	_energy_text.name = "EnergyText"
+	_energy_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_energy_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_energy_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_energy_text.add_theme_font_size_override("font_size", 10)
+	_energy_text.add_theme_color_override("font_color", Color(0.9, 0.93, 1.0, 0.95))
+	_energy_text.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.6))
+	_energy_text.add_theme_constant_override("shadow_offset_x", 1)
+	_energy_text.add_theme_constant_override("shadow_offset_y", 1)
+	_energy_text.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	energy_bar.add_child(_energy_text)
 
-		var en_fill: StyleBoxFlat = StyleBoxFlat.new()
-		en_fill.bg_color = Color(0.12, 0.35, 0.75, 0.9)
-		en_fill.set_corner_radius_all(3)
-		energy_bar.add_theme_stylebox_override("fill", en_fill)
+	# ── Level label — below ADR bar area ──
+	level_label = Label.new()
+	level_label.name = "LevelLabel"
+	level_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	level_label.position = Vector2(10, 54)
+	level_label.add_theme_font_size_override("font_size", 10)
+	level_label.add_theme_color_override("font_color", Color(0.5, 0.6, 0.7, 0.7))
+	level_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
+	level_label.add_theme_constant_override("shadow_offset_x", 1)
+	level_label.add_theme_constant_override("shadow_offset_y", 1)
+	level_label.text = "Combat Lv 1 | Total Lv 7"
+	add_child(level_label)
 
-		_energy_text = Label.new()
-		_energy_text.name = "EnergyText"
-		_energy_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_energy_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_energy_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		_energy_text.add_theme_font_size_override("font_size", 10)
-		_energy_text.add_theme_color_override("font_color", Color(0.9, 0.93, 1.0, 0.95))
-		_energy_text.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.6))
-		_energy_text.add_theme_constant_override("shadow_offset_x", 1)
-		_energy_text.add_theme_constant_override("shadow_offset_y", 1)
-		_energy_text.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		energy_bar.add_child(_energy_text)
+	# ── Credits label — below level ──
+	credits_label = Label.new()
+	credits_label.name = "CreditsLabel"
+	credits_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	credits_label.position = Vector2(10, 68)
+	credits_label.add_theme_font_size_override("font_size", 11)
+	credits_label.add_theme_color_override("font_color", Color(0.85, 0.75, 0.3, 0.85))
+	credits_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
+	credits_label.add_theme_constant_override("shadow_offset_x", 1)
+	credits_label.add_theme_constant_override("shadow_offset_y", 1)
+	credits_label.text = "$0"
+	add_child(credits_label)
 
-	# Style area label — subtle with shadow
-	if area_label:
-		area_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
-		area_label.add_theme_constant_override("shadow_offset_x", 1)
-		area_label.add_theme_constant_override("shadow_offset_y", 1)
+	# ── FPS label — bottom-right ──
+	fps_label = Label.new()
+	fps_label.name = "FPSLabel"
+	fps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var vp_size: Vector2 = _get_viewport_size()
+	fps_label.position = Vector2(vp_size.x - 80, vp_size.y - 20)
+	fps_label.add_theme_font_size_override("font_size", 10)
+	fps_label.add_theme_color_override("font_color", Color(0.3, 0.35, 0.3, 0.5))
+	fps_label.text = "60 FPS"
+	add_child(fps_label)
 
-	# Style credits label — muted gold
-	if credits_label:
-		credits_label.add_theme_font_size_override("font_size", 13)
-		credits_label.add_theme_color_override("font_color", Color(0.85, 0.75, 0.3, 0.9))
-		credits_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
-		credits_label.add_theme_constant_override("shadow_offset_x", 1)
-		credits_label.add_theme_constant_override("shadow_offset_y", 1)
-
-## Style the BottomBar: add subtle dark background
-func _style_bottom_bar() -> void:
-	var bottom_bar: HBoxContainer = $BottomBar
-	if bottom_bar == null:
-		return
-	# Let mouse events pass through the bottom bar to the 3D world
-	bottom_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if fps_label:
-		fps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if pos_label:
-		pos_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-	# (bottom bar background removed — cleaner look)
+	# ── Position label — bottom-right (left of FPS) ──
+	pos_label = Label.new()
+	pos_label.name = "PosLabel"
+	pos_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pos_label.position = Vector2(vp_size.x - 160, vp_size.y - 20)
+	pos_label.add_theme_font_size_override("font_size", 10)
+	pos_label.add_theme_color_override("font_color", Color(0.3, 0.35, 0.4, 0.5))
+	pos_label.text = "0, 0"
+	add_child(pos_label)
 
 func _process(delta: float) -> void:
 	# Update FPS counter
@@ -361,7 +376,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
-			# Ability keybinds (1, 2, 3)
+			# Ability keybinds (1-5)
 			KEY_1:
 				_use_ability(1)
 				get_viewport().set_input_as_handled()
@@ -370,6 +385,12 @@ func _unhandled_input(event: InputEvent) -> void:
 				get_viewport().set_input_as_handled()
 			KEY_3:
 				_use_ability(3)
+				get_viewport().set_input_as_handled()
+			KEY_4:
+				_use_ability(4)
+				get_viewport().set_input_as_handled()
+			KEY_5:
+				_use_ability(5)
 				get_viewport().set_input_as_handled()
 			# Eat food (F)
 			KEY_F:
@@ -428,13 +449,13 @@ func _build_panels() -> void:
 	panel_style.set_corner_radius_all(4)
 	panel_style.set_content_margin_all(6)
 
-	# Inventory panel (right side) — open by default
+	# Inventory panel (far right) — open by default
+	var vp_sz: Vector2 = _get_viewport_size()
 	_inventory_panel = PanelContainer.new()
 	_inventory_panel.set_script(inventory_script)
 	_inventory_panel.add_theme_stylebox_override("panel", panel_style.duplicate())
 	_inventory_panel.visible = true
-	_inventory_panel.anchors_preset = Control.PRESET_CENTER_RIGHT
-	_inventory_panel.position = Vector2(800, 80)
+	_inventory_panel.position = Vector2(vp_sz.x - 260, 80)
 	add_child(_inventory_panel)
 
 	# Equipment panel (left of inventory) — open by default
@@ -442,15 +463,15 @@ func _build_panels() -> void:
 	_equipment_panel.set_script(equipment_script)
 	_equipment_panel.add_theme_stylebox_override("panel", panel_style.duplicate())
 	_equipment_panel.visible = true
-	_equipment_panel.position = Vector2(560, 80)
+	_equipment_panel.position = Vector2(vp_sz.x - 520, 80)
 	add_child(_equipment_panel)
 
-	# Skills panel (left side) — open by default
+	# Skills panel (left side, below stat bars) — open by default
 	_skills_panel = PanelContainer.new()
 	_skills_panel.set_script(skills_script)
 	_skills_panel.add_theme_stylebox_override("panel", panel_style.duplicate())
 	_skills_panel.visible = true
-	_skills_panel.position = Vector2(20, 80)
+	_skills_panel.position = Vector2(10, 120)
 	add_child(_skills_panel)
 
 	# Dialogue panel (center of screen)
@@ -906,14 +927,9 @@ func _reposition_chat() -> void:
 	var vp_size: Vector2 = _get_viewport_size()
 	_chat_bg.position = Vector2(8, vp_size.y - 260)
 
-func _update_area_display(area_id: String) -> void:
-	if area_label == null:
-		return
-	var area_data: Dictionary = DataManager.get_area(area_id)
-	if not area_data.is_empty():
-		area_label.text = str(area_data.get("name", area_id))
-	else:
-		area_label.text = area_id
+func _update_area_display(_area_id: String) -> void:
+	# Area name is shown in minimap only now — no separate label
+	pass
 
 func _update_credits_display(amount: int) -> void:
 	if credits_label:
@@ -1046,7 +1062,7 @@ var _adrenaline_text: Label = null
 func _build_adrenaline_bar() -> void:
 	var adr_container: Control = Control.new()
 	adr_container.name = "AdrenalineContainer"
-	adr_container.position = Vector2(12, 36)
+	adr_container.position = Vector2(10, 40)
 	adr_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(adr_container)
 
@@ -1097,37 +1113,110 @@ func _build_adrenaline_bar() -> void:
 	_adrenaline_bar.add_child(_adrenaline_text)
 
 # ── Ability bar ──
+var _ability_bar: HBoxContainer = null
+var _ability_bar_bg: PanelContainer = null
+var _ability_buttons: Array[Button] = []
 
-## Build 3 ability buttons + eat food button below the adrenaline bar
+## Build 5 ability buttons + eat food button, centered above action bar
 func _build_ability_bar() -> void:
-	var bar: HBoxContainer = HBoxContainer.new()
-	bar.position = Vector2(12, 50)
-	bar.add_theme_constant_override("separation", 3)
-	add_child(bar)
+	_ability_bar_bg = PanelContainer.new()
+	_ability_bar_bg.name = "AbilityBarBG"
+	var bg_style: StyleBoxFlat = StyleBoxFlat.new()
+	bg_style.bg_color = Color(0.015, 0.02, 0.04, 0.65)
+	bg_style.border_color = Color(0.08, 0.15, 0.25, 0.25)
+	bg_style.border_width_top = 1
+	bg_style.set_corner_radius_all(4)
+	bg_style.set_content_margin_all(3)
+	bg_style.content_margin_left = 6
+	bg_style.content_margin_right = 6
+	_ability_bar_bg.add_theme_stylebox_override("panel", bg_style)
+	add_child(_ability_bar_bg)
 
-	# Basic ability (BUILDS +8% adrenaline) — cyan
-	var btn1: Button = _make_ability_btn("1", "Basic", Color(0.3, 0.9, 1.0), 0, "+8 ADR")
-	btn1.tooltip_text = "Basic Ability — 1.5x damage\nBuilds 8% Adrenaline"
-	btn1.pressed.connect(func(): _use_ability(1))
-	bar.add_child(btn1)
+	_ability_bar = HBoxContainer.new()
+	_ability_bar.add_theme_constant_override("separation", 3)
+	_ability_bar_bg.add_child(_ability_bar)
 
-	# Threshold ability (COSTS 50% adrenaline) — orange
-	var btn2: Button = _make_ability_btn("2", "Thresh", Color(1.0, 0.6, 0.1), 50)
-	btn2.tooltip_text = "Threshold Ability — 2.88x damage\nCosts 50% Adrenaline"
-	btn2.pressed.connect(func(): _use_ability(2))
-	bar.add_child(btn2)
+	# Build buttons from data
+	_refresh_ability_buttons()
 
-	# Ultimate ability (COSTS 100% adrenaline) — magenta
-	var btn3: Button = _make_ability_btn("3", "Ulti", Color(1.0, 0.2, 0.9), 100)
-	btn3.tooltip_text = "Ultimate Ability — 5.0x damage\nCosts 100% Adrenaline"
-	btn3.pressed.connect(func(): _use_ability(3))
-	bar.add_child(btn3)
+	# Position centered above action bar
+	_reposition_ability_bar()
 
-	# Eat food button — green
+## Refresh ability buttons based on current combat style
+func _refresh_ability_buttons() -> void:
+	if _ability_bar == null:
+		return
+
+	# Clear old buttons
+	for child in _ability_bar.get_children():
+		child.queue_free()
+	_ability_buttons.clear()
+
+	var style: String = str(GameState.player.get("combat_style", "nano"))
+	var abilities: Array = DataManager.get_abilities_for_style(style) if DataManager.has_method("get_abilities_for_style") else []
+
+	# Accent colors by tier
+	var tier_colors: Dictionary = {
+		"basic": Color(0.3, 0.9, 1.0),
+		"threshold": Color(1.0, 0.6, 0.1),
+		"ultimate": Color(1.0, 0.2, 0.9),
+	}
+
+	if abilities.size() > 0:
+		# Sort by slot
+		abilities.sort_custom(func(a, b): return int(a.get("slot", 0)) < int(b.get("slot", 0)))
+		for i in range(abilities.size()):
+			var ab: Dictionary = abilities[i]
+			var tier: String = str(ab.get("tier", "basic"))
+			var accent: Color = tier_colors.get(tier, Color(0.3, 0.9, 1.0))
+			var adr_cost: int = int(ab.get("adr_cost", 0))
+			var adr_gain: int = int(ab.get("adr_gain", 0))
+			var cost_text: String = "+%d ADR" % adr_gain if adr_gain > 0 else ("%d ADR" % adr_cost if adr_cost > 0 else "")
+			var slot_num: int = i + 1
+			var ab_name: String = str(ab.get("name", "Ability"))
+			# Truncate name for button
+			var short_name: String = ab_name if ab_name.length() <= 8 else ab_name.substr(0, 7) + "."
+
+			var btn: Button = _make_ability_btn(str(slot_num), short_name, accent, adr_cost, cost_text)
+			btn.tooltip_text = "%s — %.1fx damage\n%s" % [ab_name, float(ab.get("damage_mult", 1.0)), str(ab.get("description", ""))]
+			var slot_idx: int = slot_num
+			btn.pressed.connect(func(): _use_ability(slot_idx))
+			_ability_bar.add_child(btn)
+			_ability_buttons.append(btn)
+	else:
+		# Fallback: generic 5 buttons if DataManager doesn't have abilities yet
+		var fallback_data: Array = [
+			{"key": "1", "name": "Basic 1", "color": Color(0.3, 0.9, 1.0), "cost": 0, "cost_text": "+8 ADR"},
+			{"key": "2", "name": "Basic 2", "color": Color(0.3, 0.9, 1.0), "cost": 0, "cost_text": "+8 ADR"},
+			{"key": "3", "name": "Thresh 1", "color": Color(1.0, 0.6, 0.1), "cost": 50, "cost_text": "50 ADR"},
+			{"key": "4", "name": "Thresh 2", "color": Color(1.0, 0.6, 0.1), "cost": 50, "cost_text": "50 ADR"},
+			{"key": "5", "name": "Ultimate", "color": Color(1.0, 0.2, 0.9), "cost": 100, "cost_text": "100 ADR"},
+		]
+		for i in range(fallback_data.size()):
+			var fb: Dictionary = fallback_data[i]
+			var btn: Button = _make_ability_btn(fb["key"], fb["name"], fb["color"], fb["cost"], fb["cost_text"])
+			var slot_idx: int = i + 1
+			btn.pressed.connect(func(): _use_ability(slot_idx))
+			_ability_bar.add_child(btn)
+			_ability_buttons.append(btn)
+
+	# Eat food button — always last, green
 	var food_btn: Button = _make_ability_btn("F", "Eat", Color(0.3, 1.0, 0.3), 0)
 	food_btn.tooltip_text = "Eat Food — Heals HP\nUses best food in inventory"
 	food_btn.pressed.connect(func(): _eat_food())
-	bar.add_child(food_btn)
+	_ability_bar.add_child(food_btn)
+
+## Position the ability bar centered above the action bar
+func _reposition_ability_bar() -> void:
+	if _ability_bar_bg == null:
+		return
+	var vp_size: Vector2 = _get_viewport_size()
+	# Wait a frame for size to update
+	await get_tree().process_frame
+	var bar_width: float = _ability_bar_bg.size.x
+	if bar_width < 10:
+		bar_width = 480.0  # Estimate for 5+1 buttons
+	_ability_bar_bg.position = Vector2(vp_size.x / 2.0 - bar_width / 2.0, vp_size.y - 82)
 
 ## Create a styled ability button with keybind + name + cost badge
 func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost: int, cost_text_override: String = "") -> Button:
@@ -1410,7 +1499,7 @@ func _build_combat_indicator() -> void:
 	_combat_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
 	_combat_label.add_theme_constant_override("shadow_offset_x", 1)
 	_combat_label.add_theme_constant_override("shadow_offset_y", 1)
-	_combat_label.position = Vector2(12, 88)
+	_combat_label.position = Vector2(10, 84)
 	_combat_label.size = Vector2(100, 16)
 	_combat_label.visible = false
 	add_child(_combat_label)
@@ -1427,7 +1516,7 @@ func _build_slayer_display() -> void:
 	_slayer_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.8))
 	_slayer_label.add_theme_constant_override("shadow_offset_x", 1)
 	_slayer_label.add_theme_constant_override("shadow_offset_y", 1)
-	_slayer_label.position = Vector2(12, 108)
+	_slayer_label.position = Vector2(10, 98)
 	_slayer_label.size = Vector2(250, 16)
 	_slayer_label.visible = false
 	add_child(_slayer_label)
@@ -1784,7 +1873,7 @@ func _build_target_info_panel() -> void:
 	_target_panel.visible = false
 	_target_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var vp_w: float = _design_size.x
-	_target_panel.position = Vector2(vp_w / 2.0 - 110, 38)
+	_target_panel.position = Vector2(vp_w / 2.0 - 110, 6)
 	_target_panel.custom_minimum_size = Vector2(220, 0)
 	add_child(_target_panel)
 
@@ -2104,7 +2193,7 @@ func _build_save_toast() -> void:
 	_save_toast_label.add_theme_constant_override("shadow_offset_x", 1)
 	_save_toast_label.add_theme_constant_override("shadow_offset_y", 1)
 	var vp_size: Vector2 = _get_viewport_size()
-	_save_toast_label.position = Vector2(vp_size.x - 160, vp_size.y - 30)
+	_save_toast_label.position = Vector2(vp_size.x - 160, vp_size.y - 40)
 	_save_toast_label.size = Vector2(150, 20)
 	_save_toast_label.modulate = Color(1, 1, 1, 0)
 	add_child(_save_toast_label)
@@ -2132,8 +2221,8 @@ func _build_combat_style_indicator() -> void:
 	_style_indicator_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.5))
 	_style_indicator_label.add_theme_constant_override("shadow_offset_x", 1)
 	_style_indicator_label.add_theme_constant_override("shadow_offset_y", 1)
-	# Position next to adrenaline bar
-	_style_indicator_label.position = Vector2(200, 44)
+	# Position right of adrenaline bar
+	_style_indicator_label.position = Vector2(195, 40)
 	_style_indicator_label.size = Vector2(120, 16)
 	add_child(_style_indicator_label)
 	_update_style_indicator()
@@ -2162,6 +2251,14 @@ func _cycle_combat_style() -> void:
 	var next_idx: int = (idx + 1) % styles.size()
 	GameState.player["combat_style"] = styles[next_idx]
 	_update_style_indicator()
+	# Refresh ability bar to show new style's abilities
+	_refresh_ability_buttons()
+	_reposition_ability_bar()
+	# Refresh combat controller abilities
+	if _player:
+		var combat: Node = _player.get_node_or_null("CombatController")
+		if combat and combat.has_method("refresh_abilities"):
+			combat.refresh_abilities()
 	EventBus.chat_message.emit("Combat style: %s" % styles[next_idx].capitalize(), "combat")
 	# Flash the label for feedback
 	if _style_indicator_label:
@@ -2676,8 +2773,12 @@ func _on_window_resized() -> void:
 	_resize_minimap()
 	# Reposition action bar to bottom-center
 	_reposition_action_bar()
+	# Reposition ability bar to centered above action bar
+	_reposition_ability_bar()
 	# Reposition chat to bottom-left
 	_reposition_chat()
+	# Reposition FPS/Pos labels to bottom-right
+	_reposition_bottom_labels()
 
 ## Reposition the bottom action bar to horizontal center
 func _reposition_action_bar() -> void:
@@ -2685,6 +2786,14 @@ func _reposition_action_bar() -> void:
 		return
 	var vp_size: Vector2 = _get_viewport_size()
 	_action_bar_bg.position = Vector2(vp_size.x / 2.0 - 380, vp_size.y - 52)
+
+## Reposition FPS and Position labels to bottom-right
+func _reposition_bottom_labels() -> void:
+	var vp_size: Vector2 = _get_viewport_size()
+	if fps_label:
+		fps_label.position = Vector2(vp_size.x - 80, vp_size.y - 20)
+	if pos_label:
+		pos_label.position = Vector2(vp_size.x - 160, vp_size.y - 20)
 
 ## Cycle minimap zoom level (small → medium → large)
 var _minimap_zoom_level: int = 0  # 0=small (160), 1=medium (220), 2=large (300)

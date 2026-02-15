@@ -52,6 +52,9 @@ func _ready() -> void:
 	# Listen for enemy attacks on player
 	EventBus.hit_landed.connect(_on_hit_landed)
 
+	# Load abilities for current combat style
+	refresh_abilities()
+
 	# Create target indicator ring (MeshInstance3D — no CSG compile flash)
 	_target_indicator = MeshInstance3D.new()
 	var cyl_mesh: CylinderMesh = CylinderMesh.new()
@@ -350,10 +353,19 @@ func _find_best_food() -> String:
 			best_id = sid
 	return best_id
 
-# ── Abilities (adrenaline-based) ──
+# ── Abilities (adrenaline-based, data-driven) ──
 
-## Use style-based ability (RS3-style).
-## Basics (1) BUILD adrenaline (+8%). Thresholds (2) COST 50%. Ultimates (3) COST 100%.
+## Cached active abilities for current style (refreshed on style change)
+var _active_abilities: Array = []
+
+## Refresh abilities from DataManager for current combat style
+func refresh_abilities() -> void:
+	var style: String = str(GameState.player.get("combat_style", "nano"))
+	_active_abilities = DataManager.get_abilities_for_style(style)
+	_active_abilities.sort_custom(func(a, b): return int(a.get("slot", 0)) < int(b.get("slot", 0)))
+
+## Use style-based ability (data-driven from abilities.json).
+## Slot 1-5 corresponds to current style's abilities sorted by slot.
 func use_ability(ability_slot: int) -> bool:
 	if target == null or not is_instance_valid(target):
 		EventBus.chat_message.emit("No target selected.", "system")
@@ -365,43 +377,24 @@ func use_ability(ability_slot: int) -> bool:
 	if _gcd_timer > 0:
 		return false
 
-	var adrenaline: float = float(GameState.player["adrenaline"])
-	var cost: float = 0.0
-	var adr_gain: float = 0.0
-	var damage_mult: float = 1.0
-	var ability_name: String = ""
-	var style: String = str(GameState.player["combat_style"])
+	# Refresh if empty
+	if _active_abilities.is_empty():
+		refresh_abilities()
 
-	match ability_slot:
-		1:  # Basic: BUILDS adrenaline, moderate damage
-			cost = 0.0
-			adr_gain = ADRENALINE_PER_BASIC
-			damage_mult = 1.5
-			match style:
-				"nano":   ability_name = "Nano Slice"
-				"tesla":  ability_name = "Tesla Bolt"
-				"void":   ability_name = "Void Pulse"
-				_:        ability_name = "Basic Ability"
-		2:  # Threshold: COSTS 50% adrenaline, strong damage
-			cost = 50.0
-			adr_gain = 0.0
-			damage_mult = 2.88
-			match style:
-				"nano":   ability_name = "Molecular Storm"
-				"tesla":  ability_name = "Chain Lightning"
-				"void":   ability_name = "Void Rend"
-				_:        ability_name = "Threshold Ability"
-		3:  # Ultimate: COSTS 100% adrenaline, devastating damage
-			cost = 100.0
-			adr_gain = 0.0
-			damage_mult = 5.0
-			match style:
-				"nano":   ability_name = "Nano Swarm"
-				"tesla":  ability_name = "Thunderstrike"
-				"void":   ability_name = "Singularity"
-				_:        ability_name = "Ultimate Ability"
-		_:
-			return false
+	# Find the ability for this slot
+	var slot_idx: int = ability_slot - 1
+	if slot_idx < 0 or slot_idx >= _active_abilities.size():
+		return false
+
+	var ab: Dictionary = _active_abilities[slot_idx]
+	var adrenaline: float = float(GameState.player["adrenaline"])
+	var cost: float = float(ab.get("adr_cost", 0))
+	var adr_gain: float = float(ab.get("adr_gain", 0))
+	var damage_mult: float = float(ab.get("damage_mult", 1.0))
+	var ability_name: String = str(ab.get("name", "Ability"))
+	var tier: String = str(ab.get("tier", "basic"))
+	var style: String = str(GameState.player["combat_style"])
+	var effects: Array = ab.get("effects", [])
 
 	if adrenaline < cost:
 		EventBus.chat_message.emit("Not enough adrenaline (%d/%d)." % [int(adrenaline), int(cost)], "combat")
@@ -413,7 +406,7 @@ func use_ability(ability_slot: int) -> bool:
 	elif adr_gain > 0:
 		GameState.player["adrenaline"] = minf(ADRENALINE_MAX, adrenaline + adr_gain)
 
-	# Calculate damage
+	# Calculate base damage
 	var weapon_damage: int = _get_weapon_damage()
 	var total_damage: int = int(float(base_damage + weapon_damage) * damage_mult)
 
@@ -429,40 +422,232 @@ func use_ability(ability_slot: int) -> bool:
 	# Capture position
 	var target_pos: Vector3 = (target as Node3D).global_position
 
-	# Deal damage
+	# Deal primary damage
 	var actual: int = target.take_damage(total_damage, style)
+
+	# Tier-based color
+	var ability_color: Color
+	match tier:
+		"basic": ability_color = Color(0.3, 0.9, 1.0)
+		"threshold": ability_color = Color(1.0, 0.6, 0.1)
+		"ultimate": ability_color = Color(1.0, 0.2, 0.9)
+		_: ability_color = Color.WHITE
 
 	# Feedback
 	EventBus.chat_message.emit("%s hit for %d!" % [ability_name, actual], "combat")
-	var ability_color: Color
-	match ability_slot:
-		1: ability_color = Color(0.3, 0.9, 1.0)
-		2: ability_color = Color(1.0, 0.6, 0.1)
-		3: ability_color = Color(1.0, 0.2, 0.9)
-		_: ability_color = Color.WHITE
 	EventBus.float_text_requested.emit(
 		"%s %d" % [ability_name, actual],
 		target_pos + Vector3(randf_range(-0.5, 0.5), 3.0, 0),
 		ability_color
 	)
 
-	# Screen shake for threshold/ultimate abilities
-	if ability_slot >= 2:
+	# Apply special effects
+	_apply_ability_effects(effects, target, target_pos, total_damage, style, ability_color)
+
+	# Screen shake for threshold/ultimate
+	if tier == "threshold" or tier == "ultimate":
 		var cam_rig: Node = _player.get_node_or_null("CameraRig")
 		if cam_rig and cam_rig.has_method("shake"):
-			match ability_slot:
-				2: cam_rig.shake(0.4)   # Threshold
-				3: cam_rig.shake(0.7)   # Ultimate
+			var shake_strength: float = 0.4 if tier == "threshold" else 0.7
+			cam_rig.shake(shake_strength)
 
-	# Impact ring for threshold/ultimate abilities
-	if ability_slot >= 2:
-		_spawn_impact_ring(target_pos, ability_color, ability_slot)
+	# Impact ring for threshold/ultimate
+	if tier == "threshold" or tier == "ultimate":
+		var ring_slot: int = 2 if tier == "threshold" else 3
+		_spawn_impact_ring(target_pos, ability_color, ring_slot)
 
-	# Reset attack timer and start GCD (ability replaces auto-attack tick)
+	# Reset attack timer and start GCD
 	attack_timer = base_attack_speed
 	_gcd_timer = GCD_TIME
 
+	# Face target
+	var to_target: Vector3 = target_pos - _player.global_position
+	if to_target.length() > 0.1:
+		_player.rotation.y = atan2(-to_target.x, -to_target.z)
+
 	return true
+
+## Apply special effects from ability data (DoT, AoE, chain, stun, debuff, heal)
+func _apply_ability_effects(effects: Array, primary_target: Node, target_pos: Vector3, base_dmg: int, style: String, color: Color) -> void:
+	for effect in effects:
+		if not effect is Dictionary:
+			continue
+		var etype: String = str(effect.get("type", ""))
+
+		match etype:
+			"dot":
+				# Damage over time on primary target
+				if primary_target and is_instance_valid(primary_target) and primary_target.has_method("apply_dot"):
+					var ticks: int = int(effect.get("ticks", 3))
+					var tick_mult: float = float(effect.get("tick_damage_mult", 0.4))
+					var duration: float = float(effect.get("duration", 6.0))
+					var weapon_damage: int = _get_weapon_damage()
+					var tick_dmg: int = maxi(1, int(float(base_damage + weapon_damage) * tick_mult))
+					primary_target.apply_dot(tick_dmg, ticks, duration, style)
+					EventBus.float_text_requested.emit("DoT!", target_pos + Vector3(0, 3.5, 0), Color(0.6, 0.9, 0.3))
+
+			"aoe":
+				# Area of effect — damage all enemies in radius
+				var radius: float = float(effect.get("radius", 5.0))
+				var aoe_targets: Array = _find_enemies_in_radius(target_pos, radius)
+				for enemy in aoe_targets:
+					if enemy == primary_target:
+						continue  # Already hit
+					if not is_instance_valid(enemy):
+						continue
+					var aoe_dmg: int = int(float(base_dmg) * 0.8)  # AoE does 80% of primary
+					var aoe_actual: int = enemy.take_damage(aoe_dmg, style)
+					EventBus.float_text_requested.emit(
+						str(aoe_actual),
+						enemy.global_position + Vector3(randf_range(-0.3, 0.3), 2.5, 0),
+						color.darkened(0.15)
+					)
+
+			"chain":
+				# Chain to nearby enemies
+				var chain_count: int = int(effect.get("chain_count", 2))
+				var chain_range: float = float(effect.get("chain_range", 6.0))
+				var chain_mult: float = float(effect.get("chain_damage_mult", 0.6))
+				var chain_targets: Array = _find_chain_targets(target_pos, chain_count, chain_range, primary_target)
+				for enemy in chain_targets:
+					if not is_instance_valid(enemy):
+						continue
+					var chain_dmg: int = maxi(1, int(float(base_dmg) * chain_mult))
+					var chain_actual: int = enemy.take_damage(chain_dmg, style)
+					EventBus.float_text_requested.emit(
+						str(chain_actual),
+						enemy.global_position + Vector3(randf_range(-0.3, 0.3), 2.5, 0),
+						Color(0.4, 0.8, 1.0)
+					)
+					# Visual chain line
+					_spawn_chain_line(target_pos, enemy.global_position, color)
+
+			"stun":
+				# Stun the primary target
+				var stun_dur: float = float(effect.get("duration", 2.0))
+				if primary_target and is_instance_valid(primary_target) and primary_target.has_method("apply_stun"):
+					primary_target.apply_stun(stun_dur)
+
+			"debuff":
+				# Apply a debuff to the primary target
+				var debuff_type: String = str(effect.get("debuff_type", "defense"))
+				var value: float = float(effect.get("value", 0.2))
+				var duration: float = float(effect.get("duration", 8.0))
+				if primary_target and is_instance_valid(primary_target) and primary_target.has_method("apply_debuff"):
+					primary_target.apply_debuff(debuff_type, value, duration)
+
+			"heal":
+				# Heal the player for a percentage of damage dealt
+				var heal_pct: float = float(effect.get("heal_percent", 0.5))
+				var heal_amount: int = maxi(1, int(float(base_dmg) * heal_pct))
+				var max_hp: int = int(GameState.player["max_hp"])
+				var old_hp: int = int(GameState.player["hp"])
+				GameState.player["hp"] = mini(max_hp, old_hp + heal_amount)
+				var actual_heal: int = int(GameState.player["hp"]) - old_hp
+				if actual_heal > 0:
+					EventBus.float_text_requested.emit(
+						"+%d" % actual_heal,
+						_player.global_position + Vector3(0, 3.0, 0),
+						Color(0.3, 1.0, 0.3)
+					)
+					EventBus.player_healed.emit(actual_heal)
+
+			"ground_aoe":
+				# Ground AoE — creates a persistent damage zone
+				var gaoe_radius: float = float(effect.get("radius", 4.0))
+				var gaoe_tick_mult: float = float(effect.get("tick_damage_mult", 0.5))
+				var gaoe_duration: float = float(effect.get("duration", 5.0))
+				# Apply DoT to all enemies in the area
+				var gaoe_targets: Array = _find_enemies_in_radius(target_pos, gaoe_radius)
+				var weapon_damage: int = _get_weapon_damage()
+				var tick_dmg: int = maxi(1, int(float(base_damage + weapon_damage) * gaoe_tick_mult))
+				var ticks: int = int(gaoe_duration)  # 1 tick per second
+				for enemy in gaoe_targets:
+					if is_instance_valid(enemy) and enemy.has_method("apply_dot"):
+						enemy.apply_dot(tick_dmg, ticks, gaoe_duration, style)
+				# Visual feedback — spawn ground ring
+				_spawn_ground_aoe_visual(target_pos, gaoe_radius, gaoe_duration, color)
+
+## Find all enemies within a radius of a position
+func _find_enemies_in_radius(center: Vector3, radius: float) -> Array:
+	var result: Array = []
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		if not is_instance_valid(enemy):
+			continue
+		if enemy.state == enemy.State.DEAD:
+			continue
+		var dist: float = enemy.global_position.distance_to(center)
+		if dist <= radius:
+			result.append(enemy)
+	return result
+
+## Find chain targets (closest enemies not already hit)
+func _find_chain_targets(origin: Vector3, count: int, max_range: float, exclude: Node) -> Array:
+	var candidates: Array = []
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		if not is_instance_valid(enemy):
+			continue
+		if enemy == exclude:
+			continue
+		if enemy.state == enemy.State.DEAD:
+			continue
+		var dist: float = enemy.global_position.distance_to(origin)
+		if dist <= max_range:
+			candidates.append({ "enemy": enemy, "dist": dist })
+	# Sort by distance
+	candidates.sort_custom(func(a, b): return a["dist"] < b["dist"])
+	var result: Array = []
+	for i in range(mini(count, candidates.size())):
+		result.append(candidates[i]["enemy"])
+	return result
+
+## Spawn a visual chain lightning line between two positions
+func _spawn_chain_line(from: Vector3, to: Vector3, color: Color) -> void:
+	# Create a simple line using a stretched CSGBox3D
+	var midpoint: Vector3 = (from + to) / 2.0
+	midpoint.y = maxf(from.y, to.y) + 1.0
+	var chain_visual: CSGBox3D = CSGBox3D.new()
+	chain_visual.size = Vector3(0.08, 0.08, from.distance_to(to))
+	chain_visual.top_level = true
+	chain_visual.global_position = midpoint
+	chain_visual.look_at(to, Vector3.UP)
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	mat.albedo_color = Color(color.r, color.g, color.b, 0.8)
+	mat.emission_enabled = true
+	mat.emission = color
+	mat.emission_energy_multiplier = 3.0
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	chain_visual.material = mat
+	_player.get_tree().root.add_child(chain_visual)
+	# Fade out quickly
+	var tween: Tween = chain_visual.create_tween()
+	tween.tween_property(mat, "albedo_color:a", 0.0, 0.3)
+	tween.tween_callback(chain_visual.queue_free)
+
+## Spawn a ground AoE visual ring that persists for duration then fades
+func _spawn_ground_aoe_visual(pos: Vector3, radius: float, duration: float, color: Color) -> void:
+	var ring: CSGTorus3D = CSGTorus3D.new()
+	ring.inner_radius = radius - 0.15
+	ring.outer_radius = radius
+	ring.ring_sides = 6
+	ring.sides = 32
+	ring.rotation_degrees.x = 90.0
+	ring.top_level = true
+	ring.global_position = Vector3(pos.x, 0.1, pos.z)
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	mat.albedo_color = Color(color.r, color.g, color.b, 0.5)
+	mat.emission_enabled = true
+	mat.emission = color
+	mat.emission_energy_multiplier = 1.5
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.no_depth_test = true
+	ring.material = mat
+	_player.get_tree().root.add_child(ring)
+	# Hold then fade
+	var tween: Tween = ring.create_tween()
+	tween.tween_interval(duration)
+	tween.tween_property(mat, "albedo_color:a", 0.0, 0.5)
+	tween.tween_callback(ring.queue_free)
 
 # ── Damage taken ──
 

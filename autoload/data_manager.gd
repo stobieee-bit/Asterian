@@ -44,6 +44,7 @@ var dungeon_loot_tiers: Array = []
 var pets: Array = []
 var equipment_data: Dictionary = {}
 var enemy_loot_tables: Dictionary = {}
+var abilities: Dictionary = {}
 
 # ── Loading ──
 
@@ -133,6 +134,11 @@ func _load_all_data() -> void:
 	if loot_data is Dictionary:
 		enemy_loot_tables = loot_data
 
+	# Abilities
+	var ability_data: Variant = _load_json("res://data/abilities.json")
+	if ability_data is Dictionary:
+		abilities = ability_data
+
 	# Print summary
 	print("  Items: %d" % items.size())
 	print("  Recipes: %d" % recipes.size())
@@ -143,6 +149,7 @@ func _load_all_data() -> void:
 	print("  NPCs: %d" % npcs.size())
 	print("  Achievements: %d" % achievements.size())
 	print("  Pets: %d" % pets.size())
+	print("  Abilities: %d" % abilities.size())
 
 # ── JSON loading utility ──
 
@@ -257,4 +264,21 @@ func get_recipes_for_skill(skill_id: String) -> Array:
 		if recipe.get("skill", "") == skill_id:
 			recipe["id"] = recipe_id
 			result.append(recipe)
+	return result
+
+## Get an ability definition by id. Returns empty dict if not found.
+func get_ability(ability_id: String) -> Dictionary:
+	if abilities.has(ability_id):
+		return abilities[ability_id]
+	return {}
+
+## Get all abilities for a specific combat style, sorted by slot.
+func get_abilities_for_style(style: String) -> Array:
+	var result: Array = []
+	for ability_id in abilities:
+		var ab: Dictionary = abilities[ability_id]
+		if str(ab.get("style", "")) == style:
+			result.append(ab)
+	# Sort by slot number
+	result.sort_custom(func(a, b): return int(a.get("slot", 0)) < int(b.get("slot", 0)))
 	return result
