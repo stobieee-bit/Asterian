@@ -4,6 +4,8 @@
 ## and a list of response buttons. Supports dialogue tree navigation.
 extends PanelContainer
 
+const NPC_ACTION_RANGE: float = 5.0
+
 # ── State ──
 var _current_npc: Node = null
 var _current_node_key: String = "greeting"
@@ -173,6 +175,12 @@ func _on_navigate(key: String) -> void:
 
 ## Handle an action option
 func _on_action(action: String) -> void:
+	# All NPC-dependent actions require proximity
+	if not _is_npc_in_range():
+		EventBus.chat_message.emit("You need to move closer.", "system")
+		_on_close()
+		return
+
 	# Handle parameterized actions (e.g., "acceptQuest:first_blood")
 	if action.begins_with("acceptQuest:"):
 		var quest_id: String = action.substr(12)
@@ -214,6 +222,15 @@ func _on_action(action: String) -> void:
 			EventBus.chat_message.emit("Appearance editor coming soon!", "system")
 		_:
 			EventBus.chat_message.emit("Action not implemented: %s" % action, "system")
+
+## Check if the player is still close enough to the current NPC for actions
+func _is_npc_in_range() -> bool:
+	if _current_npc == null or not is_instance_valid(_current_npc):
+		return false
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+	if player == null:
+		return false
+	return player.global_position.distance_to(_current_npc.global_position) <= NPC_ACTION_RANGE
 
 func _open_shop_for(npc: Node) -> void:
 	var hud_node: Node = get_parent()
