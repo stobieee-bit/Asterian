@@ -71,20 +71,19 @@ func _create_skill_row(parent: VBoxContainer, skill_id: String) -> Dictionary:
 	var skill_name: String = str(skill_data.get("name", skill_id.capitalize()))
 	var skill_color: Color = _skill_color(skill_id)
 
-	# Clickable button-like container
 	var click_panel: PanelContainer = PanelContainer.new()
 	var click_style: StyleBoxFlat = StyleBoxFlat.new()
-	click_style.bg_color = Color(0.08, 0.1, 0.16, 0.6)
+	click_style.bg_color = Color(0.04, 0.05, 0.08, 0.4)
 	click_style.set_corner_radius_all(3)
 	click_style.set_content_margin_all(3)
 	click_panel.add_theme_stylebox_override("panel", click_style)
 	click_panel.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	parent.add_child(click_panel)
 
-	# Hover effect
 	var hover_style: StyleBoxFlat = click_style.duplicate()
-	hover_style.bg_color = Color(0.12, 0.16, 0.24, 0.8)
+	hover_style.bg_color = Color(0.06, 0.08, 0.14, 0.6)
 	hover_style.border_color = skill_color.darkened(0.4)
+	hover_style.border_color.a = 0.4
 	hover_style.set_border_width_all(1)
 
 	click_panel.mouse_entered.connect(func():
@@ -131,18 +130,18 @@ func _create_skill_row(parent: VBoxContainer, skill_id: String) -> Dictionary:
 	arrow.add_theme_color_override("font_color", Color(0.4, 0.5, 0.6))
 	name_row.add_child(arrow)
 
-	# XP progress bar
 	var xp_bar: ProgressBar = ProgressBar.new()
-	xp_bar.custom_minimum_size = Vector2(0, 12)
+	xp_bar.custom_minimum_size = Vector2(0, 8)
 	xp_bar.show_percentage = false
 
 	var bg_style: StyleBoxFlat = StyleBoxFlat.new()
-	bg_style.bg_color = Color(0.1, 0.12, 0.18, 0.9)
+	bg_style.bg_color = Color(0.05, 0.06, 0.1, 0.6)
 	bg_style.set_corner_radius_all(2)
 	xp_bar.add_theme_stylebox_override("background", bg_style)
 
 	var fill_style: StyleBoxFlat = StyleBoxFlat.new()
 	fill_style.bg_color = skill_color.darkened(0.3)
+	fill_style.bg_color.a = 0.8
 	fill_style.set_corner_radius_all(2)
 	xp_bar.add_theme_stylebox_override("fill", fill_style)
 

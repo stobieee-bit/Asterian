@@ -33,72 +33,67 @@ static func attach(panel: PanelContainer, title: String, close_callback: Callabl
 
 func _setup(title: String, close_callback: Callable) -> void:
 	name = "DragHeader"
-	custom_minimum_size = Vector2(0, 26)
-	mouse_filter = Control.MOUSE_FILTER_STOP  # Catch mouse events for dragging
+	custom_minimum_size = Vector2(0, 22)
+	mouse_filter = Control.MOUSE_FILTER_STOP
 
-	# Title label
+	# Title label — muted, clean
 	_title_label = Label.new()
 	_title_label.text = title
 	_title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_title_label.add_theme_color_override("font_color", Color(0.3, 0.9, 1.0))
-	_title_label.add_theme_font_size_override("font_size", 14)
-	_title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE  # Let drag through
+	_title_label.add_theme_color_override("font_color", Color(0.45, 0.7, 0.8, 0.9))
+	_title_label.add_theme_font_size_override("font_size", 12)
+	_title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_title_label)
 
-	# Drag hint (subtle dots icon — hidden when locked)
+	# Drag hint
 	_drag_hint = Label.new()
-	_drag_hint.text = ":::"
-	_drag_hint.add_theme_color_override("font_color", Color(0.3, 0.5, 0.6, 0.5))
-	_drag_hint.add_theme_font_size_override("font_size", 12)
+	_drag_hint.text = "⋮⋮"
+	_drag_hint.add_theme_color_override("font_color", Color(0.3, 0.4, 0.5, 0.35))
+	_drag_hint.add_theme_font_size_override("font_size", 10)
 	_drag_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_drag_hint)
 
-	# Lock button
+	# Lock button — minimal
 	_lock_btn = Button.new()
-	_lock_btn.text = "O"  # O = open/unlocked
-	_lock_btn.custom_minimum_size = Vector2(24, 24)
-	_lock_btn.add_theme_font_size_override("font_size", 10)
+	_lock_btn.text = "O"
+	_lock_btn.custom_minimum_size = Vector2(20, 20)
+	_lock_btn.add_theme_font_size_override("font_size", 9)
 	_lock_btn.tooltip_text = "Lock panel position"
 
 	var lock_style: StyleBoxFlat = StyleBoxFlat.new()
-	lock_style.bg_color = Color(0.08, 0.1, 0.15, 0.5)
-	lock_style.set_corner_radius_all(3)
-	lock_style.set_content_margin_all(2)
+	lock_style.bg_color = Color(0.0, 0.0, 0.0, 0.0)
+	lock_style.set_corner_radius_all(2)
+	lock_style.set_content_margin_all(1)
 	_lock_btn.add_theme_stylebox_override("normal", lock_style)
 
 	var lock_hover: StyleBoxFlat = lock_style.duplicate()
-	lock_hover.bg_color = Color(0.1, 0.15, 0.25, 0.8)
-	lock_hover.border_color = Color(0.3, 0.6, 0.8, 0.5)
-	lock_hover.set_border_width_all(1)
+	lock_hover.bg_color = Color(0.1, 0.15, 0.25, 0.5)
 	_lock_btn.add_theme_stylebox_override("hover", lock_hover)
 
-	_lock_btn.add_theme_color_override("font_color", Color(0.4, 0.6, 0.7))
-	_lock_btn.add_theme_color_override("font_hover_color", Color(0.5, 0.8, 0.9))
+	_lock_btn.add_theme_color_override("font_color", Color(0.35, 0.5, 0.6, 0.6))
+	_lock_btn.add_theme_color_override("font_hover_color", Color(0.5, 0.7, 0.85))
 	_lock_btn.pressed.connect(_on_lock_toggle)
 	add_child(_lock_btn)
 
-	# Close button
+	# Close button — minimal, red on hover
 	if close_callback.is_valid():
 		_close_btn = Button.new()
-		_close_btn.text = "X"
-		_close_btn.custom_minimum_size = Vector2(24, 24)
-		_close_btn.add_theme_font_size_override("font_size", 11)
+		_close_btn.text = "×"
+		_close_btn.custom_minimum_size = Vector2(20, 20)
+		_close_btn.add_theme_font_size_override("font_size", 12)
 
-		# Style close button
 		var btn_style: StyleBoxFlat = StyleBoxFlat.new()
-		btn_style.bg_color = Color(0.08, 0.1, 0.15, 0.5)
-		btn_style.set_corner_radius_all(3)
-		btn_style.set_content_margin_all(2)
+		btn_style.bg_color = Color(0.0, 0.0, 0.0, 0.0)
+		btn_style.set_corner_radius_all(2)
+		btn_style.set_content_margin_all(1)
 		_close_btn.add_theme_stylebox_override("normal", btn_style)
 
 		var btn_hover: StyleBoxFlat = btn_style.duplicate()
-		btn_hover.bg_color = Color(0.5, 0.15, 0.1, 0.8)
-		btn_hover.border_color = Color(0.8, 0.2, 0.1, 0.5)
-		btn_hover.set_border_width_all(1)
+		btn_hover.bg_color = Color(0.4, 0.1, 0.08, 0.6)
 		_close_btn.add_theme_stylebox_override("hover", btn_hover)
 
-		_close_btn.add_theme_color_override("font_color", Color(0.7, 0.5, 0.5))
-		_close_btn.add_theme_color_override("font_hover_color", Color(1.0, 0.4, 0.3))
+		_close_btn.add_theme_color_override("font_color", Color(0.5, 0.4, 0.4, 0.6))
+		_close_btn.add_theme_color_override("font_hover_color", Color(1.0, 0.35, 0.25))
 
 		_close_btn.pressed.connect(close_callback)
 		add_child(_close_btn)
@@ -145,14 +140,14 @@ func _on_lock_toggle() -> void:
 func _update_lock_visuals() -> void:
 	if _lock_btn:
 		if _is_locked:
-			_lock_btn.text = "L"  # L = locked
-			_lock_btn.add_theme_color_override("font_color", Color(1.0, 0.7, 0.2))
-			_lock_btn.add_theme_color_override("font_hover_color", Color(1.0, 0.85, 0.4))
+			_lock_btn.text = "L"
+			_lock_btn.add_theme_color_override("font_color", Color(0.8, 0.6, 0.2, 0.7))
+			_lock_btn.add_theme_color_override("font_hover_color", Color(0.9, 0.75, 0.3))
 			_lock_btn.tooltip_text = "Unlock panel position"
 		else:
-			_lock_btn.text = "O"  # O = open/unlocked
-			_lock_btn.add_theme_color_override("font_color", Color(0.4, 0.6, 0.7))
-			_lock_btn.add_theme_color_override("font_hover_color", Color(0.5, 0.8, 0.9))
+			_lock_btn.text = "O"
+			_lock_btn.add_theme_color_override("font_color", Color(0.35, 0.5, 0.6, 0.6))
+			_lock_btn.add_theme_color_override("font_hover_color", Color(0.5, 0.7, 0.85))
 			_lock_btn.tooltip_text = "Lock panel position"
 	if _drag_hint:
 		_drag_hint.visible = not _is_locked

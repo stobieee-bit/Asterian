@@ -9,26 +9,26 @@ script = ExtResource("1_hud")
 [node name="TopBar" type="HBoxContainer" parent="."]
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 40.0
+offset_bottom = 32.0
 grow_horizontal = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="AreaLabel" type="Label" parent="TopBar"]
-custom_minimum_size = Vector2(180, 0)
+custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.9, 0.7, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.35, 0.75, 0.6, 0.85)
+theme_override_font_sizes/font_size = 13
 text = "Station Hub"
 
 [node name="HPBar" type="ProgressBar" parent="TopBar"]
-custom_minimum_size = Vector2(180, 22)
+custom_minimum_size = Vector2(160, 18)
 layout_mode = 2
 max_value = 100.0
 value = 100.0
 show_percentage = false
 
 [node name="EnergyBar" type="ProgressBar" parent="TopBar"]
-custom_minimum_size = Vector2(140, 22)
+custom_minimum_size = Vector2(130, 18)
 layout_mode = 2
 max_value = 100.0
 value = 100.0
@@ -36,15 +36,15 @@ show_percentage = false
 
 [node name="LevelLabel" type="Label" parent="TopBar"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.7, 0.8, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.5, 0.6, 0.7, 0.8)
+theme_override_font_sizes/font_size = 11
 text = "Combat Lv 1 | Total Lv 7"
 
 [node name="CreditsLabel" type="Label" parent="TopBar"]
 layout_mode = 2
 size_flags_horizontal = 10
-theme_override_colors/font_color = Color(0.9, 0.8, 0.3, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.85, 0.75, 0.3, 0.9)
+theme_override_font_sizes/font_size = 12
 text = "0 credits"
 
 [node name="BottomBar" type="HBoxContainer" parent="."]
@@ -59,13 +59,13 @@ theme_override_constants/separation = 20
 
 [node name="PosLabel" type="Label" parent="BottomBar"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.5, 0.6, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.3, 0.35, 0.4, 0.5)
+theme_override_font_sizes/font_size = 10
 text = "0, 0"
 
 [node name="FPSLabel" type="Label" parent="BottomBar"]
 layout_mode = 2
 size_flags_horizontal = 10
-theme_override_colors/font_color = Color(0.4, 0.5, 0.4, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.3, 0.35, 0.3, 0.5)
+theme_override_font_sizes/font_size = 10
 text = "60 FPS"

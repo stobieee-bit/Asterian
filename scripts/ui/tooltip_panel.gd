@@ -18,51 +18,44 @@ var _is_showing: bool = false
 var _follow_mouse: bool = true
 
 func _ready() -> void:
-	# Panel style: dark with cyan border
 	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = Color(0.05, 0.07, 0.12, 0.95)
-	style.border_color = Color(0.2, 0.6, 0.8, 0.8)
+	style.bg_color = Color(0.025, 0.035, 0.06, 0.92)
+	style.border_color = Color(0.1, 0.25, 0.35, 0.45)
 	style.set_border_width_all(1)
-	style.set_corner_radius_all(4)
-	style.set_content_margin_all(8)
+	style.set_corner_radius_all(3)
+	style.set_content_margin_all(6)
 	add_theme_stylebox_override("panel", style)
 
-	# Build content
 	_vbox = VBoxContainer.new()
 	_vbox.add_theme_constant_override("separation", 2)
 	add_child(_vbox)
 
-	# Item name (colored by tier)
 	_name_label = Label.new()
-	_name_label.add_theme_font_size_override("font_size", 14)
-	_name_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
+	_name_label.add_theme_font_size_override("font_size", 12)
+	_name_label.add_theme_color_override("font_color", Color(0.95, 0.95, 0.95))
 	_vbox.add_child(_name_label)
 
-	# Type / tier line
 	_type_label = Label.new()
-	_type_label.add_theme_font_size_override("font_size", 11)
-	_type_label.add_theme_color_override("font_color", Color(0.5, 0.6, 0.7))
+	_type_label.add_theme_font_size_override("font_size", 10)
+	_type_label.add_theme_color_override("font_color", Color(0.45, 0.55, 0.65, 0.8))
 	_vbox.add_child(_type_label)
 
-	# Stats block
 	_stats_label = Label.new()
-	_stats_label.add_theme_font_size_override("font_size", 11)
-	_stats_label.add_theme_color_override("font_color", Color(0.7, 0.85, 0.7))
+	_stats_label.add_theme_font_size_override("font_size", 10)
+	_stats_label.add_theme_color_override("font_color", Color(0.6, 0.75, 0.6, 0.9))
 	_vbox.add_child(_stats_label)
 
-	# Comparison block (green = better, red = worse)
 	_compare_label = Label.new()
-	_compare_label.add_theme_font_size_override("font_size", 11)
-	_compare_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.8))
+	_compare_label.add_theme_font_size_override("font_size", 10)
+	_compare_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7, 0.85))
 	_compare_label.visible = false
 	_vbox.add_child(_compare_label)
 
-	# Description
 	_desc_label = Label.new()
-	_desc_label.add_theme_font_size_override("font_size", 10)
-	_desc_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+	_desc_label.add_theme_font_size_override("font_size", 9)
+	_desc_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5, 0.75))
 	_desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_desc_label.custom_minimum_size.x = 200
+	_desc_label.custom_minimum_size.x = 190
 	_vbox.add_child(_desc_label)
 
 	# Start hidden

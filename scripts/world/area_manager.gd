@@ -166,7 +166,7 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	_add_crystals(area_id, center_x, center_z, radius, base_color, y_base)
 	if not _is_clean_area:
 		_add_alien_flora(area_id, center_x, center_z, radius, base_color, y_base)
-		_add_floating_debris(area_id, center_x, center_z, radius, base_color, y_base)
+		# Floating debris removed — will revisit with proper particle system later
 		_add_pipe_structures(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_ruined_walls(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_area_unique_structures(area_id, center_x, center_z, radius, base_color, y_base)
@@ -1506,25 +1506,7 @@ func _build_wastes_spore_fields(y_base: float) -> void:
 		tendril.material = tendril_mat
 		add_child(tendril)
 
-	# Floating spore particles — small glowing orbs drifting lazily
-	for i in range(12):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(5.0, zr * 0.7)
-		var float_y: float = rng.randf_range(1.5, 5.0)
-		var spore: CSGSphere3D = CSGSphere3D.new()
-		spore.radius = rng.randf_range(0.1, 0.25)
-		spore.radial_segments = 6
-		spore.rings = 4
-		spore.position = Vector3(zcx + cos(angle) * dist, y_base + float_y, zcz + sin(angle) * dist)
-		spore.material = spore_glow
-		add_child(spore)
-		_animated_nodes.append({
-			"node": spore, "type": "hover",
-			"base_y": y_base + float_y,
-			"speed": rng.randf_range(0.3, 0.8),
-			"phase": rng.randf() * TAU,
-			"amplitude": rng.randf_range(0.5, 1.5)
-		})
+	# Floating spore particles removed — will revisit with proper particle system later
 
 	# Omni lights for ambient glow
 	for i in range(4):

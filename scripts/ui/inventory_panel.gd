@@ -63,10 +63,9 @@ func _create_slot(index: int) -> PanelContainer:
 	var slot: PanelContainer = PanelContainer.new()
 	slot.custom_minimum_size = Vector2(SLOT_SIZE, SLOT_SIZE)
 
-	# Style: dark background
 	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = Color(0.08, 0.1, 0.15, 0.9)
-	style.border_color = Color(0.2, 0.3, 0.4, 0.6)
+	style.bg_color = Color(0.04, 0.05, 0.08, 0.7)
+	style.border_color = Color(0.1, 0.15, 0.22, 0.35)
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(3)
 	slot.add_theme_stylebox_override("panel", style)

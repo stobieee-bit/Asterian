@@ -114,12 +114,11 @@ func _create_slot(slot_name: String, display_name: String) -> PanelContainer:
 	var slot: PanelContainer = PanelContainer.new()
 	slot.custom_minimum_size = Vector2(SLOT_SIZE, SLOT_SIZE)
 
-	# Style
 	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = Color(0.1, 0.12, 0.18, 0.9)
-	style.border_color = Color(0.2, 0.4, 0.5, 0.7)
+	style.bg_color = Color(0.04, 0.05, 0.09, 0.7)
+	style.border_color = Color(0.1, 0.18, 0.25, 0.35)
 	style.set_border_width_all(1)
-	style.set_corner_radius_all(4)
+	style.set_corner_radius_all(3)
 	slot.add_theme_stylebox_override("panel", style)
 
 	# Inner control for absolute positioning
@@ -138,7 +137,7 @@ func _create_slot(slot_name: String, display_name: String) -> PanelContainer:
 	icon_label.position = Vector2(0, 0)
 	icon_label.size = Vector2(SLOT_SIZE, SLOT_SIZE)
 	icon_label.add_theme_font_size_override("font_size", 26)
-	icon_label.add_theme_color_override("font_color", Color(0.2, 0.3, 0.4, 0.4))
+	icon_label.add_theme_color_override("font_color", Color(0.15, 0.22, 0.3, 0.3))
 	icon_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(icon_label)
 
