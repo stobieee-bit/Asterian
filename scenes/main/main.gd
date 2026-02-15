@@ -36,7 +36,7 @@ var float_text: Node3D = null
 var loot_system: Node3D = null
 
 # ── Auto-save ──
-const AUTO_SAVE_INTERVAL: float = 60.0  # Save every 60 seconds
+const AUTO_SAVE_INTERVAL: float = 30.0  # Save every 30 seconds
 var _auto_save_timer: float = 0.0
 var _loaded_from_save: bool = false
 
@@ -214,6 +214,10 @@ func _ready() -> void:
 	EventBus.achievement_unlocked.connect(_on_save_event_str)
 	EventBus.prestige_triggered.connect(_on_save_event_int)
 
+	# ── Web: register beforeunload + visibilitychange to save on tab close/refresh ──
+	if OS.has_feature("web"):
+		_register_web_save_hooks()
+
 	print("=== Ready! ===")
 
 func _process(delta: float) -> void:
@@ -248,6 +252,25 @@ func _on_save_event_str(_s: String) -> void:
 	SaveManager.save_game()
 
 func _on_save_event_int(_i: int) -> void:
+	_sync_player_state()
+	SaveManager.save_game()
+
+## Register JavaScript hooks for web export to save on tab close/refresh/hide
+func _register_web_save_hooks() -> void:
+	# Use a Callable that Godot can expose to JS via JavaScriptBridge
+	var save_callback: Callable = _web_save_callback
+	var js_cb: JavaScriptObject = JavaScriptBridge.create_callback(save_callback)
+
+	# beforeunload — fires on tab close, refresh, navigate away
+	JavaScriptBridge.get_interface("window").addEventListener("beforeunload", js_cb)
+
+	# visibilitychange — fires when user switches tabs or minimizes
+	JavaScriptBridge.get_interface("document").addEventListener("visibilitychange", js_cb)
+
+	print("Web save hooks registered (beforeunload + visibilitychange).")
+
+## Called from JavaScript when the page is about to close or become hidden
+func _web_save_callback(_args: Variant) -> void:
 	_sync_player_state()
 	SaveManager.save_game()
 
