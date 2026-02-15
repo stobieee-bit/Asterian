@@ -858,10 +858,7 @@ func _on_chat_input_submitted(text: String) -> void:
 		var client: Node = get_tree().get_first_node_in_group("multiplayer_client")
 		if client and client.has_method("send_chat") and client.is_mp_connected():
 			client.send_chat(trimmed)
-			var own_name: String = str(GameState.settings.get("mp_name", "You"))
-			if own_name == "":
-				own_name = "You"
-			EventBus.chat_message.emit("%s: %s" % [own_name, trimmed], "multiplayer")
+			# Don't emit locally — server echoes our message back via _handle_chat()
 		else:
 			# Not connected — show locally as system message
 			EventBus.chat_message.emit(trimmed, "system")
@@ -1073,21 +1070,21 @@ func _build_ability_bar() -> void:
 	bar.add_theme_constant_override("separation", 4)
 	add_child(bar)
 
-	# Basic ability (25 adrenaline) — cyan
-	var btn1: Button = _make_ability_btn("1", "Basic", Color(0.3, 0.9, 1.0), 25)
-	btn1.tooltip_text = "Basic Ability — 1.2x damage\nCost: 25 Adrenaline"
+	# Basic ability (BUILDS +8% adrenaline) — cyan
+	var btn1: Button = _make_ability_btn("1", "Basic", Color(0.3, 0.9, 1.0), 0, "+8 ADR")
+	btn1.tooltip_text = "Basic Ability — 1.5x damage\nBuilds 8% Adrenaline"
 	btn1.pressed.connect(func(): _use_ability(1))
 	bar.add_child(btn1)
 
-	# Threshold ability (50 adrenaline) — orange
+	# Threshold ability (COSTS 50% adrenaline) — orange
 	var btn2: Button = _make_ability_btn("2", "Thresh", Color(1.0, 0.6, 0.1), 50)
-	btn2.tooltip_text = "Threshold Ability — 1.8x damage\nCost: 50 Adrenaline"
+	btn2.tooltip_text = "Threshold Ability — 2.88x damage\nCosts 50% Adrenaline"
 	btn2.pressed.connect(func(): _use_ability(2))
 	bar.add_child(btn2)
 
-	# Ultimate ability (100 adrenaline) — magenta
+	# Ultimate ability (COSTS 100% adrenaline) — magenta
 	var btn3: Button = _make_ability_btn("3", "Ulti", Color(1.0, 0.2, 0.9), 100)
-	btn3.tooltip_text = "Ultimate Ability — 3.0x damage\nCost: 100 Adrenaline"
+	btn3.tooltip_text = "Ultimate Ability — 5.0x damage\nCosts 100% Adrenaline"
 	btn3.pressed.connect(func(): _use_ability(3))
 	bar.add_child(btn3)
 
@@ -1098,7 +1095,7 @@ func _build_ability_bar() -> void:
 	bar.add_child(food_btn)
 
 ## Create a styled ability button with keybind number + name + cost badge
-func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost: int) -> Button:
+func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost: int, cost_text_override: String = "") -> Button:
 	var btn: Button = Button.new()
 	btn.custom_minimum_size = Vector2(80, 38)
 	btn.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -1176,15 +1173,18 @@ func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost:
 	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(name_lbl)
 
-	# Cost badge at bottom (e.g. "25 ADR")
-	if cost > 0:
+	# Cost badge at bottom (e.g. "50 ADR" or "+8 ADR")
+	var badge_text: String = cost_text_override if cost_text_override != "" else ("%d ADR" % cost if cost > 0 else "")
+	if badge_text != "":
 		var cost_lbl: Label = Label.new()
-		cost_lbl.text = "%d ADR" % cost
+		cost_lbl.text = badge_text
 		cost_lbl.position = Vector2(0, 20)
 		cost_lbl.size = Vector2(80, 14)
 		cost_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		cost_lbl.add_theme_font_size_override("font_size", 8)
-		cost_lbl.add_theme_color_override("font_color", Color(0.5, 0.7, 0.5, 0.7))
+		# Green for gain, red-ish for cost
+		var badge_color: Color = Color(0.3, 0.9, 0.4, 0.8) if badge_text.begins_with("+") else Color(0.5, 0.7, 0.5, 0.7)
+		cost_lbl.add_theme_color_override("font_color", badge_color)
 		cost_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		inner.add_child(cost_lbl)
 

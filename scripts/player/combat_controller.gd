@@ -9,17 +9,22 @@ extends Node
 
 # ── Combat settings ──
 @export var attack_range: float = 2.5      ## Must be within this to attack
-@export var base_attack_speed: float = 0.6 ## GCD in seconds
+@export var base_attack_speed: float = 2.4 ## Auto-attack interval (RS-style: 2.4/3.0/3.6s)
 @export var base_damage: int = 10          ## Base damage (weapon adds more)
+
+# ── Global cooldown (GCD) for abilities ──
+const GCD_TIME: float = 1.8           ## Minimum time between ability uses
+var _gcd_timer: float = 0.0
 
 # ── Regen settings ──
 const REGEN_INTERVAL: float = 5.0    ## Seconds between passive HP/energy ticks
 const REGEN_HP_PERCENT: float = 0.02 ## 2% max HP per tick (out of combat only)
 const REGEN_ENERGY_RATE: float = 5.0 ## Flat energy per tick
 
-# ── Adrenaline settings ──
-const ADRENALINE_PER_HIT: float = 8.0    ## Gained per attack that lands
-const ADRENALINE_DECAY: float = 2.0      ## Lost per second out of combat
+# ── Adrenaline settings (RS3-style) ──
+const ADRENALINE_PER_AUTO: float = 3.0   ## Gained per auto-attack hit
+const ADRENALINE_PER_BASIC: float = 8.0  ## Gained per basic ability hit
+const ADRENALINE_DECAY: float = 5.0      ## Lost per second out of combat (faster drain)
 const ADRENALINE_MAX: float = 100.0
 
 # ── Food cooldown ──
@@ -102,6 +107,10 @@ func _process(delta: float) -> void:
 
 	# Passive HP/energy regen (only out of combat)
 	_process_regen(delta)
+
+	# GCD cooldown
+	if _gcd_timer > 0:
+		_gcd_timer -= delta
 
 	# Food cooldown
 	if _food_cooldown_timer > 0:
@@ -220,8 +229,8 @@ func _do_attack() -> void:
 	var style: String = GameState.player["combat_style"]
 	var actual: int = target.take_damage(total_damage, style)
 
-	# Build adrenaline
-	GameState.player["adrenaline"] = minf(ADRENALINE_MAX, float(GameState.player["adrenaline"]) + ADRENALINE_PER_HIT)
+	# Build adrenaline (small amount from auto-attacks, like RS3)
+	GameState.player["adrenaline"] = minf(ADRENALINE_MAX, float(GameState.player["adrenaline"]) + ADRENALINE_PER_AUTO)
 
 	# Float text — use cached position since target may be null now
 	var color: Color = Color(1.0, 0.7, 0.0) if is_crit else Color(1.0, 0.2, 0.1)
@@ -336,8 +345,8 @@ func _find_best_food() -> String:
 
 # ── Abilities (adrenaline-based) ──
 
-## Use style-based ability. Costs adrenaline, deals bonus damage or heals.
-## ability_slot: 1 = basic (25 adrenaline), 2 = threshold (50), 3 = ultimate (100)
+## Use style-based ability (RS3-style).
+## Basics (1) BUILD adrenaline (+8%). Thresholds (2) COST 50%. Ultimates (3) COST 100%.
 func use_ability(ability_slot: int) -> bool:
 	if target == null or not is_instance_valid(target):
 		EventBus.chat_message.emit("No target selected.", "system")
@@ -345,31 +354,39 @@ func use_ability(ability_slot: int) -> bool:
 	if target.state == target.State.DEAD:
 		return false
 
+	# Check GCD
+	if _gcd_timer > 0:
+		return false
+
 	var adrenaline: float = float(GameState.player["adrenaline"])
 	var cost: float = 0.0
+	var adr_gain: float = 0.0
 	var damage_mult: float = 1.0
 	var ability_name: String = ""
 	var style: String = str(GameState.player["combat_style"])
 
 	match ability_slot:
-		1:
-			cost = 25.0
+		1:  # Basic: BUILDS adrenaline, moderate damage
+			cost = 0.0
+			adr_gain = ADRENALINE_PER_BASIC
 			damage_mult = 1.5
 			match style:
 				"nano":   ability_name = "Nano Slice"
 				"tesla":  ability_name = "Tesla Bolt"
 				"void":   ability_name = "Void Pulse"
 				_:        ability_name = "Basic Ability"
-		2:
+		2:  # Threshold: COSTS 50% adrenaline, strong damage
 			cost = 50.0
-			damage_mult = 2.5
+			adr_gain = 0.0
+			damage_mult = 2.88
 			match style:
 				"nano":   ability_name = "Molecular Storm"
 				"tesla":  ability_name = "Chain Lightning"
 				"void":   ability_name = "Void Rend"
 				_:        ability_name = "Threshold Ability"
-		3:
+		3:  # Ultimate: COSTS 100% adrenaline, devastating damage
 			cost = 100.0
+			adr_gain = 0.0
 			damage_mult = 5.0
 			match style:
 				"nano":   ability_name = "Nano Swarm"
@@ -383,8 +400,11 @@ func use_ability(ability_slot: int) -> bool:
 		EventBus.chat_message.emit("Not enough adrenaline (%d/%d)." % [int(adrenaline), int(cost)], "combat")
 		return false
 
-	# Spend adrenaline
-	GameState.player["adrenaline"] = adrenaline - cost
+	# Spend or gain adrenaline
+	if cost > 0:
+		GameState.player["adrenaline"] = adrenaline - cost
+	elif adr_gain > 0:
+		GameState.player["adrenaline"] = minf(ADRENALINE_MAX, adrenaline + adr_gain)
 
 	# Calculate damage
 	var weapon_damage: int = _get_weapon_damage()
@@ -419,8 +439,9 @@ func use_ability(ability_slot: int) -> bool:
 		ability_color
 	)
 
-	# Reset attack timer (ability replaces auto-attack)
+	# Reset attack timer and start GCD (ability replaces auto-attack tick)
 	attack_timer = base_attack_speed
+	_gcd_timer = GCD_TIME
 
 	return true
 

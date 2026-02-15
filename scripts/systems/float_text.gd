@@ -30,8 +30,8 @@ func _ready() -> void:
 		var label: Label3D = Label3D.new()
 		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		label.no_depth_test = true
-		label.font_size = 28
-		label.outline_size = 6
+		label.font_size = 42
+		label.outline_size = 10
 		label.visible = false
 		label.top_level = true
 		add_child(label)
@@ -138,22 +138,25 @@ func _on_float_text_requested(text: String, world_pos: Vector3, color: Color) ->
 	# Record this spawn
 	_recent_spawns.append({"pos": world_pos, "time": now})
 
-	# ── Font size and style ──
-	var base_font_size: int = 28
-	var outline_size: int = 6
+	# ── Font size and style (larger for visibility at ortho zoom) ──
+	var base_font_size: int = 42
+	var outline_size: int = 10
 
 	if is_crit:
-		base_font_size = 38
-		outline_size = 8
+		base_font_size = 56
+		outline_size = 14
 	elif is_large:
-		base_font_size = 36
-		outline_size = 7
+		base_font_size = 52
+		outline_size = 12
 	elif is_miss:
-		base_font_size = 22
-		outline_size = 4
+		base_font_size = 30
+		outline_size = 7
 	elif is_xp:
-		base_font_size = 22
-		outline_size = 4
+		base_font_size = 28
+		outline_size = 6
+	elif is_damage and not is_heal:
+		base_font_size = 44
+		outline_size = 10
 
 	# ── Configure label ──
 	label.text = text
@@ -167,14 +170,16 @@ func _on_float_text_requested(text: String, world_pos: Vector3, color: Color) ->
 	label.outline_modulate = Color(0, 0, 0, 0.8)
 
 	# ── Duration ──
-	var duration: float = 1.0
+	var duration: float = 1.2
 	if is_crit:
-		duration = 1.6
+		duration = 1.8
 	elif is_large:
-		duration = 1.5
+		duration = 1.6
 	elif is_miss:
-		duration = 0.7
+		duration = 0.8
 	elif is_xp:
+		duration = 1.4
+	elif is_damage:
 		duration = 1.3
 
 	_active.append({

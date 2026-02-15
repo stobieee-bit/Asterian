@@ -124,11 +124,15 @@ func setup(type_id: String, spawn_pos: Vector3) -> void:
 	if _mesh_root == null:
 		_apply_visuals()
 
-	# Update nameplate
+	# Update nameplate — bigger text with outline for visibility
 	if nameplate:
 		nameplate.text = "%s (Lv %d)" % [enemy_name, level]
+		nameplate.outline_size = 8
+		nameplate.outline_modulate = Color(0, 0, 0, 0.9)
 		if is_boss:
 			nameplate.modulate = Color(1.0, 0.3, 0.3, 1.0)
+		else:
+			nameplate.modulate = Color(1.0, 1.0, 0.6, 1.0)
 
 func _ready() -> void:
 	add_to_group("enemies")
@@ -521,7 +525,7 @@ func _build_template_mesh() -> void:
 	var height_offset: float = 1.4 * mesh_scale
 	if nameplate:
 		nameplate.position.y = height_offset + 0.5
-		nameplate.font_size = int(24 * minf(mesh_scale, 2.0))
+		nameplate.font_size = int(36 * minf(mesh_scale, 2.0))
 	if hp_bar_pivot:
 		hp_bar_pivot.position.y = height_offset + 0.2
 
