@@ -390,10 +390,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_SPACE:
 				_deselect_target()
 				get_viewport().set_input_as_handled()
-			# Bank (B)
-			KEY_B:
-				_toggle_panel(_bank_panel, "bank")
-				get_viewport().set_input_as_handled()
 			# Dungeon (N)
 			KEY_N:
 				_toggle_panel(_dungeon_panel, "dungeon")
@@ -762,12 +758,6 @@ func _build_action_bar() -> void:
 	pet_btn.tooltip_text = "Pet Companions"
 	pet_btn.pressed.connect(func(): _toggle_panel(_pet_panel, "pets"))
 	bar.add_child(pet_btn)
-
-	# Bank button
-	var bank_btn: Button = _make_sci_btn("Bank [B]", 68, gold)
-	bank_btn.tooltip_text = "Bank (B)"
-	bank_btn.pressed.connect(func(): _toggle_panel(_bank_panel, "bank"))
-	bar.add_child(bank_btn)
 
 	# Craft button
 	var craft_btn: Button = _make_sci_btn("Craft", 56, Color(0.3, 0.8, 0.9))

@@ -632,5 +632,47 @@
         ]
       }
     }
+  },
+  "banker_tessara": {
+    "name": "Tessara the Vault Keeper",
+    "position": {
+      "x": 10,
+      "z": -10
+    },
+    "bodyColor": 4474470,
+    "headColor": 11184810,
+    "desc": "Station vault keeper. Stores your items safely.",
+    "dialogue": {
+      "greeting": {
+        "text": "Welcome to the Nova Station Vault. Your items are secure with me. How can I help?",
+        "options": [
+          {
+            "label": "I'd like to access my bank.",
+            "action": "openBank"
+          },
+          {
+            "label": "How much can I store?",
+            "next": "capacity_info"
+          },
+          {
+            "label": "Goodbye.",
+            "next": null
+          }
+        ]
+      },
+      "capacity_info": {
+        "text": "The vault can hold up to 48 item stacks. Stackable materials will combine automatically. Keep your gear organized and you'll have plenty of room.",
+        "options": [
+          {
+            "label": "Let me access my bank.",
+            "action": "openBank"
+          },
+          {
+            "label": "Thanks.",
+            "next": null
+          }
+        ]
+      }
+    }
   }
 }

@@ -2,8 +2,10 @@
 ##
 ## Two tabs: "Bank" (8x6 grid, 48 slots) and "Inventory" (7x4 grid, 28 slots).
 ## Click a bank slot to withdraw to inventory; click an inventory slot to deposit
-## to bank. "Deposit All" button dumps entire inventory into the bank.
-## All bank deposit/withdraw logic is handled inline (GameState has no bank methods).
+## to bank.
+## Quantity selector: 1 / 5 / 10 / X (custom amount) — applies to each click.
+## "Deposit All" dumps entire inventory into the bank.
+## "Deposit Equip" unequips all gear and deposits it into the bank.
 extends PanelContainer
 
 # ── Constants ──
@@ -20,16 +22,23 @@ var _close_btn: Button = null
 var _bank_tab_btn: Button = null
 var _inv_tab_btn: Button = null
 var _deposit_all_btn: Button = null
+var _deposit_equip_btn: Button = null
 var _grid: GridContainer = null
 var _slots: Array[PanelContainer] = []
 
+# Quantity selector
+var _qty_buttons: Array[Button] = []
+var _qty_custom_input: LineEdit = null
+var _qty_row: HBoxContainer = null
+
 # ── State ──
 var _mode: String = "bank"  # "bank" or "inventory"
+var _transfer_qty: int = 1  # How many items per click (1, 5, 10, or custom)
 
 # ── Lifecycle ──
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(400, 420)
+	custom_minimum_size = Vector2(400, 460)
 	visible = false
 	z_index = 55
 
@@ -41,7 +50,7 @@ func _ready() -> void:
 	var drag_header: DraggableHeader = DraggableHeader.attach(self, "Bank", _on_close)
 	vbox.add_child(drag_header)
 
-	# ── Tab buttons + Deposit All ──
+	# ── Tab buttons + Deposit buttons ──
 	var tabs: HBoxContainer = HBoxContainer.new()
 	tabs.add_theme_constant_override("separation", 4)
 	vbox.add_child(tabs)
@@ -58,10 +67,17 @@ func _ready() -> void:
 	_inv_tab_btn.pressed.connect(func(): _set_mode("inventory"))
 	tabs.add_child(_inv_tab_btn)
 
-	# Spacer to push "Deposit All" to the right
+	# Spacer to push action buttons right
 	var spacer: Control = Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tabs.add_child(spacer)
+
+	_deposit_equip_btn = Button.new()
+	_deposit_equip_btn.text = "Deposit Equip"
+	_deposit_equip_btn.add_theme_font_size_override("font_size", 11)
+	_deposit_equip_btn.custom_minimum_size = Vector2(96, 24)
+	_deposit_equip_btn.pressed.connect(_on_deposit_equipment)
+	tabs.add_child(_deposit_equip_btn)
 
 	_deposit_all_btn = Button.new()
 	_deposit_all_btn.text = "Deposit All"
@@ -69,6 +85,48 @@ func _ready() -> void:
 	_deposit_all_btn.custom_minimum_size = Vector2(80, 24)
 	_deposit_all_btn.pressed.connect(_on_deposit_all)
 	tabs.add_child(_deposit_all_btn)
+
+	# ── Quantity selector row ──
+	_qty_row = HBoxContainer.new()
+	_qty_row.add_theme_constant_override("separation", 3)
+	vbox.add_child(_qty_row)
+
+	var qty_label: Label = Label.new()
+	qty_label.text = "Qty:"
+	qty_label.add_theme_font_size_override("font_size", 11)
+	qty_label.add_theme_color_override("font_color", Color(0.6, 0.7, 0.8))
+	_qty_row.add_child(qty_label)
+
+	var qty_values: Array[int] = [1, 5, 10, -1]  # -1 = custom (X)
+	for val in qty_values:
+		var btn: Button = Button.new()
+		btn.text = "X" if val == -1 else str(val)
+		btn.add_theme_font_size_override("font_size", 11)
+		btn.custom_minimum_size = Vector2(32, 22)
+		btn.pressed.connect(_on_qty_selected.bind(val))
+		_qty_row.add_child(btn)
+		_qty_buttons.append(btn)
+
+	# Custom amount input (hidden until X is pressed)
+	_qty_custom_input = LineEdit.new()
+	_qty_custom_input.placeholder_text = "amt"
+	_qty_custom_input.add_theme_font_size_override("font_size", 11)
+	_qty_custom_input.custom_minimum_size = Vector2(50, 22)
+	_qty_custom_input.max_length = 6
+	_qty_custom_input.visible = false
+	_qty_custom_input.text_submitted.connect(_on_custom_qty_submitted)
+	_qty_row.add_child(_qty_custom_input)
+
+	# All button (withdraw/deposit all of a single item stack)
+	var all_btn: Button = Button.new()
+	all_btn.text = "All"
+	all_btn.add_theme_font_size_override("font_size", 11)
+	all_btn.custom_minimum_size = Vector2(36, 22)
+	all_btn.pressed.connect(_on_qty_selected.bind(0))  # 0 = "All"
+	_qty_row.add_child(all_btn)
+	_qty_buttons.append(all_btn)
+
+	_update_qty_buttons()
 
 	# ── Grid container (slots rebuilt on mode switch) ──
 	_grid = GridContainer.new()
@@ -82,6 +140,68 @@ func _ready() -> void:
 
 	# Build initial grid (bank mode)
 	_rebuild_grid()
+
+# ── Quantity selector ──
+
+## Called when user clicks a qty button (1/5/10/X/All)
+func _on_qty_selected(value: int) -> void:
+	if value == -1:
+		# Show custom input
+		_qty_custom_input.visible = true
+		_qty_custom_input.grab_focus()
+		_transfer_qty = -1
+	elif value == 0:
+		# "All" mode
+		_transfer_qty = 0
+		_qty_custom_input.visible = false
+	else:
+		_transfer_qty = value
+		_qty_custom_input.visible = false
+	_update_qty_buttons()
+
+## Called when user types a custom amount and presses Enter
+func _on_custom_qty_submitted(text: String) -> void:
+	var val: int = int(text.strip_edges())
+	if val < 1:
+		val = 1
+	_transfer_qty = val
+	_qty_custom_input.visible = false
+	_update_qty_buttons()
+
+## Highlight the active quantity button
+func _update_qty_buttons() -> void:
+	var preset_values: Array[int] = [1, 5, 10, -1, 0]  # matches button order
+	for i in range(_qty_buttons.size()):
+		var btn: Button = _qty_buttons[i]
+		var val: int = preset_values[i] if i < preset_values.size() else -99
+		var is_active: bool = false
+
+		if val == -1:
+			# X button — active when transfer_qty is a custom (non-preset) value
+			is_active = _transfer_qty not in [0, 1, 5, 10] and _transfer_qty != -1
+			if _transfer_qty == -1:
+				is_active = true
+			if is_active and _transfer_qty > 0:
+				btn.text = "X:%d" % _transfer_qty
+			else:
+				btn.text = "X"
+		elif val == 0:
+			is_active = (_transfer_qty == 0)
+		else:
+			is_active = (_transfer_qty == val)
+
+		if is_active:
+			btn.add_theme_color_override("font_color", Color(0.2, 0.9, 1.0))
+		else:
+			btn.remove_theme_color_override("font_color")
+
+## Get effective quantity for a transfer, clamped to available
+func _get_effective_qty(available: int) -> int:
+	if _transfer_qty == 0:
+		return available  # "All"
+	if _transfer_qty == -1:
+		return 1  # X not yet set, treat as 1
+	return mini(_transfer_qty, available)
 
 # ── Mode switching ──
 
@@ -115,8 +235,9 @@ func _rebuild_grid() -> void:
 	_bank_tab_btn.disabled = (_mode == "bank")
 	_inv_tab_btn.disabled = (_mode == "inventory")
 
-	# Deposit All only makes sense when viewing the bank tab
+	# Deposit buttons only visible on bank tab
 	_deposit_all_btn.visible = (_mode == "bank")
+	_deposit_equip_btn.visible = (_mode == "bank")
 
 	refresh()
 
@@ -144,15 +265,15 @@ func _create_slot(index: int) -> PanelContainer:
 	slot.add_child(item_label)
 
 	# Quantity label (bottom-right)
-	var qty_label: Label = Label.new()
-	qty_label.name = "QtyLabel"
-	qty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	qty_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
-	qty_label.add_theme_font_size_override("font_size", 9)
-	qty_label.add_theme_color_override("font_color", Color(1.0, 1.0, 0.6))
-	qty_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	qty_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	slot.add_child(qty_label)
+	var qty_lbl: Label = Label.new()
+	qty_lbl.name = "QtyLabel"
+	qty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	qty_lbl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	qty_lbl.add_theme_font_size_override("font_size", 9)
+	qty_lbl.add_theme_color_override("font_color", Color(1.0, 1.0, 0.6))
+	qty_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	qty_lbl.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	slot.add_child(qty_lbl)
 
 	# Input / hover signals
 	slot.gui_input.connect(_on_slot_input.bind(index))
@@ -170,7 +291,7 @@ func refresh() -> void:
 	for i in range(_slots.size()):
 		var slot: PanelContainer = _slots[i]
 		var item_label: Label = slot.get_node("ItemLabel") as Label
-		var qty_label: Label = slot.get_node("QtyLabel") as Label
+		var qty_lbl: Label = slot.get_node("QtyLabel") as Label
 		var style: StyleBoxFlat = slot.get_theme_stylebox("panel") as StyleBoxFlat
 
 		if i < source.size():
@@ -189,7 +310,7 @@ func refresh() -> void:
 				item_label.text = item_name
 
 			item_label.add_theme_color_override("font_color", _tier_color(tier))
-			qty_label.text = str(quantity) if quantity > 1 else ""
+			qty_lbl.text = str(quantity) if quantity > 1 else ""
 
 			# Tier-colored border
 			if style:
@@ -198,7 +319,7 @@ func refresh() -> void:
 		else:
 			# Empty slot
 			item_label.text = ""
-			qty_label.text = ""
+			qty_lbl.text = ""
 			if style:
 				style.border_color = Color(0.2, 0.3, 0.4, 0.6)
 
@@ -216,66 +337,98 @@ func _on_slot_input(event: InputEvent, index: int) -> void:
 	else:
 		_deposit_item(index)
 
-# ── Bank operations (inline logic — GameState has no bank helpers) ──
+# ── Bank operations ──
 
-## Withdraw an item from the bank into the player's inventory
+## Withdraw item(s) from the bank into the player's inventory
 func _withdraw_item(bank_index: int) -> void:
 	if bank_index >= GameState.bank.size():
 		return
 
 	var entry: Dictionary = GameState.bank[bank_index]
 	var item_id: String = str(entry.get("item_id", ""))
-	var quantity: int = int(entry.get("quantity", 1))
+	var available: int = int(entry.get("quantity", 1))
 	var item_data: Dictionary = DataManager.get_item(item_id)
 
 	if item_data.is_empty():
 		return
 
-	# Check if inventory can accept the item
+	var amount: int = _get_effective_qty(available)
+	if amount <= 0:
+		return
+
 	var is_stackable: bool = item_data.get("stackable", false)
 	var inv_idx: int = GameState.find_inventory_item(item_id)
 
+	# For non-stackable items, withdraw one at a time and check space each time
+	var actually_withdrawn: int = 0
 	if is_stackable and inv_idx >= 0:
-		# Item already stacks in inventory — always room
-		pass
-	elif not GameState.has_inventory_space():
-		EventBus.chat_message.emit("Inventory full!", "system")
-		return
+		# Already in inventory stack — can always add more
+		actually_withdrawn = amount
+	elif is_stackable:
+		# Need one free slot for the new stack
+		if not GameState.has_inventory_space():
+			EventBus.chat_message.emit("Inventory full!", "system")
+			return
+		actually_withdrawn = amount
+	else:
+		# Non-stackable: each unit needs its own inventory slot
+		for _i in range(amount):
+			if not GameState.has_inventory_space():
+				if actually_withdrawn == 0:
+					EventBus.chat_message.emit("Inventory full!", "system")
+					return
+				break
+			actually_withdrawn += 1
 
-	# Withdraw 1 unit from bank
-	GameState.bank[bank_index]["quantity"] -= 1
+	# Remove from bank
+	GameState.bank[bank_index]["quantity"] -= actually_withdrawn
 	if GameState.bank[bank_index]["quantity"] <= 0:
 		GameState.bank.remove_at(bank_index)
 
-	# Add to inventory via GameState helper (handles stacking)
-	GameState.add_item(item_id, 1)
+	# Add to inventory (non-stackable items need individual add_item calls)
+	if is_stackable:
+		GameState.add_item(item_id, actually_withdrawn)
+	else:
+		for _i in range(actually_withdrawn):
+			GameState.add_item(item_id, 1)
 
 	var item_name: String = str(item_data.get("name", item_id))
-	EventBus.chat_message.emit("Withdrew %s from bank." % item_name, "system")
+	if actually_withdrawn > 1:
+		EventBus.chat_message.emit("Withdrew %d x %s from bank." % [actually_withdrawn, item_name], "system")
+	else:
+		EventBus.chat_message.emit("Withdrew %s from bank." % item_name, "system")
 	refresh()
 
-## Deposit an item from inventory into the bank
+## Deposit item(s) from inventory into the bank
 func _deposit_item(inv_index: int) -> void:
 	if inv_index >= GameState.inventory.size():
 		return
 
 	var entry: Dictionary = GameState.inventory[inv_index]
 	var item_id: String = str(entry.get("item_id", ""))
+	var available: int = int(entry.get("quantity", 1))
 	var item_data: Dictionary = DataManager.get_item(item_id)
 
 	if item_data.is_empty():
 		return
 
-	# Try to add to existing bank stack or new slot
-	if not _bank_add(item_id, 1, item_data):
+	var amount: int = _get_effective_qty(available)
+	if amount <= 0:
+		return
+
+	# Try to deposit into bank
+	if not _bank_add(item_id, amount, item_data):
 		EventBus.chat_message.emit("Bank is full!", "system")
 		return
 
-	# Remove from inventory via GameState helper
-	GameState.remove_item(item_id, 1)
+	# Remove from inventory
+	GameState.remove_item(item_id, amount)
 
 	var item_name: String = str(item_data.get("name", item_id))
-	EventBus.chat_message.emit("Deposited %s in bank." % item_name, "system")
+	if amount > 1:
+		EventBus.chat_message.emit("Deposited %d x %s in bank." % [amount, item_name], "system")
+	else:
+		EventBus.chat_message.emit("Deposited %s in bank." % item_name, "system")
 	refresh()
 
 ## Deposit all inventory items into the bank
@@ -301,15 +454,44 @@ func _on_deposit_all() -> void:
 			GameState.inventory.remove_at(i)
 			deposited_count += quantity
 		else:
-			# Bank full — try to deposit as many as possible
+			# Bank full
 			break
 
 	if deposited_count > 0:
-		# Emit item_removed so other UI (inventory panel) stays in sync
 		EventBus.item_removed.emit("", deposited_count)
 		EventBus.chat_message.emit("Deposited %d item(s) into bank." % deposited_count, "system")
 	else:
 		EventBus.chat_message.emit("Bank is full!", "system")
+
+	refresh()
+
+## Deposit all equipped gear into the bank
+func _on_deposit_equipment() -> void:
+	var deposited_count: int = 0
+	var slots: Array[String] = ["head", "body", "legs", "boots", "gloves", "weapon", "offhand"]
+
+	for slot_name in slots:
+		var item_id: String = str(GameState.equipment.get(slot_name, ""))
+		if item_id == "":
+			continue
+
+		var item_data: Dictionary = DataManager.get_item(item_id)
+		if item_data.is_empty():
+			continue
+
+		# Try to bank the equipped item
+		if _bank_add(item_id, 1, item_data):
+			GameState.equipment[slot_name] = ""
+			EventBus.item_unequipped.emit(slot_name, item_id)
+			deposited_count += 1
+		else:
+			EventBus.chat_message.emit("Bank full! Some equipment not deposited.", "system")
+			break
+
+	if deposited_count > 0:
+		EventBus.chat_message.emit("Deposited %d equipped item(s) into bank." % deposited_count, "system")
+	else:
+		EventBus.chat_message.emit("No equipment to deposit.", "system")
 
 	refresh()
 
