@@ -103,6 +103,9 @@ func _ready() -> void:
 	## Apply initial volumes from GameState settings
 	_apply_initial_volumes()
 
+	## Re-apply volumes after save data is loaded (autoloads _ready before main.gd loads save)
+	EventBus.game_loaded.connect(_apply_initial_volumes)
+
 	## Connect EventBus signals for automatic SFX playback
 	_connect_signals()
 
