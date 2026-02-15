@@ -112,14 +112,19 @@ func _ready() -> void:
 	mp_row.add_child(_mp_connect_btn)
 
 	_mp_status_label = Label.new()
-	_mp_status_label.text = "Disconnected"
+	_mp_status_label.text = "Auto-connecting..."
 	_mp_status_label.add_theme_font_size_override("font_size", 10)
-	_mp_status_label.add_theme_color_override("font_color", Color(0.6, 0.4, 0.4))
+	_mp_status_label.add_theme_color_override("font_color", Color(0.8, 0.7, 0.3))
 	vbox.add_child(_mp_status_label)
 
 	# Listen for multiplayer connection events
 	EventBus.multiplayer_connected.connect(_on_mp_connected)
 	EventBus.multiplayer_disconnected.connect(_on_mp_disconnected)
+
+	# Populate name field from saved settings
+	var saved_name: String = str(GameState.settings.get("mp_name", ""))
+	if saved_name != "":
+		_mp_name_input.text = saved_name
 
 	# Play time display
 	_play_time_label = Label.new()
@@ -215,6 +220,12 @@ func refresh() -> void:
 		if _mp_status_label:
 			_mp_status_label.text = "Connected"
 			_mp_status_label.add_theme_color_override("font_color", Color(0.3, 0.8, 0.4))
+	elif mp_client:
+		if _mp_connect_btn:
+			_mp_connect_btn.text = "Connect"
+		if _mp_status_label:
+			_mp_status_label.text = "Connecting..."
+			_mp_status_label.add_theme_color_override("font_color", Color(0.8, 0.7, 0.3))
 
 	# Play time
 	_update_play_time()

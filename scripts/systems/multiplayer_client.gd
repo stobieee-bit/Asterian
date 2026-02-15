@@ -36,11 +36,12 @@ const DEFAULT_STYLE_COLOR: Color = Color(0.6, 0.6, 0.6)  # Grey fallback
 
 # ── WebSocket ──
 
-var _ws: WebSocketPeer = WebSocketPeer.new()
+var _ws: WebSocketPeer = null  # Created on first connect attempt
 var _connected: bool = false
 var _server_url: String = ""
 var _player_name: String = ""
 var _my_id: String = ""
+var _last_ws_state: int = -1  # Track state transitions for debugging
 
 # ── Reconnection ──
 
@@ -49,6 +50,7 @@ var _reconnect_delay: float = INITIAL_RECONNECT_DELAY
 var _reconnect_timer: float = 0.0
 var _reconnecting: bool = false
 var _connect_timeout_timer: float = 0.0
+var _join_sent: bool = false  # Track whether "join" was sent for this connection
 
 # ── Position sync ──
 
@@ -117,44 +119,66 @@ func _process(delta: float) -> void:
 	if _player_node == null:
 		_player_node = get_tree().get_first_node_in_group("player") as CharacterBody3D
 
-	# Poll WebSocket every frame (required by Godot 4.4 WebSocketPeer)
-	_ws.poll()
+	# Only poll if we have an active WebSocket peer
+	if _ws != null:
+		_ws.poll()
 
-	var state: int = _ws.get_ready_state()
+		var state: int = _ws.get_ready_state()
 
-	if state == WebSocketPeer.STATE_OPEN:
-		# Process all incoming packets
-		while _ws.get_available_packet_count() > 0:
-			var pkt: PackedByteArray = _ws.get_packet()
-			var text: String = pkt.get_string_from_utf8()
-			_handle_message(text)
+		# Log state transitions for debugging
+		if state != _last_ws_state:
+			var state_names: Array[String] = ["CONNECTING", "OPEN", "CLOSING", "CLOSED"]
+			var sname: String = state_names[state] if state >= 0 and state < state_names.size() else str(state)
+			print("MultiplayerClient: WebSocket state → %s" % sname)
+			if state == WebSocketPeer.STATE_CLOSED:
+				print("MultiplayerClient: Close code=%d reason='%s'" % [_ws.get_close_code(), _ws.get_close_reason()])
+			_last_ws_state = state
 
-		# Position sync tick
-		_position_timer += delta
-		if _position_timer >= POSITION_SYNC_INTERVAL:
-			_position_timer -= POSITION_SYNC_INTERVAL
-			_send_position()
+		if state == WebSocketPeer.STATE_OPEN:
+			# Send "join" immediately once the socket opens
+			# Server expects "join" first, then responds with "welcome"
+			if not _join_sent:
+				_join_sent = true
+				_send_join()
+				print("MultiplayerClient: Socket open — sent join as '%s'" % _player_name)
 
-		# Stats & equipment change detection (checked every frame, sends only on change)
-		_check_stats_changed()
-		_check_equipment_changed()
+			# Process all incoming packets
+			while _ws.get_available_packet_count() > 0:
+				var pkt: PackedByteArray = _ws.get_packet()
+				var text: String = pkt.get_string_from_utf8()
+				_handle_message(text)
 
-	elif state == WebSocketPeer.STATE_CLOSING:
-		pass  # Wait for the close handshake to finish
+			# Position sync tick (only after handshake complete)
+			if _connected:
+				_position_timer += delta
+				if _position_timer >= POSITION_SYNC_INTERVAL:
+					_position_timer -= POSITION_SYNC_INTERVAL
+					_send_position()
 
-	elif state == WebSocketPeer.STATE_CLOSED:
-		if _connected:
-			_on_connection_closed()
+				# Stats & equipment change detection (checked every frame, sends only on change)
+				_check_stats_changed()
+				_check_equipment_changed()
 
-	elif state == WebSocketPeer.STATE_CONNECTING:
-		# Track connection timeout — server may be asleep (Render free tier)
-		_connect_timeout_timer += delta
-		if _connect_timeout_timer >= CONNECTION_TIMEOUT:
-			_connect_timeout_timer = 0.0
-			_ws.close()
-			EventBus.chat_message.emit("Connection timed out. Server may be waking up — retrying...", "system")
-			if _should_reconnect:
+		elif state == WebSocketPeer.STATE_CLOSING:
+			pass  # Wait for the close handshake to finish
+
+		elif state == WebSocketPeer.STATE_CLOSED:
+			if _connected:
+				_on_connection_closed()
+			elif _should_reconnect and not _reconnecting:
+				# Connection failed before we ever got "welcome" — still reconnect
+				print("MultiplayerClient: Connection failed before handshake. Scheduling reconnect...")
 				_schedule_reconnect()
+
+		elif state == WebSocketPeer.STATE_CONNECTING:
+			# Track connection timeout — server may be asleep (Render free tier)
+			_connect_timeout_timer += delta
+			if _connect_timeout_timer >= CONNECTION_TIMEOUT:
+				_connect_timeout_timer = 0.0
+				_ws.close()
+				EventBus.chat_message.emit("Connection timed out — retrying...", "system")
+				if _should_reconnect:
+					_schedule_reconnect()
 
 	# Handle reconnection timer
 	if _reconnecting:
@@ -197,7 +221,7 @@ func disconnect_from_server() -> void:
 	_should_reconnect = false
 	_reconnecting = false
 
-	if _ws.get_ready_state() == WebSocketPeer.STATE_OPEN:
+	if _ws != null and _ws.get_ready_state() == WebSocketPeer.STATE_OPEN:
 		_ws.close()
 
 	_cleanup_all_remote_players()
@@ -265,18 +289,20 @@ func _attempt_connect() -> void:
 	print("MultiplayerClient: Connecting to %s ..." % _server_url)
 	EventBus.chat_message.emit("Connecting to multiplayer...", "system")
 
-	# Reset the peer and timeout timer
+	# Reset the peer, state tracker, and timeout timer
 	_ws = WebSocketPeer.new()
+	_last_ws_state = -1
 	_connect_timeout_timer = 0.0
+	_join_sent = false
 
 	var err: int = _ws.connect_to_url(_server_url)
 	if err != OK:
 		push_warning("MultiplayerClient: connect_to_url failed with error %d" % err)
+		EventBus.chat_message.emit("WebSocket error %d — retrying..." % err, "system")
 		_schedule_reconnect()
 		return
 
-	# The STATE_OPEN transition will be caught in _process → _handle_message
-	# once the server sends "welcome".
+	print("MultiplayerClient: connect_to_url() returned OK, waiting for handshake...")
 
 
 ## Called when the WebSocket transitions to STATE_CLOSED.
@@ -308,7 +334,7 @@ func _schedule_reconnect() -> void:
 
 ## Send a JSON dictionary to the server.
 func _send(data: Dictionary) -> void:
-	if _ws.get_ready_state() != WebSocketPeer.STATE_OPEN:
+	if _ws == null or _ws.get_ready_state() != WebSocketPeer.STATE_OPEN:
 		return
 	_ws.send_text(JSON.stringify(data))
 
@@ -463,8 +489,8 @@ func _handle_welcome(msg: Dictionary) -> void:
 	_connected = true
 	_reconnect_delay = INITIAL_RECONNECT_DELAY  # Reset backoff on success
 
-	# Send join message now that connection is open
-	_send_join()
+	# "join" was already sent in _process when STATE_OPEN was first detected.
+	# The server responds with "welcome" after receiving our "join".
 
 	# Spawn existing players
 	var players: Array = msg.get("players", []) as Array

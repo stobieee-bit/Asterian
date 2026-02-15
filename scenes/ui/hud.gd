@@ -2664,15 +2664,20 @@ func _on_minimap_click(event: InputEvent) -> void:
 		var norm_x: float = (local_pos.x / tex_size.x) - 0.5
 		var norm_y: float = (local_pos.y / tex_size.y) - 0.5
 
-		# Convert to world offset (camera looks down, Y rotation matters)
-		var cam_rot_y: float = _minimap_camera.global_rotation.y
+		# Convert to world offset.
+		# Godot orthographic camera.size = vertical extent in world units.
+		# Horizontal extent = size * aspect_ratio.
 		var cam_size: float = _minimap_camera.size
-		var offset_x: float = norm_x * cam_size
+		var aspect: float = tex_size.x / tex_size.y if tex_size.y > 0 else 1.0
+		var offset_x: float = norm_x * cam_size * aspect
 		var offset_z: float = norm_y * cam_size
 
-		# Rotate the offset by camera Y rotation
-		var cos_r: float = cos(cam_rot_y)
-		var sin_r: float = sin(cam_rot_y)
+		# The minimap camera is rotated to match the main camera.
+		# Screen-space offsets are in the camera's local frame, so we
+		# need the INVERSE rotation (negate the angle) to get world offsets.
+		var cam_rot_y: float = _minimap_camera.global_rotation.y
+		var cos_r: float = cos(-cam_rot_y)
+		var sin_r: float = sin(-cam_rot_y)
 		var world_x: float = _player.global_position.x + offset_x * cos_r - offset_z * sin_r
 		var world_z: float = _player.global_position.z + offset_x * sin_r + offset_z * cos_r
 
