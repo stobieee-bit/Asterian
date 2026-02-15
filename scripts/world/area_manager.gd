@@ -152,23 +152,29 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	# ── Build all detail layers ──
 	# Bio-Lab is a small crafting hub — skip heavy clutter, keep it clean
 	var _is_clean_area: bool = area_id == "bio-lab"
+	# Asteroid Mines: sparse clutter so ore nodes are the visual focus
+	var _is_mines: bool = area_id == "asteroid-mines"
 
 	_add_ground_variation(area_id, center_x, center_z, radius, base_color, y_base)
-	if not _is_clean_area:
+	if not _is_clean_area and not _is_mines:
 		_add_terrain_bumps(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_concentric_rings(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_grid_lines(area_id, center_x, center_z, radius, base_color, y_base)
 	if not _is_clean_area:
 		_add_rocks_and_boulders(area_id, center_x, center_z, radius, base_color, y_base)
-		_add_energy_pylons(area_id, center_x, center_z, radius, base_color, y_base)
-		_add_tech_panels(area_id, center_x, center_z, radius, base_color, y_base)
+		if not _is_mines:
+			_add_energy_pylons(area_id, center_x, center_z, radius, base_color, y_base)
+			_add_tech_panels(area_id, center_x, center_z, radius, base_color, y_base)
 		_add_light_columns(area_id, center_x, center_z, radius, base_color, y_base)
-	_add_crystals(area_id, center_x, center_z, radius, base_color, y_base)
+	if not _is_mines:
+		_add_crystals(area_id, center_x, center_z, radius, base_color, y_base)
 	if not _is_clean_area:
 		_add_alien_flora(area_id, center_x, center_z, radius, base_color, y_base)
 		# Floating debris removed — will revisit with proper particle system later
-		_add_pipe_structures(area_id, center_x, center_z, radius, base_color, y_base)
-	_add_ruined_walls(area_id, center_x, center_z, radius, base_color, y_base)
+		if not _is_mines:
+			_add_pipe_structures(area_id, center_x, center_z, radius, base_color, y_base)
+	if not _is_mines:
+		_add_ruined_walls(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_area_unique_structures(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_point_lights(area_id, center_x, center_z, radius, base_color, y_base)
 
@@ -327,8 +333,10 @@ func _add_rocks_and_boulders(area_id: String, cx: float, cz: float, radius: floa
 	rock_mat.roughness = 0.85
 	rock_mat.metallic = 0.1
 
-	# Scale count by area size
+	# Scale count by area size — mines gets fewer so ore nodes stand out
 	var rock_count: int = int(12 + radius * 0.08)
+	if area_id == "asteroid-mines":
+		rock_count = 6
 	rock_count = mini(rock_count, 80)  # Cap for performance
 
 	for i in range(rock_count):
@@ -2166,8 +2174,8 @@ func _build_mines_structures(cx: float, cz: float, radius: float,
 	orange_mat.emission = Color(0.9, 0.5, 0.15)
 	orange_mat.emission_energy_multiplier = 1.0
 
-	# Drill towers
-	for i in range(6):
+	# Drill towers (3 — enough to set the scene without cluttering ore fields)
+	for i in range(3):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(20.0, radius * 0.7)
 		var px: float = cx + cos(angle) * dist
@@ -2213,8 +2221,8 @@ func _build_mines_structures(cx: float, cz: float, radius: float,
 			"phase": 0.0
 		})
 
-	# Conveyor frame structures (horizontal beams with supports)
-	for i in range(4):
+	# Conveyor frame structures (2 — trimmed to reduce ground clutter)
+	for i in range(2):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(30.0, radius * 0.6)
 		var px: float = cx + cos(angle) * dist
