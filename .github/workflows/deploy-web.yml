@@ -62,11 +62,17 @@ jobs:
           mkdir -p export/web
           godot --headless --export-release "Web" export/web/index.html 2>&1
 
-      - name: Add coi-serviceworker for SharedArrayBuffer support
+      - name: Add cross-origin isolation headers for SharedArrayBuffer
         run: |
           cd export/web
-          wget -q https://raw.githubusercontent.com/nicolo-ribaudo/coi-serviceworker/master/coi-serviceworker.min.js -O coi-serviceworker.min.js
-          sed -i 's|</head>|<script src="coi-serviceworker.min.js"></script></head>|' index.html
+          # Godot 4 web exports need SharedArrayBuffer which requires COOP/COEP headers.
+          # GitHub Pages doesn't allow custom headers, so we use a service worker approach.
+          # Inline a minimal coi-serviceworker script directly.
+          cat > coi-serviceworker.js << 'SWEOF'
+          /*! coi-serviceworker v0.1.7 - Guido Zuidhof, licensed under MIT */
+          if(typeof window==='undefined'){self.addEventListener("install",()=>self.skipWaiting());self.addEventListener("activate",(e)=>e.waitUntil(self.clients.claim()));self.addEventListener("fetch",(e)=>{if(e.request.cache==="only-if-cached"&&e.request.mode!=="same-origin")return;e.respondWith(fetch(e.request).then((r)=>{if(r.status===0)return r;const h=new Headers(r.headers);h.set("Cross-Origin-Embedder-Policy","credentialless");h.set("Cross-Origin-Opener-Policy","same-origin");return new Response(r.body,{status:r.status,statusText:r.statusText,headers:h})}));})}else{const r=window.location;if(window.crossOriginIsolated!==false){}else if(navigator.serviceWorker){navigator.serviceWorker.register(new URL("coi-serviceworker.js",r.href).href).then((reg)=>{reg.addEventListener("updatefound",()=>{const w=reg.installing;w.addEventListener("statechange",()=>{if(w.state==="activated"){window.location.reload()}})})},console.error)}}
+          SWEOF
+          sed -i 's|</head>|<script src="coi-serviceworker.js"></script></head>|' index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
