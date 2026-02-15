@@ -125,11 +125,8 @@ func _gui_input(event: InputEvent) -> void:
 		var delta: Vector2 = event.global_position - _drag_start
 		var new_pos: Vector2 = _panel_start + delta
 
-		# Clamp to viewport
-		var viewport_size: Vector2 = Vector2(
-			ProjectSettings.get_setting("display/window/size/viewport_width", 1920),
-			ProjectSettings.get_setting("display/window/size/viewport_height", 1080)
-		)
+		# Clamp to actual viewport size (not design resolution)
+		var viewport_size: Vector2 = _target_panel.get_viewport_rect().size
 		var panel_size: Vector2 = _target_panel.size
 		new_pos.x = clampf(new_pos.x, 0, viewport_size.x - panel_size.x)
 		new_pos.y = clampf(new_pos.y, 0, viewport_size.y - panel_size.y)

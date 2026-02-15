@@ -16,6 +16,11 @@ var _hp_bars_check: CheckBox = null
 # ── Node refs (combat) ──
 var _auto_retaliate_check: CheckBox = null
 
+# ── Node refs (multiplayer) ──
+var _mp_name_input: LineEdit = null
+var _mp_connect_btn: Button = null
+var _mp_status_label: Label = null
+
 # ── Node refs (game) ──
 var _play_time_label: Label = null
 
@@ -78,6 +83,43 @@ func _ready() -> void:
 	load_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	load_btn.pressed.connect(_on_load_pressed)
 	save_load_row.add_child(load_btn)
+
+	# ── Multiplayer section ──
+	vbox.add_child(_create_section_header("Multiplayer"))
+
+	var mp_row: HBoxContainer = HBoxContainer.new()
+	mp_row.add_theme_constant_override("separation", 6)
+	vbox.add_child(mp_row)
+
+	var mp_label: Label = Label.new()
+	mp_label.text = "Name:"
+	mp_label.add_theme_font_size_override("font_size", 11)
+	mp_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	mp_row.add_child(mp_label)
+
+	_mp_name_input = LineEdit.new()
+	_mp_name_input.placeholder_text = "Enter name..."
+	_mp_name_input.custom_minimum_size = Vector2(100, 0)
+	_mp_name_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_mp_name_input.add_theme_font_size_override("font_size", 11)
+	_mp_name_input.max_length = 20
+	mp_row.add_child(_mp_name_input)
+
+	_mp_connect_btn = Button.new()
+	_mp_connect_btn.text = "Connect"
+	_mp_connect_btn.add_theme_font_size_override("font_size", 11)
+	_mp_connect_btn.pressed.connect(_on_mp_connect_pressed)
+	mp_row.add_child(_mp_connect_btn)
+
+	_mp_status_label = Label.new()
+	_mp_status_label.text = "Disconnected"
+	_mp_status_label.add_theme_font_size_override("font_size", 10)
+	_mp_status_label.add_theme_color_override("font_color", Color(0.6, 0.4, 0.4))
+	vbox.add_child(_mp_status_label)
+
+	# Listen for multiplayer connection events
+	EventBus.multiplayer_connected.connect(_on_mp_connected)
+	EventBus.multiplayer_disconnected.connect(_on_mp_disconnected)
 
 	# Play time display
 	_play_time_label = Label.new()
@@ -163,6 +205,17 @@ func refresh() -> void:
 	if _auto_retaliate_check != null:
 		_auto_retaliate_check.set_pressed_no_signal(bool(s.get("auto_retaliate", true)))
 
+	# Multiplayer
+	if _mp_name_input != null:
+		_mp_name_input.text = str(s.get("mp_name", ""))
+	var mp_client: Node = get_tree().get_first_node_in_group("multiplayer_client")
+	if mp_client and mp_client.is_mp_connected():
+		if _mp_connect_btn:
+			_mp_connect_btn.text = "Disconnect"
+		if _mp_status_label:
+			_mp_status_label.text = "Connected"
+			_mp_status_label.add_theme_color_override("font_color", Color(0.3, 0.8, 0.4))
+
 	# Play time
 	_update_play_time()
 
@@ -215,6 +268,44 @@ func _on_load_pressed() -> void:
 		refresh()
 	else:
 		EventBus.chat_message.emit("No save file found.", "system")
+
+# ── Signal handlers (multiplayer) ──
+
+## Connect or disconnect from the multiplayer server
+func _on_mp_connect_pressed() -> void:
+	var mp_client: Node = get_tree().get_first_node_in_group("multiplayer_client")
+	if mp_client == null:
+		EventBus.chat_message.emit("Multiplayer system not available.", "system")
+		return
+
+	if mp_client.is_mp_connected():
+		mp_client.disconnect_from_server()
+		return
+
+	var player_name: String = _mp_name_input.text.strip_edges()
+	if player_name.length() == 0:
+		EventBus.chat_message.emit("Please enter a name to connect.", "system")
+		return
+
+	mp_client.connect_to_server(mp_client.SERVER_URL_DEFAULT, player_name)
+	_mp_status_label.text = "Connecting..."
+	_mp_status_label.add_theme_color_override("font_color", Color(0.8, 0.7, 0.3))
+
+## Called when multiplayer connects successfully
+func _on_mp_connected(player_count: int) -> void:
+	if _mp_connect_btn:
+		_mp_connect_btn.text = "Disconnect"
+	if _mp_status_label:
+		_mp_status_label.text = "Connected (%d online)" % player_count
+		_mp_status_label.add_theme_color_override("font_color", Color(0.3, 0.8, 0.4))
+
+## Called when multiplayer disconnects
+func _on_mp_disconnected() -> void:
+	if _mp_connect_btn:
+		_mp_connect_btn.text = "Connect"
+	if _mp_status_label:
+		_mp_status_label.text = "Disconnected"
+		_mp_status_label.add_theme_color_override("font_color", Color(0.6, 0.4, 0.4))
 
 # ── Close handler ──
 

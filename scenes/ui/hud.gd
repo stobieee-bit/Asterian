@@ -21,6 +21,13 @@ var _design_size: Vector2 = Vector2(
 	ProjectSettings.get_setting("display/window/size/viewport_height", 1080)
 )
 
+## Get the actual viewport size (responds to window resizes)
+func _get_viewport_size() -> Vector2:
+	var vp: Viewport = get_viewport()
+	if vp:
+		return vp.get_visible_rect().size
+	return _design_size
+
 # ── UI panel instances ──
 var _inventory_panel: PanelContainer = null
 var _equipment_panel: PanelContainer = null
@@ -100,6 +107,9 @@ func _ready() -> void:
 	# Context menu signal
 	EventBus.context_menu_requested.connect(_on_context_menu_requested)
 	EventBus.context_menu_hidden.connect(_hide_context_menu)
+
+	# Window resize — reposition minimap and action bar
+	get_tree().root.size_changed.connect(_on_window_resized)
 
 	# Style the top and bottom bars
 	_style_top_bar()
@@ -632,10 +642,14 @@ func _make_sci_btn(text: String, width: float = 70, accent: Color = Color(0.2, 0
 
 	return btn
 
+## Action bar background reference (for repositioning on window resize)
+var _action_bar_bg: PanelContainer = null
+
 ## Build action button bar at the bottom
 func _build_action_bar() -> void:
 	# Background panel for the action bar
-	var bar_bg: PanelContainer = PanelContainer.new()
+	_action_bar_bg = PanelContainer.new()
+	var bar_bg: PanelContainer = _action_bar_bg
 	bar_bg.name = "ActionBarBG"
 	var bg_style: StyleBoxFlat = StyleBoxFlat.new()
 	bg_style.bg_color = Color(0.02, 0.03, 0.06, 0.8)
@@ -646,7 +660,8 @@ func _build_action_bar() -> void:
 	bg_style.content_margin_left = 8
 	bg_style.content_margin_right = 8
 	bar_bg.add_theme_stylebox_override("panel", bg_style)
-	bar_bg.position = Vector2(_design_size.x / 2.0 - 380, _design_size.y - 52)
+	var vp_init: Vector2 = _get_viewport_size()
+	bar_bg.position = Vector2(vp_init.x / 2.0 - 380, vp_init.y - 52)
 	add_child(bar_bg)
 
 	var bar: HBoxContainer = HBoxContainer.new()
@@ -1114,7 +1129,7 @@ func _build_low_hp_vignette() -> void:
 	_low_hp_vignette.name = "LowHPVignette"
 	_low_hp_vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# Full-screen overlay — use explicit size since parent is CanvasLayer
-	var vp_size: Vector2 = _design_size
+	var vp_size: Vector2 = _get_viewport_size()
 	_low_hp_vignette.position = Vector2.ZERO
 	_low_hp_vignette.size = vp_size
 	_low_hp_vignette.color = Color(0.8, 0.0, 0.0, 0.0)  # Start invisible
@@ -1159,7 +1174,7 @@ func _build_area_toast() -> void:
 	_area_toast_label.add_theme_constant_override("shadow_offset_x", 2)
 	_area_toast_label.add_theme_constant_override("shadow_offset_y", 2)
 	# Position in upper-center of screen
-	var vp_size: Vector2 = _design_size
+	var vp_size: Vector2 = _get_viewport_size()
 	_area_toast_label.position = Vector2(0, vp_size.y * 0.18)
 	_area_toast_label.size = Vector2(vp_size.x, 50)
 	_area_toast_label.modulate = Color(1, 1, 1, 0)  # Start invisible
@@ -1221,7 +1236,7 @@ func _build_levelup_flash() -> void:
 	_levelup_label.add_theme_color_override("font_shadow_color", Color(0.3, 0.15, 0.0, 0.8))
 	_levelup_label.add_theme_constant_override("shadow_offset_x", 3)
 	_levelup_label.add_theme_constant_override("shadow_offset_y", 3)
-	var vp_size: Vector2 = _design_size
+	var vp_size: Vector2 = _get_viewport_size()
 	_levelup_label.position = Vector2(0, vp_size.y * 0.3)
 	_levelup_label.size = Vector2(vp_size.x, 60)
 	_levelup_label.modulate = Color(1, 1, 1, 0)
@@ -1302,7 +1317,7 @@ func _build_loot_toast() -> void:
 	_loot_toast_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.7))
 	_loot_toast_label.add_theme_constant_override("shadow_offset_x", 2)
 	_loot_toast_label.add_theme_constant_override("shadow_offset_y", 2)
-	var vp_size: Vector2 = _design_size
+	var vp_size: Vector2 = _get_viewport_size()
 	_loot_toast_label.position = Vector2(0, vp_size.y * 0.4)
 	_loot_toast_label.size = Vector2(vp_size.x, 40)
 	_loot_toast_label.modulate = Color(1, 1, 1, 0)
@@ -1812,7 +1827,7 @@ func _build_quest_tracker() -> void:
 	_quest_tracker_panel.visible = false
 	_quest_tracker_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# Position below the minimap in top-right corner
-	var vp_size: Vector2 = _design_size
+	var vp_size: Vector2 = _get_viewport_size()
 	_quest_tracker_panel.position = Vector2(vp_size.x - 250, 172)
 	_quest_tracker_panel.custom_minimum_size = Vector2(230, 0)
 	add_child(_quest_tracker_panel)
@@ -1916,7 +1931,7 @@ func _build_save_toast() -> void:
 	_save_toast_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.5))
 	_save_toast_label.add_theme_constant_override("shadow_offset_x", 1)
 	_save_toast_label.add_theme_constant_override("shadow_offset_y", 1)
-	var vp_size: Vector2 = _design_size
+	var vp_size: Vector2 = _get_viewport_size()
 	_save_toast_label.position = Vector2(vp_size.x - 160, vp_size.y - 30)
 	_save_toast_label.size = Vector2(150, 20)
 	_save_toast_label.modulate = Color(1, 1, 1, 0)
@@ -2294,7 +2309,7 @@ func _update_hover_label() -> void:
 
 	# Don't hover when over UI panels
 	# Simple check: if mouse is in top 42px (top bar) or bottom 55px (bottom bar + action bar)
-	var vp_size: Vector2 = _design_size
+	var vp_size: Vector2 = _get_viewport_size()
 	if mouse_pos.y < 42 or mouse_pos.y > vp_size.y - 55:
 		_hover_label.visible = false
 		_hover_target = null
@@ -2486,6 +2501,20 @@ func _close_all_panels() -> void:
 		if panel and panel.visible:
 			panel.visible = false
 
+## Handle window resize — reposition anchored elements
+func _on_window_resized() -> void:
+	# Reposition minimap to top-right corner
+	_resize_minimap()
+	# Reposition action bar to bottom-center
+	_reposition_action_bar()
+
+## Reposition the bottom action bar to horizontal center
+func _reposition_action_bar() -> void:
+	if _action_bar_bg == null:
+		return
+	var vp_size: Vector2 = _get_viewport_size()
+	_action_bar_bg.position = Vector2(vp_size.x / 2.0 - 380, vp_size.y - 52)
+
 ## Cycle minimap zoom level (small → medium → large)
 var _minimap_zoom_level: int = 0  # 0=small (160), 1=medium (220), 2=large (300)
 
@@ -2502,8 +2531,9 @@ func _resize_minimap() -> void:
 	var map_size: int = sizes[_minimap_zoom_level]
 	var cam_size: float = cam_sizes[_minimap_zoom_level]
 
-	# Update container position and size
-	_minimap_container.position = Vector2(_design_size.x - map_size - 16, 4)
+	# Update container position and size (use actual viewport, not design size)
+	var vp_size: Vector2 = _get_viewport_size()
+	_minimap_container.position = Vector2(vp_size.x - map_size - 16, 4)
 	_minimap_container.custom_minimum_size = Vector2(map_size, map_size)
 
 	# Update viewport size
@@ -2561,7 +2591,8 @@ func _build_minimap() -> void:
 	_minimap_container.name = "MinimapPanel"
 	_minimap_container.add_theme_stylebox_override("panel", style)
 	_minimap_container.mouse_filter = Control.MOUSE_FILTER_STOP  # Block clicks through
-	_minimap_container.position = Vector2(_design_size.x - map_size - 16, 4)
+	var vp_size: Vector2 = _get_viewport_size()
+	_minimap_container.position = Vector2(vp_size.x - map_size - 16, 4)
 	_minimap_container.custom_minimum_size = Vector2(map_size, map_size)
 	add_child(_minimap_container)
 
@@ -2686,8 +2717,9 @@ func _toggle_full_map() -> void:
 	if _full_map_panel and is_instance_valid(_full_map_panel):
 		_full_map_panel.visible = not _full_map_panel.visible
 		if _full_map_panel.visible and _full_map_camera:
-			# Center on player
 			_full_map_camera.global_position = Vector3(_player.global_position.x if _player else 0.0, 200.0, _player.global_position.z if _player else 0.0)
+		# Save visibility state
+		_save_full_map_state()
 		return
 
 	# Build full map panel
@@ -2702,28 +2734,34 @@ func _toggle_full_map() -> void:
 	_full_map_panel.name = "FullMapPanel"
 	_full_map_panel.add_theme_stylebox_override("panel", panel_style)
 	_full_map_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	_full_map_panel.position = Vector2(200, 60)
 	_full_map_panel.custom_minimum_size = Vector2(600, 500)
 	add_child(_full_map_panel)
+
+	# Restore saved position or use default
+	var saved: Dictionary = GameState.panel_layout.get("world_map", {}) as Dictionary
+	var default_x: float = 200.0
+	var default_y: float = 60.0
+	_full_map_panel.position = Vector2(
+		float(saved.get("x", default_x)),
+		float(saved.get("y", default_y))
+	)
 
 	var vbox: VBoxContainer = VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 4)
 	_full_map_panel.add_child(vbox)
 
-	# Title row
-	var title_row: HBoxContainer = HBoxContainer.new()
-	vbox.add_child(title_row)
-	var title: Label = Label.new()
-	title.text = "World Map"
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title.add_theme_font_size_override("font_size", 16)
-	title.add_theme_color_override("font_color", Color(0.4, 0.8, 1.0))
-	title_row.add_child(title)
-	var close_btn: Button = Button.new()
-	close_btn.text = "X"
-	close_btn.add_theme_font_size_override("font_size", 14)
-	close_btn.pressed.connect(func(): _full_map_panel.visible = false)
-	title_row.add_child(close_btn)
+	# Draggable header with close button (replaces old title row)
+	var header: DraggableHeader = DraggableHeader.attach(
+		_full_map_panel, "World Map",
+		func(): _full_map_panel.visible = false; _save_full_map_state()
+	)
+	header._on_drag_end = func(): _save_full_map_state()
+	vbox.add_child(header)
+	vbox.move_child(header, 0)
+
+	# Restore lock state
+	var locked: bool = bool(saved.get("locked", false))
+	header.set_locked(locked)
 
 	# Map viewport
 	_full_map_viewport = SubViewport.new()
@@ -2752,6 +2790,21 @@ func _toggle_full_map() -> void:
 	map_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	map_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(map_tex)
+
+## Save the full world map panel's position and state
+func _save_full_map_state() -> void:
+	if _full_map_panel == null:
+		return
+	var header: DraggableHeader = _full_map_panel.get_node_or_null("DragHeader") as DraggableHeader
+	var locked: bool = false
+	if header:
+		locked = header._is_locked
+	GameState.panel_layout["world_map"] = {
+		"x": _full_map_panel.position.x,
+		"y": _full_map_panel.position.y,
+		"visible": _full_map_panel.visible,
+		"locked": locked,
+	}
 
 func _update_minimap() -> void:
 	if _minimap_camera == null or _player == null:
