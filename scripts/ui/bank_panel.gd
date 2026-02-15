@@ -356,23 +356,33 @@ func _withdraw_item(bank_index: int) -> void:
 	if amount <= 0:
 		return
 
-	# Each withdrawn item takes its own inventory slot (no stacking)
+	# Withdraw one at a time: only remove from bank after successful inventory add
 	var actually_withdrawn: int = 0
 	for _i in range(amount):
 		if not GameState.has_inventory_space():
-			if actually_withdrawn == 0:
-				EventBus.chat_message.emit("Inventory full!", "system")
-				return
 			break
+		# Add one to inventory first
+		GameState.inventory.append({ "item_id": item_id, "quantity": 1 })
 		actually_withdrawn += 1
 
-	# Remove from bank
-	GameState.bank[bank_index]["quantity"] -= actually_withdrawn
-	if GameState.bank[bank_index]["quantity"] <= 0:
-		GameState.bank.remove_at(bank_index)
+	if actually_withdrawn == 0:
+		EventBus.chat_message.emit("Inventory full!", "system")
+		return
 
-	# Add to inventory (each item gets its own slot)
-	GameState.add_item(item_id, actually_withdrawn)
+	# Now safely remove from bank (items are already in inventory)
+	# Re-fetch index in case bank shifted (it shouldn't, but be safe)
+	var bi: int = -1
+	for i in range(GameState.bank.size()):
+		if GameState.bank[i].get("item_id", "") == item_id:
+			bi = i
+			break
+
+	if bi >= 0:
+		GameState.bank[bi]["quantity"] -= actually_withdrawn
+		if GameState.bank[bi]["quantity"] <= 0:
+			GameState.bank.remove_at(bi)
+
+	EventBus.item_added.emit(item_id, actually_withdrawn)
 
 	var item_name: String = str(item_data.get("name", item_id))
 	if actually_withdrawn > 1:

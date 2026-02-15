@@ -138,22 +138,30 @@ func find_inventory_item(item_id: String) -> int:
 			return i
 	return -1
 
-## Add item to inventory. Returns true if successful.
+## Add item to inventory. Returns true if ALL items were added.
 ## Items NEVER stack in inventory — each item takes its own slot.
+## If inventory fills mid-way, the items already added stay (no rollback),
+## but returns false so callers know not all were placed.
 func add_item(item_id: String, quantity: int = 1) -> bool:
 	var item_data: Dictionary = DataManager.get_item(item_id)
 	if item_data.is_empty():
 		push_warning("GameState.add_item: Unknown item '%s'" % item_id)
 		return false
 
-	# Each unit gets its own slot — no stacking in inventory
+	var added: int = 0
 	for _i in range(quantity):
 		if not has_inventory_space():
-			EventBus.inventory_full.emit()
-			return false
+			break
 		inventory.append({ "item_id": item_id, "quantity": 1 })
+		added += 1
 
-	EventBus.item_added.emit(item_id, quantity)
+	if added > 0:
+		EventBus.item_added.emit(item_id, added)
+
+	if added < quantity:
+		EventBus.inventory_full.emit()
+		return false
+
 	return true
 
 ## Remove item from inventory. Returns true if successful.
