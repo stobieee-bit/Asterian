@@ -15,6 +15,11 @@ extends CanvasLayer
 
 var _player: Node3D = null
 
+# ── Distance-close tracking for interaction panels ──
+const PANEL_CLOSE_DISTANCE: float = 8.0  # Close panels when player walks this far
+var _interaction_source_pos: Vector3 = Vector3.ZERO  # Where the interaction started
+var _interaction_panels_open: bool = false  # Whether any interaction panel is open
+
 # ── Design resolution (reliable fallback for viewport size at _ready time) ──
 var _design_size: Vector2 = Vector2(
 	ProjectSettings.get_setting("display/window/size/viewport_width", 1920),
@@ -316,6 +321,9 @@ func _process(delta: float) -> void:
 
 	# ── Minimap camera follow ──
 	_update_minimap()
+
+	# ── Distance check: close interaction panels if player walks away ──
+	_check_interaction_distance()
 
 func _unhandled_input(event: InputEvent) -> void:
 	# ── Chat input: Enter to open, Escape to close ──
@@ -938,20 +946,24 @@ func _update_level_display() -> void:
 func open_dialogue(npc: Node) -> void:
 	if _dialogue_panel and _dialogue_panel.has_method("open_dialogue"):
 		_dialogue_panel.open_dialogue(npc)
+		_mark_interaction_source()
 
 ## Open shop panel — called by DialoguePanel when player selects "Shop"
 func open_shop(npc: Node) -> void:
 	if _shop_panel and _shop_panel.has_method("open_shop"):
 		_shop_panel.open_shop(npc)
+		_mark_interaction_source()
 
 ## Open crafting panel — called when player interacts with a processing station
 func open_crafting(skill_id: String, station_name: String) -> void:
 	if _crafting_panel and _crafting_panel.has_method("open_crafting"):
 		_crafting_panel.open_crafting(skill_id, station_name)
+		_mark_interaction_source()
 
 ## Open bank panel
 func open_bank() -> void:
 	_toggle_panel(_bank_panel, "bank")
+	_mark_interaction_source()
 
 ## Open prestige panel
 func open_prestige() -> void:
@@ -960,6 +972,36 @@ func open_prestige() -> void:
 ## Open dungeon panel
 func open_dungeon() -> void:
 	_toggle_panel(_dungeon_panel, "dungeon")
+
+# ── Distance-based panel closing ──
+
+## Record the player's position when an interaction panel opens
+func _mark_interaction_source() -> void:
+	if _player:
+		_interaction_source_pos = _player.global_position
+		_interaction_panels_open = true
+
+## Close interaction panels (bank, shop, crafting, dialogue) if the player walks too far
+func _check_interaction_distance() -> void:
+	if not _interaction_panels_open or _player == null:
+		return
+
+	var dist: float = _player.global_position.distance_to(_interaction_source_pos)
+	if dist < PANEL_CLOSE_DISTANCE:
+		return
+
+	# Close all interaction panels
+	var closed_any: bool = false
+	var interaction_panels: Array = [_dialogue_panel, _shop_panel, _crafting_panel, _bank_panel]
+	for panel in interaction_panels:
+		if panel and panel.visible:
+			panel.visible = false
+			closed_any = true
+
+	if closed_any:
+		EventBus.chat_message.emit("Moved too far away.", "system")
+
+	_interaction_panels_open = false
 
 # ── Gathering progress bar ──
 # Managed by InteractionController but displayed by HUD

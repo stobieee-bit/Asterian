@@ -296,6 +296,20 @@ func _try_right_click(event: InputEvent) -> void:
 			_player.get_viewport().set_input_as_handled()
 			return
 
+	# Check NPCs (layer 8)
+	var npc_query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, from + dir * 200.0)
+	npc_query.collision_mask = 8
+	npc_query.exclude = [_player.get_rid()]
+	var npc_result: Dictionary = space_state.intersect_ray(npc_query)
+	if npc_result:
+		var hit: Node = npc_result.collider
+		while hit and not hit.is_in_group("npcs"):
+			hit = hit.get_parent()
+		if hit and hit.is_in_group("npcs") and hit.has_method("show_context_menu"):
+			hit.show_context_menu(screen_pos)
+			_player.get_viewport().set_input_as_handled()
+			return
+
 	# Check gathering nodes (layer 16)
 	var gather_query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, from + dir * 200.0)
 	gather_query.collision_mask = 16

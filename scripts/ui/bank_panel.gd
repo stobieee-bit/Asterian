@@ -356,41 +356,23 @@ func _withdraw_item(bank_index: int) -> void:
 	if amount <= 0:
 		return
 
-	var is_stackable: bool = item_data.get("stackable", false)
-	var inv_idx: int = GameState.find_inventory_item(item_id)
-
-	# For non-stackable items, withdraw one at a time and check space each time
+	# Each withdrawn item takes its own inventory slot (no stacking)
 	var actually_withdrawn: int = 0
-	if is_stackable and inv_idx >= 0:
-		# Already in inventory stack — can always add more
-		actually_withdrawn = amount
-	elif is_stackable:
-		# Need one free slot for the new stack
+	for _i in range(amount):
 		if not GameState.has_inventory_space():
-			EventBus.chat_message.emit("Inventory full!", "system")
-			return
-		actually_withdrawn = amount
-	else:
-		# Non-stackable: each unit needs its own inventory slot
-		for _i in range(amount):
-			if not GameState.has_inventory_space():
-				if actually_withdrawn == 0:
-					EventBus.chat_message.emit("Inventory full!", "system")
-					return
-				break
-			actually_withdrawn += 1
+			if actually_withdrawn == 0:
+				EventBus.chat_message.emit("Inventory full!", "system")
+				return
+			break
+		actually_withdrawn += 1
 
 	# Remove from bank
 	GameState.bank[bank_index]["quantity"] -= actually_withdrawn
 	if GameState.bank[bank_index]["quantity"] <= 0:
 		GameState.bank.remove_at(bank_index)
 
-	# Add to inventory (non-stackable items need individual add_item calls)
-	if is_stackable:
-		GameState.add_item(item_id, actually_withdrawn)
-	else:
-		for _i in range(actually_withdrawn):
-			GameState.add_item(item_id, 1)
+	# Add to inventory (each item gets its own slot)
+	GameState.add_item(item_id, actually_withdrawn)
 
 	var item_name: String = str(item_data.get("name", item_id))
 	if actually_withdrawn > 1:
@@ -406,22 +388,23 @@ func _deposit_item(inv_index: int) -> void:
 
 	var entry: Dictionary = GameState.inventory[inv_index]
 	var item_id: String = str(entry.get("item_id", ""))
-	var available: int = int(entry.get("quantity", 1))
 	var item_data: Dictionary = DataManager.get_item(item_id)
 
 	if item_data.is_empty():
 		return
 
-	var amount: int = _get_effective_qty(available)
+	# Count how many of this item exist across all inventory slots
+	var total_owned: int = GameState.count_item(item_id)
+	var amount: int = _get_effective_qty(total_owned)
 	if amount <= 0:
 		return
 
-	# Try to deposit into bank
+	# Try to deposit into bank (bank always stacks)
 	if not _bank_add(item_id, amount, item_data):
 		EventBus.chat_message.emit("Bank is full!", "system")
 		return
 
-	# Remove from inventory
+	# Remove from inventory (removes individual slots)
 	GameState.remove_item(item_id, amount)
 
 	var item_name: String = str(item_data.get("name", item_id))
@@ -496,18 +479,15 @@ func _on_deposit_equipment() -> void:
 	refresh()
 
 ## Internal helper: add an item + quantity into the bank array.
-## If the item is stackable and already present, increases the existing quantity.
+## Bank ALWAYS stacks — if the item is already present, increases quantity.
 ## Otherwise appends a new entry if bank has room.
 ## Returns true on success, false if the bank is full.
-func _bank_add(item_id: String, quantity: int, item_data: Dictionary) -> bool:
-	var is_stackable: bool = item_data.get("stackable", false)
-
-	# Look for an existing stack in the bank
-	if is_stackable:
-		for entry in GameState.bank:
-			if entry.get("item_id", "") == item_id:
-				entry["quantity"] += quantity
-				return true
+func _bank_add(item_id: String, quantity: int, _item_data: Dictionary) -> bool:
+	# Always look for an existing stack in the bank
+	for entry in GameState.bank:
+		if entry.get("item_id", "") == item_id:
+			entry["quantity"] += quantity
+			return true
 
 	# Need a new bank slot
 	if GameState.bank.size() >= GameState.bank_size:

@@ -139,50 +139,49 @@ func find_inventory_item(item_id: String) -> int:
 	return -1
 
 ## Add item to inventory. Returns true if successful.
+## Items NEVER stack in inventory — each item takes its own slot.
 func add_item(item_id: String, quantity: int = 1) -> bool:
-	# Check if item is stackable (look up in DataManager)
 	var item_data: Dictionary = DataManager.get_item(item_id)
 	if item_data.is_empty():
 		push_warning("GameState.add_item: Unknown item '%s'" % item_id)
 		return false
 
-	var is_stackable: bool = item_data.get("stackable", false)
+	# Each unit gets its own slot — no stacking in inventory
+	for _i in range(quantity):
+		if not has_inventory_space():
+			EventBus.inventory_full.emit()
+			return false
+		inventory.append({ "item_id": item_id, "quantity": 1 })
 
-	if is_stackable:
-		var idx: int = find_inventory_item(item_id)
-		if idx >= 0:
-			inventory[idx]["quantity"] += quantity
-			EventBus.item_added.emit(item_id, quantity)
-			return true
-
-	# Need a free slot
-	if not has_inventory_space():
-		EventBus.inventory_full.emit()
-		return false
-
-	inventory.append({ "item_id": item_id, "quantity": quantity })
 	EventBus.item_added.emit(item_id, quantity)
 	return true
 
 ## Remove item from inventory. Returns true if successful.
+## Since items don't stack, removes individual slots.
 func remove_item(item_id: String, quantity: int = 1) -> bool:
-	var idx: int = find_inventory_item(item_id)
-	if idx < 0:
+	# Count available first
+	if count_item(item_id) < quantity:
 		return false
-	if inventory[idx]["quantity"] < quantity:
-		return false
-	inventory[idx]["quantity"] -= quantity
-	if inventory[idx]["quantity"] <= 0:
-		inventory.remove_at(idx)
-	EventBus.item_removed.emit(item_id, quantity)
+
+	var removed: int = 0
+	# Remove from back to front so indices stay valid
+	for i in range(inventory.size() - 1, -1, -1):
+		if removed >= quantity:
+			break
+		if inventory[i]["item_id"] == item_id:
+			inventory.remove_at(i)
+			removed += 1
+
+	EventBus.item_removed.emit(item_id, removed)
 	return true
 
-## Count how many of an item the player has
+## Count how many of an item the player has (across all slots)
 func count_item(item_id: String) -> int:
-	var idx: int = find_inventory_item(item_id)
-	if idx < 0:
-		return 0
-	return inventory[idx]["quantity"]
+	var total: int = 0
+	for entry in inventory:
+		if entry["item_id"] == item_id:
+			total += int(entry.get("quantity", 1))
+	return total
 
 ## Convert full state to Dictionary for saving
 func to_save_data() -> Dictionary:

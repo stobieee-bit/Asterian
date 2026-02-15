@@ -340,6 +340,71 @@ func _animate_npc_idle(phase: float) -> void:
 		if mat:
 			mat.emission_energy_multiplier = 2.5 + sin(phase * 1.8) * 0.5
 
+## Show right-click context menu for this NPC
+func show_context_menu(screen_pos: Vector2) -> void:
+	var options: Array = []
+	var visor_col: Color = _npc_visor_color()
+
+	# Title
+	options.append({"title": npc_name, "title_color": visor_col})
+
+	# Talk option (always available)
+	options.append({
+		"label": "Talk-to",
+		"icon": "T",
+		"color": Color(0.8, 0.85, 0.9),
+		"callback": func():
+			var hud: Node = get_tree().get_first_node_in_group("hud")
+			if hud and hud.has_method("open_dialogue"):
+				hud.open_dialogue(self)
+	})
+
+	# Bank option — for banker NPCs (dialogue has openBank action)
+	if _has_dialogue_action("openBank"):
+		options.append({
+			"label": "Bank",
+			"icon": "B",
+			"color": Color(0.3, 0.9, 0.5),
+			"callback": func():
+				var hud: Node = get_tree().get_first_node_in_group("hud")
+				if hud and hud.has_method("open_bank"):
+					hud.open_bank()
+		})
+
+	# Shop option — for shop NPCs
+	if not shop_data.is_empty() or _has_dialogue_action("openShop"):
+		options.append({
+			"label": "Shop",
+			"icon": "S",
+			"color": Color(1.0, 0.85, 0.3),
+			"callback": func():
+				var hud: Node = get_tree().get_first_node_in_group("hud")
+				if hud and hud.has_method("open_shop"):
+					hud.open_shop(self)
+		})
+
+	# Examine option
+	options.append({
+		"label": "Examine",
+		"icon": "?",
+		"color": Color(0.6, 0.7, 0.8),
+		"callback": func():
+			var desc_text: String = npc_desc if npc_desc != "" else "An NPC."
+			EventBus.chat_message.emit("%s — %s" % [npc_name, desc_text], "system")
+	})
+
+	EventBus.context_menu_requested.emit(options, screen_pos)
+
+## Check if any dialogue option triggers a given action
+func _has_dialogue_action(action_name: String) -> bool:
+	for node_key in dialogue:
+		var node_data: Dictionary = dialogue[node_key]
+		var opts: Array = node_data.get("options", [])
+		for opt in opts:
+			if str(opt.get("action", "")) == action_name:
+				return true
+	return false
+
 ## Get the greeting dialogue node
 func get_greeting() -> Dictionary:
 	return dialogue.get("greeting", {})

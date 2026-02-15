@@ -408,7 +408,7 @@ func _add_energy_pylons(area_id: String, cx: float, cz: float, radius: float,
 		orb_mat.albedo_color = base_color.lightened(0.5)
 		orb_mat.emission_enabled = true
 		orb_mat.emission = base_color.lightened(0.6)
-		orb_mat.emission_energy_multiplier = 4.0
+		orb_mat.emission_energy_multiplier = 2.0
 		orb.material = orb_mat
 		add_child(orb)
 
@@ -508,7 +508,7 @@ func _add_light_columns(area_id: String, cx: float, cz: float, radius: float,
 		beam_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		beam_mat.emission_enabled = true
 		beam_mat.emission = beam_color
-		beam_mat.emission_energy_multiplier = 3.0
+		beam_mat.emission_energy_multiplier = 1.5
 		beam_mat.no_depth_test = true
 		beam.material = beam_mat
 		add_child(beam)
@@ -523,7 +523,7 @@ func _add_light_columns(area_id: String, cx: float, cz: float, radius: float,
 		disc_mat.albedo_color = beam_color
 		disc_mat.emission_enabled = true
 		disc_mat.emission = beam_color
-		disc_mat.emission_energy_multiplier = 3.5
+		disc_mat.emission_energy_multiplier = 1.5
 		disc_mat.metallic = 0.5
 		base_disc.material = disc_mat
 		add_child(base_disc)
@@ -579,7 +579,7 @@ func _add_crystals(area_id: String, cx: float, cz: float, radius: float,
 		cryst_mat.roughness = 0.1
 		cryst_mat.emission_enabled = true
 		cryst_mat.emission = base_color.lightened(0.6)
-		cryst_mat.emission_energy_multiplier = 3.5
+		cryst_mat.emission_energy_multiplier = 1.8
 		crystal.material = cryst_mat
 		add_child(crystal)
 
@@ -659,7 +659,7 @@ func _add_alien_flora(area_id: String, cx: float, cz: float, radius: float,
 		bulb_mat.albedo_color = bulb_color
 		bulb_mat.emission_enabled = true
 		bulb_mat.emission = bulb_color
-		bulb_mat.emission_energy_multiplier = 2.5
+		bulb_mat.emission_energy_multiplier = 1.2
 		bulb.material = bulb_mat
 		add_child(bulb)
 
@@ -875,7 +875,7 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 	glow_mat.albedo_color = Color(0.2, 0.8, 1.0)
 	glow_mat.emission_enabled = true
 	glow_mat.emission = Color(0.2, 0.8, 1.0)
-	glow_mat.emission_energy_multiplier = 3.0
+	glow_mat.emission_energy_multiplier = 1.5
 
 	var metal_mat: StandardMaterial3D = StandardMaterial3D.new()
 	metal_mat.albedo_color = Color(0.15, 0.2, 0.3)
@@ -891,7 +891,7 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 	warm_glow.albedo_color = Color(1.0, 0.6, 0.2)
 	warm_glow.emission_enabled = true
 	warm_glow.emission = Color(1.0, 0.6, 0.2)
-	warm_glow.emission_energy_multiplier = 2.5
+	warm_glow.emission_energy_multiplier = 1.2
 
 	var crate_mat: StandardMaterial3D = StandardMaterial3D.new()
 	crate_mat.albedo_color = Color(0.2, 0.25, 0.35)
@@ -936,7 +936,7 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 	holo_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	holo_mat.emission_enabled = true
 	holo_mat.emission = Color(0.2, 0.7, 1.0)
-	holo_mat.emission_energy_multiplier = 2.0
+	holo_mat.emission_energy_multiplier = 1.0
 	holo_globe.material = holo_mat
 	add_child(holo_globe)
 	_animated_nodes.append({
@@ -1044,7 +1044,7 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 		strip_mat.albedo_color = sc.lightened(0.4)
 		strip_mat.emission_enabled = true
 		strip_mat.emission = sc.lightened(0.5)
-		strip_mat.emission_energy_multiplier = 2.0
+		strip_mat.emission_energy_multiplier = 1.0
 		strip.material = strip_mat
 		add_child(strip)
 
@@ -1343,7 +1343,7 @@ func _build_gathering_structures(cx: float, cz: float, radius: float,
 	vent_mat.albedo_color = Color(0.3, 0.7, 0.2)
 	vent_mat.emission_enabled = true
 	vent_mat.emission = Color(0.3, 0.8, 0.2)
-	vent_mat.emission_energy_multiplier = 2.0
+	vent_mat.emission_energy_multiplier = 1.0
 
 	for i in range(4):
 		var angle: float = rng.randf() * TAU
@@ -2149,7 +2149,7 @@ func _build_abyss_structures(cx: float, cz: float, radius: float,
 	rift_mat.albedo_color = Color(0.5, 0.1, 0.8)
 	rift_mat.emission_enabled = true
 	rift_mat.emission = Color(0.6, 0.15, 0.9)
-	rift_mat.emission_energy_multiplier = 5.0
+	rift_mat.emission_energy_multiplier = 2.5
 
 	# Massive void pillars
 	for i in range(15):
@@ -2232,7 +2232,7 @@ func _build_mines_structures(cx: float, cz: float, radius: float,
 	orange_mat.albedo_color = Color(0.8, 0.4, 0.1)
 	orange_mat.emission_enabled = true
 	orange_mat.emission = Color(0.9, 0.5, 0.15)
-	orange_mat.emission_energy_multiplier = 2.0
+	orange_mat.emission_energy_multiplier = 1.0
 
 	# Drill towers
 	for i in range(6):
@@ -2336,7 +2336,7 @@ func _build_biolab_structures(cx: float, cz: float, radius: float,
 	glow_mat.albedo_color = Color(0.2, 0.9, 0.5)
 	glow_mat.emission_enabled = true
 	glow_mat.emission = Color(0.2, 0.9, 0.5)
-	glow_mat.emission_energy_multiplier = 2.5
+	glow_mat.emission_energy_multiplier = 1.2
 
 	# ── Central reactor column ──
 	var reactor_base: CSGCylinder3D = CSGCylinder3D.new()
@@ -2443,7 +2443,7 @@ func _add_point_lights(area_id: String, cx: float, cz: float, radius: float,
 			cz + sin(angle) * dist
 		)
 		light.light_color = base_color.lightened(0.5)
-		light.light_energy = rng.randf_range(0.5, 1.5)
+		light.light_energy = rng.randf_range(0.3, 0.8)
 		light.omni_range = rng.randf_range(8.0, 20.0)
 		light.omni_attenuation = 1.5
 		light.shadow_enabled = false  # Performance
@@ -2522,7 +2522,7 @@ func _create_corridor(data: Dictionary) -> void:
 	edge_mat.albedo_color = corridor_color.lightened(0.5)
 	edge_mat.emission_enabled = true
 	edge_mat.emission = corridor_color.lightened(0.6)
-	edge_mat.emission_energy_multiplier = 2.0
+	edge_mat.emission_energy_multiplier = 1.0
 	edge_mat.metallic = 0.5
 
 	var is_vertical: bool = corridor_d > corridor_w
@@ -2567,7 +2567,7 @@ func _create_corridor(data: Dictionary) -> void:
 	lamp_mat.albedo_color = corridor_color.lightened(0.6)
 	lamp_mat.emission_enabled = true
 	lamp_mat.emission = corridor_color.lightened(0.6)
-	lamp_mat.emission_energy_multiplier = 3.0
+	lamp_mat.emission_energy_multiplier = 1.5
 
 	for i in range(post_count):
 		var frac: float = (float(i) + 0.5) / float(post_count)
