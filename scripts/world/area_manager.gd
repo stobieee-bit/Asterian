@@ -1836,8 +1836,9 @@ func _build_wastes_toxic_heart(y_base: float) -> void:
 	var bone_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 7, 6.0)
 	for pos in bone_positions:
 		var bone_h: float = rng.randf_range(3.0, 10.0)
+		var bone_r: float = rng.randf_range(0.2, 0.6)
 		var bone: CSGCylinder3D = CSGCylinder3D.new()
-		bone.radius = rng.randf_range(0.2, 0.6)
+		bone.radius = bone_r
 		bone.height = bone_h
 		bone.sides = 5
 		bone.cone = rng.randf() > 0.5

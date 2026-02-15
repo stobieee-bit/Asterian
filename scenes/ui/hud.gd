@@ -167,14 +167,23 @@ func _ready() -> void:
 	_build_hover_label()
 
 ## Build stat bars + info labels with absolute positioning (no TopBar/BottomBar containers)
+var _stat_bars_container: VBoxContainer = null
+
 func _build_stat_bars() -> void:
-	# ── HP Bar — top-left ──
+	# ── Stat bars container — centered above ability bar at bottom of screen ──
+	_stat_bars_container = VBoxContainer.new()
+	_stat_bars_container.name = "StatBarsContainer"
+	_stat_bars_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stat_bars_container.alignment = BoxContainer.ALIGNMENT_CENTER
+	_stat_bars_container.add_theme_constant_override("separation", 2)
+	add_child(_stat_bars_container)
+
+	# ── HP Bar ──
 	hp_bar = ProgressBar.new()
 	hp_bar.name = "HPBar"
 	hp_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hp_bar.position = Vector2(14, 10)
-	hp_bar.custom_minimum_size = Vector2(280, 24)
-	hp_bar.size = Vector2(280, 24)
+	hp_bar.custom_minimum_size = Vector2(280, 18)
+	hp_bar.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	hp_bar.max_value = 100.0
 	hp_bar.value = 100.0
 	hp_bar.show_percentage = false
@@ -190,14 +199,14 @@ func _build_stat_bars() -> void:
 	hp_fill.bg_color = Color(0.65, 0.12, 0.08, 0.9)
 	hp_fill.set_corner_radius_all(4)
 	hp_bar.add_theme_stylebox_override("fill", hp_fill)
-	add_child(hp_bar)
+	_stat_bars_container.add_child(hp_bar)
 
 	_hp_text = Label.new()
 	_hp_text.name = "HPText"
 	_hp_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hp_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hp_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_hp_text.add_theme_font_size_override("font_size", 14)
+	_hp_text.add_theme_font_size_override("font_size", 12)
 	_hp_text.add_theme_color_override("font_color", Color(1.0, 0.95, 0.95, 0.95))
 	_hp_text.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.6))
 	_hp_text.add_theme_constant_override("shadow_offset_x", 1)
@@ -205,13 +214,12 @@ func _build_stat_bars() -> void:
 	_hp_text.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	hp_bar.add_child(_hp_text)
 
-	# ── Energy Bar — below HP ──
+	# ── Energy Bar ──
 	energy_bar = ProgressBar.new()
 	energy_bar.name = "EnergyBar"
 	energy_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	energy_bar.position = Vector2(14, 38)
-	energy_bar.custom_minimum_size = Vector2(240, 20)
-	energy_bar.size = Vector2(240, 20)
+	energy_bar.custom_minimum_size = Vector2(220, 14)
+	energy_bar.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	energy_bar.max_value = 100.0
 	energy_bar.value = 100.0
 	energy_bar.show_percentage = false
@@ -227,14 +235,14 @@ func _build_stat_bars() -> void:
 	en_fill.bg_color = Color(0.12, 0.35, 0.75, 0.9)
 	en_fill.set_corner_radius_all(4)
 	energy_bar.add_theme_stylebox_override("fill", en_fill)
-	add_child(energy_bar)
+	_stat_bars_container.add_child(energy_bar)
 
 	_energy_text = Label.new()
 	_energy_text.name = "EnergyText"
 	_energy_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_energy_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_energy_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_energy_text.add_theme_font_size_override("font_size", 13)
+	_energy_text.add_theme_font_size_override("font_size", 11)
 	_energy_text.add_theme_color_override("font_color", Color(0.9, 0.93, 1.0, 0.95))
 	_energy_text.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.6))
 	_energy_text.add_theme_constant_override("shadow_offset_x", 1)
@@ -242,11 +250,11 @@ func _build_stat_bars() -> void:
 	_energy_text.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	energy_bar.add_child(_energy_text)
 
-	# ── Level label — below ADR bar area ──
+	# ── Level label — top-left corner ──
 	level_label = Label.new()
 	level_label.name = "LevelLabel"
 	level_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	level_label.position = Vector2(14, 84)
+	level_label.position = Vector2(14, 10)
 	level_label.add_theme_font_size_override("font_size", 14)
 	level_label.add_theme_color_override("font_color", Color(0.5, 0.6, 0.7, 0.8))
 	level_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
@@ -259,7 +267,7 @@ func _build_stat_bars() -> void:
 	credits_label = Label.new()
 	credits_label.name = "CreditsLabel"
 	credits_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	credits_label.position = Vector2(14, 104)
+	credits_label.position = Vector2(14, 30)
 	credits_label.add_theme_font_size_override("font_size", 15)
 	credits_label.add_theme_color_override("font_color", Color(0.85, 0.75, 0.3, 0.9))
 	credits_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
@@ -1071,32 +1079,34 @@ func hide_gather_progress() -> void:
 var _adrenaline_bar: ProgressBar = null
 var _adrenaline_text: Label = null
 
-## Build the adrenaline bar under the HP/Energy bars
+## Build the adrenaline bar inside the stat bars container
 func _build_adrenaline_bar() -> void:
-	var adr_container: Control = Control.new()
-	adr_container.name = "AdrenalineContainer"
-	adr_container.position = Vector2(14, 62)
-	adr_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(adr_container)
+	var adr_row: HBoxContainer = HBoxContainer.new()
+	adr_row.name = "AdrenalineRow"
+	adr_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	adr_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	adr_row.add_theme_constant_override("separation", 4)
+	if _stat_bars_container:
+		_stat_bars_container.add_child(adr_row)
+	else:
+		add_child(adr_row)
 
 	var lbl: Label = Label.new()
 	lbl.text = "ADR"
 	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	lbl.add_theme_font_size_override("font_size", 12)
+	lbl.add_theme_font_size_override("font_size", 10)
 	lbl.add_theme_color_override("font_color", Color(0.4, 0.7, 0.3, 0.8))
 	lbl.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.4))
 	lbl.add_theme_constant_override("shadow_offset_x", 1)
 	lbl.add_theme_constant_override("shadow_offset_y", 1)
-	lbl.position = Vector2(0, 0)
-	adr_container.add_child(lbl)
+	adr_row.add_child(lbl)
 
 	_adrenaline_bar = ProgressBar.new()
 	_adrenaline_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_adrenaline_bar.custom_minimum_size = Vector2(210, 16)
+	_adrenaline_bar.custom_minimum_size = Vector2(200, 12)
 	_adrenaline_bar.show_percentage = false
 	_adrenaline_bar.max_value = 100.0
 	_adrenaline_bar.value = 0.0
-	_adrenaline_bar.position = Vector2(38, 1)
 
 	var bg_style: StyleBoxFlat = StyleBoxFlat.new()
 	bg_style.bg_color = Color(0.04, 0.06, 0.03, 0.6)
@@ -1110,7 +1120,7 @@ func _build_adrenaline_bar() -> void:
 	fill_style.set_corner_radius_all(3)
 	_adrenaline_bar.add_theme_stylebox_override("fill", fill_style)
 
-	adr_container.add_child(_adrenaline_bar)
+	adr_row.add_child(_adrenaline_bar)
 
 	_adrenaline_text = Label.new()
 	_adrenaline_text.name = "AdrText"
@@ -1230,6 +1240,19 @@ func _reposition_ability_bar() -> void:
 	if bar_width < 10:
 		bar_width = 830.0  # Estimate for 6 buttons × 120px + gaps + margins
 	_ability_bar_bg.position = Vector2(vp_size.x / 2.0 - bar_width / 2.0, vp_size.y - 104)
+	# Also reposition stat bars above ability bar
+	_reposition_stat_bars()
+
+func _reposition_stat_bars() -> void:
+	if _stat_bars_container == null:
+		return
+	var vp_size: Vector2 = _get_viewport_size()
+	# Stat bars sit centered above the ability bar (which is at vp.y - 104)
+	var container_width: float = 280.0  # Width of widest bar (HP)
+	_stat_bars_container.position = Vector2(
+		vp_size.x / 2.0 - container_width / 2.0,
+		vp_size.y - 160
+	)
 
 ## Create a styled ability button with keybind + name + cost badge
 func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost: int, cost_text_override: String = "", is_icon: bool = false) -> Button:
@@ -2805,6 +2828,8 @@ func _on_window_resized() -> void:
 	_reposition_action_bar()
 	# Reposition ability bar to centered above action bar
 	_reposition_ability_bar()
+	# Reposition stat bars above ability bar
+	_reposition_stat_bars()
 	# Reposition chat to bottom-left
 	_reposition_chat()
 	# Reposition FPS/Pos labels to bottom-right
