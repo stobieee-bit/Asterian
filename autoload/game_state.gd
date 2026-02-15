@@ -91,6 +91,9 @@ var settings: Dictionary = {
 	"auto_retaliate": true,
 }
 
+# ── Panel layout: { panel_name: { x, y, visible, locked } } ──
+var panel_layout: Dictionary = {}
+
 # ── Play time tracking ──
 var total_play_time: float = 0.0
 var session_start_time: float = 0.0
@@ -105,14 +108,14 @@ func _process(delta: float) -> void:
 
 ## Get total combat level (average of 3 combat skills)
 func get_combat_level() -> int:
-	var total := skills["nano"]["level"] + skills["tesla"]["level"] + skills["void"]["level"]
+	var total: int = int(skills["nano"]["level"]) + int(skills["tesla"]["level"]) + int(skills["void"]["level"])
 	return int(total / 3.0)
 
 ## Get total level across all skills
 func get_total_level() -> int:
-	var total := 0
+	var total: int = 0
 	for skill_data in skills.values():
-		total += skill_data["level"]
+		total += int(skill_data["level"])
 	return total
 
 ## Check if player has enough credits
@@ -138,7 +141,7 @@ func find_inventory_item(item_id: String) -> int:
 ## Add item to inventory. Returns true if successful.
 func add_item(item_id: String, quantity: int = 1) -> bool:
 	# Check if item is stackable (look up in DataManager)
-	var item_data := DataManager.get_item(item_id)
+	var item_data: Dictionary = DataManager.get_item(item_id)
 	if item_data.is_empty():
 		push_warning("GameState.add_item: Unknown item '%s'" % item_id)
 		return false
@@ -146,7 +149,7 @@ func add_item(item_id: String, quantity: int = 1) -> bool:
 	var is_stackable: bool = item_data.get("stackable", false)
 
 	if is_stackable:
-		var idx := find_inventory_item(item_id)
+		var idx: int = find_inventory_item(item_id)
 		if idx >= 0:
 			inventory[idx]["quantity"] += quantity
 			EventBus.item_added.emit(item_id, quantity)
@@ -163,7 +166,7 @@ func add_item(item_id: String, quantity: int = 1) -> bool:
 
 ## Remove item from inventory. Returns true if successful.
 func remove_item(item_id: String, quantity: int = 1) -> bool:
-	var idx := find_inventory_item(item_id)
+	var idx: int = find_inventory_item(item_id)
 	if idx < 0:
 		return false
 	if inventory[idx]["quantity"] < quantity:
@@ -176,16 +179,21 @@ func remove_item(item_id: String, quantity: int = 1) -> bool:
 
 ## Count how many of an item the player has
 func count_item(item_id: String) -> int:
-	var idx := find_inventory_item(item_id)
+	var idx: int = find_inventory_item(item_id)
 	if idx < 0:
 		return 0
 	return inventory[idx]["quantity"]
 
 ## Convert full state to Dictionary for saving
 func to_save_data() -> Dictionary:
+	# Serialize player dict with Vector3 → array for JSON compatibility
+	var player_copy: Dictionary = player.duplicate(true)
+	if player_copy.has("position") and player_copy["position"] is Vector3:
+		var pos: Vector3 = player_copy["position"]
+		player_copy["position"] = [pos.x, pos.y, pos.z]
 	return {
 		"current_area": current_area,
-		"player": player.duplicate(true),
+		"player": player_copy,
 		"skills": skills.duplicate(true),
 		"equipment": equipment.duplicate(true),
 		"inventory": inventory.duplicate(true),
@@ -206,12 +214,22 @@ func to_save_data() -> Dictionary:
 		"owned_pets": owned_pets.duplicate(true),
 		"settings": settings.duplicate(true),
 		"total_play_time": total_play_time,
+		"panel_layout": panel_layout.duplicate(true),
 	}
 
 ## Load state from a save Dictionary
 func from_save_data(data: Dictionary) -> void:
 	current_area = data.get("current_area", "station-hub")
 	player = data.get("player", player)
+	# Deserialize position from [x, y, z] array back to Vector3
+	if player.has("position") and player["position"] is Array:
+		var arr: Array = player["position"]
+		if arr.size() >= 3:
+			player["position"] = Vector3(float(arr[0]), float(arr[1]), float(arr[2]))
+		else:
+			player["position"] = Vector3.ZERO
+	elif not (player.get("position") is Vector3):
+		player["position"] = Vector3.ZERO
 	skills = data.get("skills", skills)
 	equipment = data.get("equipment", equipment)
 	inventory.assign(data.get("inventory", []))
@@ -232,3 +250,4 @@ func from_save_data(data: Dictionary) -> void:
 	owned_pets = data.get("owned_pets", {})
 	settings = data.get("settings", settings)
 	total_play_time = data.get("total_play_time", 0.0)
+	panel_layout = data.get("panel_layout", {})

@@ -4,49 +4,73 @@
       "name": "Nanotech",
       "icon": "🔬",
       "color": "#44ff88",
-      "type": "combat"
+      "type": "combat",
+      "desc": "Close-range melee combat using nano-swarm blades. Strong vs Tesla, weak vs Void.",
+      "trains": "Kill enemies while using Nano combat style.",
+      "category": "Combat"
     },
     "tesla": {
       "name": "Tesla",
       "icon": "⚡",
       "color": "#44aaff",
-      "type": "combat"
+      "type": "combat",
+      "desc": "Mid-range electrical attacks with coilguns. Strong vs Void, weak vs Nano.",
+      "trains": "Kill enemies while using Tesla combat style.",
+      "category": "Combat"
     },
     "void": {
       "name": "Void",
       "icon": "🌀",
       "color": "#aa44ff",
-      "type": "combat"
+      "type": "combat",
+      "desc": "Long-range dark energy from voidstaffs. Strong vs Nano, weak vs Tesla.",
+      "trains": "Kill enemies while using Void combat style.",
+      "category": "Combat"
     },
     "astromining": {
       "name": "Astromining",
       "icon": "⛏️",
       "color": "#ff8844",
-      "type": "gathering"
+      "type": "gathering",
+      "desc": "Extract ores and gems from asteroid deposits. Higher levels unlock rarer materials.",
+      "trains": "Mine ore nodes in the Asteroid Mines.",
+      "category": "Gathering"
     },
     "bioforge": {
       "name": "Bioforge",
       "icon": "🧬",
       "color": "#44ffaa",
-      "type": "production"
+      "type": "production",
+      "desc": "Craft armor and brew serums from creature parts. Use Bioforge Stations in the Bio-Lab.",
+      "trains": "Craft items at Bioforge Stations.",
+      "category": "Production"
     },
     "circuitry": {
       "name": "Circuitry",
       "icon": "🔧",
       "color": "#ffaa44",
-      "type": "production"
+      "type": "production",
+      "desc": "Smelt ores into bars and forge weapons, tools, and gadgets. Use Smelting Furnaces in the Bio-Lab.",
+      "trains": "Smelt bars and craft equipment at Smelting Furnaces.",
+      "category": "Production"
     },
     "xenocook": {
       "name": "Xenocook",
       "icon": "🍳",
       "color": "#ff4488",
-      "type": "production"
+      "type": "production",
+      "desc": "Cook alien ingredients into healing food and combat buff meals. Use Xenocook Ranges in the Bio-Lab.",
+      "trains": "Cook food at Xenocook Ranges.",
+      "category": "Production"
     },
     "psionics": {
       "name": "Neural Engineering",
       "icon": "🧠",
       "color": "#ff44ff",
       "type": "prestige",
+      "desc": "Advanced crafting using neural tissue from deep-space organisms. Produces psi-weave gear and power cores.",
+      "trains": "Process neural materials at the Neural Processor.",
+      "category": "Prestige",
       "locked": true,
       "lockText": "Complete the Neural Awakening quest chain."
     },
@@ -55,136 +79,13 @@
       "icon": "⏳",
       "color": "#44ffff",
       "type": "prestige",
+      "desc": "Transmute lower ores into higher-tier bars and brew temporal elixirs. Shortcuts material progression.",
+      "trains": "Transmute materials at the Quantum Synthesizer.",
+      "category": "Prestige",
       "softGate": true,
       "softGateText": "Requires Level 10 in any combat skill."
     }
   },
-  "synergies": [
-    {
-      "id": "double_ore",
-      "name": "Rich Veins",
-      "desc": "15% chance to mine double ores",
-      "requirement": "[function]",
-      "reqText": "Astromining 20+",
-      "type": "gathering_bonus",
-      "value": 0.15
-    },
-    {
-      "id": "weapon_durability",
-      "name": "Precision Forge",
-      "desc": "Crafted weapons get +5% durability",
-      "requirement": "[function]",
-      "reqText": "Circuitry 15+",
-      "type": "durability_bonus_weapon",
-      "value": 0.05
-    },
-    {
-      "id": "armor_durability",
-      "name": "Bio-Reinforcement",
-      "desc": "Crafted armor gets +5% durability",
-      "requirement": "[function]",
-      "reqText": "Bioforge 15+",
-      "type": "durability_bonus_armor",
-      "value": 0.05
-    },
-    {
-      "id": "food_heal_bonus",
-      "name": "Gourmet Touch",
-      "desc": "Food heals 10% more",
-      "requirement": "[function]",
-      "reqText": "Xenocook 10+",
-      "type": "heal_bonus",
-      "value": 0.1
-    },
-    {
-      "id": "combat_damage_nano",
-      "name": "Nano Mastery",
-      "desc": "+5% nano damage",
-      "requirement": "[function]",
-      "reqText": "Nanotech 20+",
-      "type": "combat_damage",
-      "value": 0.05,
-      "style": "nano"
-    },
-    {
-      "id": "combat_damage_tesla",
-      "name": "Tesla Mastery",
-      "desc": "+5% tesla damage",
-      "requirement": "[function]",
-      "reqText": "Tesla 20+",
-      "type": "combat_damage",
-      "value": 0.05,
-      "style": "tesla"
-    },
-    {
-      "id": "combat_damage_void",
-      "name": "Void Mastery",
-      "desc": "+5% void damage",
-      "requirement": "[function]",
-      "reqText": "Void 20+",
-      "type": "combat_damage",
-      "value": 0.05,
-      "style": "void"
-    },
-    {
-      "id": "cross_combat_accuracy",
-      "name": "Combat Versatility",
-      "desc": "+5% accuracy",
-      "requirement": "[function]",
-      "reqText": "2+ combat skills at 10+",
-      "type": "combat_accuracy",
-      "value": 0.05
-    },
-    {
-      "id": "smelting_xp_bonus",
-      "name": "Forge Synergy",
-      "desc": "Smelting gives +10% XP",
-      "requirement": "[function]",
-      "reqText": "Astromining 15+ AND Circuitry 15+",
-      "type": "xp_bonus",
-      "value": 0.1,
-      "skill": "circuitry"
-    },
-    {
-      "id": "neural_bio",
-      "name": "Neural Refinement",
-      "desc": "+5% Neural Engineering recipe XP",
-      "requirement": "[function]",
-      "reqText": "Neural Eng. 20+ AND Bioforge 20+",
-      "type": "xp_bonus",
-      "value": 0.05,
-      "skill": "psionics"
-    },
-    {
-      "id": "quantum_mining",
-      "name": "Quantum Extraction",
-      "desc": "+5% Quantum Synthesis recipe XP",
-      "requirement": "[function]",
-      "reqText": "Quantum Syn. 15+ AND Astromining 20+",
-      "type": "xp_bonus",
-      "value": 0.05,
-      "skill": "chronomancy"
-    },
-    {
-      "id": "quantum_forge",
-      "name": "Transmutation Mastery",
-      "desc": "+8% transmutation XP",
-      "requirement": "[function]",
-      "reqText": "Quantum Syn. 20+ AND Circuitry 20+",
-      "type": "xp_bonus",
-      "value": 0.08,
-      "skill": "chronomancy"
-    },
-    {
-      "id": "neural_quantum",
-      "name": "Prestige Resonance",
-      "desc": "+5% all prestige recipe XP",
-      "requirement": "[function]",
-      "reqText": "Neural Eng. 40+ AND Quantum Syn. 40+",
-      "type": "prestige_xp_bonus",
-      "value": 0.05
-    }
-  ],
   "unlocks": {
     "astromining": [
       {

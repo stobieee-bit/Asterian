@@ -9,24 +9,29 @@ const BACKUP_PATH := "user://save_data_backup.json"
 
 ## Save current game state to disk
 func save_game() -> bool:
-	var data := GameState.to_save_data()
+	var data: Dictionary = GameState.to_save_data()
 	data["save_version"] = 1
 	data["save_timestamp"] = Time.get_unix_time_from_system()
 
+	# Save achievement system internal counters
+	var achieve_sys: Node = get_tree().get_first_node_in_group("achievement_system")
+	if achieve_sys and achieve_sys.has_method("to_save_data"):
+		data["achievement_data"] = achieve_sys.to_save_data()
+
 	# Create backup of existing save first
 	if FileAccess.file_exists(SAVE_PATH):
-		var old := FileAccess.open(SAVE_PATH, FileAccess.READ)
+		var old: FileAccess = FileAccess.open(SAVE_PATH, FileAccess.READ)
 		if old:
-			var old_text := old.get_as_text()
+			var old_text: String = old.get_as_text()
 			old.close()
-			var backup := FileAccess.open(BACKUP_PATH, FileAccess.WRITE)
+			var backup: FileAccess = FileAccess.open(BACKUP_PATH, FileAccess.WRITE)
 			if backup:
 				backup.store_string(old_text)
 				backup.close()
 
 	# Write new save
-	var json_text := JSON.stringify(data, "\t")
-	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var json_text: String = JSON.stringify(data, "\t")
+	var file: FileAccess = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
 		push_error("SaveManager: Could not open save file for writing.")
 		return false
@@ -43,16 +48,16 @@ func load_game() -> bool:
 		print("SaveManager: No save file found.")
 		return false
 
-	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	var file: FileAccess = FileAccess.open(SAVE_PATH, FileAccess.READ)
 	if file == null:
 		push_error("SaveManager: Could not open save file for reading.")
 		return false
 
-	var text := file.get_as_text()
+	var text: String = file.get_as_text()
 	file.close()
 
-	var json := JSON.new()
-	var err := json.parse(text)
+	var json: JSON = JSON.new()
+	var err: Error = json.parse(text)
 	if err != OK:
 		push_error("SaveManager: JSON parse error: %s" % json.get_error_message())
 		return false
@@ -63,6 +68,12 @@ func load_game() -> bool:
 		return false
 
 	GameState.from_save_data(data)
+
+	# Restore achievement system internal counters
+	var achieve_sys: Node = get_tree().get_first_node_in_group("achievement_system")
+	if achieve_sys and achieve_sys.has_method("from_save_data"):
+		achieve_sys.from_save_data(data.get("achievement_data", {}))
+
 	print("SaveManager: Game loaded successfully (save version %d)." % data.get("save_version", 0))
 	EventBus.game_loaded.emit()
 	return true

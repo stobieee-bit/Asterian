@@ -1,0 +1,59 @@
+[gd_scene load_steps=5 format=3 uid="uid://cfr7x2nkb5pad"]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_controller.gd" id="1_enemy"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_enemy"]
+radius = 0.4
+height = 1.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hpbg"]
+albedo_color = Color(0.15, 0.15, 0.15, 0.8)
+transparency = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hpfill"]
+albedo_color = Color(0.2, 0.9, 0.2, 0.9)
+transparency = 1
+
+[node name="Enemy" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_enemy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("CapsuleShape3D_enemy")
+
+[node name="EnemyMesh" type="Node3D" parent="."]
+
+[node name="Body" type="CSGCylinder3D" parent="EnemyMesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+radius = 0.35
+height = 1.2
+sides = 6
+
+[node name="Head" type="CSGSphere3D" parent="EnemyMesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0)
+radius = 0.22
+radial_segments = 6
+rings = 4
+
+[node name="Nameplate" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
+billboard = 1
+no_depth_test = true
+modulate = Color(0.8, 0.9, 0.8, 0.9)
+text = "Enemy (Lv 1)"
+font_size = 20
+outline_size = 4
+
+[node name="HPBarPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+
+[node name="HPBarBG" type="CSGBox3D" parent="HPBarPivot"]
+size = Vector3(1.1, 0.12, 0.05)
+material = SubResource("StandardMaterial3D_hpbg")
+
+[node name="HPBarFill" type="CSGBox3D" parent="HPBarPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.01)
+size = Vector3(1.0, 0.1, 0.05)
+material = SubResource("StandardMaterial3D_hpfill")

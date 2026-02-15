@@ -50,6 +50,8 @@ signal panel_opened(panel_name: String)
 signal panel_closed(panel_name: String)
 signal tooltip_requested(data: Dictionary, global_pos: Vector2)
 signal tooltip_hidden
+signal context_menu_requested(options: Array, global_pos: Vector2)
+signal context_menu_hidden
 signal float_text_requested(text: String, position: Vector3, color: Color)
 signal chat_message(text: String, channel: String)
 
@@ -68,3 +70,20 @@ signal achievement_unlocked(achievement_id: String)
 
 # ── Prestige signals ──
 signal prestige_triggered(new_tier: int)
+
+# ── Dungeon signals ──
+signal dungeon_started(floor_data: Dictionary)
+signal dungeon_floor_advanced(floor_data: Dictionary)
+signal dungeon_room_cleared(grid_x: int, grid_z: int)
+signal dungeon_exited
+
+# ── Pet signals ──
+signal pet_summoned(pet_id: String)
+signal pet_dismissed
+signal pet_level_up(pet_id: String, new_level: int)
+
+# ── Multiplayer signals ──
+signal multiplayer_connected(player_count: int)
+signal multiplayer_disconnected
+signal multiplayer_player_joined(player_name: String)
+signal multiplayer_player_left(player_name: String)

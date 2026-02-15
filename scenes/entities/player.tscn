@@ -1,0 +1,39 @@
+[gd_scene load_steps=7 format=3 uid="uid://dpk4r7h2wmxe8"]
+
+[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1_player"]
+[ext_resource type="Script" path="res://scripts/player/camera_rig.gd" id="2_camera"]
+[ext_resource type="Script" path="res://scripts/player/combat_controller.gd" id="3_combat"]
+[ext_resource type="Script" path="res://scripts/player/player_mesh_setup.gd" id="4_mesh_setup"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.2, 0.6, 0.9, 1)
+emission_enabled = true
+emission = Color(0.1, 0.3, 0.5, 1)
+emission_energy_multiplier = 0.3
+
+[node name="Player" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_player")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_player")
+
+[node name="PlayerMesh" type="Node3D" parent="."]
+script = ExtResource("4_mesh_setup")
+
+[node name="CameraRig" type="Node3D" parent="."]
+script = ExtResource("2_camera")
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig"]
+fov = 55.0
+near = 0.1
+far = 500.0
+
+[node name="CombatController" type="Node" parent="."]
+script = ExtResource("3_combat")

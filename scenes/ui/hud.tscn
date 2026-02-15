@@ -1,0 +1,71 @@
+[gd_scene load_steps=2 format=3 uid="uid://bwx8nvl5dm4e6"]
+
+[ext_resource type="Script" path="res://scenes/ui/hud.gd" id="1_hud"]
+
+[node name="HUD" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_hud")
+
+[node name="TopBar" type="HBoxContainer" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 40.0
+grow_horizontal = 2
+theme_override_constants/separation = 12
+
+[node name="AreaLabel" type="Label" parent="TopBar"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.9, 0.7, 1)
+theme_override_font_sizes/font_size = 16
+text = "Station Hub"
+
+[node name="HPBar" type="ProgressBar" parent="TopBar"]
+custom_minimum_size = Vector2(180, 22)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="EnergyBar" type="ProgressBar" parent="TopBar"]
+custom_minimum_size = Vector2(140, 22)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="LevelLabel" type="Label" parent="TopBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+text = "Combat Lv 1 | Total Lv 7"
+
+[node name="CreditsLabel" type="Label" parent="TopBar"]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_colors/font_color = Color(0.9, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 13
+text = "0 credits"
+
+[node name="BottomBar" type="HBoxContainer" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -30.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 20
+
+[node name="PosLabel" type="Label" parent="BottomBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.5, 0.6, 1)
+theme_override_font_sizes/font_size = 11
+text = "0, 0"
+
+[node name="FPSLabel" type="Label" parent="BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_colors/font_color = Color(0.4, 0.5, 0.4, 1)
+theme_override_font_sizes/font_size = 11
+text = "60 FPS"

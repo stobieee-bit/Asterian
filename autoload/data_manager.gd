@@ -22,14 +22,14 @@ var area_level_ranges: Dictionary = {}
 var enemy_sub_zones: Array = []
 var processing_stations: Array = []
 var skill_defs: Dictionary = {}
-var synergy_defs: Array = []
+var synergy_defs: Array = []  # Deprecated — kept empty for compatibility
 var skill_unlocks: Dictionary = {}
 var xp_table: Array = []
 var quests: Dictionary = {}
 var quest_chains: Array = []
 var board_quests: Dictionary = {}
-var slayer_shop: Array = []
-var relic_recipes: Array = []
+var slayer_shop: Dictionary = {}
+var relic_recipes: Dictionary = {}
 var npcs: Dictionary = {}
 var achievements: Array = []
 var prestige_config: Dictionary = {}
@@ -69,7 +69,7 @@ func _load_all_data() -> void:
 		enemy_defs = ed.values() if ed.size() > 0 else []
 
 	# Areas (compound file)
-	var area_data := _load_json("res://data/areas.json")
+	var area_data: Dictionary = _load_json("res://data/areas.json")
 	areas = area_data.get("areas", {})
 	corrupted_areas = area_data.get("corrupted_areas", {})
 	area_atmosphere = area_data.get("atmosphere", {})
@@ -79,36 +79,38 @@ func _load_all_data() -> void:
 	processing_stations = area_data.get("processing_stations", [])
 
 	# Skills (compound file)
-	var skill_data := _load_json("res://data/skills.json")
+	var skill_data: Dictionary = _load_json("res://data/skills.json")
 	skill_defs = skill_data.get("skill_defs", {})
-	synergy_defs = skill_data.get("synergies", [])
+	# synergy_defs removed — no longer used
 	skill_unlocks = skill_data.get("unlocks", {})
 	xp_table = skill_data.get("xp_table", [])
 
 	# Quests (compound file)
-	var quest_data := _load_json("res://data/quests.json")
+	var quest_data: Dictionary = _load_json("res://data/quests.json")
 	quests = quest_data.get("quests", {})
 	quest_chains = quest_data.get("quest_chains", [])
 	board_quests = quest_data.get("board_quests", {})
-	slayer_shop = quest_data.get("slayer_shop", [])
-	relic_recipes = quest_data.get("relic_recipes", [])
+	slayer_shop = quest_data.get("slayer_shop", {})
+	relic_recipes = quest_data.get("relic_recipes", {})
 
 	# NPCs
-	npcs = _load_json("res://data/npcs.json")
+	var npcs_data: Variant = _load_json("res://data/npcs.json")
+	if npcs_data is Dictionary:
+		npcs = npcs_data
 
 	# Achievements
-	var ach = _load_json("res://data/achievements.json")
+	var ach: Variant = _load_json("res://data/achievements.json")
 	if ach is Array:
 		achievements = ach
 
 	# Prestige (compound file)
-	var pres_data := _load_json("res://data/prestige.json")
+	var pres_data: Dictionary = _load_json("res://data/prestige.json")
 	prestige_config = pres_data.get("config", {})
 	prestige_passives = pres_data.get("passives", {})
 	prestige_shop_items = pres_data.get("shop_items", [])
 
 	# Dungeons (compound file)
-	var dung_data := _load_json("res://data/dungeons.json")
+	var dung_data: Dictionary = _load_json("res://data/dungeons.json")
 	dungeon_themes = dung_data.get("themes", {})
 	dungeon_area_theme_map = dung_data.get("area_theme_map", {})
 	dungeon_modifiers = dung_data.get("modifiers", {})
@@ -117,15 +119,19 @@ func _load_all_data() -> void:
 	dungeon_loot_tiers = dung_data.get("loot_tiers", [])
 
 	# Pets
-	var pet_data = _load_json("res://data/pets.json")
+	var pet_data: Variant = _load_json("res://data/pets.json")
 	if pet_data is Array:
 		pets = pet_data
 
 	# Equipment data (compound file)
-	equipment_data = _load_json("res://data/equipment.json")
+	var equip_data: Variant = _load_json("res://data/equipment.json")
+	if equip_data is Dictionary:
+		equipment_data = equip_data
 
 	# Enemy loot lookup tables
-	enemy_loot_tables = _load_json("res://data/enemy_loot_tables.json")
+	var loot_data: Variant = _load_json("res://data/enemy_loot_tables.json")
+	if loot_data is Dictionary:
+		enemy_loot_tables = loot_data
 
 	# Print summary
 	print("  Items: %d" % items.size())
@@ -144,14 +150,14 @@ func _load_json(file_path: String) -> Variant:
 	if not FileAccess.file_exists(file_path):
 		push_warning("DataManager: File not found: %s" % file_path)
 		return {}
-	var file := FileAccess.open(file_path, FileAccess.READ)
+	var file: FileAccess = FileAccess.open(file_path, FileAccess.READ)
 	if file == null:
 		push_warning("DataManager: Could not open: %s" % file_path)
 		return {}
-	var text := file.get_as_text()
+	var text: String = file.get_as_text()
 	file.close()
-	var json := JSON.new()
-	var err := json.parse(text)
+	var json: JSON = JSON.new()
+	var err: Error = json.parse(text)
 	if err != OK:
 		push_error("DataManager: JSON parse error in %s: %s" % [file_path, json.get_error_message()])
 		return {}
@@ -209,14 +215,19 @@ func get_skill(skill_id: String) -> Dictionary:
 		return skill_defs[skill_id]
 	return {}
 
-## Get XP required for a given level (1-99)
+## Current max skill level (capped for early game testing)
+const MAX_SKILL_LEVEL: int = 50
+
+## Get XP required for a given level. Returns 0 if level exceeds cap.
 func xp_for_level(level: int) -> int:
-	var idx := clampi(level - 1, 0, xp_table.size() - 1)
+	if level > MAX_SKILL_LEVEL:
+		return 0
+	var idx: int = clampi(level - 1, 0, xp_table.size() - 1)
 	return int(xp_table[idx]) if idx < xp_table.size() else 0
 
-## Get level for a given amount of XP
+## Get level for a given amount of XP (capped at MAX_SKILL_LEVEL)
 func level_for_xp(xp: int) -> int:
-	for i in range(xp_table.size() - 1, -1, -1):
+	for i in range(mini(xp_table.size() - 1, MAX_SKILL_LEVEL - 1), -1, -1):
 		if xp >= int(xp_table[i]):
 			return i + 1
 	return 1
@@ -232,17 +243,18 @@ func get_all_area_ids() -> Array[String]:
 
 ## Get sub-zones for a specific area
 func get_sub_zones_for_area(area_id: String) -> Array:
-	var result := []
+	var result: Array = []
 	for zone in enemy_sub_zones:
 		if zone.get("area", "") == area_id:
 			result.append(zone)
 	return result
 
-## Get all recipes for a specific skill
+## Get all recipes for a specific skill (includes "id" key in each recipe)
 func get_recipes_for_skill(skill_id: String) -> Array:
-	var result := []
+	var result: Array = []
 	for recipe_id in recipes:
-		var recipe: Dictionary = recipes[recipe_id]
+		var recipe: Dictionary = recipes[recipe_id].duplicate()
 		if recipe.get("skill", "") == skill_id:
+			recipe["id"] = recipe_id
 			result.append(recipe)
 	return result
