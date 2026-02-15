@@ -97,17 +97,9 @@ func _centered_row() -> HBoxContainer:
 	row.add_theme_constant_override("separation", SLOT_GAP)
 	return row
 
-## Get icon symbol for a slot type (empty state) — ASCII-safe
+## Get emoji icon for a slot type (empty state) — delegates to shared ItemIcons
 func _slot_icon(slot_name: String) -> String:
-	match slot_name:
-		"head":    return "He"
-		"body":    return "Bd"
-		"weapon":  return "Wp"
-		"offhand": return "Oh"
-		"legs":    return "Lg"
-		"boots":   return "Bt"
-		"gloves":  return "Gl"
-		_: return "?"
+	return ItemIcons.get_equip_slot_icon(slot_name)
 
 ## Create a single equipment slot
 func _create_slot(slot_name: String, display_name: String) -> PanelContainer:
@@ -344,19 +336,10 @@ func _tier_color(tier: int) -> Color:
 		return Color.html(str(tiers[tier_str].get("color", "#888888")))
 	return Color(0.55, 0.55, 0.55)
 
-## Get icon symbol for equipped item (from item data icon field) — ASCII-safe
+## Get emoji icon for equipped item — delegates to shared ItemIcons
 func _item_icon(icon_name: String, slot_name: String) -> String:
-	match icon_name:
-		"icon_nanoblade":  return "Nb"
-		"icon_coilgun":    return "Cg"
-		"icon_voidstaff":  return "Vs"
-		"icon_capacitor":  return "Zp"
-		"icon_helmet":     return "He"
-		"icon_vest":       return "Ve"
-		"icon_greaves":    return "Lg"
-		"icon_boots":      return "Bo"
-		"icon_gloves":     return "Gl"
-		"icon_shield":     return "Sh"
-		"icon_crown":      return "Cw"
-	# Fallback to slot default
-	return _slot_icon(slot_name)
+	var icon: String = ItemIcons.get_icon(icon_name, "")
+	if icon == "📦":
+		# No match found — use slot placeholder instead
+		return _slot_icon(slot_name)
+	return icon

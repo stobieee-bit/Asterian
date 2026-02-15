@@ -2,6 +2,7 @@
   "nano_strike": {
     "id": "nano_strike",
     "name": "Nano Strike",
+    "icon": "🗡️",
     "style": "nano",
     "tier": "basic",
     "slot": 1,
@@ -15,6 +16,7 @@
   "swarm_lash": {
     "id": "swarm_lash",
     "name": "Swarm Lash",
+    "icon": "🪱",
     "style": "nano",
     "tier": "basic",
     "slot": 2,
@@ -30,6 +32,7 @@
   "molecular_storm": {
     "id": "molecular_storm",
     "name": "Molecular Storm",
+    "icon": "🌪️",
     "style": "nano",
     "tier": "threshold",
     "slot": 3,
@@ -45,6 +48,7 @@
   "nano_drain": {
     "id": "nano_drain",
     "name": "Nano Drain",
+    "icon": "🩸",
     "style": "nano",
     "tier": "threshold",
     "slot": 4,
@@ -60,6 +64,7 @@
   "swarm_apocalypse": {
     "id": "swarm_apocalypse",
     "name": "Swarm Apocalypse",
+    "icon": "☣️",
     "style": "nano",
     "tier": "ultimate",
     "slot": 5,
@@ -76,6 +81,7 @@
   "arc_bolt": {
     "id": "arc_bolt",
     "name": "Arc Bolt",
+    "icon": "⚡",
     "style": "tesla",
     "tier": "basic",
     "slot": 1,
@@ -89,6 +95,7 @@
   "chain_lightning": {
     "id": "chain_lightning",
     "name": "Chain Lightning",
+    "icon": "🔗",
     "style": "tesla",
     "tier": "basic",
     "slot": 2,
@@ -104,6 +111,7 @@
   "overcharge": {
     "id": "overcharge",
     "name": "Overcharge",
+    "icon": "💥",
     "style": "tesla",
     "tier": "threshold",
     "slot": 3,
@@ -119,6 +127,7 @@
   "tesla_cage": {
     "id": "tesla_cage",
     "name": "Tesla Cage",
+    "icon": "🔲",
     "style": "tesla",
     "tier": "threshold",
     "slot": 4,
@@ -134,6 +143,7 @@
   "thunderstrike": {
     "id": "thunderstrike",
     "name": "Thunderstrike",
+    "icon": "🌩️",
     "style": "tesla",
     "tier": "ultimate",
     "slot": 5,
@@ -149,6 +159,7 @@
   "void_bolt": {
     "id": "void_bolt",
     "name": "Void Bolt",
+    "icon": "🔮",
     "style": "void",
     "tier": "basic",
     "slot": 1,
@@ -162,6 +173,7 @@
   "gravity_well": {
     "id": "gravity_well",
     "name": "Gravity Well",
+    "icon": "🌀",
     "style": "void",
     "tier": "basic",
     "slot": 2,
@@ -177,6 +189,7 @@
   "void_rend": {
     "id": "void_rend",
     "name": "Void Rend",
+    "icon": "💀",
     "style": "void",
     "tier": "threshold",
     "slot": 3,
@@ -192,6 +205,7 @@
   "dark_singularity": {
     "id": "dark_singularity",
     "name": "Dark Singularity",
+    "icon": "🕳️",
     "style": "void",
     "tier": "threshold",
     "slot": 4,
@@ -207,6 +221,7 @@
   "oblivion": {
     "id": "oblivion",
     "name": "Oblivion",
+    "icon": "☠️",
     "style": "void",
     "tier": "ultimate",
     "slot": 5,

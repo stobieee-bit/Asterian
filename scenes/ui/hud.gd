@@ -1187,8 +1187,10 @@ func _refresh_ability_buttons() -> void:
 			var cost_text: String = "+%d ADR" % adr_gain if adr_gain > 0 else ("%d ADR" % adr_cost if adr_cost > 0 else "")
 			var slot_num: int = i + 1
 			var ab_name: String = str(ab.get("name", "Ability"))
+			var ab_icon: String = str(ab.get("icon", ""))
+			var display: String = ab_icon if ab_icon != "" else ab_name
 
-			var btn: Button = _make_ability_btn(str(slot_num), ab_name, accent, adr_cost, cost_text)
+			var btn: Button = _make_ability_btn(str(slot_num), display, accent, adr_cost, cost_text, ab_icon != "")
 			btn.tooltip_text = "%s — %.1fx damage\n%s" % [ab_name, float(ab.get("damage_mult", 1.0)), str(ab.get("description", ""))]
 			var slot_idx: int = slot_num
 			btn.pressed.connect(func(): _use_ability(slot_idx))
@@ -1197,22 +1199,22 @@ func _refresh_ability_buttons() -> void:
 	else:
 		# Fallback: generic 5 buttons if DataManager doesn't have abilities yet
 		var fallback_data: Array = [
-			{"key": "1", "name": "Basic 1", "color": Color(0.3, 0.9, 1.0), "cost": 0, "cost_text": "+8 ADR"},
-			{"key": "2", "name": "Basic 2", "color": Color(0.3, 0.9, 1.0), "cost": 0, "cost_text": "+8 ADR"},
-			{"key": "3", "name": "Thresh 1", "color": Color(1.0, 0.6, 0.1), "cost": 50, "cost_text": "50 ADR"},
-			{"key": "4", "name": "Thresh 2", "color": Color(1.0, 0.6, 0.1), "cost": 50, "cost_text": "50 ADR"},
-			{"key": "5", "name": "Ultimate", "color": Color(1.0, 0.2, 0.9), "cost": 100, "cost_text": "100 ADR"},
+			{"key": "1", "name": "⚔️", "color": Color(0.3, 0.9, 1.0), "cost": 0, "cost_text": "+8 ADR"},
+			{"key": "2", "name": "⚔️", "color": Color(0.3, 0.9, 1.0), "cost": 0, "cost_text": "+8 ADR"},
+			{"key": "3", "name": "🔥", "color": Color(1.0, 0.6, 0.1), "cost": 50, "cost_text": "50 ADR"},
+			{"key": "4", "name": "🔥", "color": Color(1.0, 0.6, 0.1), "cost": 50, "cost_text": "50 ADR"},
+			{"key": "5", "name": "💫", "color": Color(1.0, 0.2, 0.9), "cost": 100, "cost_text": "100 ADR"},
 		]
 		for i in range(fallback_data.size()):
 			var fb: Dictionary = fallback_data[i]
-			var btn: Button = _make_ability_btn(fb["key"], fb["name"], fb["color"], fb["cost"], fb["cost_text"])
+			var btn: Button = _make_ability_btn(fb["key"], fb["name"], fb["color"], fb["cost"], fb["cost_text"], true)
 			var slot_idx: int = i + 1
 			btn.pressed.connect(func(): _use_ability(slot_idx))
 			_ability_bar.add_child(btn)
 			_ability_buttons.append(btn)
 
 	# Eat food button — always last, green
-	var food_btn: Button = _make_ability_btn("F", "Eat", Color(0.3, 1.0, 0.3), 0)
+	var food_btn: Button = _make_ability_btn("F", "🍖", Color(0.3, 1.0, 0.3), 0, "", true)
 	food_btn.tooltip_text = "Eat Food — Heals HP\nUses best food in inventory"
 	food_btn.pressed.connect(func(): _eat_food())
 	_ability_bar.add_child(food_btn)
@@ -1230,7 +1232,7 @@ func _reposition_ability_bar() -> void:
 	_ability_bar_bg.position = Vector2(vp_size.x / 2.0 - bar_width / 2.0, vp_size.y - 104)
 
 ## Create a styled ability button with keybind + name + cost badge
-func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost: int, cost_text_override: String = "") -> Button:
+func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost: int, cost_text_override: String = "", is_icon: bool = false) -> Button:
 	var btn: Button = Button.new()
 	btn.custom_minimum_size = Vector2(120, 44)
 	btn.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -1281,21 +1283,31 @@ func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost:
 	key_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(key_lbl)
 
-	# Ability name — centered, clipped to prevent overlap
+	# Ability display — large emoji icon or clipped text fallback
 	var name_lbl: Label = Label.new()
 	name_lbl.text = label_text
-	name_lbl.position = Vector2(20, 2)
-	name_lbl.size = Vector2(96, 20)
-	name_lbl.clip_text = true
-	name_lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	name_lbl.add_theme_font_size_override("font_size", 11)
-	name_lbl.add_theme_color_override("font_color", accent)
+	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if is_icon:
+		# Large centered emoji icon
+		name_lbl.position = Vector2(20, -2)
+		name_lbl.size = Vector2(80, 28)
+		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		name_lbl.add_theme_font_size_override("font_size", 22)
+		name_lbl.add_theme_color_override("font_color", Color.WHITE)
+	else:
+		# Text name fallback — clipped with ellipsis
+		name_lbl.position = Vector2(20, 2)
+		name_lbl.size = Vector2(96, 20)
+		name_lbl.clip_text = true
+		name_lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		name_lbl.add_theme_font_size_override("font_size", 11)
+		name_lbl.add_theme_color_override("font_color", accent)
 	name_lbl.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.4))
 	name_lbl.add_theme_constant_override("shadow_offset_x", 1)
 	name_lbl.add_theme_constant_override("shadow_offset_y", 1)
-	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(name_lbl)
 
 	# Cost badge

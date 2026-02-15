@@ -241,7 +241,7 @@ func _rebuild_grid() -> void:
 
 	refresh()
 
-## Create a single grid slot with item label and quantity label
+## Create a single grid slot with icon, colored background, and quantity label
 func _create_slot(index: int) -> PanelContainer:
 	var slot: PanelContainer = PanelContainer.new()
 	slot.custom_minimum_size = Vector2(SLOT_SIZE, SLOT_SIZE)
@@ -254,26 +254,56 @@ func _create_slot(index: int) -> PanelContainer:
 	style.set_corner_radius_all(3)
 	slot.add_theme_stylebox_override("panel", style)
 
-	# Item name label (centered)
+	# Inner control for absolute positioning
+	var inner: Control = Control.new()
+	inner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	slot.add_child(inner)
+
+	# Colored icon background (type-coded)
+	var icon_bg: ColorRect = ColorRect.new()
+	icon_bg.name = "IconBG"
+	icon_bg.position = Vector2(3, 3)
+	icon_bg.size = Vector2(SLOT_SIZE - 6, SLOT_SIZE - 6)
+	icon_bg.color = Color(0.15, 0.15, 0.2, 0.0)
+	icon_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(icon_bg)
+
+	# Emoji icon label (centered)
+	var icon_label: Label = Label.new()
+	icon_label.name = "IconLabel"
+	icon_label.position = Vector2(3, 1)
+	icon_label.size = Vector2(SLOT_SIZE - 6, SLOT_SIZE - 6)
+	icon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	icon_label.add_theme_font_size_override("font_size", 20)
+	icon_label.add_theme_color_override("font_color", Color.WHITE)
+	icon_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.5))
+	icon_label.add_theme_constant_override("shadow_offset_x", 1)
+	icon_label.add_theme_constant_override("shadow_offset_y", 1)
+	icon_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(icon_label)
+
+	# Hidden item name (for tooltip/data)
 	var item_label: Label = Label.new()
 	item_label.name = "ItemLabel"
-	item_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	item_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	item_label.add_theme_font_size_override("font_size", 12)
-	item_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
-	item_label.clip_text = true
-	slot.add_child(item_label)
+	item_label.visible = false
+	inner.add_child(item_label)
 
 	# Quantity label (bottom-right)
 	var qty_lbl: Label = Label.new()
 	qty_lbl.name = "QtyLabel"
+	qty_lbl.position = Vector2(0, 0)
+	qty_lbl.size = Vector2(SLOT_SIZE - 4, SLOT_SIZE - 4)
 	qty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	qty_lbl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
-	qty_lbl.add_theme_font_size_override("font_size", 12)
+	qty_lbl.add_theme_font_size_override("font_size", 11)
 	qty_lbl.add_theme_color_override("font_color", Color(1.0, 1.0, 0.6))
-	qty_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	qty_lbl.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	slot.add_child(qty_lbl)
+	qty_lbl.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.6))
+	qty_lbl.add_theme_constant_override("shadow_offset_x", 1)
+	qty_lbl.add_theme_constant_override("shadow_offset_y", 1)
+	qty_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(qty_lbl)
 
 	# Input / hover signals
 	slot.gui_input.connect(_on_slot_input.bind(index))
@@ -290,8 +320,11 @@ func refresh() -> void:
 
 	for i in range(_slots.size()):
 		var slot: PanelContainer = _slots[i]
-		var item_label: Label = slot.get_node("ItemLabel") as Label
-		var qty_lbl: Label = slot.get_node("QtyLabel") as Label
+		var inner: Control = slot.get_child(0)
+		var icon_bg: ColorRect = inner.get_node("IconBG") as ColorRect
+		var icon_label: Label = inner.get_node("IconLabel") as Label
+		var item_label: Label = inner.get_node("ItemLabel") as Label
+		var qty_lbl: Label = inner.get_node("QtyLabel") as Label
 		var style: StyleBoxFlat = slot.get_theme_stylebox("panel") as StyleBoxFlat
 
 		if i < source.size():
@@ -302,14 +335,18 @@ func refresh() -> void:
 
 			var item_name: String = str(item_data.get("name", item_id))
 			var tier: int = int(item_data.get("tier", 1))
+			var item_type: String = str(item_data.get("type", ""))
+			var icon_name: String = str(item_data.get("icon", ""))
 
-			# Truncate long names to fit in the 44px slot
-			if item_name.length() > 7:
-				item_label.text = item_name.left(6) + "."
-			else:
-				item_label.text = item_name
+			# Emoji icon
+			icon_label.text = ItemIcons.get_icon(icon_name, item_type)
 
-			item_label.add_theme_color_override("font_color", _tier_color(tier))
+			# Colored background by type
+			icon_bg.color = _type_bg_color(item_type)
+
+			# Hidden name for tooltip reference
+			item_label.text = item_name
+
 			qty_lbl.text = str(quantity) if quantity > 1 else ""
 
 			# Tier-colored border
@@ -318,6 +355,8 @@ func refresh() -> void:
 				style.border_color.a = 0.8
 		else:
 			# Empty slot
+			icon_label.text = ""
+			icon_bg.color = Color(0.15, 0.15, 0.2, 0.0)
 			item_label.text = ""
 			qty_lbl.text = ""
 			if style:
@@ -552,3 +591,17 @@ func _tier_color(tier: int) -> Color:
 	if tiers.has(tier_str):
 		return Color.html(str(tiers[tier_str].get("color", "#888888")))
 	return Color(0.55, 0.55, 0.55)
+
+## Background color for item type (matches inventory_panel)
+func _type_bg_color(item_type: String) -> Color:
+	match item_type:
+		"weapon":      return Color(0.7, 0.2, 0.2, 0.35)
+		"armor":       return Color(0.25, 0.35, 0.6, 0.35)
+		"offhand":     return Color(0.5, 0.25, 0.6, 0.35)
+		"food":        return Color(0.2, 0.55, 0.2, 0.35)
+		"consumable":  return Color(0.6, 0.5, 0.15, 0.35)
+		"resource":    return Color(0.35, 0.3, 0.2, 0.35)
+		"material":    return Color(0.3, 0.4, 0.35, 0.35)
+		"tool":        return Color(0.45, 0.4, 0.3, 0.35)
+		"pet":         return Color(0.55, 0.3, 0.5, 0.35)
+		_:             return Color(0.25, 0.25, 0.3, 0.2)
