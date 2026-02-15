@@ -360,108 +360,108 @@ func _type_icon_color(item_type: String) -> Color:
 		"pet":         return Color(0.55, 0.3, 0.5)   # Magenta
 		_:             return Color(0.25, 0.25, 0.3)   # Default gray
 
-## Get symbol character for item type icon (fallback if no specific icon)
+## Get short letter symbol for item type (ASCII-safe, works in all fonts)
 func _type_icon_symbol(item_type: String) -> String:
 	match item_type:
-		"weapon":      return "\u2694"  # Crossed swords
-		"armor":       return "\u229B"  # Circled asterisk
-		"offhand":     return "\u25D7"  # Half circle (shield)
-		"food":        return "\u2663"  # Club (organic)
-		"consumable":  return "\u2606"  # Star outline
-		"resource":    return "\u25C6"  # Diamond
-		"material":    return "\u25A0"  # Filled square
-		"tool":        return "\u2692"  # Hammer/pick
-		"pet":         return "\u2740"  # Flower
-		_:             return "\u25CB"  # Circle
+		"weapon":      return "W"
+		"armor":       return "A"
+		"offhand":     return "S"
+		"food":        return "F"
+		"consumable":  return "C"
+		"resource":    return "R"
+		"material":    return "M"
+		"tool":        return "T"
+		"pet":         return "P"
+		_:             return "?"
 
-## Get icon from item data's icon field — maps to Unicode symbols
+## Get icon symbol from item data's icon field — ASCII-safe abbreviations
 func _item_icon_symbol(icon_name: String, item_type: String) -> String:
 	match icon_name:
 		# Ores & bars & crafting
-		"icon_ore":       return "\u25C6"  # Diamond
-		"icon_bar":       return "\u25AC"  # Rectangle
-		"icon_alloy":     return "\u25A3"  # Nested square
-		"icon_essence":   return "\u2727"  # 4-point star
-		"icon_gem":       return "\u2666"  # Diamond suit
-		"icon_dust":      return "\u2729"  # Stress star
+		"icon_ore":       return "Or"
+		"icon_bar":       return "Br"
+		"icon_alloy":     return "Al"
+		"icon_essence":   return "Es"
+		"icon_gem":       return "Gm"
+		"icon_dust":      return "Du"
 		# Bio resources
-		"icon_bio_bone":     return "\u2620"  # Skull
-		"icon_bio_membrane": return "\u25CE"  # Bullseye
-		"icon_bio_mushroom": return "\u2660"  # Spade
-		"icon_bio_swirl":    return "\u263C"  # Sun face
-		"icon_bio_brain":    return "\u2609"  # Sun
-		"icon_bio_galaxy":   return "\u2738"  # 8-point star
-		"icon_bio_sparkle":  return "\u2726"  # 4-star
-		"icon_bio_crystal":  return "\u2662"  # Diamond outline
-		"icon_bio_fiber":    return "\u2248"  # Approx
-		"icon_bio_conduit":  return "\u2261"  # Identical
-		"icon_neural":       return "\u2318"  # POI
-		"icon_chrono":       return "\u231A"  # Watch
-		"icon_stinger":      return "\u2191"  # Up arrow
-		"icon_dark_orb":     return "\u25CF"  # Filled circle
+		"icon_bio_bone":     return "Bn"
+		"icon_bio_membrane": return "Mb"
+		"icon_bio_mushroom": return "Ms"
+		"icon_bio_swirl":    return "Sw"
+		"icon_bio_brain":    return "Br"
+		"icon_bio_galaxy":   return "Gx"
+		"icon_bio_sparkle":  return "Sp"
+		"icon_bio_crystal":  return "Cr"
+		"icon_bio_fiber":    return "Fb"
+		"icon_bio_conduit":  return "Cd"
+		"icon_neural":       return "Nr"
+		"icon_chrono":       return "Ch"
+		"icon_stinger":      return "St"
+		"icon_dark_orb":     return "Ob"
 		# Raw food ingredients
-		"icon_food_lichen":   return "\u2618"  # Shamrock
-		"icon_food_fruit":    return "\u2663"  # Club
-		"icon_food_meat":     return "\u2665"  # Heart
-		"icon_food_pepper":   return "\u2740"  # Flower
-		"icon_food_truffle":  return "\u2660"  # Spade
-		"icon_food_kelp":     return "\u223F"  # Sine wave
-		"icon_food_grain":    return "\u2637"  # Trigram
-		"icon_food_mushroom": return "\u2660"  # Spade
-		"icon_food_honey":    return "\u2736"  # 6-point star
-		"icon_food_yeast":    return "\u25CB"  # Circle
+		"icon_food_lichen":   return "Li"
+		"icon_food_fruit":    return "Fr"
+		"icon_food_meat":     return "Mt"
+		"icon_food_pepper":   return "Pp"
+		"icon_food_truffle":  return "Tr"
+		"icon_food_kelp":     return "Kp"
+		"icon_food_grain":    return "Gr"
+		"icon_food_mushroom": return "Ms"
+		"icon_food_honey":    return "Hn"
+		"icon_food_yeast":    return "Ys"
 		# Cooked food
-		"icon_wrap":       return "\u25AD"  # Rect
-		"icon_soup":       return "\u2615"  # Hot beverage
-		"icon_smoothie":   return "\u2661"  # Heart outline
-		"icon_grain_bowl": return "\u2312"  # Arc
-		"icon_burger":     return "\u25A0"  # Square
-		"icon_stew":       return "\u2615"  # Hot beverage
-		"icon_curry":      return "\u263C"  # Sun
-		"icon_steak":      return "\u2665"  # Heart
-		"icon_feast":      return "\u2605"  # Star
-		"icon_pasta":      return "\u223F"  # Sine
-		"icon_cake":       return "\u25B3"  # Triangle
-		"icon_drumstick":  return "\u2742"  # Florette
-		"icon_elixir":     return "\u2606"  # Star outline
-		"icon_serum":      return "\u2721"  # 6-point star
-		"icon_syringe":    return "\u2191"  # Arrow up
+		"icon_wrap":       return "Wr"
+		"icon_soup":       return "Sp"
+		"icon_smoothie":   return "Sm"
+		"icon_grain_bowl": return "Bw"
+		"icon_burger":     return "Bg"
+		"icon_stew":       return "Sw"
+		"icon_curry":      return "Cu"
+		"icon_steak":      return "Sk"
+		"icon_feast":      return "Ft"
+		"icon_pasta":      return "Pa"
+		"icon_cake":       return "Ck"
+		"icon_drumstick":  return "Dm"
+		"icon_elixir":     return "Ex"
+		"icon_serum":      return "Sr"
+		"icon_syringe":    return "Sy"
 		# Consumables & utility
-		"icon_repair_kit": return "\u2692"  # Hammer pick
-		"icon_beacon":     return "\u2604"  # Comet
-		"icon_battery":    return "\u26A1"  # Lightning
-		"icon_flare":      return "\u2600"  # Sun
-		"icon_chip":       return "\u25A3"  # Nested square
-		"icon_bomb":       return "\u25C9"  # Fisheye
+		"icon_repair_kit": return "Rk"
+		"icon_beacon":     return "Bc"
+		"icon_battery":    return "Bt"
+		"icon_flare":      return "Fl"
+		"icon_chip":       return "Cp"
+		"icon_bomb":       return "Bm"
 		# Trophy & special
-		"icon_crown":     return "\u265B"  # Queen
-		"icon_heart":     return "\u2665"  # Heart
-		"icon_star":      return "\u2605"  # Star
-		"icon_shield":    return "\u25D7"  # Half circle
-		"icon_medal":     return "\u2742"  # Florette
-		"icon_speaker":   return "\u266B"  # Music notes
-		"icon_telescope": return "\u25CE"  # Bullseye
-		"icon_sigil":     return "\u2721"  # 6-point star
-		"icon_skull":     return "\u2620"  # Skull
-		"icon_relic":     return "\u2756"  # Diamond mark
+		"icon_crown":     return "Cw"
+		"icon_heart":     return "Ht"
+		"icon_star":      return "*"
+		"icon_shield":    return "Sh"
+		"icon_medal":     return "Md"
+		"icon_speaker":   return "Sp"
+		"icon_telescope": return "Te"
+		"icon_sigil":     return "Si"
+		"icon_skull":     return "Sk"
+		"icon_relic":     return "Rl"
 		# Weapons
-		"icon_nanoblade":  return "\u2694"  # Swords
-		"icon_coilgun":    return "\u27B5"  # Arrow
-		"icon_voidstaff":  return "\u2742"  # Florette
-		"icon_capacitor":  return "\u26A1"  # Lightning
+		"icon_nanoblade":  return "Nb"
+		"icon_coilgun":    return "Cg"
+		"icon_voidstaff":  return "Vs"
+		"icon_capacitor":  return "Zp"
 		# Armor pieces
-		"icon_helmet":  return "\u2299"  # Circled dot
-		"icon_vest":    return "\u229B"  # Circled asterisk
-		"icon_greaves": return "\u2296"  # Circled minus
-		"icon_boots":   return "\u22A5"  # Perpendicular
-		"icon_gloves":  return "\u270B"  # Hand
+		"icon_helmet":  return "He"
+		"icon_vest":    return "Ve"
+		"icon_greaves": return "Lg"
+		"icon_boots":   return "Bo"
+		"icon_gloves":  return "Gl"
 		# Tools
-		"icon_pickaxe": return "\u2692"  # Hammer pick
-		"icon_scanner": return "\u25CE"  # Bullseye
-		"icon_welder":  return "\u2604"  # Comet
-		"icon_stove":   return "\u2302"  # House
+		"icon_pickaxe": return "Pk"
+		"icon_scanner": return "Sc"
+		"icon_welder":  return "We"
+		"icon_stove":   return "Sv"
 		# Other
-		"icon_credits": return "\u20B5"  # Cedi sign
-		"icon_pet":     return "\u2740"  # Flower
+		"icon_credits": return "Cr"
+		"icon_pet":     return "Pt"
 	# Fallback to type-based symbol
 	return _type_icon_symbol(item_type)

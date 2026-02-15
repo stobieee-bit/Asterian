@@ -10,7 +10,7 @@ extends Node
 # ── Combat settings ──
 @export var attack_range: float = 2.5      ## Must be within this to attack
 @export var base_attack_speed: float = 2.4 ## Auto-attack interval (RS-style: 2.4/3.0/3.6s)
-@export var base_damage: int = 10          ## Base damage (weapon adds more)
+@export var base_damage: int = 3           ## Base damage (weapon adds more)
 
 # ── Global cooldown (GCD) for abilities ──
 const GCD_TIME: float = 1.8           ## Minimum time between ability uses
@@ -542,8 +542,8 @@ func _player_death() -> void:
 ## Handle enemy death — clear target if it was our target, handle dungeon logic
 func _on_enemy_killed(eid: String, _etype: String) -> void:
 	if target and is_instance_valid(target) and target.enemy_id == eid:
-		# Award XP
-		var xp_reward: int = target.level * 10 + target.level * target.level
+		# Award XP (scaled to require ~15-20 kills per level at appropriate tier)
+		var xp_reward: int = target.level * 4 + (target.level * target.level) / 2
 		if target.is_boss:
 			xp_reward *= 3
 

@@ -97,17 +97,17 @@ func _centered_row() -> HBoxContainer:
 	row.add_theme_constant_override("separation", SLOT_GAP)
 	return row
 
-## Get icon symbol for a slot type (empty state)
+## Get icon symbol for a slot type (empty state) — ASCII-safe
 func _slot_icon(slot_name: String) -> String:
 	match slot_name:
-		"head":    return "\u2299"  # Circled dot (helmet)
-		"body":    return "\u229B"  # Circled asterisk (vest)
-		"weapon":  return "\u2694"  # Crossed swords
-		"offhand": return "\u25D7"  # Half circle (shield)
-		"legs":    return "\u2296"  # Circled minus (greaves)
-		"boots":   return "\u22A5"  # Perpendicular (boots)
-		"gloves":  return "\u270B"  # Hand
-		_: return "\u25CB"
+		"head":    return "He"
+		"body":    return "Bd"
+		"weapon":  return "Wp"
+		"offhand": return "Oh"
+		"legs":    return "Lg"
+		"boots":   return "Bt"
+		"gloves":  return "Gl"
+		_: return "?"
 
 ## Create a single equipment slot
 func _create_slot(slot_name: String, display_name: String) -> PanelContainer:
@@ -345,19 +345,19 @@ func _tier_color(tier: int) -> Color:
 		return Color.html(str(tiers[tier_str].get("color", "#888888")))
 	return Color(0.55, 0.55, 0.55)
 
-## Get icon symbol for equipped item (from item data icon field)
+## Get icon symbol for equipped item (from item data icon field) — ASCII-safe
 func _item_icon(icon_name: String, slot_name: String) -> String:
 	match icon_name:
-		"icon_nanoblade":  return "\u2694"  # Swords
-		"icon_coilgun":    return "\u27B5"  # Arrow
-		"icon_voidstaff":  return "\u2742"  # Florette
-		"icon_capacitor":  return "\u26A1"  # Lightning
-		"icon_helmet":     return "\u2299"  # Circled dot
-		"icon_vest":       return "\u229B"  # Circled asterisk
-		"icon_greaves":    return "\u2296"  # Circled minus
-		"icon_boots":      return "\u22A5"  # Perpendicular
-		"icon_gloves":     return "\u270B"  # Hand
-		"icon_shield":     return "\u25D7"  # Half circle
-		"icon_crown":      return "\u265B"  # Queen
+		"icon_nanoblade":  return "Nb"
+		"icon_coilgun":    return "Cg"
+		"icon_voidstaff":  return "Vs"
+		"icon_capacitor":  return "Zp"
+		"icon_helmet":     return "He"
+		"icon_vest":       return "Ve"
+		"icon_greaves":    return "Lg"
+		"icon_boots":      return "Bo"
+		"icon_gloves":     return "Gl"
+		"icon_shield":     return "Sh"
+		"icon_crown":      return "Cw"
 	# Fallback to slot default
 	return _slot_icon(slot_name)
