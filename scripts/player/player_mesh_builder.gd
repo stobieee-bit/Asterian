@@ -666,7 +666,7 @@ static func animate_attack(root: Node3D, phase: float) -> void:
 	var left_leg_upper: Node3D = root.get_meta("left_leg_upper") as Node3D
 	var right_leg_upper: Node3D = root.get_meta("right_leg_upper") as Node3D
 	if phase < 0.6:
-		var step: float = sinf(phase / 0.6 * PI) * 0.15
+		var step: float = sin(phase / 0.6 * PI) * 0.15
 		if right_leg_upper:
 			right_leg_upper.rotation.x = step  # Right foot steps forward with punch
 		if left_leg_upper:
