@@ -18,7 +18,7 @@ var _active_guide_skill: String = ""       # Which skill guide is open
 # Skill display order grouped by category
 var _skill_groups: Array[Dictionary] = [
 	{"label": "Combat", "color": Color(0.8, 0.3, 0.3), "skills": ["nano", "tesla", "void"]},
-	{"label": "Gathering", "color": Color(0.8, 0.6, 0.3), "skills": ["astromining"]},
+	{"label": "Gathering", "color": Color(0.8, 0.6, 0.3), "skills": ["astromining", "xenobotany"]},
 	{"label": "Production", "color": Color(0.3, 0.7, 0.5), "skills": ["bioforge", "circuitry", "xenocook"]},
 ]
 
@@ -238,6 +238,65 @@ func _show_skill_guide(skill_id: String) -> void:
 		train_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_guide_container.add_child(train_label)
 
+	# ── Skill chain info ──
+	var feed_desc: String = str(skill_data.get("feedDesc", ""))
+	var feeds_arr: Array = skill_data.get("feeds", []) as Array
+	var needs_arr: Array = skill_data.get("needs", []) as Array
+	if feed_desc != "":
+		var chain_sep: HSeparator = HSeparator.new()
+		chain_sep.add_theme_constant_override("separation", 2)
+		_guide_container.add_child(chain_sep)
+
+		var chain_header: Label = Label.new()
+		chain_header.text = "Skill Chain"
+		chain_header.add_theme_font_size_override("font_size", 13)
+		chain_header.add_theme_color_override("font_color", Color(0.7, 0.55, 0.9))
+		_guide_container.add_child(chain_header)
+
+		# Show "Needs:" line if this skill requires input from others
+		if not needs_arr.is_empty():
+			var needs_text: String = "Needs: "
+			for i in range(needs_arr.size()):
+				var nid: String = str(needs_arr[i])
+				var ndata: Dictionary = DataManager.get_skill(nid)
+				var nicon: String = str(ndata.get("icon", ""))
+				var nname: String = str(ndata.get("name", nid.capitalize()))
+				if i > 0:
+					needs_text += ", "
+				needs_text += "%s %s" % [nicon, nname]
+			var needs_label: Label = Label.new()
+			needs_label.text = needs_text
+			needs_label.add_theme_font_size_override("font_size", 12)
+			needs_label.add_theme_color_override("font_color", Color(0.6, 0.75, 0.55))
+			needs_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			_guide_container.add_child(needs_label)
+
+		# Show "Feeds:" line if this skill outputs to others
+		if not feeds_arr.is_empty():
+			var feeds_text: String = "Feeds: "
+			for i in range(feeds_arr.size()):
+				var fid: String = str(feeds_arr[i])
+				var fdata: Dictionary = DataManager.get_skill(fid)
+				var ficon: String = str(fdata.get("icon", ""))
+				var fname: String = str(fdata.get("name", fid.capitalize()))
+				if i > 0:
+					feeds_text += ", "
+				feeds_text += "%s %s" % [ficon, fname]
+			var feeds_label: Label = Label.new()
+			feeds_label.text = feeds_text
+			feeds_label.add_theme_font_size_override("font_size", 12)
+			feeds_label.add_theme_color_override("font_color", Color(0.55, 0.65, 0.85))
+			feeds_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			_guide_container.add_child(feeds_label)
+
+		# Show the description of the chain
+		var chain_desc: Label = Label.new()
+		chain_desc.text = feed_desc
+		chain_desc.add_theme_font_size_override("font_size", 12)
+		chain_desc.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7))
+		chain_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_guide_container.add_child(chain_desc)
+
 	# ── Current level / XP summary ──
 	var current_xp: int = int(skill_state.get("xp", 0))
 	var next_xp: int = DataManager.xp_for_level(current_level + 1)
@@ -402,25 +461,35 @@ func _on_close_pressed() -> void:
 ## Color for each skill type
 func _skill_color(skill_id: String) -> Color:
 	match skill_id:
-		"nano": return Color(0.2, 0.9, 0.4)     # Green
-		"tesla": return Color(0.3, 0.6, 1.0)     # Blue
-		"void": return Color(0.6, 0.2, 0.9)      # Purple
-		"astromining": return Color(0.8, 0.6, 0.3) # Orange
-		"bioforge": return Color(0.2, 0.8, 0.6)   # Teal
-		"circuitry": return Color(0.2, 0.8, 0.8)  # Cyan
-		"xenocook": return Color(0.9, 0.8, 0.2)   # Yellow
+		"nano": return Color(0.2, 0.9, 0.4)       # Green
+		"tesla": return Color(0.3, 0.6, 1.0)       # Blue
+		"void": return Color(0.6, 0.2, 0.9)        # Purple
+		"astromining": return Color(0.8, 0.6, 0.3)  # Orange
+		"xenobotany": return Color(0.4, 0.8, 0.33)  # Leaf green
+		"bioforge": return Color(0.2, 0.8, 0.6)     # Teal
+		"circuitry": return Color(0.2, 0.8, 0.8)    # Cyan
+		"xenocook": return Color(0.9, 0.8, 0.2)     # Yellow
+		"psionics": return Color(0.9, 0.3, 0.9)     # Magenta
+		"chronomancy": return Color(0.3, 0.9, 0.9)  # Aqua
 		_: return Color(0.6, 0.6, 0.6)
 
 ## Unicode icon for each skill
 func _skill_icon(skill_id: String) -> String:
+	var skill_data: Dictionary = DataManager.get_skill(skill_id)
+	var icon: String = str(skill_data.get("icon", ""))
+	if icon != "":
+		return icon
 	match skill_id:
 		"nano": return "N"
 		"tesla": return "T"
 		"void": return "V"
 		"astromining": return "A"
+		"xenobotany": return "Xb"
 		"bioforge": return "B"
 		"circuitry": return "C"
 		"xenocook": return "X"
+		"psionics": return "P"
+		"chronomancy": return "Ch"
 		_: return "?"
 
 ## Format large numbers: 1000 → "1.0K", 1000000 → "1.0M"

@@ -73,8 +73,9 @@ var tooltip_script: GDScript = preload("res://scripts/ui/tooltip_panel.gd")
 # ── Chat log ──
 var _chat_bg: PanelContainer = null
 var _chat_container: VBoxContainer = null
+var _chat_scroll: ScrollContainer = null
 var _chat_messages: Array[Label] = []
-var _max_chat_lines: int = 10
+var _max_chat_lines: int = 50
 var _chat_input: LineEdit = null
 var _chat_typing: bool = false  # True when chat input is focused
 
@@ -623,12 +624,20 @@ func _build_chat_log() -> void:
 	msg_margin.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	outer_vbox.add_child(msg_margin)
 
+	_chat_scroll = ScrollContainer.new()
+	_chat_scroll.name = "ChatScroll"
+	_chat_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_chat_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_chat_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	_chat_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	msg_margin.add_child(_chat_scroll)
+
 	_chat_container = VBoxContainer.new()
 	_chat_container.name = "ChatContainer"
 	_chat_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_chat_container.custom_minimum_size = Vector2(400, 0)
+	_chat_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_chat_container.add_theme_constant_override("separation", 3)
-	msg_margin.add_child(_chat_container)
+	_chat_scroll.add_child(_chat_container)
 
 	# ── Chat input field at the bottom ──
 	var input_margin: MarginContainer = MarginContainer.new()
@@ -862,16 +871,16 @@ func _on_chat_message(text: String, channel: String) -> void:
 	_chat_container.add_child(label)
 	_chat_messages.append(label)
 
-	# Remove old messages
+	# Remove old messages beyond limit
 	while _chat_messages.size() > _max_chat_lines:
 		var old: Label = _chat_messages[0]
 		_chat_messages.remove_at(0)
 		old.queue_free()
 
-	# Auto-fade after 8 seconds
-	var tween: Tween = create_tween()
-	tween.tween_interval(8.0)
-	tween.tween_property(label, "modulate:a", 0.0, 2.0)
+	# Auto-scroll to bottom so newest messages are visible
+	if _chat_scroll:
+		await get_tree().process_frame
+		_chat_scroll.scroll_vertical = int(_chat_scroll.get_v_scroll_bar().max_value)
 
 # ── Chat input handlers ──
 
@@ -898,6 +907,8 @@ func _on_chat_focus_entered() -> void:
 	# Make the chat panel stop ignoring mouse so scrolling/clicking works
 	if _chat_bg:
 		_chat_bg.mouse_filter = Control.MOUSE_FILTER_STOP
+	if _chat_scroll:
+		_chat_scroll.mouse_filter = Control.MOUSE_FILTER_STOP
 
 ## Called when the chat input loses focus
 func _on_chat_focus_exited() -> void:
@@ -907,6 +918,8 @@ func _on_chat_focus_exited() -> void:
 	# Return to mouse-transparent so clicks pass through to the game world
 	if _chat_bg:
 		_chat_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if _chat_scroll:
+		_chat_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 ## Focus the chat input (called from Enter key)
 func _focus_chat_input() -> void:

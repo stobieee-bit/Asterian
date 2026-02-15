@@ -18,7 +18,7 @@ func _define_spawn_zones() -> void:
 	# Asteroid Mines — Ore nodes
 	_spawn_defs.append({
 		"area": "asteroid-mines",
-		"cx": 300.0, "cz": 0.0, "radius": 180.0,
+		"cx": 300.0, "cz": 0.0, "radius": 70.0,
 		"skill": "astromining",
 		"nodes": [
 			{"level": 1, "item": "stellarite_ore", "color": Color(0.6, 0.6, 0.55), "count": 12},
@@ -36,7 +36,7 @@ func _define_spawn_zones() -> void:
 	_spawn_defs.append({
 		"area": "gathering-grounds",
 		"cx": 0.0, "cz": -100.0, "radius": 50.0,
-		"skill": "bioforge",
+		"skill": "xenobotany",
 		"nodes": [
 			{"level": 1, "item": "space_lichen", "color": Color(0.3, 0.5, 0.25), "count": 10},
 			{"level": 5, "item": "cryo_kelp", "color": Color(0.2, 0.5, 0.6), "count": 8},

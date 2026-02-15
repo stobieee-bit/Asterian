@@ -16,7 +16,7 @@
         "x": 300,
         "z": 0
       },
-      "radius": 200,
+      "radius": 80,
       "groundColor": 2759184,
       "floorY": -2
     },
@@ -215,14 +215,14 @@
       "from": "station-hub",
       "to": "asteroid-mines",
       "minX": 33,
-      "maxX": 102,
+      "maxX": 222,
       "minZ": -6,
       "maxZ": 6,
       "floorY": -1,
       "groundColor": 1710632,
       "label": "Asteroid Mines →",
       "labelPos": {
-        "x": 65,
+        "x": 130,
         "z": 0
       }
     },
@@ -315,7 +315,7 @@
       "min": 80,
       "max": 99,
       "label": "Lv 80-99 Prestige"
-    },
+    }
   },
   "sub_zones": [
     {

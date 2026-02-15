@@ -26,6 +26,7 @@ var skills: Dictionary = {
 	"tesla": { "level": 1, "xp": 0 },
 	"void": { "level": 1, "xp": 0 },
 	"astromining": { "level": 1, "xp": 0 },
+	"xenobotany": { "level": 1, "xp": 0 },
 	"bioforge": { "level": 1, "xp": 0 },
 	"circuitry": { "level": 1, "xp": 0 },
 	"xenocook": { "level": 1, "xp": 0 },
@@ -238,6 +239,16 @@ func from_save_data(data: Dictionary) -> void:
 	elif not (player.get("position") is Vector3):
 		player["position"] = Vector3.ZERO
 	skills = data.get("skills", skills)
+	# Ensure any new skills added since save was created exist with defaults
+	var default_skills: Dictionary = {
+		"nano": { "level": 1, "xp": 0 }, "tesla": { "level": 1, "xp": 0 },
+		"void": { "level": 1, "xp": 0 }, "astromining": { "level": 1, "xp": 0 },
+		"xenobotany": { "level": 1, "xp": 0 }, "bioforge": { "level": 1, "xp": 0 },
+		"circuitry": { "level": 1, "xp": 0 }, "xenocook": { "level": 1, "xp": 0 },
+	}
+	for skill_id in default_skills:
+		if not skills.has(skill_id):
+			skills[skill_id] = default_skills[skill_id]
 	equipment = data.get("equipment", equipment)
 	inventory.assign(data.get("inventory", []))
 	bank.assign(data.get("bank", []))

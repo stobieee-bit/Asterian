@@ -7,7 +7,9 @@
       "type": "combat",
       "desc": "Close-range melee combat using nano-swarm blades. Strong vs Tesla, weak vs Void.",
       "trains": "Kill enemies while using Nano combat style.",
-      "category": "Combat"
+      "category": "Combat",
+      "needs": ["circuitry", "bioforge"],
+      "feedDesc": "Equip Circuitry weapons + Bioforge armor to fight stronger enemies"
     },
     "tesla": {
       "name": "Tesla",
@@ -16,7 +18,9 @@
       "type": "combat",
       "desc": "Mid-range electrical attacks with coilguns. Strong vs Void, weak vs Nano.",
       "trains": "Kill enemies while using Tesla combat style.",
-      "category": "Combat"
+      "category": "Combat",
+      "needs": ["circuitry", "bioforge"],
+      "feedDesc": "Equip Circuitry weapons + Bioforge armor to fight stronger enemies"
     },
     "void": {
       "name": "Void",
@@ -25,7 +29,9 @@
       "type": "combat",
       "desc": "Long-range dark energy from voidstaffs. Strong vs Nano, weak vs Tesla.",
       "trains": "Kill enemies while using Void combat style.",
-      "category": "Combat"
+      "category": "Combat",
+      "needs": ["circuitry", "bioforge"],
+      "feedDesc": "Equip Circuitry weapons + Bioforge armor to fight stronger enemies"
     },
     "astromining": {
       "name": "Astromining",
@@ -34,7 +40,20 @@
       "type": "gathering",
       "desc": "Extract ores and gems from asteroid deposits. Higher levels unlock rarer materials.",
       "trains": "Mine ore nodes in the Asteroid Mines.",
-      "category": "Gathering"
+      "category": "Gathering",
+      "feeds": ["circuitry"],
+      "feedDesc": "Ores feed into Circuitry for smelting bars and forging gear"
+    },
+    "xenobotany": {
+      "name": "Xenobotany",
+      "icon": "🌿",
+      "color": "#66cc55",
+      "type": "gathering",
+      "desc": "Harvest alien flora — lichens, kelps, fruits, and chitin from the Gathering Grounds. Supplies ingredients for Xenocook and Bioforge.",
+      "trains": "Gather bio-resources in the Gathering Grounds.",
+      "category": "Gathering",
+      "feeds": ["bioforge", "xenocook"],
+      "feedDesc": "Bio-resources feed into Bioforge for armor/serums and Xenocook for food"
     },
     "bioforge": {
       "name": "Bioforge",
@@ -43,7 +62,10 @@
       "type": "production",
       "desc": "Craft armor and brew serums from creature parts. Use Bioforge Stations in the Bio-Lab.",
       "trains": "Craft items at Bioforge Stations.",
-      "category": "Production"
+      "category": "Production",
+      "needs": ["xenobotany"],
+      "feeds": ["nano", "tesla", "void"],
+      "feedDesc": "Craft armor sets and brew combat serums for all combat styles"
     },
     "circuitry": {
       "name": "Circuitry",
@@ -52,7 +74,10 @@
       "type": "production",
       "desc": "Smelt ores into bars and forge weapons, tools, and gadgets. Use Smelting Furnaces in the Bio-Lab.",
       "trains": "Smelt bars and craft equipment at Smelting Furnaces.",
-      "category": "Production"
+      "category": "Production",
+      "needs": ["astromining"],
+      "feeds": ["nano", "tesla", "void"],
+      "feedDesc": "Forge weapons and tools for all combat styles"
     },
     "xenocook": {
       "name": "Xenocook",
@@ -61,7 +86,10 @@
       "type": "production",
       "desc": "Cook alien ingredients into healing food and combat buff meals. Use Xenocook Ranges in the Bio-Lab.",
       "trains": "Cook food at Xenocook Ranges.",
-      "category": "Production"
+      "category": "Production",
+      "needs": ["xenobotany"],
+      "feeds": ["nano", "tesla", "void"],
+      "feedDesc": "Cook healing food and combat buff meals for all combat styles"
     },
     "psionics": {
       "name": "Neural Engineering",
@@ -72,7 +100,9 @@
       "trains": "Process neural materials at the Neural Processor.",
       "category": "Prestige",
       "locked": true,
-      "lockText": "Complete the Neural Awakening quest chain."
+      "lockText": "Complete the Neural Awakening quest chain.",
+      "needs": ["nano", "tesla", "void"],
+      "feedDesc": "Boss drops from combat feed into endgame psi-weave gear crafting"
     },
     "chronomancy": {
       "name": "Quantum Synthesis",
@@ -83,7 +113,9 @@
       "trains": "Transmute materials at the Quantum Synthesizer.",
       "category": "Prestige",
       "softGate": true,
-      "softGateText": "Requires Level 10 in any combat skill."
+      "softGateText": "Requires Level 10 in any combat skill.",
+      "needs": ["astromining"],
+      "feedDesc": "Transmute ores to skip tiers — shortcuts the Astromining pipeline"
     }
   },
   "unlocks": {
@@ -147,6 +179,48 @@
         "level": 90,
         "type": "item",
         "desc": "Mine Voidsteel Ore"
+      }
+    ],
+    "xenobotany": [
+      {
+        "level": 1,
+        "type": "item",
+        "desc": "Harvest Space Lichen"
+      },
+      {
+        "level": 5,
+        "type": "item",
+        "desc": "Harvest Cryo Kelp"
+      },
+      {
+        "level": 10,
+        "type": "item",
+        "desc": "Harvest Nebula Fruit"
+      },
+      {
+        "level": 20,
+        "type": "item",
+        "desc": "Harvest Chitin Shards"
+      },
+      {
+        "level": 30,
+        "type": "item",
+        "desc": "Harvest Spore Pods"
+      },
+      {
+        "level": 40,
+        "type": "item",
+        "desc": "Harvest Void Moss"
+      },
+      {
+        "level": 50,
+        "type": "item",
+        "desc": "Harvest Neural Bloom"
+      },
+      {
+        "level": 60,
+        "type": "item",
+        "desc": "Harvest Quantum Vine"
       }
     ],
     "circuitry": [

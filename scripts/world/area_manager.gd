@@ -2038,32 +2038,6 @@ func _build_wastes_eldritch_edge(y_base: float) -> void:
 		crack.material = rift_mat
 		add_child(crack)
 
-	# Floating shards — broken reality fragments hovering above
-	for i in range(10):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(8.0, zr * 0.7)
-		var float_y: float = rng.randf_range(3.0, 10.0)
-		var shard: CSGBox3D = CSGBox3D.new()
-		shard.size = Vector3(rng.randf_range(0.5, 2.0), rng.randf_range(0.5, 2.0), rng.randf_range(0.1, 0.5))
-		var shx: float = zcx + cos(angle) * dist
-		var shz: float = zcz + sin(angle) * dist
-		shard.position = Vector3(shx, y_base + float_y, shz)
-		shard.rotation = Vector3(rng.randf() * TAU, rng.randf() * TAU, rng.randf() * TAU)
-		shard.material = void_mat
-		add_child(shard)
-		_animated_nodes.append({
-			"node": shard, "type": "hover",
-			"base_y": y_base + float_y,
-			"speed": rng.randf_range(0.2, 0.6),
-			"phase": rng.randf() * TAU,
-			"amplitude": rng.randf_range(0.3, 1.5)
-		})
-		_animated_nodes.append({
-			"node": shard, "type": "rotate",
-			"speed": rng.randf_range(0.1, 0.3),
-			"phase": 0.0
-		})
-
 	# Intense purple/void lights
 	for i in range(5):
 		var angle: float = rng.randf() * TAU
@@ -2152,30 +2126,6 @@ func _build_abyss_structures(cx: float, cz: float, radius: float,
 		)
 		pillar.material = void_mat
 		add_child(pillar)
-
-	# Floating platforms
-	for i in range(10):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(15.0, radius * 0.7)
-		var plat_y: float = rng.randf_range(3.0, 12.0)
-		var px: float = cx + cos(angle) * dist
-		var pz: float = cz + sin(angle) * dist
-
-		var platform: CSGCylinder3D = CSGCylinder3D.new()
-		platform.radius = rng.randf_range(1.5, 5.0)
-		platform.height = 0.5
-		platform.sides = 8
-		platform.position = Vector3(px, y_base + plat_y, pz)
-		platform.material = void_mat
-		add_child(platform)
-
-		_animated_nodes.append({
-			"node": platform, "type": "hover",
-			"base_y": y_base + plat_y,
-			"speed": rng.randf_range(0.2, 0.5),
-			"phase": rng.randf() * TAU,
-			"amplitude": rng.randf_range(0.5, 2.0)
-		})
 
 	# Reality tear rifts (thin vertical planes of energy)
 	for i in range(6):
@@ -2458,7 +2408,7 @@ func _create_corridor(data: Dictionary) -> void:
 	var box: CSGBox3D = CSGBox3D.new()
 	box.name = "Corridor_%s" % data.get("id", "unknown")
 	box.size = Vector3(corridor_w, 0.2, corridor_d)
-	box.position = Vector3(center_x, GROUND_Y + 0.05, center_z)
+	box.position = Vector3(center_x, GROUND_Y - 0.02, center_z)
 
 	var corridor_color: Color = _hex_to_color(ground_color_int)
 	var mat: StandardMaterial3D = StandardMaterial3D.new()
@@ -2468,7 +2418,7 @@ func _create_corridor(data: Dictionary) -> void:
 	mat.emission_enabled = true
 	mat.emission = corridor_color.lightened(0.25)
 	mat.emission_energy_multiplier = 0.15
-	mat.render_priority = 4
+	mat.render_priority = -1
 	box.material = mat
 
 	var static_body: StaticBody3D = StaticBody3D.new()
