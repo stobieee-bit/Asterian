@@ -35,7 +35,7 @@ func _ready() -> void:
 
 	var total_label: Label = Label.new()
 	total_label.name = "TotalLevel"
-	total_label.add_theme_font_size_override("font_size", 11)
+	total_label.add_theme_font_size_override("font_size", 14)
 	total_label.add_theme_color_override("font_color", Color(0.5, 0.7, 0.5))
 	_main_vbox.add_child(total_label)
 
@@ -57,7 +57,7 @@ func _ready() -> void:
 func _add_group_header(parent: VBoxContainer, label_text: String, color: Color) -> void:
 	var header: Label = Label.new()
 	header.text = label_text
-	header.add_theme_font_size_override("font_size", 10)
+	header.add_theme_font_size_override("font_size", 13)
 	header.add_theme_color_override("font_color", color.darkened(0.1))
 	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var margin: MarginContainer = MarginContainer.new()
@@ -107,26 +107,26 @@ func _create_skill_row(parent: VBoxContainer, skill_id: String) -> Dictionary:
 
 	var icon_label: Label = Label.new()
 	icon_label.text = _skill_icon(skill_id)
-	icon_label.add_theme_font_size_override("font_size", 13)
+	icon_label.add_theme_font_size_override("font_size", 16)
 	name_row.add_child(icon_label)
 
 	var name_label: Label = Label.new()
 	name_label.text = " " + skill_name
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_label.add_theme_font_size_override("font_size", 12)
+	name_label.add_theme_font_size_override("font_size", 14)
 	name_label.add_theme_color_override("font_color", skill_color)
 	name_row.add_child(name_label)
 
 	var level_label: Label = Label.new()
 	level_label.name = "LevelLabel"
-	level_label.add_theme_font_size_override("font_size", 12)
+	level_label.add_theme_font_size_override("font_size", 14)
 	level_label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
 	name_row.add_child(level_label)
 
 	# Arrow hint
 	var arrow: Label = Label.new()
 	arrow.text = " >"
-	arrow.add_theme_font_size_override("font_size", 11)
+	arrow.add_theme_font_size_override("font_size", 14)
 	arrow.add_theme_color_override("font_color", Color(0.4, 0.5, 0.6))
 	name_row.add_child(arrow)
 
@@ -151,7 +151,7 @@ func _create_skill_row(parent: VBoxContainer, skill_id: String) -> Dictionary:
 	var xp_label: Label = Label.new()
 	xp_label.name = "XPLabel"
 	xp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	xp_label.add_theme_font_size_override("font_size", 9)
+	xp_label.add_theme_font_size_override("font_size", 12)
 	xp_label.add_theme_color_override("font_color", Color(0.5, 0.6, 0.5))
 	row.add_child(xp_label)
 
@@ -190,7 +190,7 @@ func _show_skill_guide(skill_id: String) -> void:
 
 	var back_btn: Button = Button.new()
 	back_btn.text = "< Back"
-	back_btn.add_theme_font_size_override("font_size", 11)
+	back_btn.add_theme_font_size_override("font_size", 14)
 
 	var back_style: StyleBoxFlat = StyleBoxFlat.new()
 	back_style.bg_color = Color(0.12, 0.15, 0.22)
@@ -208,7 +208,7 @@ func _show_skill_guide(skill_id: String) -> void:
 	var title: Label = Label.new()
 	title.text = "  %s %s" % [_skill_icon(skill_id), skill_name]
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title.add_theme_font_size_override("font_size", 14)
+	title.add_theme_font_size_override("font_size", 16)
 	title.add_theme_color_override("font_color", skill_color)
 	header.add_child(title)
 
@@ -216,7 +216,7 @@ func _show_skill_guide(skill_id: String) -> void:
 	if skill_category != "":
 		var cat_label: Label = Label.new()
 		cat_label.text = skill_category
-		cat_label.add_theme_font_size_override("font_size", 10)
+		cat_label.add_theme_font_size_override("font_size", 13)
 		cat_label.add_theme_color_override("font_color", Color(0.5, 0.6, 0.5))
 		_guide_container.add_child(cat_label)
 
@@ -224,7 +224,7 @@ func _show_skill_guide(skill_id: String) -> void:
 	if skill_desc != "":
 		var desc_label: Label = Label.new()
 		desc_label.text = skill_desc
-		desc_label.add_theme_font_size_override("font_size", 11)
+		desc_label.add_theme_font_size_override("font_size", 14)
 		desc_label.add_theme_color_override("font_color", Color(0.75, 0.75, 0.75))
 		desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_guide_container.add_child(desc_label)
@@ -233,7 +233,7 @@ func _show_skill_guide(skill_id: String) -> void:
 	if skill_trains != "":
 		var train_label: Label = Label.new()
 		train_label.text = "Train: %s" % skill_trains
-		train_label.add_theme_font_size_override("font_size", 10)
+		train_label.add_theme_font_size_override("font_size", 13)
 		train_label.add_theme_color_override("font_color", Color(0.5, 0.7, 0.5))
 		train_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_guide_container.add_child(train_label)
@@ -248,7 +248,7 @@ func _show_skill_guide(skill_id: String) -> void:
 		summary.text = "Level %d (MAX)  |  %s XP" % [current_level, _format_number(current_xp)]
 	else:
 		summary.text = "Level %d  |  %s / %s XP" % [current_level, _format_number(current_xp), _format_number(next_xp)]
-	summary.add_theme_font_size_override("font_size", 11)
+	summary.add_theme_font_size_override("font_size", 14)
 	summary.add_theme_color_override("font_color", Color(0.7, 0.8, 0.7))
 	_guide_container.add_child(summary)
 
@@ -260,7 +260,7 @@ func _show_skill_guide(skill_id: String) -> void:
 	# ── Unlock header ──
 	var unlock_header: Label = Label.new()
 	unlock_header.text = "Unlocks"
-	unlock_header.add_theme_font_size_override("font_size", 12)
+	unlock_header.add_theme_font_size_override("font_size", 14)
 	unlock_header.add_theme_color_override("font_color", skill_color.lightened(0.1))
 	_guide_container.add_child(unlock_header)
 
@@ -285,7 +285,7 @@ func _show_skill_guide(skill_id: String) -> void:
 	if unlocks.is_empty():
 		var no_data: Label = Label.new()
 		no_data.text = "No unlock data available."
-		no_data.add_theme_font_size_override("font_size", 11)
+		no_data.add_theme_font_size_override("font_size", 14)
 		no_data.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
 		unlock_list.add_child(no_data)
 	else:
@@ -305,7 +305,7 @@ func _show_skill_guide(skill_id: String) -> void:
 			else:
 				status_icon.text = "-"
 				status_icon.add_theme_color_override("font_color", Color(0.5, 0.3, 0.3))
-			status_icon.add_theme_font_size_override("font_size", 12)
+			status_icon.add_theme_font_size_override("font_size", 14)
 			status_icon.custom_minimum_size.x = 16
 			entry.add_child(status_icon)
 
@@ -313,7 +313,7 @@ func _show_skill_guide(skill_id: String) -> void:
 			var lvl_badge: Label = Label.new()
 			lvl_badge.text = "Lv %d" % req_level
 			lvl_badge.custom_minimum_size.x = 40
-			lvl_badge.add_theme_font_size_override("font_size", 10)
+			lvl_badge.add_theme_font_size_override("font_size", 13)
 			if is_unlocked:
 				lvl_badge.add_theme_color_override("font_color", skill_color.darkened(0.1))
 			else:
@@ -324,7 +324,7 @@ func _show_skill_guide(skill_id: String) -> void:
 			var desc_label: Label = Label.new()
 			desc_label.text = desc
 			desc_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			desc_label.add_theme_font_size_override("font_size", 10)
+			desc_label.add_theme_font_size_override("font_size", 13)
 			desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			if is_unlocked:
 				desc_label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))

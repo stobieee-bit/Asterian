@@ -39,20 +39,20 @@ func _ready() -> void:
 
 	_buy_btn = Button.new()
 	_buy_btn.text = "Buy"
-	_buy_btn.add_theme_font_size_override("font_size", 12)
+	_buy_btn.add_theme_font_size_override("font_size", 14)
 	_buy_btn.pressed.connect(func(): _set_mode("buy"))
 	tabs.add_child(_buy_btn)
 
 	_sell_btn = Button.new()
 	_sell_btn.text = "Sell"
-	_sell_btn.add_theme_font_size_override("font_size", 12)
+	_sell_btn.add_theme_font_size_override("font_size", 14)
 	_sell_btn.pressed.connect(func(): _set_mode("sell"))
 	tabs.add_child(_sell_btn)
 
 	_credits_label = Label.new()
 	_credits_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_credits_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_credits_label.add_theme_font_size_override("font_size", 12)
+	_credits_label.add_theme_font_size_override("font_size", 14)
 	_credits_label.add_theme_color_override("font_color", Color(0.9, 0.8, 0.3))
 	tabs.add_child(_credits_label)
 
@@ -117,7 +117,7 @@ func _refresh_buy() -> void:
 		var name_lbl: Label = Label.new()
 		name_lbl.text = item_name
 		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		name_lbl.add_theme_font_size_override("font_size", 11)
+		name_lbl.add_theme_font_size_override("font_size", 14)
 		name_lbl.add_theme_color_override("font_color", _tier_color(tier))
 		name_lbl.clip_text = true
 		name_lbl.custom_minimum_size.x = 140
@@ -126,14 +126,14 @@ func _refresh_buy() -> void:
 		# Price
 		var price_lbl: Label = Label.new()
 		price_lbl.text = "%d cr" % price
-		price_lbl.add_theme_font_size_override("font_size", 11)
+		price_lbl.add_theme_font_size_override("font_size", 14)
 		price_lbl.add_theme_color_override("font_color", Color(0.9, 0.8, 0.3))
 		row.add_child(price_lbl)
 
 		# Buy button
 		var buy_button: Button = Button.new()
 		buy_button.text = "Buy"
-		buy_button.add_theme_font_size_override("font_size", 10)
+		buy_button.add_theme_font_size_override("font_size", 13)
 		buy_button.custom_minimum_size = Vector2(40, 22)
 		buy_button.pressed.connect(_on_buy.bind(item_id, price))
 
@@ -172,7 +172,7 @@ func _refresh_sell() -> void:
 		var qty_text: String = " x%d" % quantity if quantity > 1 else ""
 		name_lbl.text = "%s%s" % [item_name, qty_text]
 		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		name_lbl.add_theme_font_size_override("font_size", 11)
+		name_lbl.add_theme_font_size_override("font_size", 14)
 		name_lbl.add_theme_color_override("font_color", _tier_color(tier))
 		name_lbl.clip_text = true
 		name_lbl.custom_minimum_size.x = 140
@@ -181,14 +181,14 @@ func _refresh_sell() -> void:
 		# Sell price
 		var price_lbl: Label = Label.new()
 		price_lbl.text = "%d cr" % sell_price
-		price_lbl.add_theme_font_size_override("font_size", 11)
+		price_lbl.add_theme_font_size_override("font_size", 14)
 		price_lbl.add_theme_color_override("font_color", Color(0.6, 0.9, 0.4))
 		row.add_child(price_lbl)
 
 		# Sell button
 		var sell_button: Button = Button.new()
 		sell_button.text = "Sell"
-		sell_button.add_theme_font_size_override("font_size", 10)
+		sell_button.add_theme_font_size_override("font_size", 13)
 		sell_button.custom_minimum_size = Vector2(40, 22)
 		sell_button.pressed.connect(_on_sell.bind(item_id, sell_price))
 		row.add_child(sell_button)

@@ -67,14 +67,14 @@ func _ready() -> void:
 	_status_section.add_child(_floor_label)
 
 	_theme_label = Label.new()
-	_theme_label.add_theme_font_size_override("font_size", 12)
+	_theme_label.add_theme_font_size_override("font_size", 14)
 	_theme_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	_status_section.add_child(_theme_label)
 
 	# Sub-header for active modifiers
 	var mod_title: Label = Label.new()
 	mod_title.text = "Active Modifiers:"
-	mod_title.add_theme_font_size_override("font_size", 11)
+	mod_title.add_theme_font_size_override("font_size", 14)
 	mod_title.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	_status_section.add_child(mod_title)
 
@@ -83,14 +83,14 @@ func _ready() -> void:
 	_status_section.add_child(_modifiers_container)
 
 	_rooms_label = Label.new()
-	_rooms_label.add_theme_font_size_override("font_size", 12)
+	_rooms_label.add_theme_font_size_override("font_size", 14)
 	_rooms_label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
 	_status_section.add_child(_rooms_label)
 
 	_next_floor_btn = Button.new()
 	_next_floor_btn.text = "Next Floor"
 	_next_floor_btn.custom_minimum_size = Vector2(120, 32)
-	_next_floor_btn.add_theme_font_size_override("font_size", 13)
+	_next_floor_btn.add_theme_font_size_override("font_size", 15)
 	_next_floor_btn.add_theme_color_override("font_color", Color(0.3, 0.9, 0.3))
 	_next_floor_btn.pressed.connect(_on_next_floor)
 	_status_section.add_child(_next_floor_btn)
@@ -98,7 +98,7 @@ func _ready() -> void:
 	_exit_btn = Button.new()
 	_exit_btn.text = "Exit Dungeon"
 	_exit_btn.custom_minimum_size = Vector2(120, 30)
-	_exit_btn.add_theme_font_size_override("font_size", 12)
+	_exit_btn.add_theme_font_size_override("font_size", 14)
 	_exit_btn.add_theme_color_override("font_color", Color(1.0, 0.3, 0.3))
 	_exit_btn.pressed.connect(_on_exit_dungeon)
 	_status_section.add_child(_exit_btn)
@@ -110,7 +110,7 @@ func _ready() -> void:
 
 	var select_label: Label = Label.new()
 	select_label.text = "Select Modifiers:"
-	select_label.add_theme_font_size_override("font_size", 13)
+	select_label.add_theme_font_size_override("font_size", 15)
 	select_label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
 	_entry_section.add_child(select_label)
 
@@ -128,7 +128,7 @@ func _ready() -> void:
 	_enter_btn = Button.new()
 	_enter_btn.text = "Enter Dungeon"
 	_enter_btn.custom_minimum_size = Vector2(160, 36)
-	_enter_btn.add_theme_font_size_override("font_size", 14)
+	_enter_btn.add_theme_font_size_override("font_size", 16)
 	_enter_btn.add_theme_color_override("font_color", Color(1.0, 0.5, 0.2))
 	_enter_btn.pressed.connect(_on_enter_dungeon)
 	_entry_section.add_child(_enter_btn)
@@ -203,7 +203,7 @@ func _refresh_active_modifiers(dungeon_sys: Node) -> void:
 	if active_mods.is_empty():
 		var none_label: Label = Label.new()
 		none_label.text = "  None"
-		none_label.add_theme_font_size_override("font_size", 11)
+		none_label.add_theme_font_size_override("font_size", 14)
 		none_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
 		_modifiers_container.add_child(none_label)
 		return
@@ -216,13 +216,13 @@ func _refresh_active_modifiers(dungeon_sys: Node) -> void:
 		# Icon label (emoji/text stand-in)
 		var icon_lbl: Label = Label.new()
 		icon_lbl.text = str(mod.get("icon", "?"))
-		icon_lbl.add_theme_font_size_override("font_size", 12)
+		icon_lbl.add_theme_font_size_override("font_size", 14)
 		row.add_child(icon_lbl)
 
 		# Modifier name
 		var name_lbl: Label = Label.new()
 		name_lbl.text = str(mod.get("name", "Unknown"))
-		name_lbl.add_theme_font_size_override("font_size", 11)
+		name_lbl.add_theme_font_size_override("font_size", 14)
 		name_lbl.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
 		row.add_child(name_lbl)
 
@@ -275,14 +275,14 @@ func _refresh_entry() -> void:
 		# Icon label
 		var icon_lbl: Label = Label.new()
 		icon_lbl.text = mod_icon
-		icon_lbl.add_theme_font_size_override("font_size", 12)
+		icon_lbl.add_theme_font_size_override("font_size", 14)
 		row.add_child(icon_lbl)
 
 		# Name + description label
 		var info_lbl: Label = Label.new()
 		info_lbl.text = "%s — %s" % [mod_name, mod_desc]
 		info_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		info_lbl.add_theme_font_size_override("font_size", 11)
+		info_lbl.add_theme_font_size_override("font_size", 14)
 		info_lbl.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
 		info_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(info_lbl)

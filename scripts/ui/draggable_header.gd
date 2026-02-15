@@ -33,7 +33,7 @@ static func attach(panel: PanelContainer, title: String, close_callback: Callabl
 
 func _setup(title: String, close_callback: Callable) -> void:
 	name = "DragHeader"
-	custom_minimum_size = Vector2(0, 22)
+	custom_minimum_size = Vector2(0, 28)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 
 	# Title label — muted, clean
@@ -41,7 +41,7 @@ func _setup(title: String, close_callback: Callable) -> void:
 	_title_label.text = title
 	_title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_title_label.add_theme_color_override("font_color", Color(0.45, 0.7, 0.8, 0.9))
-	_title_label.add_theme_font_size_override("font_size", 12)
+	_title_label.add_theme_font_size_override("font_size", 15)
 	_title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_title_label)
 
@@ -49,15 +49,15 @@ func _setup(title: String, close_callback: Callable) -> void:
 	_drag_hint = Label.new()
 	_drag_hint.text = "⋮⋮"
 	_drag_hint.add_theme_color_override("font_color", Color(0.3, 0.4, 0.5, 0.35))
-	_drag_hint.add_theme_font_size_override("font_size", 10)
+	_drag_hint.add_theme_font_size_override("font_size", 13)
 	_drag_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_drag_hint)
 
 	# Lock button — minimal
 	_lock_btn = Button.new()
 	_lock_btn.text = "O"
-	_lock_btn.custom_minimum_size = Vector2(20, 20)
-	_lock_btn.add_theme_font_size_override("font_size", 9)
+	_lock_btn.custom_minimum_size = Vector2(24, 24)
+	_lock_btn.add_theme_font_size_override("font_size", 12)
 	_lock_btn.tooltip_text = "Lock panel position"
 
 	var lock_style: StyleBoxFlat = StyleBoxFlat.new()
@@ -79,8 +79,8 @@ func _setup(title: String, close_callback: Callable) -> void:
 	if close_callback.is_valid():
 		_close_btn = Button.new()
 		_close_btn.text = "×"
-		_close_btn.custom_minimum_size = Vector2(20, 20)
-		_close_btn.add_theme_font_size_override("font_size", 12)
+		_close_btn.custom_minimum_size = Vector2(24, 24)
+		_close_btn.add_theme_font_size_override("font_size", 15)
 
 		var btn_style: StyleBoxFlat = StyleBoxFlat.new()
 		btn_style.bg_color = Color(0.0, 0.0, 0.0, 0.0)

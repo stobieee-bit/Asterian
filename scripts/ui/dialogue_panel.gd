@@ -69,7 +69,7 @@ func _ready() -> void:
 	_text_label.bbcode_enabled = false
 	_text_label.fit_content = true
 	_text_label.add_theme_color_override("default_color", Color(0.8, 0.85, 0.8))
-	_text_label.add_theme_font_size_override("normal_font_size", 13)
+	_text_label.add_theme_font_size_override("normal_font_size", 15)
 	content_row.add_child(_text_label)
 
 	# Options
@@ -131,7 +131,7 @@ func _show_dialogue_node(key: String) -> void:
 		if dynamic_options.is_empty():
 			var btn: Button = Button.new()
 			btn.text = "Continue"
-			btn.add_theme_font_size_override("font_size", 12)
+			btn.add_theme_font_size_override("font_size", 14)
 			btn.pressed.connect(_on_close)
 			_options_container.add_child(btn)
 		else:
@@ -140,7 +140,7 @@ func _show_dialogue_node(key: String) -> void:
 				var daction: String = str(dopt.get("action", ""))
 				var dbtn: Button = Button.new()
 				dbtn.text = dlabel
-				dbtn.add_theme_font_size_override("font_size", 12)
+				dbtn.add_theme_font_size_override("font_size", 14)
 				dbtn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 				if daction != "":
 					dbtn.pressed.connect(_on_action.bind(daction))
@@ -156,7 +156,7 @@ func _show_dialogue_node(key: String) -> void:
 
 		var btn: Button = Button.new()
 		btn.text = label_text
-		btn.add_theme_font_size_override("font_size", 12)
+		btn.add_theme_font_size_override("font_size", 14)
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 
 		if action != "":

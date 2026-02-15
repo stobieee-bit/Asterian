@@ -90,7 +90,7 @@ func refresh() -> void:
 		var name_lbl: Label = Label.new()
 		name_lbl.text = recipe_name
 		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		name_lbl.add_theme_font_size_override("font_size", 12)
+		name_lbl.add_theme_font_size_override("font_size", 14)
 
 		# Color based on whether player meets level req
 		var player_level: int = int(GameState.skills.get(_skill_id, {}).get("level", 1))
@@ -102,13 +102,13 @@ func refresh() -> void:
 
 		var level_lbl: Label = Label.new()
 		level_lbl.text = "Lv %d" % req_level
-		level_lbl.add_theme_font_size_override("font_size", 10)
+		level_lbl.add_theme_font_size_override("font_size", 13)
 		level_lbl.add_theme_color_override("font_color", Color(0.5, 0.6, 0.5))
 		name_row.add_child(level_lbl)
 
 		var xp_lbl: Label = Label.new()
 		xp_lbl.text = "%d XP" % xp
-		xp_lbl.add_theme_font_size_override("font_size", 10)
+		xp_lbl.add_theme_font_size_override("font_size", 13)
 		xp_lbl.add_theme_color_override("font_color", Color(0.3, 0.8, 0.3))
 		name_row.add_child(xp_lbl)
 
@@ -125,14 +125,14 @@ func refresh() -> void:
 
 		var ing_lbl: Label = Label.new()
 		ing_lbl.text = "  Needs: %s" % ing_text
-		ing_lbl.add_theme_font_size_override("font_size", 9)
+		ing_lbl.add_theme_font_size_override("font_size", 12)
 		ing_lbl.add_theme_color_override("font_color", Color(0.5, 0.55, 0.5))
 		recipe_box.add_child(ing_lbl)
 
 		# Craft button
 		var craft_btn: Button = Button.new()
 		craft_btn.text = "Craft"
-		craft_btn.add_theme_font_size_override("font_size", 10)
+		craft_btn.add_theme_font_size_override("font_size", 13)
 		craft_btn.custom_minimum_size = Vector2(50, 22)
 
 		var can_do: bool = false

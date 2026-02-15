@@ -56,7 +56,7 @@ func _ready() -> void:
 	# ── Placeholder when no pet is active ──
 	_no_pet_label = Label.new()
 	_no_pet_label.text = "No pet summoned"
-	_no_pet_label.add_theme_font_size_override("font_size", 12)
+	_no_pet_label.add_theme_font_size_override("font_size", 14)
 	_no_pet_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
 	_root_vbox.add_child(_no_pet_label)
 
@@ -66,7 +66,7 @@ func _ready() -> void:
 	# ── Owned pets header ──
 	var list_title: Label = Label.new()
 	list_title.text = "Owned Pets"
-	list_title.add_theme_font_size_override("font_size", 13)
+	list_title.add_theme_font_size_override("font_size", 15)
 	list_title.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
 	_root_vbox.add_child(list_title)
 
@@ -132,7 +132,7 @@ func _refresh_active_section() -> void:
 	# ── Name + Level ──
 	var name_label: Label = Label.new()
 	name_label.text = "%s  (Lv %d)" % [pet_name, pet_level]
-	name_label.add_theme_font_size_override("font_size", 14)
+	name_label.add_theme_font_size_override("font_size", 16)
 	name_label.add_theme_color_override("font_color", rarity_color)
 	_active_section.add_child(name_label)
 
@@ -155,14 +155,14 @@ func _refresh_active_section() -> void:
 		xp_label.text = "XP: MAX"
 	else:
 		xp_label.text = "XP: %d / %d" % [xp_into_level, xp_range]
-	xp_label.add_theme_font_size_override("font_size", 10)
+	xp_label.add_theme_font_size_override("font_size", 13)
 	xp_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	_active_section.add_child(xp_label)
 
 	# ── Buff description ──
 	var buff_label: Label = Label.new()
 	buff_label.text = _format_buff(pet_def, pet_level)
-	buff_label.add_theme_font_size_override("font_size", 11)
+	buff_label.add_theme_font_size_override("font_size", 14)
 	buff_label.add_theme_color_override("font_color", Color(0.3, 0.9, 1.0))
 	_active_section.add_child(buff_label)
 
@@ -173,7 +173,7 @@ func _refresh_active_section() -> void:
 
 	var evo_label: Label = Label.new()
 	evo_label.text = "Stage %d/%d" % [current_stage, total_stages]
-	evo_label.add_theme_font_size_override("font_size", 11)
+	evo_label.add_theme_font_size_override("font_size", 14)
 	evo_label.add_theme_color_override("font_color", Color(0.9, 0.8, 0.3))
 	_active_section.add_child(evo_label)
 
@@ -181,7 +181,7 @@ func _refresh_active_section() -> void:
 	var dismiss_btn: Button = Button.new()
 	dismiss_btn.text = "Dismiss"
 	dismiss_btn.custom_minimum_size = Vector2(80, 26)
-	dismiss_btn.add_theme_font_size_override("font_size", 11)
+	dismiss_btn.add_theme_font_size_override("font_size", 14)
 	dismiss_btn.pressed.connect(_on_dismiss)
 	_active_section.add_child(dismiss_btn)
 
@@ -200,7 +200,7 @@ func _refresh_owned_list() -> void:
 	if owned.is_empty():
 		var empty_label: Label = Label.new()
 		empty_label.text = "No pets owned yet."
-		empty_label.add_theme_font_size_override("font_size", 11)
+		empty_label.add_theme_font_size_override("font_size", 14)
 		empty_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
 		_list_container.add_child(empty_label)
 		return
@@ -228,7 +228,7 @@ func _refresh_owned_list() -> void:
 		var name_label: Label = Label.new()
 		name_label.text = pet_name
 		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		name_label.add_theme_font_size_override("font_size", 12)
+		name_label.add_theme_font_size_override("font_size", 14)
 		name_label.clip_text = true
 		name_label.custom_minimum_size.x = 100
 		if is_active:
@@ -241,14 +241,14 @@ func _refresh_owned_list() -> void:
 		# ── Level label ──
 		var level_label: Label = Label.new()
 		level_label.text = "Lv %d" % pet_level
-		level_label.add_theme_font_size_override("font_size", 11)
+		level_label.add_theme_font_size_override("font_size", 14)
 		level_label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
 		row.add_child(level_label)
 
 		# ── Buff summary ──
 		var buff_label: Label = Label.new()
 		buff_label.text = _format_buff(pet_def, pet_level)
-		buff_label.add_theme_font_size_override("font_size", 10)
+		buff_label.add_theme_font_size_override("font_size", 13)
 		buff_label.add_theme_color_override("font_color", Color(0.6, 0.8, 0.6))
 		row.add_child(buff_label)
 
@@ -256,14 +256,14 @@ func _refresh_owned_list() -> void:
 		if is_active:
 			var active_label: Label = Label.new()
 			active_label.text = "Active"
-			active_label.add_theme_font_size_override("font_size", 10)
+			active_label.add_theme_font_size_override("font_size", 13)
 			active_label.add_theme_color_override("font_color", Color(0.3, 0.9, 0.3))
 			active_label.custom_minimum_size = Vector2(50, 22)
 			row.add_child(active_label)
 		else:
 			var summon_btn: Button = Button.new()
 			summon_btn.text = "Summon"
-			summon_btn.add_theme_font_size_override("font_size", 10)
+			summon_btn.add_theme_font_size_override("font_size", 13)
 			summon_btn.custom_minimum_size = Vector2(60, 22)
 			summon_btn.pressed.connect(_on_summon.bind(pet_id_str))
 			row.add_child(summon_btn)

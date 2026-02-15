@@ -41,7 +41,7 @@ func _ready() -> void:
 	# ── Empty state label (hidden when quests exist) ──
 	_empty_label = Label.new()
 	_empty_label.text = "No active quests."
-	_empty_label.add_theme_font_size_override("font_size", 12)
+	_empty_label.add_theme_font_size_override("font_size", 14)
 	_empty_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
 	_empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_quests_container.add_child(_empty_label)
@@ -71,7 +71,7 @@ func refresh() -> void:
 	if quest_ids.is_empty():
 		_empty_label = Label.new()
 		_empty_label.text = "No active quests."
-		_empty_label.add_theme_font_size_override("font_size", 12)
+		_empty_label.add_theme_font_size_override("font_size", 14)
 		_empty_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
 		_empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_quests_container.add_child(_empty_label)
@@ -110,7 +110,7 @@ func _build_quest_entry(quest_id: String) -> void:
 	# ── Quest name ──
 	var name_label: Label = Label.new()
 	name_label.text = quest_name
-	name_label.add_theme_font_size_override("font_size", 13)
+	name_label.add_theme_font_size_override("font_size", 15)
 	name_label.add_theme_color_override("font_color", Color(0.95, 0.95, 0.95))
 	quest_box.add_child(name_label)
 
@@ -128,7 +128,7 @@ func _build_quest_entry(quest_id: String) -> void:
 			desc = desc.substr(0, paren_idx)
 
 		var step_label: Label = Label.new()
-		step_label.add_theme_font_size_override("font_size", 11)
+		step_label.add_theme_font_size_override("font_size", 14)
 
 		if done:
 			# Completed step — green with checkmark
@@ -145,7 +145,7 @@ func _build_quest_entry(quest_id: String) -> void:
 	if completable:
 		var turn_in_btn: Button = Button.new()
 		turn_in_btn.text = "Turn In"
-		turn_in_btn.add_theme_font_size_override("font_size", 11)
+		turn_in_btn.add_theme_font_size_override("font_size", 14)
 		turn_in_btn.custom_minimum_size = Vector2(70, 26)
 		turn_in_btn.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
 		turn_in_btn.pressed.connect(_on_turn_in.bind(quest_id))

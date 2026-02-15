@@ -91,7 +91,7 @@ func _create_slot(index: int) -> PanelContainer:
 	icon_sym.name = "IconSymbol"
 	icon_sym.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	icon_sym.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	icon_sym.add_theme_font_size_override("font_size", 22)
+	icon_sym.add_theme_font_size_override("font_size", 24)
 	icon_sym.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
 	icon_sym.position = Vector2(4, 2)
 	icon_sym.size = Vector2(40, 40)
@@ -112,7 +112,7 @@ func _create_slot(index: int) -> PanelContainer:
 	qty_label.name = "QtyLabel"
 	qty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	qty_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
-	qty_label.add_theme_font_size_override("font_size", 9)
+	qty_label.add_theme_font_size_override("font_size", 12)
 	qty_label.add_theme_color_override("font_color", Color(1.0, 1.0, 0.6))
 	qty_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
 	qty_label.add_theme_constant_override("shadow_offset_x", 1)

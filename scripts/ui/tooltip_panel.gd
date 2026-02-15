@@ -31,28 +31,28 @@ func _ready() -> void:
 	add_child(_vbox)
 
 	_name_label = Label.new()
-	_name_label.add_theme_font_size_override("font_size", 12)
+	_name_label.add_theme_font_size_override("font_size", 14)
 	_name_label.add_theme_color_override("font_color", Color(0.95, 0.95, 0.95))
 	_vbox.add_child(_name_label)
 
 	_type_label = Label.new()
-	_type_label.add_theme_font_size_override("font_size", 10)
+	_type_label.add_theme_font_size_override("font_size", 13)
 	_type_label.add_theme_color_override("font_color", Color(0.45, 0.55, 0.65, 0.8))
 	_vbox.add_child(_type_label)
 
 	_stats_label = Label.new()
-	_stats_label.add_theme_font_size_override("font_size", 10)
+	_stats_label.add_theme_font_size_override("font_size", 13)
 	_stats_label.add_theme_color_override("font_color", Color(0.6, 0.75, 0.6, 0.9))
 	_vbox.add_child(_stats_label)
 
 	_compare_label = Label.new()
-	_compare_label.add_theme_font_size_override("font_size", 10)
+	_compare_label.add_theme_font_size_override("font_size", 13)
 	_compare_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7, 0.85))
 	_compare_label.visible = false
 	_vbox.add_child(_compare_label)
 
 	_desc_label = Label.new()
-	_desc_label.add_theme_font_size_override("font_size", 9)
+	_desc_label.add_theme_font_size_override("font_size", 12)
 	_desc_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5, 0.75))
 	_desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_desc_label.custom_minimum_size.x = 190

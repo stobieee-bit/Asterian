@@ -97,7 +97,7 @@ func _ready() -> void:
 
 	var mp_label: Label = Label.new()
 	mp_label.text = "Name:"
-	mp_label.add_theme_font_size_override("font_size", 11)
+	mp_label.add_theme_font_size_override("font_size", 14)
 	mp_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	mp_row.add_child(mp_label)
 
@@ -105,19 +105,19 @@ func _ready() -> void:
 	_mp_name_input.placeholder_text = "Enter name..."
 	_mp_name_input.custom_minimum_size = Vector2(100, 0)
 	_mp_name_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_mp_name_input.add_theme_font_size_override("font_size", 11)
+	_mp_name_input.add_theme_font_size_override("font_size", 14)
 	_mp_name_input.max_length = 20
 	mp_row.add_child(_mp_name_input)
 
 	_mp_connect_btn = Button.new()
 	_mp_connect_btn.text = "Connect"
-	_mp_connect_btn.add_theme_font_size_override("font_size", 11)
+	_mp_connect_btn.add_theme_font_size_override("font_size", 14)
 	_mp_connect_btn.pressed.connect(_on_mp_connect_pressed)
 	mp_row.add_child(_mp_connect_btn)
 
 	_mp_status_label = Label.new()
 	_mp_status_label.text = "Auto-connecting..."
-	_mp_status_label.add_theme_font_size_override("font_size", 10)
+	_mp_status_label.add_theme_font_size_override("font_size", 13)
 	_mp_status_label.add_theme_color_override("font_color", Color(0.8, 0.7, 0.3))
 	vbox.add_child(_mp_status_label)
 
@@ -132,7 +132,7 @@ func _ready() -> void:
 
 	# Play time display
 	_play_time_label = Label.new()
-	_play_time_label.add_theme_font_size_override("font_size", 11)
+	_play_time_label.add_theme_font_size_override("font_size", 14)
 	_play_time_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	vbox.add_child(_play_time_label)
 
@@ -145,7 +145,7 @@ func _ready() -> void:
 func _create_section_header(title: String) -> Label:
 	var label: Label = Label.new()
 	label.text = title
-	label.add_theme_font_size_override("font_size", 13)
+	label.add_theme_font_size_override("font_size", 15)
 	label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
 	return label
 
@@ -160,7 +160,7 @@ func _create_slider_row(parent: VBoxContainer, label_text: String, min_val: floa
 	var label: Label = Label.new()
 	label.text = label_text
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	label.add_theme_font_size_override("font_size", 11)
+	label.add_theme_font_size_override("font_size", 14)
 	label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	row.add_child(label)
 
@@ -183,7 +183,7 @@ func _create_checkbox_row(parent: VBoxContainer, label_text: String) -> CheckBox
 	var label: Label = Label.new()
 	label.text = label_text
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	label.add_theme_font_size_override("font_size", 11)
+	label.add_theme_font_size_override("font_size", 14)
 	label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	row.add_child(label)
 

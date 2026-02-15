@@ -57,13 +57,13 @@ func _ready() -> void:
 
 	_bank_tab_btn = Button.new()
 	_bank_tab_btn.text = "Bank"
-	_bank_tab_btn.add_theme_font_size_override("font_size", 12)
+	_bank_tab_btn.add_theme_font_size_override("font_size", 14)
 	_bank_tab_btn.pressed.connect(func(): _set_mode("bank"))
 	tabs.add_child(_bank_tab_btn)
 
 	_inv_tab_btn = Button.new()
 	_inv_tab_btn.text = "Inventory"
-	_inv_tab_btn.add_theme_font_size_override("font_size", 12)
+	_inv_tab_btn.add_theme_font_size_override("font_size", 14)
 	_inv_tab_btn.pressed.connect(func(): _set_mode("inventory"))
 	tabs.add_child(_inv_tab_btn)
 
@@ -74,14 +74,14 @@ func _ready() -> void:
 
 	_deposit_equip_btn = Button.new()
 	_deposit_equip_btn.text = "Deposit Equip"
-	_deposit_equip_btn.add_theme_font_size_override("font_size", 11)
+	_deposit_equip_btn.add_theme_font_size_override("font_size", 14)
 	_deposit_equip_btn.custom_minimum_size = Vector2(96, 24)
 	_deposit_equip_btn.pressed.connect(_on_deposit_equipment)
 	tabs.add_child(_deposit_equip_btn)
 
 	_deposit_all_btn = Button.new()
 	_deposit_all_btn.text = "Deposit All"
-	_deposit_all_btn.add_theme_font_size_override("font_size", 11)
+	_deposit_all_btn.add_theme_font_size_override("font_size", 14)
 	_deposit_all_btn.custom_minimum_size = Vector2(80, 24)
 	_deposit_all_btn.pressed.connect(_on_deposit_all)
 	tabs.add_child(_deposit_all_btn)
@@ -93,7 +93,7 @@ func _ready() -> void:
 
 	var qty_label: Label = Label.new()
 	qty_label.text = "Qty:"
-	qty_label.add_theme_font_size_override("font_size", 11)
+	qty_label.add_theme_font_size_override("font_size", 14)
 	qty_label.add_theme_color_override("font_color", Color(0.6, 0.7, 0.8))
 	_qty_row.add_child(qty_label)
 
@@ -101,7 +101,7 @@ func _ready() -> void:
 	for val in qty_values:
 		var btn: Button = Button.new()
 		btn.text = "X" if val == -1 else str(val)
-		btn.add_theme_font_size_override("font_size", 11)
+		btn.add_theme_font_size_override("font_size", 14)
 		btn.custom_minimum_size = Vector2(32, 22)
 		btn.pressed.connect(_on_qty_selected.bind(val))
 		_qty_row.add_child(btn)
@@ -110,7 +110,7 @@ func _ready() -> void:
 	# Custom amount input (hidden until X is pressed)
 	_qty_custom_input = LineEdit.new()
 	_qty_custom_input.placeholder_text = "amt"
-	_qty_custom_input.add_theme_font_size_override("font_size", 11)
+	_qty_custom_input.add_theme_font_size_override("font_size", 14)
 	_qty_custom_input.custom_minimum_size = Vector2(50, 22)
 	_qty_custom_input.max_length = 6
 	_qty_custom_input.visible = false
@@ -120,7 +120,7 @@ func _ready() -> void:
 	# All button (withdraw/deposit all of a single item stack)
 	var all_btn: Button = Button.new()
 	all_btn.text = "All"
-	all_btn.add_theme_font_size_override("font_size", 11)
+	all_btn.add_theme_font_size_override("font_size", 14)
 	all_btn.custom_minimum_size = Vector2(36, 22)
 	all_btn.pressed.connect(_on_qty_selected.bind(0))  # 0 = "All"
 	_qty_row.add_child(all_btn)
@@ -259,7 +259,7 @@ func _create_slot(index: int) -> PanelContainer:
 	item_label.name = "ItemLabel"
 	item_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	item_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	item_label.add_theme_font_size_override("font_size", 9)
+	item_label.add_theme_font_size_override("font_size", 12)
 	item_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
 	item_label.clip_text = true
 	slot.add_child(item_label)
@@ -269,7 +269,7 @@ func _create_slot(index: int) -> PanelContainer:
 	qty_lbl.name = "QtyLabel"
 	qty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	qty_lbl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
-	qty_lbl.add_theme_font_size_override("font_size", 9)
+	qty_lbl.add_theme_font_size_override("font_size", 12)
 	qty_lbl.add_theme_color_override("font_color", Color(1.0, 1.0, 0.6))
 	qty_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	qty_lbl.size_flags_vertical = Control.SIZE_EXPAND_FILL

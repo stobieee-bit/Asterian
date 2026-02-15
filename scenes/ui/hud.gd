@@ -171,23 +171,23 @@ func _build_stat_bars() -> void:
 	hp_bar = ProgressBar.new()
 	hp_bar.name = "HPBar"
 	hp_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hp_bar.position = Vector2(10, 6)
-	hp_bar.custom_minimum_size = Vector2(200, 16)
-	hp_bar.size = Vector2(200, 16)
+	hp_bar.position = Vector2(14, 10)
+	hp_bar.custom_minimum_size = Vector2(280, 24)
+	hp_bar.size = Vector2(280, 24)
 	hp_bar.max_value = 100.0
 	hp_bar.value = 100.0
 	hp_bar.show_percentage = false
 
 	var hp_bg: StyleBoxFlat = StyleBoxFlat.new()
 	hp_bg.bg_color = Color(0.08, 0.02, 0.02, 0.7)
-	hp_bg.set_corner_radius_all(3)
+	hp_bg.set_corner_radius_all(4)
 	hp_bg.border_color = Color(0.3, 0.08, 0.08, 0.4)
 	hp_bg.set_border_width_all(1)
 	hp_bar.add_theme_stylebox_override("background", hp_bg)
 
 	var hp_fill: StyleBoxFlat = StyleBoxFlat.new()
 	hp_fill.bg_color = Color(0.65, 0.12, 0.08, 0.9)
-	hp_fill.set_corner_radius_all(3)
+	hp_fill.set_corner_radius_all(4)
 	hp_bar.add_theme_stylebox_override("fill", hp_fill)
 	add_child(hp_bar)
 
@@ -196,7 +196,7 @@ func _build_stat_bars() -> void:
 	_hp_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hp_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hp_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_hp_text.add_theme_font_size_override("font_size", 10)
+	_hp_text.add_theme_font_size_override("font_size", 14)
 	_hp_text.add_theme_color_override("font_color", Color(1.0, 0.95, 0.95, 0.95))
 	_hp_text.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.6))
 	_hp_text.add_theme_constant_override("shadow_offset_x", 1)
@@ -208,23 +208,23 @@ func _build_stat_bars() -> void:
 	energy_bar = ProgressBar.new()
 	energy_bar.name = "EnergyBar"
 	energy_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	energy_bar.position = Vector2(10, 24)
-	energy_bar.custom_minimum_size = Vector2(160, 14)
-	energy_bar.size = Vector2(160, 14)
+	energy_bar.position = Vector2(14, 38)
+	energy_bar.custom_minimum_size = Vector2(240, 20)
+	energy_bar.size = Vector2(240, 20)
 	energy_bar.max_value = 100.0
 	energy_bar.value = 100.0
 	energy_bar.show_percentage = false
 
 	var en_bg: StyleBoxFlat = StyleBoxFlat.new()
 	en_bg.bg_color = Color(0.02, 0.04, 0.1, 0.7)
-	en_bg.set_corner_radius_all(3)
+	en_bg.set_corner_radius_all(4)
 	en_bg.border_color = Color(0.06, 0.1, 0.3, 0.4)
 	en_bg.set_border_width_all(1)
 	energy_bar.add_theme_stylebox_override("background", en_bg)
 
 	var en_fill: StyleBoxFlat = StyleBoxFlat.new()
 	en_fill.bg_color = Color(0.12, 0.35, 0.75, 0.9)
-	en_fill.set_corner_radius_all(3)
+	en_fill.set_corner_radius_all(4)
 	energy_bar.add_theme_stylebox_override("fill", en_fill)
 	add_child(energy_bar)
 
@@ -233,7 +233,7 @@ func _build_stat_bars() -> void:
 	_energy_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_energy_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_energy_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_energy_text.add_theme_font_size_override("font_size", 10)
+	_energy_text.add_theme_font_size_override("font_size", 13)
 	_energy_text.add_theme_color_override("font_color", Color(0.9, 0.93, 1.0, 0.95))
 	_energy_text.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.6))
 	_energy_text.add_theme_constant_override("shadow_offset_x", 1)
@@ -245,9 +245,9 @@ func _build_stat_bars() -> void:
 	level_label = Label.new()
 	level_label.name = "LevelLabel"
 	level_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	level_label.position = Vector2(10, 54)
-	level_label.add_theme_font_size_override("font_size", 10)
-	level_label.add_theme_color_override("font_color", Color(0.5, 0.6, 0.7, 0.7))
+	level_label.position = Vector2(14, 84)
+	level_label.add_theme_font_size_override("font_size", 14)
+	level_label.add_theme_color_override("font_color", Color(0.5, 0.6, 0.7, 0.8))
 	level_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
 	level_label.add_theme_constant_override("shadow_offset_x", 1)
 	level_label.add_theme_constant_override("shadow_offset_y", 1)
@@ -258,9 +258,9 @@ func _build_stat_bars() -> void:
 	credits_label = Label.new()
 	credits_label.name = "CreditsLabel"
 	credits_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	credits_label.position = Vector2(10, 68)
-	credits_label.add_theme_font_size_override("font_size", 11)
-	credits_label.add_theme_color_override("font_color", Color(0.85, 0.75, 0.3, 0.85))
+	credits_label.position = Vector2(14, 104)
+	credits_label.add_theme_font_size_override("font_size", 15)
+	credits_label.add_theme_color_override("font_color", Color(0.85, 0.75, 0.3, 0.9))
 	credits_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
 	credits_label.add_theme_constant_override("shadow_offset_x", 1)
 	credits_label.add_theme_constant_override("shadow_offset_y", 1)
@@ -272,8 +272,8 @@ func _build_stat_bars() -> void:
 	fps_label.name = "FPSLabel"
 	fps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var vp_size: Vector2 = _get_viewport_size()
-	fps_label.position = Vector2(vp_size.x - 80, vp_size.y - 20)
-	fps_label.add_theme_font_size_override("font_size", 10)
+	fps_label.position = Vector2(vp_size.x - 100, vp_size.y - 26)
+	fps_label.add_theme_font_size_override("font_size", 13)
 	fps_label.add_theme_color_override("font_color", Color(0.3, 0.35, 0.3, 0.5))
 	fps_label.text = "60 FPS"
 	add_child(fps_label)
@@ -282,8 +282,8 @@ func _build_stat_bars() -> void:
 	pos_label = Label.new()
 	pos_label.name = "PosLabel"
 	pos_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pos_label.position = Vector2(vp_size.x - 160, vp_size.y - 20)
-	pos_label.add_theme_font_size_override("font_size", 10)
+	pos_label.position = Vector2(vp_size.x - 200, vp_size.y - 26)
+	pos_label.add_theme_font_size_override("font_size", 13)
 	pos_label.add_theme_color_override("font_color", Color(0.3, 0.35, 0.4, 0.5))
 	pos_label.text = "0, 0"
 	add_child(pos_label)
@@ -471,7 +471,7 @@ func _build_panels() -> void:
 	_skills_panel.set_script(skills_script)
 	_skills_panel.add_theme_stylebox_override("panel", panel_style.duplicate())
 	_skills_panel.visible = true
-	_skills_panel.position = Vector2(10, 120)
+	_skills_panel.position = Vector2(14, 170)
 	add_child(_skills_panel)
 
 	# Dialogue panel (center of screen)
@@ -584,8 +584,8 @@ func _build_chat_log() -> void:
 	bg_style.set_content_margin_all(0)
 	_chat_bg.add_theme_stylebox_override("panel", bg_style)
 	var vp_size: Vector2 = _get_viewport_size()
-	_chat_bg.position = Vector2(8, vp_size.y - 240)
-	_chat_bg.custom_minimum_size = Vector2(360, 180)
+	_chat_bg.position = Vector2(10, vp_size.y - 290)
+	_chat_bg.custom_minimum_size = Vector2(400, 220)
 	_chat_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_chat_bg)
 
@@ -600,25 +600,25 @@ func _build_chat_log() -> void:
 	header_style.bg_color = Color(0.02, 0.04, 0.08, 0.5)
 	header_style.corner_radius_top_left = 4
 	header_style.corner_radius_top_right = 4
-	header_style.set_content_margin_all(2)
-	header_style.content_margin_left = 6
+	header_style.set_content_margin_all(3)
+	header_style.content_margin_left = 8
 	header.add_theme_stylebox_override("panel", header_style)
 	header.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	outer_vbox.add_child(header)
 
 	var header_label: Label = Label.new()
 	header_label.text = "Chat"
-	header_label.add_theme_font_size_override("font_size", 9)
-	header_label.add_theme_color_override("font_color", Color(0.35, 0.55, 0.65, 0.6))
+	header_label.add_theme_font_size_override("font_size", 12)
+	header_label.add_theme_color_override("font_color", Color(0.35, 0.55, 0.65, 0.7))
 	header_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	header.add_child(header_label)
 
 	# Message area with padding
 	var msg_margin: MarginContainer = MarginContainer.new()
-	msg_margin.add_theme_constant_override("margin_left", 6)
-	msg_margin.add_theme_constant_override("margin_right", 6)
-	msg_margin.add_theme_constant_override("margin_top", 4)
-	msg_margin.add_theme_constant_override("margin_bottom", 2)
+	msg_margin.add_theme_constant_override("margin_left", 8)
+	msg_margin.add_theme_constant_override("margin_right", 8)
+	msg_margin.add_theme_constant_override("margin_top", 5)
+	msg_margin.add_theme_constant_override("margin_bottom", 3)
 	msg_margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	msg_margin.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	outer_vbox.add_child(msg_margin)
@@ -626,8 +626,8 @@ func _build_chat_log() -> void:
 	_chat_container = VBoxContainer.new()
 	_chat_container.name = "ChatContainer"
 	_chat_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_chat_container.custom_minimum_size = Vector2(360, 0)
-	_chat_container.add_theme_constant_override("separation", 2)
+	_chat_container.custom_minimum_size = Vector2(400, 0)
+	_chat_container.add_theme_constant_override("separation", 3)
 	msg_margin.add_child(_chat_container)
 
 	# ── Chat input field at the bottom ──
@@ -642,8 +642,8 @@ func _build_chat_log() -> void:
 	_chat_input.name = "ChatInput"
 	_chat_input.placeholder_text = "Press Enter to chat..."
 	_chat_input.max_length = 200
-	_chat_input.add_theme_font_size_override("font_size", 11)
-	_chat_input.custom_minimum_size = Vector2(0, 24)
+	_chat_input.add_theme_font_size_override("font_size", 14)
+	_chat_input.custom_minimum_size = Vector2(0, 30)
 
 	var input_style: StyleBoxFlat = StyleBoxFlat.new()
 	input_style.bg_color = Color(0.025, 0.035, 0.06, 0.7)
@@ -674,8 +674,8 @@ func _build_chat_log() -> void:
 func _make_sci_btn(text: String, width: float = 70, accent: Color = Color(0.2, 0.6, 0.8)) -> Button:
 	var btn: Button = Button.new()
 	btn.text = text
-	btn.custom_minimum_size = Vector2(width, 28)
-	btn.add_theme_font_size_override("font_size", 10)
+	btn.custom_minimum_size = Vector2(width * 1.2, 36)
+	btn.add_theme_font_size_override("font_size", 14)
 	btn.add_theme_color_override("font_color", accent.lightened(0.1))
 	btn.add_theme_color_override("font_hover_color", accent.lightened(0.4))
 	btn.add_theme_color_override("font_pressed_color", Color(1, 1, 1))
@@ -685,11 +685,11 @@ func _make_sci_btn(text: String, width: float = 70, accent: Color = Color(0.2, 0
 	normal.bg_color = Color(0.03, 0.04, 0.08, 0.6)
 	normal.border_color = Color(0.1, 0.15, 0.2, 0.3)
 	normal.set_border_width_all(0)
-	normal.border_width_bottom = 1
+	normal.border_width_bottom = 2
 	normal.border_color = accent.darkened(0.4)
 	normal.border_color.a = 0.35
-	normal.set_corner_radius_all(3)
-	normal.set_content_margin_all(3)
+	normal.set_corner_radius_all(4)
+	normal.set_content_margin_all(4)
 	btn.add_theme_stylebox_override("normal", normal)
 
 	# Hover — slight lift effect
@@ -697,7 +697,7 @@ func _make_sci_btn(text: String, width: float = 70, accent: Color = Color(0.2, 0
 	hover.bg_color = Color(0.05, 0.07, 0.14, 0.75)
 	hover.border_color = accent.darkened(0.15)
 	hover.border_color.a = 0.6
-	hover.border_width_bottom = 2
+	hover.border_width_bottom = 3
 	btn.add_theme_stylebox_override("hover", hover)
 
 	# Pressed — inset feel
@@ -705,7 +705,7 @@ func _make_sci_btn(text: String, width: float = 70, accent: Color = Color(0.2, 0
 	pressed.bg_color = accent.darkened(0.65)
 	pressed.bg_color.a = 0.7
 	pressed.border_width_bottom = 0
-	pressed.border_width_top = 1
+	pressed.border_width_top = 2
 	pressed.border_color = accent.darkened(0.2)
 	pressed.border_color.a = 0.5
 	btn.add_theme_stylebox_override("pressed", pressed)
@@ -721,20 +721,20 @@ func _build_action_bar() -> void:
 	var bar_bg: PanelContainer = _action_bar_bg
 	bar_bg.name = "ActionBarBG"
 	var bg_style: StyleBoxFlat = StyleBoxFlat.new()
-	bg_style.bg_color = Color(0.015, 0.02, 0.04, 0.65)
-	bg_style.border_color = Color(0.08, 0.15, 0.25, 0.25)
+	bg_style.bg_color = Color(0.015, 0.02, 0.04, 0.7)
+	bg_style.border_color = Color(0.08, 0.15, 0.25, 0.3)
 	bg_style.border_width_top = 1
-	bg_style.set_corner_radius_all(4)
-	bg_style.set_content_margin_all(3)
-	bg_style.content_margin_left = 6
-	bg_style.content_margin_right = 6
+	bg_style.set_corner_radius_all(6)
+	bg_style.set_content_margin_all(4)
+	bg_style.content_margin_left = 8
+	bg_style.content_margin_right = 8
 	bar_bg.add_theme_stylebox_override("panel", bg_style)
 	var vp_init: Vector2 = _get_viewport_size()
-	bar_bg.position = Vector2(vp_init.x / 2.0 - 440, vp_init.y - 44)
+	bar_bg.position = Vector2(vp_init.x / 2.0 - 520, vp_init.y - 52)
 	add_child(bar_bg)
 
 	var bar: HBoxContainer = HBoxContainer.new()
-	bar.add_theme_constant_override("separation", 2)
+	bar.add_theme_constant_override("separation", 4)
 	bar_bg.add_child(bar)
 
 	var cyan: Color = Color(0.2, 0.7, 0.9)
@@ -818,7 +818,7 @@ func _on_chat_message(text: String, channel: String) -> void:
 
 	var label: Label = Label.new()
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.add_theme_font_size_override("font_size", 11)
+	label.add_theme_font_size_override("font_size", 14)
 
 	# Color by channel — slightly muted for a cleaner look
 	var color: Color
@@ -925,7 +925,7 @@ func _reposition_chat() -> void:
 	if _chat_bg == null:
 		return
 	var vp_size: Vector2 = _get_viewport_size()
-	_chat_bg.position = Vector2(8, vp_size.y - 260)
+	_chat_bg.position = Vector2(10, vp_size.y - 310)
 
 func _update_area_display(_area_id: String) -> void:
 	# Area name is shown in minimap only now — no separate label
@@ -1023,10 +1023,10 @@ var _gather_progress: ProgressBar = null
 func _build_gather_progress() -> void:
 	_gather_progress = ProgressBar.new()
 	_gather_progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_gather_progress.custom_minimum_size = Vector2(110, 8)
+	_gather_progress.custom_minimum_size = Vector2(140, 12)
 	_gather_progress.show_percentage = false
 	_gather_progress.visible = false
-	_gather_progress.position = Vector2(340, _design_size.y - 60)
+	_gather_progress.position = Vector2(340, _design_size.y - 80)
 
 	var bg_style: StyleBoxFlat = StyleBoxFlat.new()
 	bg_style.bg_color = Color(0.05, 0.06, 0.1, 0.6)
@@ -1062,15 +1062,15 @@ var _adrenaline_text: Label = null
 func _build_adrenaline_bar() -> void:
 	var adr_container: Control = Control.new()
 	adr_container.name = "AdrenalineContainer"
-	adr_container.position = Vector2(10, 40)
+	adr_container.position = Vector2(14, 62)
 	adr_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(adr_container)
 
 	var lbl: Label = Label.new()
 	lbl.text = "ADR"
 	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	lbl.add_theme_font_size_override("font_size", 9)
-	lbl.add_theme_color_override("font_color", Color(0.4, 0.7, 0.3, 0.7))
+	lbl.add_theme_font_size_override("font_size", 12)
+	lbl.add_theme_color_override("font_color", Color(0.4, 0.7, 0.3, 0.8))
 	lbl.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.4))
 	lbl.add_theme_constant_override("shadow_offset_x", 1)
 	lbl.add_theme_constant_override("shadow_offset_y", 1)
@@ -1079,22 +1079,22 @@ func _build_adrenaline_bar() -> void:
 
 	_adrenaline_bar = ProgressBar.new()
 	_adrenaline_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_adrenaline_bar.custom_minimum_size = Vector2(150, 10)
+	_adrenaline_bar.custom_minimum_size = Vector2(210, 16)
 	_adrenaline_bar.show_percentage = false
 	_adrenaline_bar.max_value = 100.0
 	_adrenaline_bar.value = 0.0
-	_adrenaline_bar.position = Vector2(30, 2)
+	_adrenaline_bar.position = Vector2(38, 1)
 
 	var bg_style: StyleBoxFlat = StyleBoxFlat.new()
 	bg_style.bg_color = Color(0.04, 0.06, 0.03, 0.6)
-	bg_style.set_corner_radius_all(2)
+	bg_style.set_corner_radius_all(3)
 	bg_style.border_color = Color(0.12, 0.25, 0.08, 0.3)
 	bg_style.set_border_width_all(1)
 	_adrenaline_bar.add_theme_stylebox_override("background", bg_style)
 
 	var fill_style: StyleBoxFlat = StyleBoxFlat.new()
 	fill_style.bg_color = Color(0.25, 0.7, 0.18, 0.85)
-	fill_style.set_corner_radius_all(2)
+	fill_style.set_corner_radius_all(3)
 	_adrenaline_bar.add_theme_stylebox_override("fill", fill_style)
 
 	adr_container.add_child(_adrenaline_bar)
@@ -1104,8 +1104,8 @@ func _build_adrenaline_bar() -> void:
 	_adrenaline_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_adrenaline_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_adrenaline_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_adrenaline_text.add_theme_font_size_override("font_size", 8)
-	_adrenaline_text.add_theme_color_override("font_color", Color(0.85, 0.95, 0.75, 0.8))
+	_adrenaline_text.add_theme_font_size_override("font_size", 11)
+	_adrenaline_text.add_theme_color_override("font_color", Color(0.85, 0.95, 0.75, 0.9))
 	_adrenaline_text.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
 	_adrenaline_text.add_theme_constant_override("shadow_offset_x", 1)
 	_adrenaline_text.add_theme_constant_override("shadow_offset_y", 1)
@@ -1122,18 +1122,18 @@ func _build_ability_bar() -> void:
 	_ability_bar_bg = PanelContainer.new()
 	_ability_bar_bg.name = "AbilityBarBG"
 	var bg_style: StyleBoxFlat = StyleBoxFlat.new()
-	bg_style.bg_color = Color(0.015, 0.02, 0.04, 0.65)
-	bg_style.border_color = Color(0.08, 0.15, 0.25, 0.25)
+	bg_style.bg_color = Color(0.015, 0.02, 0.04, 0.7)
+	bg_style.border_color = Color(0.08, 0.15, 0.25, 0.3)
 	bg_style.border_width_top = 1
-	bg_style.set_corner_radius_all(4)
-	bg_style.set_content_margin_all(3)
-	bg_style.content_margin_left = 6
-	bg_style.content_margin_right = 6
+	bg_style.set_corner_radius_all(6)
+	bg_style.set_content_margin_all(5)
+	bg_style.content_margin_left = 8
+	bg_style.content_margin_right = 8
 	_ability_bar_bg.add_theme_stylebox_override("panel", bg_style)
 	add_child(_ability_bar_bg)
 
 	_ability_bar = HBoxContainer.new()
-	_ability_bar.add_theme_constant_override("separation", 3)
+	_ability_bar.add_theme_constant_override("separation", 5)
 	_ability_bar_bg.add_child(_ability_bar)
 
 	# Build buttons from data
@@ -1174,10 +1174,8 @@ func _refresh_ability_buttons() -> void:
 			var cost_text: String = "+%d ADR" % adr_gain if adr_gain > 0 else ("%d ADR" % adr_cost if adr_cost > 0 else "")
 			var slot_num: int = i + 1
 			var ab_name: String = str(ab.get("name", "Ability"))
-			# Truncate name for button
-			var short_name: String = ab_name if ab_name.length() <= 8 else ab_name.substr(0, 7) + "."
 
-			var btn: Button = _make_ability_btn(str(slot_num), short_name, accent, adr_cost, cost_text)
+			var btn: Button = _make_ability_btn(str(slot_num), ab_name, accent, adr_cost, cost_text)
 			btn.tooltip_text = "%s — %.1fx damage\n%s" % [ab_name, float(ab.get("damage_mult", 1.0)), str(ab.get("description", ""))]
 			var slot_idx: int = slot_num
 			btn.pressed.connect(func(): _use_ability(slot_idx))
@@ -1215,13 +1213,13 @@ func _reposition_ability_bar() -> void:
 	await get_tree().process_frame
 	var bar_width: float = _ability_bar_bg.size.x
 	if bar_width < 10:
-		bar_width = 480.0  # Estimate for 5+1 buttons
-	_ability_bar_bg.position = Vector2(vp_size.x / 2.0 - bar_width / 2.0, vp_size.y - 82)
+		bar_width = 760.0  # Estimate for 5+1 buttons at larger size
+	_ability_bar_bg.position = Vector2(vp_size.x / 2.0 - bar_width / 2.0, vp_size.y - 104)
 
 ## Create a styled ability button with keybind + name + cost badge
 func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost: int, cost_text_override: String = "") -> Button:
 	var btn: Button = Button.new()
-	btn.custom_minimum_size = Vector2(72, 32)
+	btn.custom_minimum_size = Vector2(108, 44)
 	btn.mouse_filter = Control.MOUSE_FILTER_STOP
 	btn.focus_mode = Control.FOCUS_NONE
 
@@ -1230,23 +1228,23 @@ func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost:
 	normal.border_color = accent.darkened(0.35)
 	normal.border_color.a = 0.4
 	normal.set_border_width_all(0)
-	normal.border_width_bottom = 1
-	normal.set_corner_radius_all(3)
-	normal.set_content_margin_all(2)
+	normal.border_width_bottom = 2
+	normal.set_corner_radius_all(4)
+	normal.set_content_margin_all(3)
 	btn.add_theme_stylebox_override("normal", normal)
 
 	var hover: StyleBoxFlat = normal.duplicate()
 	hover.bg_color = Color(0.04, 0.06, 0.12, 0.8)
 	hover.border_color = accent.darkened(0.1)
 	hover.border_color.a = 0.6
-	hover.border_width_bottom = 2
+	hover.border_width_bottom = 3
 	btn.add_theme_stylebox_override("hover", hover)
 
 	var pressed: StyleBoxFlat = normal.duplicate()
 	pressed.bg_color = accent.darkened(0.65)
 	pressed.bg_color.a = 0.6
 	pressed.border_width_bottom = 0
-	pressed.border_width_top = 1
+	pressed.border_width_top = 2
 	pressed.border_color = accent.darkened(0.2)
 	pressed.border_color.a = 0.4
 	btn.add_theme_stylebox_override("pressed", pressed)
@@ -1258,27 +1256,26 @@ func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost:
 	inner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	btn.add_child(inner)
 
-	# Keybind — small, top-left
+	# Keybind — top-left
 	var key_lbl: Label = Label.new()
 	key_lbl.text = keybind
-	key_lbl.position = Vector2(3, 0)
-	key_lbl.size = Vector2(14, 14)
+	key_lbl.position = Vector2(4, 1)
+	key_lbl.size = Vector2(18, 18)
 	key_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	key_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	key_lbl.add_theme_font_size_override("font_size", 9)
-	key_lbl.add_theme_color_override("font_color", accent.darkened(0.1))
+	key_lbl.add_theme_font_size_override("font_size", 12)
 	key_lbl.add_theme_color_override("font_color", accent.lightened(0.15))
 	key_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(key_lbl)
 
-	# Ability name
+	# Ability name — centered
 	var name_lbl: Label = Label.new()
 	name_lbl.text = label_text
-	name_lbl.position = Vector2(18, 1)
-	name_lbl.size = Vector2(52, 14)
+	name_lbl.position = Vector2(20, 2)
+	name_lbl.size = Vector2(84, 20)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	name_lbl.add_theme_font_size_override("font_size", 10)
+	name_lbl.add_theme_font_size_override("font_size", 13)
 	name_lbl.add_theme_color_override("font_color", accent)
 	name_lbl.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.4))
 	name_lbl.add_theme_constant_override("shadow_offset_x", 1)
@@ -1291,11 +1288,11 @@ func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost:
 	if badge_text != "":
 		var cost_lbl: Label = Label.new()
 		cost_lbl.text = badge_text
-		cost_lbl.position = Vector2(0, 16)
-		cost_lbl.size = Vector2(72, 12)
+		cost_lbl.position = Vector2(0, 24)
+		cost_lbl.size = Vector2(108, 16)
 		cost_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		cost_lbl.add_theme_font_size_override("font_size", 7)
-		var badge_color: Color = Color(0.3, 0.75, 0.4, 0.6) if badge_text.begins_with("+") else Color(0.45, 0.55, 0.45, 0.55)
+		cost_lbl.add_theme_font_size_override("font_size", 10)
+		var badge_color: Color = Color(0.3, 0.75, 0.4, 0.7) if badge_text.begins_with("+") else Color(0.45, 0.55, 0.45, 0.6)
 		cost_lbl.add_theme_color_override("font_color", badge_color)
 		cost_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		inner.add_child(cost_lbl)
@@ -1492,15 +1489,15 @@ func _build_combat_indicator() -> void:
 	_combat_label = Label.new()
 	_combat_label.name = "CombatIndicator"
 	_combat_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_combat_label.text = "IN COMBAT"
+	_combat_label.text = "⚔ IN COMBAT"
 	_combat_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_combat_label.add_theme_font_size_override("font_size", 11)
-	_combat_label.add_theme_color_override("font_color", Color(1.0, 0.3, 0.2, 0.8))
-	_combat_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
+	_combat_label.add_theme_font_size_override("font_size", 14)
+	_combat_label.add_theme_color_override("font_color", Color(1.0, 0.3, 0.2, 0.9))
+	_combat_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.6))
 	_combat_label.add_theme_constant_override("shadow_offset_x", 1)
 	_combat_label.add_theme_constant_override("shadow_offset_y", 1)
-	_combat_label.position = Vector2(10, 84)
-	_combat_label.size = Vector2(100, 16)
+	_combat_label.position = Vector2(14, 126)
+	_combat_label.size = Vector2(160, 22)
 	_combat_label.visible = false
 	add_child(_combat_label)
 
@@ -1511,13 +1508,13 @@ func _build_slayer_display() -> void:
 	_slayer_label = Label.new()
 	_slayer_label.name = "SlayerTask"
 	_slayer_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_slayer_label.add_theme_font_size_override("font_size", 11)
+	_slayer_label.add_theme_font_size_override("font_size", 14)
 	_slayer_label.add_theme_color_override("font_color", Color(1.0, 0.5, 0.2))
 	_slayer_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.8))
 	_slayer_label.add_theme_constant_override("shadow_offset_x", 1)
 	_slayer_label.add_theme_constant_override("shadow_offset_y", 1)
-	_slayer_label.position = Vector2(10, 98)
-	_slayer_label.size = Vector2(250, 16)
+	_slayer_label.position = Vector2(14, 148)
+	_slayer_label.size = Vector2(320, 22)
 	_slayer_label.visible = false
 	add_child(_slayer_label)
 	# Connect to enemy killed to update
@@ -1570,7 +1567,7 @@ func _build_loot_toast() -> void:
 	_loot_toast_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_loot_toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_loot_toast_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_loot_toast_label.add_theme_font_size_override("font_size", 22)
+	_loot_toast_label.add_theme_font_size_override("font_size", 26)
 	_loot_toast_label.add_theme_color_override("font_color", Color(0.3, 0.9, 1.0, 1.0))
 	_loot_toast_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.7))
 	_loot_toast_label.add_theme_constant_override("shadow_offset_x", 2)
@@ -1682,7 +1679,7 @@ func _build_multiplayer_panel_contents() -> void:
 	# Title
 	var title: Label = Label.new()
 	title.text = "Multiplayer"
-	title.add_theme_font_size_override("font_size", 14)
+	title.add_theme_font_size_override("font_size", 16)
 	title.add_theme_color_override("font_color", Color(0.3, 0.7, 1.0))
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(title)
@@ -1690,7 +1687,7 @@ func _build_multiplayer_panel_contents() -> void:
 	# Status label
 	_mp_status_label = Label.new()
 	_mp_status_label.text = "Disconnected"
-	_mp_status_label.add_theme_font_size_override("font_size", 11)
+	_mp_status_label.add_theme_font_size_override("font_size", 14)
 	_mp_status_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
 	_mp_status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(_mp_status_label)
@@ -1698,7 +1695,7 @@ func _build_multiplayer_panel_contents() -> void:
 	# Online count
 	_mp_online_label = Label.new()
 	_mp_online_label.text = ""
-	_mp_online_label.add_theme_font_size_override("font_size", 10)
+	_mp_online_label.add_theme_font_size_override("font_size", 13)
 	_mp_online_label.add_theme_color_override("font_color", Color(0.4, 0.8, 0.4))
 	_mp_online_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(_mp_online_label)
@@ -1710,7 +1707,7 @@ func _build_multiplayer_panel_contents() -> void:
 
 	var name_lbl: Label = Label.new()
 	name_lbl.text = "Name:"
-	name_lbl.add_theme_font_size_override("font_size", 11)
+	name_lbl.add_theme_font_size_override("font_size", 14)
 	name_row.add_child(name_lbl)
 
 	_mp_name_input = LineEdit.new()
@@ -1727,7 +1724,7 @@ func _build_multiplayer_panel_contents() -> void:
 
 	var server_lbl: Label = Label.new()
 	server_lbl.text = "Server:"
-	server_lbl.add_theme_font_size_override("font_size", 11)
+	server_lbl.add_theme_font_size_override("font_size", 14)
 	server_row.add_child(server_lbl)
 
 	_mp_server_input = LineEdit.new()
@@ -1873,67 +1870,73 @@ func _build_target_info_panel() -> void:
 	_target_panel.visible = false
 	_target_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var vp_w: float = _design_size.x
-	_target_panel.position = Vector2(vp_w / 2.0 - 110, 6)
-	_target_panel.custom_minimum_size = Vector2(220, 0)
+	_target_panel.position = Vector2(vp_w / 2.0 - 150, 8)
+	_target_panel.custom_minimum_size = Vector2(300, 0)
 	add_child(_target_panel)
 
 	var vbox: VBoxContainer = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 2)
+	vbox.add_theme_constant_override("separation", 4)
 	_target_panel.add_child(vbox)
 
 	var row1: HBoxContainer = HBoxContainer.new()
-	row1.add_theme_constant_override("separation", 6)
+	row1.add_theme_constant_override("separation", 10)
 	vbox.add_child(row1)
 
 	_target_name_label = Label.new()
-	_target_name_label.add_theme_font_size_override("font_size", 11)
+	_target_name_label.add_theme_font_size_override("font_size", 15)
 	_target_name_label.add_theme_color_override("font_color", Color(0.9, 0.55, 0.3, 0.95))
+	_target_name_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.5))
+	_target_name_label.add_theme_constant_override("shadow_offset_x", 1)
+	_target_name_label.add_theme_constant_override("shadow_offset_y", 1)
 	_target_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row1.add_child(_target_name_label)
 
 	_target_level_label = Label.new()
-	_target_level_label.add_theme_font_size_override("font_size", 10)
+	_target_level_label.add_theme_font_size_override("font_size", 14)
 	_target_level_label.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55, 0.8))
 	row1.add_child(_target_level_label)
 
 	var hp_container: Control = Control.new()
-	hp_container.custom_minimum_size = Vector2(210, 10)
+	hp_container.custom_minimum_size = Vector2(288, 16)
 	vbox.add_child(hp_container)
 
 	_target_hp_bar = ProgressBar.new()
-	_target_hp_bar.custom_minimum_size = Vector2(210, 10)
+	_target_hp_bar.custom_minimum_size = Vector2(288, 16)
 	_target_hp_bar.position = Vector2.ZERO
 	_target_hp_bar.show_percentage = false
 	var hp_bg: StyleBoxFlat = StyleBoxFlat.new()
 	hp_bg.bg_color = Color(0.08, 0.03, 0.03, 0.7)
-	hp_bg.set_corner_radius_all(2)
+	hp_bg.set_corner_radius_all(3)
 	_target_hp_bar.add_theme_stylebox_override("background", hp_bg)
 	var hp_fill: StyleBoxFlat = StyleBoxFlat.new()
 	hp_fill.bg_color = Color(0.65, 0.12, 0.08, 0.85)
-	hp_fill.set_corner_radius_all(2)
+	hp_fill.set_corner_radius_all(3)
 	_target_hp_bar.add_theme_stylebox_override("fill", hp_fill)
 	hp_container.add_child(_target_hp_bar)
 
 	_target_hp_label = Label.new()
-	_target_hp_label.add_theme_font_size_override("font_size", 9)
-	_target_hp_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.85))
+	_target_hp_label.add_theme_font_size_override("font_size", 12)
+	_target_hp_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.9))
+	_target_hp_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.5))
+	_target_hp_label.add_theme_constant_override("shadow_offset_x", 1)
+	_target_hp_label.add_theme_constant_override("shadow_offset_y", 1)
 	_target_hp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_target_hp_label.position = Vector2(0, -1)
-	_target_hp_label.size = Vector2(210, 10)
+	_target_hp_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_target_hp_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	hp_container.add_child(_target_hp_label)
 
 	# Row 3: Style + Weakness
 	var row3: HBoxContainer = HBoxContainer.new()
-	row3.add_theme_constant_override("separation", 12)
+	row3.add_theme_constant_override("separation", 16)
 	vbox.add_child(row3)
 
 	_target_style_label = Label.new()
-	_target_style_label.add_theme_font_size_override("font_size", 10)
+	_target_style_label.add_theme_font_size_override("font_size", 13)
 	_target_style_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row3.add_child(_target_style_label)
 
 	_target_weakness_label = Label.new()
-	_target_weakness_label.add_theme_font_size_override("font_size", 10)
+	_target_weakness_label.add_theme_font_size_override("font_size", 13)
 	row3.add_child(_target_weakness_label)
 
 func _update_target_info() -> void:
@@ -2019,15 +2022,15 @@ func _build_gather_label() -> void:
 	_gather_label.name = "GatherLabel"
 	_gather_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_gather_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_gather_label.add_theme_font_size_override("font_size", 12)
+	_gather_label.add_theme_font_size_override("font_size", 15)
 	_gather_label.add_theme_color_override("font_color", Color(0.3, 0.85, 1.0, 0.9))
 	_gather_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.6))
 	_gather_label.add_theme_constant_override("shadow_offset_x", 1)
 	_gather_label.add_theme_constant_override("shadow_offset_y", 1)
 	# Position just above the gather progress bar
 	var gp_vp_h: float = _design_size.y
-	_gather_label.position = Vector2(290, gp_vp_h - 88)
-	_gather_label.size = Vector2(220, 20)
+	_gather_label.position = Vector2(290, gp_vp_h - 108)
+	_gather_label.size = Vector2(260, 24)
 	_gather_label.visible = false
 	add_child(_gather_label)
 
@@ -2089,16 +2092,16 @@ func _build_quest_tracker() -> void:
 	_quest_tracker_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# Position below the minimap in top-right corner
 	var vp_size: Vector2 = _get_viewport_size()
-	_quest_tracker_panel.position = Vector2(vp_size.x - 250, 172)
-	_quest_tracker_panel.custom_minimum_size = Vector2(230, 0)
+	_quest_tracker_panel.position = Vector2(vp_size.x - 280, 200)
+	_quest_tracker_panel.custom_minimum_size = Vector2(260, 0)
 	add_child(_quest_tracker_panel)
 
 	var vbox: VBoxContainer = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 2)
+	vbox.add_theme_constant_override("separation", 4)
 	_quest_tracker_panel.add_child(vbox)
 
 	_quest_tracker_title = Label.new()
-	_quest_tracker_title.add_theme_font_size_override("font_size", 11)
+	_quest_tracker_title.add_theme_font_size_override("font_size", 14)
 	_quest_tracker_title.add_theme_color_override("font_color", Color(0.9, 0.6, 1.0))
 	_quest_tracker_title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.5))
 	_quest_tracker_title.add_theme_constant_override("shadow_offset_x", 1)
@@ -2106,14 +2109,14 @@ func _build_quest_tracker() -> void:
 	vbox.add_child(_quest_tracker_title)
 
 	_quest_tracker_step = Label.new()
-	_quest_tracker_step.add_theme_font_size_override("font_size", 10)
+	_quest_tracker_step.add_theme_font_size_override("font_size", 13)
 	_quest_tracker_step.add_theme_color_override("font_color", Color(0.75, 0.75, 0.85))
 	_quest_tracker_step.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_quest_tracker_step.custom_minimum_size = Vector2(218, 0)
+	_quest_tracker_step.custom_minimum_size = Vector2(248, 0)
 	vbox.add_child(_quest_tracker_step)
 
 	_quest_tracker_progress = Label.new()
-	_quest_tracker_progress.add_theme_font_size_override("font_size", 10)
+	_quest_tracker_progress.add_theme_font_size_override("font_size", 13)
 	_quest_tracker_progress.add_theme_color_override("font_color", Color(0.3, 0.9, 0.4))
 	vbox.add_child(_quest_tracker_progress)
 
@@ -2187,14 +2190,14 @@ func _build_save_toast() -> void:
 	_save_toast_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_save_toast_label.text = "Game Saved"
 	_save_toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_save_toast_label.add_theme_font_size_override("font_size", 11)
-	_save_toast_label.add_theme_color_override("font_color", Color(0.4, 0.8, 0.4, 0.8))
+	_save_toast_label.add_theme_font_size_override("font_size", 14)
+	_save_toast_label.add_theme_color_override("font_color", Color(0.4, 0.8, 0.4, 0.85))
 	_save_toast_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.5))
 	_save_toast_label.add_theme_constant_override("shadow_offset_x", 1)
 	_save_toast_label.add_theme_constant_override("shadow_offset_y", 1)
 	var vp_size: Vector2 = _get_viewport_size()
-	_save_toast_label.position = Vector2(vp_size.x - 160, vp_size.y - 40)
-	_save_toast_label.size = Vector2(150, 20)
+	_save_toast_label.position = Vector2(vp_size.x - 180, vp_size.y - 48)
+	_save_toast_label.size = Vector2(170, 24)
 	_save_toast_label.modulate = Color(1, 1, 1, 0)
 	add_child(_save_toast_label)
 
@@ -2217,13 +2220,13 @@ func _build_combat_style_indicator() -> void:
 	_style_indicator_label = Label.new()
 	_style_indicator_label.name = "CombatStyleIndicator"
 	_style_indicator_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_style_indicator_label.add_theme_font_size_override("font_size", 11)
-	_style_indicator_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.5))
+	_style_indicator_label.add_theme_font_size_override("font_size", 14)
+	_style_indicator_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.6))
 	_style_indicator_label.add_theme_constant_override("shadow_offset_x", 1)
 	_style_indicator_label.add_theme_constant_override("shadow_offset_y", 1)
 	# Position right of adrenaline bar
-	_style_indicator_label.position = Vector2(195, 40)
-	_style_indicator_label.size = Vector2(120, 16)
+	_style_indicator_label.position = Vector2(268, 63)
+	_style_indicator_label.size = Vector2(140, 22)
 	add_child(_style_indicator_label)
 	_update_style_indicator()
 
@@ -2293,7 +2296,7 @@ func _build_context_menu() -> void:
 	_context_menu.add_child(_context_menu_vbox)
 
 	_context_menu_title = Label.new()
-	_context_menu_title.add_theme_font_size_override("font_size", 11)
+	_context_menu_title.add_theme_font_size_override("font_size", 14)
 	_context_menu_title.add_theme_color_override("font_color", Color(0.6, 0.75, 0.85, 0.9))
 	_context_menu_title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.4))
 	_context_menu_title.add_theme_constant_override("shadow_offset_x", 1)
@@ -2347,28 +2350,28 @@ func _on_context_menu_requested(options: Array, global_pos: Vector2) -> void:
 		var keybind: String = str(opt.get("keybind", ""))
 
 		var btn: Button = Button.new()
-		btn.custom_minimum_size = Vector2(140, 24)
+		btn.custom_minimum_size = Vector2(160, 30)
 		btn.focus_mode = Control.FOCUS_NONE
 
 		var btn_normal: StyleBoxFlat = StyleBoxFlat.new()
 		btn_normal.bg_color = Color(0.0, 0.0, 0.0, 0.0)
-		btn_normal.set_corner_radius_all(2)
-		btn_normal.set_content_margin_all(2)
-		btn_normal.content_margin_left = 5
+		btn_normal.set_corner_radius_all(3)
+		btn_normal.set_content_margin_all(3)
+		btn_normal.content_margin_left = 6
 		btn.add_theme_stylebox_override("normal", btn_normal)
 
 		var btn_hover: StyleBoxFlat = StyleBoxFlat.new()
 		btn_hover.bg_color = Color(0.06, 0.1, 0.18, 0.7)
-		btn_hover.set_corner_radius_all(2)
-		btn_hover.set_content_margin_all(2)
-		btn_hover.content_margin_left = 5
+		btn_hover.set_corner_radius_all(3)
+		btn_hover.set_content_margin_all(3)
+		btn_hover.content_margin_left = 6
 		btn.add_theme_stylebox_override("hover", btn_hover)
 
 		var btn_pressed: StyleBoxFlat = StyleBoxFlat.new()
 		btn_pressed.bg_color = Color(0.08, 0.15, 0.25, 0.7)
-		btn_pressed.set_corner_radius_all(2)
-		btn_pressed.set_content_margin_all(2)
-		btn_pressed.content_margin_left = 5
+		btn_pressed.set_corner_radius_all(3)
+		btn_pressed.set_content_margin_all(3)
+		btn_pressed.content_margin_left = 6
 		btn.add_theme_stylebox_override("pressed", btn_pressed)
 
 		# Build text: "[icon] label   keybind"
@@ -2381,7 +2384,7 @@ func _on_context_menu_requested(options: Array, global_pos: Vector2) -> void:
 			display_text += "  [%s]" % keybind
 
 		btn.text = display_text
-		btn.add_theme_font_size_override("font_size", 11)
+		btn.add_theme_font_size_override("font_size", 14)
 		btn.add_theme_color_override("font_color", label_color)
 		btn.add_theme_color_override("font_hover_color", label_color.lightened(0.25))
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -2543,7 +2546,7 @@ func _build_hover_label() -> void:
 	_hover_label = Label.new()
 	_hover_label.name = "HoverLabel"
 	_hover_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_hover_label.add_theme_font_size_override("font_size", 13)
+	_hover_label.add_theme_font_size_override("font_size", 15)
 	_hover_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.8, 0.95))
 	_hover_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
 	_hover_label.add_theme_constant_override("shadow_offset_x", 1)
@@ -2576,7 +2579,7 @@ func _update_hover_label() -> void:
 	# Don't hover when over UI panels
 	# Simple check: if mouse is in top 42px (top bar) or bottom 55px (bottom bar + action bar)
 	var vp_size: Vector2 = _get_viewport_size()
-	if mouse_pos.y < 42 or mouse_pos.y > vp_size.y - 55:
+	if mouse_pos.y < 60 or mouse_pos.y > vp_size.y - 70:
 		_hover_label.visible = false
 		_hover_target = null
 		return
@@ -2785,15 +2788,18 @@ func _reposition_action_bar() -> void:
 	if _action_bar_bg == null:
 		return
 	var vp_size: Vector2 = _get_viewport_size()
-	_action_bar_bg.position = Vector2(vp_size.x / 2.0 - 380, vp_size.y - 52)
+	var bar_w: float = _action_bar_bg.size.x
+	if bar_w < 10:
+		bar_w = 1040.0
+	_action_bar_bg.position = Vector2(vp_size.x / 2.0 - bar_w / 2.0, vp_size.y - 56)
 
 ## Reposition FPS and Position labels to bottom-right
 func _reposition_bottom_labels() -> void:
 	var vp_size: Vector2 = _get_viewport_size()
 	if fps_label:
-		fps_label.position = Vector2(vp_size.x - 80, vp_size.y - 20)
+		fps_label.position = Vector2(vp_size.x - 100, vp_size.y - 26)
 	if pos_label:
-		pos_label.position = Vector2(vp_size.x - 160, vp_size.y - 20)
+		pos_label.position = Vector2(vp_size.x - 200, vp_size.y - 26)
 
 ## Cycle minimap zoom level (small → medium → large)
 var _minimap_zoom_level: int = 0  # 0=small (160), 1=medium (220), 2=large (300)
@@ -2806,7 +2812,7 @@ func _resize_minimap() -> void:
 	if _minimap_container == null or _minimap_viewport == null:
 		return
 
-	var sizes: Array[int] = [160, 220, 300]
+	var sizes: Array[int] = [180, 250, 340]
 	var cam_sizes: Array[float] = [40.0, 60.0, 90.0]
 	var map_size: int = sizes[_minimap_zoom_level]
 	var cam_size: float = cam_sizes[_minimap_zoom_level]
@@ -2861,7 +2867,7 @@ var _full_map_viewport: SubViewport = null
 var _full_map_camera: Camera3D = null
 
 func _build_minimap() -> void:
-	var map_size: int = 150
+	var map_size: int = 180
 
 	# Outer panel — clean, minimal
 	var style: StyleBoxFlat = StyleBoxFlat.new()
@@ -2968,16 +2974,16 @@ func _build_minimap() -> void:
 	_minimap_area_label.name = "MinimapArea"
 	_minimap_area_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_minimap_area_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_minimap_area_label.add_theme_font_size_override("font_size", 8)
-	_minimap_area_label.add_theme_color_override("font_color", Color(0.35, 0.55, 0.65, 0.6))
+	_minimap_area_label.add_theme_font_size_override("font_size", 11)
+	_minimap_area_label.add_theme_color_override("font_color", Color(0.35, 0.55, 0.65, 0.7))
 	_minimap_area_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bottom_row.add_child(_minimap_area_label)
 
 	var map_btn: Button = Button.new()
 	map_btn.text = "M"
-	map_btn.add_theme_font_size_override("font_size", 9)
+	map_btn.add_theme_font_size_override("font_size", 12)
 	map_btn.tooltip_text = "Open Map"
-	map_btn.custom_minimum_size = Vector2(18, 12)
+	map_btn.custom_minimum_size = Vector2(22, 16)
 	var btn_style: StyleBoxFlat = StyleBoxFlat.new()
 	btn_style.bg_color = Color(0.05, 0.08, 0.15, 0.5)
 	btn_style.set_corner_radius_all(2)
@@ -3004,14 +3010,14 @@ func _build_minimap() -> void:
 	]
 	for item in legend_items:
 		var ldot: ColorRect = ColorRect.new()
-		ldot.custom_minimum_size = Vector2(4, 4)
+		ldot.custom_minimum_size = Vector2(6, 6)
 		ldot.color = item["color"]
 		ldot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		legend.add_child(ldot)
 		var lbl: Label = Label.new()
 		lbl.text = item["label"]
-		lbl.add_theme_font_size_override("font_size", 7)
-		lbl.add_theme_color_override("font_color", Color(0.4, 0.45, 0.5, 0.6))
+		lbl.add_theme_font_size_override("font_size", 10)
+		lbl.add_theme_color_override("font_color", Color(0.4, 0.45, 0.5, 0.65))
 		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		legend.add_child(lbl)
 

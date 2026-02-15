@@ -28,7 +28,7 @@ func _ready() -> void:
 
 	# ── Stats summary: "X / Y Enemies Discovered" ──
 	_summary_label = Label.new()
-	_summary_label.add_theme_font_size_override("font_size", 11)
+	_summary_label.add_theme_font_size_override("font_size", 14)
 	_summary_label.add_theme_color_override("font_color", Color(0.6, 0.8, 0.6))
 	vbox.add_child(_summary_label)
 
@@ -133,13 +133,13 @@ func _add_discovered_row(type_id: String, _entry: Dictionary) -> void:
 	var name_label: Label = Label.new()
 	name_label.text = enemy_name
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_label.add_theme_font_size_override("font_size", 13)
+	name_label.add_theme_font_size_override("font_size", 15)
 	name_label.add_theme_color_override("font_color", _style_color(combat_style))
 	line1.add_child(name_label)
 
 	var level_label: Label = Label.new()
 	level_label.text = "Lv %d" % combat_level
-	level_label.add_theme_font_size_override("font_size", 12)
+	level_label.add_theme_font_size_override("font_size", 14)
 	level_label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
 	line1.add_child(level_label)
 
@@ -150,7 +150,7 @@ func _add_discovered_row(type_id: String, _entry: Dictionary) -> void:
 	var stats_label: Label = Label.new()
 	stats_label.text = "HP: %d  |  Atk: %d-%d  |  %s" % [hp, atk_min, atk_max, _format_area(area)]
 	stats_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	stats_label.add_theme_font_size_override("font_size", 10)
+	stats_label.add_theme_font_size_override("font_size", 13)
 	stats_label.add_theme_color_override("font_color", Color(0.55, 0.65, 0.6))
 	line2.add_child(stats_label)
 
@@ -159,7 +159,7 @@ func _add_discovered_row(type_id: String, _entry: Dictionary) -> void:
 	if kill_count > 0:
 		var kill_label: Label = Label.new()
 		kill_label.text = "Kills: %d" % kill_count
-		kill_label.add_theme_font_size_override("font_size", 10)
+		kill_label.add_theme_font_size_override("font_size", 13)
 		kill_label.add_theme_color_override("font_color", Color(0.9, 0.6, 0.3))
 		row.add_child(kill_label)
 
@@ -176,7 +176,7 @@ func _add_undiscovered_row() -> void:
 	var unknown_label: Label = Label.new()
 	unknown_label.text = "???"
 	unknown_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	unknown_label.add_theme_font_size_override("font_size", 13)
+	unknown_label.add_theme_font_size_override("font_size", 15)
 	unknown_label.add_theme_color_override("font_color", Color(0.3, 0.3, 0.3))
 	row.add_child(unknown_label)
 

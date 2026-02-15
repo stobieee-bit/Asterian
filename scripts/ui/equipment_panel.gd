@@ -39,13 +39,13 @@ func _ready() -> void:
 
 	var style_label: Label = Label.new()
 	style_label.text = "Style: "
-	style_label.add_theme_font_size_override("font_size", 12)
+	style_label.add_theme_font_size_override("font_size", 14)
 	style_label.add_theme_color_override("font_color", Color(0.6, 0.7, 0.8))
 	style_row.add_child(style_label)
 
 	_style_btn = Button.new()
 	_style_btn.text = _style_display_name(GameState.player["combat_style"])
-	_style_btn.add_theme_font_size_override("font_size", 12)
+	_style_btn.add_theme_font_size_override("font_size", 14)
 	_style_btn.pressed.connect(_on_style_toggle)
 	style_row.add_child(_style_btn)
 
@@ -80,7 +80,7 @@ func _ready() -> void:
 
 	# Stats summary
 	_stats_label = Label.new()
-	_stats_label.add_theme_font_size_override("font_size", 11)
+	_stats_label.add_theme_font_size_override("font_size", 14)
 	_stats_label.add_theme_color_override("font_color", Color(0.6, 0.8, 0.7))
 	vbox.add_child(_stats_label)
 
@@ -136,7 +136,7 @@ func _create_slot(slot_name: String, display_name: String) -> PanelContainer:
 	icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	icon_label.position = Vector2(0, 0)
 	icon_label.size = Vector2(SLOT_SIZE, SLOT_SIZE)
-	icon_label.add_theme_font_size_override("font_size", 26)
+	icon_label.add_theme_font_size_override("font_size", 28)
 	icon_label.add_theme_color_override("font_color", Color(0.15, 0.22, 0.3, 0.3))
 	icon_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(icon_label)
