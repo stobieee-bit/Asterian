@@ -32,7 +32,7 @@ var _ground_plane: Plane = Plane(Vector3.UP, 0.0)
 
 # ── Click-to-move ground marker ──
 var _move_marker: Node3D = null
-var _move_marker_ring: CSGTorus3D = null
+var _move_marker_ring: MeshInstance3D = null
 var _move_marker_time: float = 0.0
 var _move_marker_active: bool = false
 
@@ -194,13 +194,13 @@ func _build_move_marker() -> void:
 	_move_marker.visible = false
 	add_child(_move_marker)
 
-	_move_marker_ring = CSGTorus3D.new()
-	_move_marker_ring.inner_radius = 0.3
-	_move_marker_ring.outer_radius = 0.5
-	_move_marker_ring.ring_sides = 8
-	_move_marker_ring.sides = 12
-	# Lay flat on the ground (torus is vertical by default)
-	_move_marker_ring.rotation_degrees.x = 90.0
+	_move_marker_ring = MeshInstance3D.new()
+	var torus_mesh: TorusMesh = TorusMesh.new()
+	torus_mesh.inner_radius = 0.3
+	torus_mesh.outer_radius = 0.5
+	torus_mesh.rings = 24
+	torus_mesh.ring_segments = 12
+	_move_marker_ring.mesh = torus_mesh
 	var mat: StandardMaterial3D = StandardMaterial3D.new()
 	mat.albedo_color = Color(0.1, 0.8, 0.9, 0.5)
 	mat.emission_enabled = true
@@ -208,7 +208,7 @@ func _build_move_marker() -> void:
 	mat.emission_energy_multiplier = 1.5
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.no_depth_test = true  # Always visible even through terrain
-	_move_marker_ring.material = mat
+	_move_marker_ring.material_override = mat
 	_move_marker.add_child(_move_marker_ring)
 
 ## Flash the marker at the click position

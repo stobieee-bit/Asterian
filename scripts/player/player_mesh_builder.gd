@@ -1,24 +1,33 @@
-## PlayerMeshBuilder — Constructs a sci-fi astronaut/space suit player character
+## PlayerMeshBuilder — Constructs a detailed sci-fi power-armored character
 ## from MeshInstance3D primitives. All positions relative to feet at y=0.
+##
+## The character is a heavily armored space marine / exosuit pilot with
+## glowing energy conduits, layered armor plating, a full-face HUD visor,
+## thruster vents, and an integrated power pack.
 ##
 ## Usage:
 ##   var root: Node3D = PlayerMeshBuilder.build_player_mesh()
 ##   add_child(root)
-##   # Animate:
 ##   PlayerMeshBuilder.animate_walk(root, phase, speed)
 ##   PlayerMeshBuilder.animate_idle(root, phase)
 class_name PlayerMeshBuilder
 extends RefCounted
 
 # ── Colour palette ──────────────────────────────────────────────────────────
-const COL_PRIMARY: Color = Color(0.2, 0.35, 0.55)        # Blue-gray suit
-const COL_ARMOR: Color = Color(0.25, 0.4, 0.6)           # Lighter armor plates
-const COL_VISOR: Color = Color(0.2, 0.8, 1.0)            # Bright cyan visor
-const COL_ENERGY: Color = Color(0.0, 1.0, 0.8)           # Teal energy core
-const COL_JOINT: Color = Color(0.1, 0.1, 0.15)           # Near-black joints
-const COL_BOOT: Color = Color(0.12, 0.12, 0.15)          # Very dark boots
-const COL_BACKPACK: Color = Color(0.18, 0.25, 0.38)      # Slightly dark blue-gray
-const COL_ANTENNA: Color = Color(0.6, 0.6, 0.65)         # Light metallic
+const COL_MAIN: Color = Color(0.15, 0.22, 0.35)          # Deep navy suit base
+const COL_PLATE: Color = Color(0.22, 0.32, 0.48)         # Steel-blue armor plates
+const COL_PLATE_EDGE: Color = Color(0.28, 0.38, 0.55)    # Lighter plate edges
+const COL_VISOR: Color = Color(0.15, 0.75, 1.0)          # Bright cyan visor
+const COL_ENERGY: Color = Color(0.0, 0.9, 0.7)           # Teal energy glow
+const COL_ENERGY_HOT: Color = Color(0.2, 1.0, 0.85)      # Brighter energy accents
+const COL_JOINT: Color = Color(0.06, 0.06, 0.09)         # Near-black flex joints
+const COL_UNDERSUIT: Color = Color(0.08, 0.1, 0.14)      # Dark undersuit
+const COL_BOOT: Color = Color(0.1, 0.1, 0.13)            # Dark boot base
+const COL_BOOT_PLATE: Color = Color(0.18, 0.22, 0.3)     # Boot armor layer
+const COL_BACKPACK: Color = Color(0.14, 0.2, 0.3)        # Power pack housing
+const COL_THRUSTER: Color = Color(1.0, 0.5, 0.1)         # Thruster vent orange
+const COL_ANTENNA: Color = Color(0.55, 0.55, 0.6)        # Light metallic
+const COL_TRIM: Color = Color(0.6, 0.45, 0.15)           # Gold trim accents
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -27,220 +36,438 @@ const COL_ANTENNA: Color = Color(0.6, 0.6, 0.65)         # Light metallic
 
 static func build_player_mesh() -> Node3D:
 	var root: Node3D = Node3D.new()
-	root.name = "AstronautMesh"
+	root.name = "PowerArmorMesh"
 
-	# ── Head & Helmet ───────────────────────────────────────────────────
+	# ── HEAD & HELMET ──────────────────────────────────────────────────
 	var head_group: Node3D = Node3D.new()
 	head_group.name = "HeadGroup"
 	head_group.position = Vector3(0.0, 1.65, 0.0)
 	root.add_child(head_group)
 
-	# Helmet shell (back)
-	var helmet_shell: MeshInstance3D = _sphere("HelmetShell", 0.21, COL_ARMOR, true)
-	helmet_shell.position = Vector3(0.0, 0.0, 0.02)
-	head_group.add_child(helmet_shell)
+	# Main helmet dome (back+top)
+	var helmet_dome: MeshInstance3D = _sphere("HelmetDome", 0.23, COL_PLATE, true)
+	helmet_dome.position = Vector3(0.0, 0.02, 0.02)
+	helmet_dome.scale = Vector3(1.0, 1.05, 1.05)
+	head_group.add_child(helmet_dome)
 
-	# Head sphere
-	var head: MeshInstance3D = _sphere("Head", 0.18, COL_PRIMARY, true)
-	head_group.add_child(head)
+	# Inner head (darker base under helmet)
+	var head_base: MeshInstance3D = _sphere("HeadBase", 0.19, COL_MAIN, true)
+	head_base.position = Vector3(0.0, 0.0, 0.0)
+	head_group.add_child(head_base)
 
-	# Visor (front face)
-	var visor: MeshInstance3D = _box("Visor", Vector3(0.26, 0.1, 0.05), COL_VISOR, false, true, 3.0)
-	visor.position = Vector3(0.0, 0.0, -0.16)
+	# Visor — wide wraparound face plate
+	var visor: MeshInstance3D = _box("Visor", Vector3(0.30, 0.13, 0.06), COL_VISOR, false, true, 3.5)
+	visor.position = Vector3(0.0, -0.01, -0.17)
 	head_group.add_child(visor)
 
-	# Helmet rim (ring around visor opening)
-	var helmet_rim: MeshInstance3D = _torus("HelmetRim", 0.19, 0.02, COL_ARMOR, true)
-	helmet_rim.position = Vector3(0.0, 0.0, -0.04)
-	helmet_rim.rotation.x = deg_to_rad(90.0)
-	head_group.add_child(helmet_rim)
+	# Visor frame (top bar)
+	var visor_frame_top: MeshInstance3D = _box("VisorFrameTop", Vector3(0.32, 0.02, 0.07), COL_PLATE_EDGE, true)
+	visor_frame_top.position = Vector3(0.0, 0.055, -0.17)
+	head_group.add_child(visor_frame_top)
 
-	# ── Neck ────────────────────────────────────────────────────────────
-	var neck: MeshInstance3D = _capsule("Neck", 0.06, 0.18, COL_JOINT, true)
+	# Visor frame (bottom bar)
+	var visor_frame_bot: MeshInstance3D = _box("VisorFrameBot", Vector3(0.32, 0.02, 0.07), COL_PLATE_EDGE, true)
+	visor_frame_bot.position = Vector3(0.0, -0.075, -0.17)
+	head_group.add_child(visor_frame_bot)
+
+	# Helmet chin guard
+	var chin_guard: MeshInstance3D = _box("ChinGuard", Vector3(0.16, 0.06, 0.1), COL_PLATE, true)
+	chin_guard.position = Vector3(0.0, -0.12, -0.1)
+	head_group.add_child(chin_guard)
+
+	# Helmet crest (raised ridge on top)
+	var crest: MeshInstance3D = _box("HelmetCrest", Vector3(0.05, 0.04, 0.22), COL_PLATE_EDGE, true)
+	crest.position = Vector3(0.0, 0.2, 0.0)
+	head_group.add_child(crest)
+
+	# Helmet side vents (left/right)
+	for side_x in [-1.0, 1.0]:
+		var vent: MeshInstance3D = _box("HelmetVent", Vector3(0.03, 0.06, 0.08), COL_JOINT, true)
+		vent.position = Vector3(side_x * 0.22, -0.02, 0.0)
+		head_group.add_child(vent)
+		var vent_glow: MeshInstance3D = _box("VentGlow", Vector3(0.015, 0.04, 0.06), COL_ENERGY, false, true, 2.0)
+		vent_glow.position = Vector3(side_x * 0.23, -0.02, 0.0)
+		head_group.add_child(vent_glow)
+
+	# Helmet energy strip (rear)
+	var rear_strip: MeshInstance3D = _box("RearStrip", Vector3(0.12, 0.015, 0.02), COL_ENERGY, false, true, 2.0)
+	rear_strip.position = Vector3(0.0, 0.08, 0.2)
+	head_group.add_child(rear_strip)
+
+	# ── NECK ────────────────────────────────────────────────────────────
+	var neck: MeshInstance3D = _capsule("Neck", 0.07, 0.2, COL_UNDERSUIT, false)
 	neck.position = Vector3(0.0, 1.48, 0.0)
 	root.add_child(neck)
 
-	# ── Torso ───────────────────────────────────────────────────────────
-	var torso: MeshInstance3D = _capsule("Torso", 0.22, 0.5, COL_PRIMARY, true)
+	# Neck ring (armor collar)
+	var neck_ring: MeshInstance3D = _torus("NeckRing", 0.12, 0.03, COL_PLATE, true)
+	neck_ring.position = Vector3(0.0, 1.42, 0.0)
+	root.add_child(neck_ring)
+
+	# ── TORSO ───────────────────────────────────────────────────────────
+	# Core torso (undersuit)
+	var torso: MeshInstance3D = _capsule("Torso", 0.24, 0.55, COL_MAIN, true)
 	torso.position = Vector3(0.0, 1.1, 0.0)
 	root.add_child(torso)
 
-	# Chest plate (front armor)
-	var chest_plate: MeshInstance3D = _sphere("ChestPlate", 0.2, COL_ARMOR, true)
-	chest_plate.position = Vector3(0.0, 1.15, -0.1)
-	chest_plate.scale = Vector3(1.1, 0.9, 0.5)
+	# Front chest plate (main armor)
+	var chest_plate: MeshInstance3D = _box("ChestPlate", Vector3(0.38, 0.32, 0.12), COL_PLATE, true)
+	chest_plate.position = Vector3(0.0, 1.14, -0.1)
 	root.add_child(chest_plate)
 
-	# Energy core
-	var energy_core: MeshInstance3D = _sphere("EnergyCore", 0.045, COL_ENERGY, false, true, 5.0)
-	energy_core.position = Vector3(0.0, 1.1, -0.18)
+	# Upper chest detail plate
+	var upper_chest: MeshInstance3D = _box("UpperChest", Vector3(0.3, 0.08, 0.13), COL_PLATE_EDGE, true)
+	upper_chest.position = Vector3(0.0, 1.3, -0.1)
+	root.add_child(upper_chest)
+
+	# Energy core (central reactor)
+	var energy_core: MeshInstance3D = _sphere("EnergyCore", 0.055, COL_ENERGY, false, true, 5.0)
+	energy_core.position = Vector3(0.0, 1.12, -0.17)
 	root.add_child(energy_core)
 
-	# ── Belt ────────────────────────────────────────────────────────────
-	var belt: MeshInstance3D = _torus("Belt", 0.2, 0.03, COL_JOINT, true)
-	belt.position = Vector3(0.0, 0.85, 0.0)
+	# Energy core housing ring
+	var core_ring: MeshInstance3D = _torus("CoreRing", 0.06, 0.015, COL_PLATE_EDGE, true)
+	core_ring.position = Vector3(0.0, 1.12, -0.17)
+	core_ring.rotation.x = deg_to_rad(90.0)
+	root.add_child(core_ring)
+
+	# Abdominal plate
+	var ab_plate: MeshInstance3D = _box("AbPlate", Vector3(0.28, 0.14, 0.1), COL_PLATE, true)
+	ab_plate.position = Vector3(0.0, 0.93, -0.08)
+	root.add_child(ab_plate)
+
+	# Side torso energy conduits
+	for side_x in [-1.0, 1.0]:
+		var conduit: MeshInstance3D = _capsule("SideConduit", 0.02, 0.28, COL_ENERGY, false, true, 1.5)
+		conduit.position = Vector3(side_x * 0.24, 1.1, -0.05)
+		root.add_child(conduit)
+
+	# Back plate
+	var back_plate: MeshInstance3D = _box("BackPlate", Vector3(0.34, 0.3, 0.08), COL_PLATE, true)
+	back_plate.position = Vector3(0.0, 1.12, 0.14)
+	root.add_child(back_plate)
+
+	# ── BELT / WAIST ────────────────────────────────────────────────────
+	var belt: MeshInstance3D = _torus("Belt", 0.22, 0.035, COL_PLATE_EDGE, true)
+	belt.position = Vector3(0.0, 0.84, 0.0)
 	root.add_child(belt)
 
-	# Belt buckle
-	var buckle: MeshInstance3D = _box("BeltBuckle", Vector3(0.08, 0.05, 0.04), COL_ARMOR, true)
-	buckle.position = Vector3(0.0, 0.85, -0.2)
+	# Belt buckle (gold trim)
+	var buckle: MeshInstance3D = _box("BeltBuckle", Vector3(0.1, 0.06, 0.05), COL_TRIM, true, true, 1.0)
+	buckle.position = Vector3(0.0, 0.84, -0.2)
 	root.add_child(buckle)
 
-	# ── Shoulders (pauldrons) ───────────────────────────────────────────
-	var left_pauldron: MeshInstance3D = _sphere("LeftPauldron", 0.1, COL_ARMOR, true)
-	left_pauldron.position = Vector3(-0.32, 1.28, 0.0)
-	left_pauldron.scale = Vector3(1.1, 0.7, 1.0)
-	root.add_child(left_pauldron)
+	# Utility pouches on belt
+	for side_x in [-1.0, 1.0]:
+		var pouch: MeshInstance3D = _box("Pouch", Vector3(0.06, 0.07, 0.05), COL_MAIN, true)
+		pouch.position = Vector3(side_x * 0.2, 0.84, -0.12)
+		root.add_child(pouch)
 
-	var right_pauldron: MeshInstance3D = _sphere("RightPauldron", 0.1, COL_ARMOR, true)
-	right_pauldron.position = Vector3(0.32, 1.28, 0.0)
-	right_pauldron.scale = Vector3(1.1, 0.7, 1.0)
-	root.add_child(right_pauldron)
+	# ── SHOULDERS (pauldrons) ──────────────────────────────────────────
+	for side_x in [-1.0, 1.0]:
+		var side_name: String = "Left" if side_x < 0 else "Right"
 
-	# ── Left Arm ────────────────────────────────────────────────────────
+		# Large layered pauldron
+		var pauldron_base: MeshInstance3D = _sphere(side_name + "PauldronBase", 0.12, COL_PLATE, true)
+		pauldron_base.position = Vector3(side_x * 0.34, 1.3, 0.0)
+		pauldron_base.scale = Vector3(1.2, 0.6, 1.1)
+		root.add_child(pauldron_base)
+
+		# Pauldron top plate (raised ridge)
+		var pauldron_ridge: MeshInstance3D = _box(side_name + "PauldronRidge", Vector3(0.14, 0.025, 0.12), COL_PLATE_EDGE, true)
+		pauldron_ridge.position = Vector3(side_x * 0.34, 1.34, 0.0)
+		root.add_child(pauldron_ridge)
+
+		# Pauldron energy trim
+		var pauldron_glow: MeshInstance3D = _box(side_name + "PauldronGlow", Vector3(0.1, 0.01, 0.08), COL_ENERGY, false, true, 2.0)
+		pauldron_glow.position = Vector3(side_x * 0.34, 1.32, -0.04)
+		root.add_child(pauldron_glow)
+
+	# ── LEFT ARM ────────────────────────────────────────────────────────
 	var left_arm_upper: Node3D = Node3D.new()
 	left_arm_upper.name = "LeftArmUpper"
-	left_arm_upper.position = Vector3(-0.32, 1.2, 0.0)
+	left_arm_upper.position = Vector3(-0.34, 1.22, 0.0)
 	root.add_child(left_arm_upper)
 
-	var lua_mesh: MeshInstance3D = _capsule("LeftUpperArmMesh", 0.065, 0.28, COL_PRIMARY, true)
-	lua_mesh.position = Vector3(0.0, -0.1, 0.0)
-	left_arm_upper.add_child(lua_mesh)
+	# Upper arm undersuit
+	var lua_under: MeshInstance3D = _capsule("LUA_Under", 0.065, 0.3, COL_UNDERSUIT, false)
+	lua_under.position = Vector3(0.0, -0.12, 0.0)
+	left_arm_upper.add_child(lua_under)
 
-	var left_elbow: MeshInstance3D = _sphere("LeftElbow", 0.05, COL_JOINT, true)
-	left_elbow.position = Vector3(0.0, -0.25, 0.0)
+	# Upper arm armor plate
+	var lua_plate: MeshInstance3D = _box("LUA_Plate", Vector3(0.1, 0.18, 0.09), COL_PLATE, true)
+	lua_plate.position = Vector3(-0.02, -0.1, 0.0)
+	left_arm_upper.add_child(lua_plate)
+
+	# Elbow joint
+	var left_elbow: MeshInstance3D = _sphere("LeftElbow", 0.055, COL_JOINT, true)
+	left_elbow.position = Vector3(0.0, -0.27, 0.0)
 	left_arm_upper.add_child(left_elbow)
+
+	# Elbow cap
+	var left_elbow_cap: MeshInstance3D = _sphere("LeftElbowCap", 0.04, COL_PLATE, true)
+	left_elbow_cap.position = Vector3(-0.03, -0.27, 0.0)
+	left_arm_upper.add_child(left_elbow_cap)
 
 	var left_arm_lower: Node3D = Node3D.new()
 	left_arm_lower.name = "LeftArmLower"
-	left_arm_lower.position = Vector3(0.0, -0.25, 0.0)
+	left_arm_lower.position = Vector3(0.0, -0.27, 0.0)
 	left_arm_upper.add_child(left_arm_lower)
 
-	var lla_mesh: MeshInstance3D = _capsule("LeftLowerArmMesh", 0.055, 0.26, COL_PRIMARY, true)
+	# Forearm
+	var lla_mesh: MeshInstance3D = _capsule("LLA_Mesh", 0.055, 0.26, COL_MAIN, true)
 	lla_mesh.position = Vector3(0.0, -0.12, 0.0)
 	left_arm_lower.add_child(lla_mesh)
 
-	var left_hand: MeshInstance3D = _sphere("LeftHand", 0.05, COL_ARMOR, true)
-	left_hand.position = Vector3(0.0, -0.26, 0.0)
+	# Forearm armor plate (vambrace)
+	var lla_vambrace: MeshInstance3D = _box("LLA_Vambrace", Vector3(0.08, 0.16, 0.08), COL_PLATE, true)
+	lla_vambrace.position = Vector3(-0.015, -0.1, 0.0)
+	left_arm_lower.add_child(lla_vambrace)
+
+	# Wrist energy band
+	var left_wrist: MeshInstance3D = _torus("LeftWrist", 0.05, 0.015, COL_ENERGY, false, true, 2.0)
+	left_wrist.position = Vector3(0.0, -0.22, 0.0)
+	left_arm_lower.add_child(left_wrist)
+
+	# Gauntlet hand
+	var left_hand: MeshInstance3D = _box("LeftHand", Vector3(0.06, 0.07, 0.08), COL_PLATE, true)
+	left_hand.position = Vector3(0.0, -0.27, 0.0)
 	left_arm_lower.add_child(left_hand)
 
-	# ── Right Arm ───────────────────────────────────────────────────────
+	# ── RIGHT ARM ───────────────────────────────────────────────────────
 	var right_arm_upper: Node3D = Node3D.new()
 	right_arm_upper.name = "RightArmUpper"
-	right_arm_upper.position = Vector3(0.32, 1.2, 0.0)
+	right_arm_upper.position = Vector3(0.34, 1.22, 0.0)
 	root.add_child(right_arm_upper)
 
-	var rua_mesh: MeshInstance3D = _capsule("RightUpperArmMesh", 0.065, 0.28, COL_PRIMARY, true)
-	rua_mesh.position = Vector3(0.0, -0.1, 0.0)
-	right_arm_upper.add_child(rua_mesh)
+	var rua_under: MeshInstance3D = _capsule("RUA_Under", 0.065, 0.3, COL_UNDERSUIT, false)
+	rua_under.position = Vector3(0.0, -0.12, 0.0)
+	right_arm_upper.add_child(rua_under)
 
-	var right_elbow: MeshInstance3D = _sphere("RightElbow", 0.05, COL_JOINT, true)
-	right_elbow.position = Vector3(0.0, -0.25, 0.0)
+	var rua_plate: MeshInstance3D = _box("RUA_Plate", Vector3(0.1, 0.18, 0.09), COL_PLATE, true)
+	rua_plate.position = Vector3(0.02, -0.1, 0.0)
+	right_arm_upper.add_child(rua_plate)
+
+	var right_elbow: MeshInstance3D = _sphere("RightElbow", 0.055, COL_JOINT, true)
+	right_elbow.position = Vector3(0.0, -0.27, 0.0)
 	right_arm_upper.add_child(right_elbow)
+
+	var right_elbow_cap: MeshInstance3D = _sphere("RightElbowCap", 0.04, COL_PLATE, true)
+	right_elbow_cap.position = Vector3(0.03, -0.27, 0.0)
+	right_arm_upper.add_child(right_elbow_cap)
 
 	var right_arm_lower: Node3D = Node3D.new()
 	right_arm_lower.name = "RightArmLower"
-	right_arm_lower.position = Vector3(0.0, -0.25, 0.0)
+	right_arm_lower.position = Vector3(0.0, -0.27, 0.0)
 	right_arm_upper.add_child(right_arm_lower)
 
-	var rla_mesh: MeshInstance3D = _capsule("RightLowerArmMesh", 0.055, 0.26, COL_PRIMARY, true)
+	var rla_mesh: MeshInstance3D = _capsule("RLA_Mesh", 0.055, 0.26, COL_MAIN, true)
 	rla_mesh.position = Vector3(0.0, -0.12, 0.0)
 	right_arm_lower.add_child(rla_mesh)
 
-	var right_hand: MeshInstance3D = _sphere("RightHand", 0.05, COL_ARMOR, true)
-	right_hand.position = Vector3(0.0, -0.26, 0.0)
+	var rla_vambrace: MeshInstance3D = _box("RLA_Vambrace", Vector3(0.08, 0.16, 0.08), COL_PLATE, true)
+	rla_vambrace.position = Vector3(0.015, -0.1, 0.0)
+	right_arm_lower.add_child(rla_vambrace)
+
+	var right_wrist: MeshInstance3D = _torus("RightWrist", 0.05, 0.015, COL_ENERGY, false, true, 2.0)
+	right_wrist.position = Vector3(0.0, -0.22, 0.0)
+	right_arm_lower.add_child(right_wrist)
+
+	var right_hand: MeshInstance3D = _box("RightHand", Vector3(0.06, 0.07, 0.08), COL_PLATE, true)
+	right_hand.position = Vector3(0.0, -0.27, 0.0)
 	right_arm_lower.add_child(right_hand)
 
-	# ── Left Leg ────────────────────────────────────────────────────────
+	# ── LEFT LEG ────────────────────────────────────────────────────────
 	var left_leg_upper: Node3D = Node3D.new()
 	left_leg_upper.name = "LeftLegUpper"
-	left_leg_upper.position = Vector3(-0.12, 0.8, 0.0)
+	left_leg_upper.position = Vector3(-0.13, 0.8, 0.0)
 	root.add_child(left_leg_upper)
 
-	var llu_mesh: MeshInstance3D = _capsule("LeftUpperLegMesh", 0.08, 0.34, COL_PRIMARY, true)
-	llu_mesh.position = Vector3(0.0, -0.14, 0.0)
-	left_leg_upper.add_child(llu_mesh)
+	# Thigh undersuit
+	var llu_under: MeshInstance3D = _capsule("LLU_Under", 0.085, 0.36, COL_UNDERSUIT, false)
+	llu_under.position = Vector3(0.0, -0.14, 0.0)
+	left_leg_upper.add_child(llu_under)
 
-	var left_knee: MeshInstance3D = _sphere("LeftKnee", 0.06, COL_JOINT, true)
-	left_knee.position = Vector3(0.0, -0.32, 0.0)
+	# Thigh armor (front plate)
+	var llu_plate: MeshInstance3D = _box("LLU_Plate", Vector3(0.12, 0.2, 0.09), COL_PLATE, true)
+	llu_plate.position = Vector3(0.0, -0.12, -0.04)
+	left_leg_upper.add_child(llu_plate)
+
+	# Thigh side plate
+	var llu_side: MeshInstance3D = _box("LLU_Side", Vector3(0.04, 0.16, 0.1), COL_PLATE_EDGE, true)
+	llu_side.position = Vector3(-0.08, -0.14, 0.0)
+	left_leg_upper.add_child(llu_side)
+
+	# Knee joint
+	var left_knee: MeshInstance3D = _sphere("LeftKnee", 0.065, COL_JOINT, true)
+	left_knee.position = Vector3(0.0, -0.33, 0.0)
 	left_leg_upper.add_child(left_knee)
+
+	# Knee cap armor
+	var left_knee_cap: MeshInstance3D = _sphere("LeftKneeCap", 0.05, COL_PLATE, true)
+	left_knee_cap.position = Vector3(0.0, -0.33, -0.05)
+	left_knee_cap.scale = Vector3(1.0, 0.8, 0.6)
+	left_leg_upper.add_child(left_knee_cap)
 
 	var left_leg_lower: Node3D = Node3D.new()
 	left_leg_lower.name = "LeftLegLower"
-	left_leg_lower.position = Vector3(0.0, -0.32, 0.0)
+	left_leg_lower.position = Vector3(0.0, -0.33, 0.0)
 	left_leg_upper.add_child(left_leg_lower)
 
-	var lll_mesh: MeshInstance3D = _capsule("LeftLowerLegMesh", 0.065, 0.32, COL_PRIMARY, true)
+	# Shin
+	var lll_mesh: MeshInstance3D = _capsule("LLL_Mesh", 0.07, 0.34, COL_MAIN, true)
 	lll_mesh.position = Vector3(0.0, -0.14, 0.0)
 	left_leg_lower.add_child(lll_mesh)
 
-	# Left boot
-	var left_boot: MeshInstance3D = _box("LeftBoot", Vector3(0.1, 0.1, 0.16), COL_BOOT, true)
-	left_boot.position = Vector3(0.0, -0.34, -0.02)
-	left_leg_lower.add_child(left_boot)
+	# Shin guard (front plate)
+	var lll_guard: MeshInstance3D = _box("LLL_Guard", Vector3(0.08, 0.22, 0.06), COL_PLATE, true)
+	lll_guard.position = Vector3(0.0, -0.12, -0.05)
+	left_leg_lower.add_child(lll_guard)
 
-	# Left boot sole
-	var left_sole: MeshInstance3D = _box("LeftBootSole", Vector3(0.11, 0.03, 0.17), COL_JOINT, true)
-	left_sole.position = Vector3(0.0, -0.38, -0.02)
+	# Shin energy strip
+	var lll_strip: MeshInstance3D = _box("LLL_Strip", Vector3(0.02, 0.16, 0.015), COL_ENERGY, false, true, 1.5)
+	lll_strip.position = Vector3(0.0, -0.12, -0.08)
+	left_leg_lower.add_child(lll_strip)
+
+	# Left boot (heavy armored)
+	var left_boot_main: MeshInstance3D = _box("LeftBootMain", Vector3(0.12, 0.12, 0.18), COL_BOOT_PLATE, true)
+	left_boot_main.position = Vector3(0.0, -0.34, -0.02)
+	left_leg_lower.add_child(left_boot_main)
+
+	# Boot sole
+	var left_sole: MeshInstance3D = _box("LeftBootSole", Vector3(0.13, 0.035, 0.2), COL_BOOT, true)
+	left_sole.position = Vector3(0.0, -0.39, -0.02)
 	left_leg_lower.add_child(left_sole)
 
-	# ── Right Leg ───────────────────────────────────────────────────────
+	# Boot toe cap
+	var left_toe: MeshInstance3D = _box("LeftToeCap", Vector3(0.1, 0.06, 0.04), COL_PLATE, true)
+	left_toe.position = Vector3(0.0, -0.36, -0.1)
+	left_leg_lower.add_child(left_toe)
+
+	# Ankle energy band
+	var left_ankle: MeshInstance3D = _torus("LeftAnkle", 0.07, 0.012, COL_ENERGY, false, true, 1.5)
+	left_ankle.position = Vector3(0.0, -0.28, 0.0)
+	left_leg_lower.add_child(left_ankle)
+
+	# ── RIGHT LEG ───────────────────────────────────────────────────────
 	var right_leg_upper: Node3D = Node3D.new()
 	right_leg_upper.name = "RightLegUpper"
-	right_leg_upper.position = Vector3(0.12, 0.8, 0.0)
+	right_leg_upper.position = Vector3(0.13, 0.8, 0.0)
 	root.add_child(right_leg_upper)
 
-	var rlu_mesh: MeshInstance3D = _capsule("RightUpperLegMesh", 0.08, 0.34, COL_PRIMARY, true)
-	rlu_mesh.position = Vector3(0.0, -0.14, 0.0)
-	right_leg_upper.add_child(rlu_mesh)
+	var rlu_under: MeshInstance3D = _capsule("RLU_Under", 0.085, 0.36, COL_UNDERSUIT, false)
+	rlu_under.position = Vector3(0.0, -0.14, 0.0)
+	right_leg_upper.add_child(rlu_under)
 
-	var right_knee: MeshInstance3D = _sphere("RightKnee", 0.06, COL_JOINT, true)
-	right_knee.position = Vector3(0.0, -0.32, 0.0)
+	var rlu_plate: MeshInstance3D = _box("RLU_Plate", Vector3(0.12, 0.2, 0.09), COL_PLATE, true)
+	rlu_plate.position = Vector3(0.0, -0.12, -0.04)
+	right_leg_upper.add_child(rlu_plate)
+
+	var rlu_side: MeshInstance3D = _box("RLU_Side", Vector3(0.04, 0.16, 0.1), COL_PLATE_EDGE, true)
+	rlu_side.position = Vector3(0.08, -0.14, 0.0)
+	right_leg_upper.add_child(rlu_side)
+
+	var right_knee: MeshInstance3D = _sphere("RightKnee", 0.065, COL_JOINT, true)
+	right_knee.position = Vector3(0.0, -0.33, 0.0)
 	right_leg_upper.add_child(right_knee)
+
+	var right_knee_cap: MeshInstance3D = _sphere("RightKneeCap", 0.05, COL_PLATE, true)
+	right_knee_cap.position = Vector3(0.0, -0.33, -0.05)
+	right_knee_cap.scale = Vector3(1.0, 0.8, 0.6)
+	right_leg_upper.add_child(right_knee_cap)
 
 	var right_leg_lower: Node3D = Node3D.new()
 	right_leg_lower.name = "RightLegLower"
-	right_leg_lower.position = Vector3(0.0, -0.32, 0.0)
+	right_leg_lower.position = Vector3(0.0, -0.33, 0.0)
 	right_leg_upper.add_child(right_leg_lower)
 
-	var rll_mesh: MeshInstance3D = _capsule("RightLowerLegMesh", 0.065, 0.32, COL_PRIMARY, true)
+	var rll_mesh: MeshInstance3D = _capsule("RLL_Mesh", 0.07, 0.34, COL_MAIN, true)
 	rll_mesh.position = Vector3(0.0, -0.14, 0.0)
 	right_leg_lower.add_child(rll_mesh)
 
-	# Right boot
-	var right_boot: MeshInstance3D = _box("RightBoot", Vector3(0.1, 0.1, 0.16), COL_BOOT, true)
-	right_boot.position = Vector3(0.0, -0.34, -0.02)
-	right_leg_lower.add_child(right_boot)
+	var rll_guard: MeshInstance3D = _box("RLL_Guard", Vector3(0.08, 0.22, 0.06), COL_PLATE, true)
+	rll_guard.position = Vector3(0.0, -0.12, -0.05)
+	right_leg_lower.add_child(rll_guard)
 
-	# Right boot sole
-	var right_sole: MeshInstance3D = _box("RightBootSole", Vector3(0.11, 0.03, 0.17), COL_JOINT, true)
-	right_sole.position = Vector3(0.0, -0.38, -0.02)
+	var rll_strip: MeshInstance3D = _box("RLL_Strip", Vector3(0.02, 0.16, 0.015), COL_ENERGY, false, true, 1.5)
+	rll_strip.position = Vector3(0.0, -0.12, -0.08)
+	right_leg_lower.add_child(rll_strip)
+
+	var right_boot_main: MeshInstance3D = _box("RightBootMain", Vector3(0.12, 0.12, 0.18), COL_BOOT_PLATE, true)
+	right_boot_main.position = Vector3(0.0, -0.34, -0.02)
+	right_leg_lower.add_child(right_boot_main)
+
+	var right_sole: MeshInstance3D = _box("RightBootSole", Vector3(0.13, 0.035, 0.2), COL_BOOT, true)
+	right_sole.position = Vector3(0.0, -0.39, -0.02)
 	right_leg_lower.add_child(right_sole)
 
-	# ── Backpack ────────────────────────────────────────────────────────
-	var backpack: MeshInstance3D = _box("Backpack", Vector3(0.24, 0.3, 0.12), COL_BACKPACK, true)
-	backpack.position = Vector3(0.0, 1.1, 0.18)
-	root.add_child(backpack)
+	var right_toe: MeshInstance3D = _box("RightToeCap", Vector3(0.1, 0.06, 0.04), COL_PLATE, true)
+	right_toe.position = Vector3(0.0, -0.36, -0.1)
+	right_leg_lower.add_child(right_toe)
 
-	# Backpack detail strip
-	var bp_strip: MeshInstance3D = _box("BackpackStrip", Vector3(0.2, 0.02, 0.13), COL_ENERGY, false, true, 1.5)
-	bp_strip.position = Vector3(0.0, 1.15, 0.18)
-	root.add_child(bp_strip)
+	var right_ankle: MeshInstance3D = _torus("RightAnkle", 0.07, 0.012, COL_ENERGY, false, true, 1.5)
+	right_ankle.position = Vector3(0.0, -0.28, 0.0)
+	right_leg_lower.add_child(right_ankle)
 
-	# Antenna base
+	# ── BACKPACK / POWER PACK ──────────────────────────────────────────
+	# Main housing
+	var bp_main: MeshInstance3D = _box("BackpackMain", Vector3(0.28, 0.34, 0.14), COL_BACKPACK, true)
+	bp_main.position = Vector3(0.0, 1.1, 0.2)
+	root.add_child(bp_main)
+
+	# Power pack top cap
+	var bp_top: MeshInstance3D = _box("BackpackTop", Vector3(0.24, 0.04, 0.12), COL_PLATE, true)
+	bp_top.position = Vector3(0.0, 1.29, 0.2)
+	root.add_child(bp_top)
+
+	# Power pack bottom vent
+	var bp_bottom: MeshInstance3D = _box("BackpackBottom", Vector3(0.24, 0.03, 0.12), COL_PLATE, true)
+	bp_bottom.position = Vector3(0.0, 0.92, 0.2)
+	root.add_child(bp_bottom)
+
+	# Central energy window on backpack
+	var bp_core: MeshInstance3D = _box("BackpackCore", Vector3(0.14, 0.12, 0.02), COL_ENERGY, false, true, 3.0)
+	bp_core.position = Vector3(0.0, 1.12, 0.28)
+	root.add_child(bp_core)
+
+	# Thruster vents (bottom corners of backpack)
+	for side_x in [-1.0, 1.0]:
+		var thruster: MeshInstance3D = _cylinder("Thruster", 0.04, 0.08, COL_JOINT, true)
+		thruster.position = Vector3(side_x * 0.1, 0.9, 0.22)
+		root.add_child(thruster)
+
+		var thruster_glow: MeshInstance3D = _cylinder("ThrusterGlow", 0.025, 0.02, COL_THRUSTER, false, true, 3.0)
+		thruster_glow.position = Vector3(side_x * 0.1, 0.855, 0.22)
+		root.add_child(thruster_glow)
+
+	# Antenna assembly (right side of backpack)
 	var antenna_base: MeshInstance3D = _cylinder("AntennaBase", 0.025, 0.06, COL_JOINT, true)
-	antenna_base.position = Vector3(0.08, 1.28, 0.18)
+	antenna_base.position = Vector3(0.1, 1.33, 0.2)
 	root.add_child(antenna_base)
 
-	# Antenna rod
-	var antenna_rod: MeshInstance3D = _cylinder("AntennaRod", 0.01, 0.16, COL_ANTENNA, true)
-	antenna_rod.position = Vector3(0.08, 1.4, 0.18)
+	var antenna_rod: MeshInstance3D = _cylinder("AntennaRod", 0.008, 0.2, COL_ANTENNA, true)
+	antenna_rod.position = Vector3(0.1, 1.46, 0.2)
 	root.add_child(antenna_rod)
 
-	# Antenna tip (small glowing sphere)
-	var antenna_tip: MeshInstance3D = _sphere("AntennaTip", 0.02, COL_ENERGY, false, true, 3.0)
-	antenna_tip.position = Vector3(0.08, 1.5, 0.18)
+	var antenna_tip: MeshInstance3D = _sphere("AntennaTip", 0.018, COL_ENERGY_HOT, false, true, 4.0)
+	antenna_tip.position = Vector3(0.1, 1.57, 0.2)
 	root.add_child(antenna_tip)
+
+	# Secondary antenna (left side, shorter)
+	var antenna2_rod: MeshInstance3D = _cylinder("Antenna2Rod", 0.006, 0.12, COL_ANTENNA, true)
+	antenna2_rod.position = Vector3(-0.08, 1.38, 0.2)
+	root.add_child(antenna2_rod)
+
+	var antenna2_tip: MeshInstance3D = _sphere("Antenna2Tip", 0.012, COL_ENERGY, false, true, 3.0)
+	antenna2_tip.position = Vector3(-0.08, 1.45, 0.2)
+	root.add_child(antenna2_tip)
+
+	# Shoulder straps connecting backpack to front (left/right)
+	for side_x in [-1.0, 1.0]:
+		var strap: MeshInstance3D = _box("Strap", Vector3(0.04, 0.35, 0.03), COL_MAIN, true)
+		strap.position = Vector3(side_x * 0.14, 1.12, 0.05)
+		strap.rotation.z = side_x * deg_to_rad(5.0)
+		root.add_child(strap)
 
 	# ── Store animatable part references in meta ────────────────────────
 	root.set_meta("head_group", head_group)
@@ -254,6 +481,9 @@ static func build_player_mesh() -> Node3D:
 	root.set_meta("right_leg_lower", right_leg_lower)
 	root.set_meta("energy_core", energy_core)
 	root.set_meta("visor", visor)
+	root.set_meta("bp_core", bp_core)
+	root.set_meta("antenna_tip", antenna_tip)
+	root.set_meta("antenna2_tip", antenna2_tip)
 
 	return root
 
@@ -345,18 +575,34 @@ static func animate_idle(root: Node3D, phase: float) -> void:
 	if right_leg_lower:
 		right_leg_lower.rotation.x = 0.0
 
-	# Energy core pulse
+	# Energy core pulse (chest)
 	var energy_core: MeshInstance3D = root.get_meta("energy_core") as MeshInstance3D
 	if energy_core:
 		var pulse: float = 0.9 + sin(phase * 3.0) * 0.15
 		energy_core.scale = Vector3(pulse, pulse, pulse)
+
+	# Backpack energy window pulse (offset phase)
+	if root.has_meta("bp_core"):
+		var bp_core: MeshInstance3D = root.get_meta("bp_core") as MeshInstance3D
+		if bp_core and bp_core.mesh:
+			var bp_mat: StandardMaterial3D = bp_core.get_surface_override_material(0) as StandardMaterial3D
+			if bp_mat:
+				bp_mat.emission_energy_multiplier = 2.5 + sin(phase * 2.5 + 1.0) * 1.0
+
+	# Antenna tips flicker
+	if root.has_meta("antenna_tip"):
+		var atip: MeshInstance3D = root.get_meta("antenna_tip") as MeshInstance3D
+		if atip and atip.mesh:
+			var atip_mat: StandardMaterial3D = atip.get_surface_override_material(0) as StandardMaterial3D
+			if atip_mat:
+				atip_mat.emission_energy_multiplier = 3.0 + sin(phase * 5.0) * 1.5
 
 	# Visor subtle brightness shift
 	var visor: MeshInstance3D = root.get_meta("visor") as MeshInstance3D
 	if visor and visor.mesh:
 		var mat: StandardMaterial3D = visor.get_surface_override_material(0) as StandardMaterial3D
 		if mat:
-			mat.emission_energy_multiplier = 2.5 + sin(phase * 2.0) * 0.5
+			mat.emission_energy_multiplier = 3.0 + sin(phase * 2.0) * 0.6
 
 
 ## Reset all animated parts to default pose.
@@ -385,9 +631,9 @@ static func _make_material(color: Color, metallic: bool = false,
 	var mat: StandardMaterial3D = StandardMaterial3D.new()
 	mat.albedo_color = color
 	if metallic:
-		mat.metallic = 0.6
+		mat.metallic = 0.65
 		mat.metallic_specular = 0.5
-		mat.roughness = 0.35
+		mat.roughness = 0.3
 	else:
 		mat.roughness = 0.5
 	if emissive:
