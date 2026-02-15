@@ -66,9 +66,12 @@ var tooltip_script: GDScript = preload("res://scripts/ui/tooltip_panel.gd")
 # context_menu is built inline in _build_context_menu()
 
 # ── Chat log ──
+var _chat_bg: PanelContainer = null
 var _chat_container: VBoxContainer = null
 var _chat_messages: Array[Label] = []
 var _max_chat_lines: int = 10
+var _chat_input: LineEdit = null
+var _chat_typing: bool = false  # True when chat input is focused
 
 ## Overlaid HP/Energy text labels (drawn on top of progress bars)
 var _hp_text: Label = null
@@ -314,6 +317,25 @@ func _process(delta: float) -> void:
 	_update_minimap()
 
 func _unhandled_input(event: InputEvent) -> void:
+	# ── Chat input: Enter to open, Escape to close ──
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_ENTER or event.keycode == KEY_KP_ENTER:
+			if not _chat_typing:
+				# Enter while not typing → focus the chat input
+				_focus_chat_input()
+				get_viewport().set_input_as_handled()
+				return
+		elif event.keycode == KEY_ESCAPE:
+			if _chat_typing:
+				# Escape while typing → unfocus chat input
+				_unfocus_chat_input()
+				get_viewport().set_input_as_handled()
+				return
+
+	# ── Block all game keybinds while typing in chat ──
+	if _chat_typing:
+		return
+
 	# Panel toggle keybinds
 	if event.is_action_pressed("toggle_inventory"):
 		_toggle_panel(_inventory_panel, "inventory")
@@ -529,24 +551,25 @@ func _build_panels() -> void:
 ## Build the chat log in the bottom-left
 func _build_chat_log() -> void:
 	# Outer panel with border
-	var chat_bg: PanelContainer = PanelContainer.new()
-	chat_bg.name = "ChatBG"
+	_chat_bg = PanelContainer.new()
+	_chat_bg.name = "ChatBG"
 	var bg_style: StyleBoxFlat = StyleBoxFlat.new()
 	bg_style.bg_color = Color(0.02, 0.03, 0.06, 0.75)
 	bg_style.border_color = Color(0.1, 0.25, 0.4, 0.5)
 	bg_style.set_border_width_all(1)
 	bg_style.set_corner_radius_all(5)
 	bg_style.set_content_margin_all(0)
-	chat_bg.add_theme_stylebox_override("panel", bg_style)
-	chat_bg.position = Vector2(8, _design_size.y - 232)
-	chat_bg.custom_minimum_size = Vector2(380, 168)
-	chat_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(chat_bg)
+	_chat_bg.add_theme_stylebox_override("panel", bg_style)
+	var vp_size: Vector2 = _get_viewport_size()
+	_chat_bg.position = Vector2(8, vp_size.y - 260)
+	_chat_bg.custom_minimum_size = Vector2(380, 196)
+	_chat_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_chat_bg)
 
 	var outer_vbox: VBoxContainer = VBoxContainer.new()
 	outer_vbox.add_theme_constant_override("separation", 0)
 	outer_vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	chat_bg.add_child(outer_vbox)
+	_chat_bg.add_child(outer_vbox)
 
 	# Header bar
 	var header: PanelContainer = PanelContainer.new()
@@ -572,8 +595,9 @@ func _build_chat_log() -> void:
 	msg_margin.add_theme_constant_override("margin_left", 6)
 	msg_margin.add_theme_constant_override("margin_right", 6)
 	msg_margin.add_theme_constant_override("margin_top", 4)
-	msg_margin.add_theme_constant_override("margin_bottom", 4)
+	msg_margin.add_theme_constant_override("margin_bottom", 2)
 	msg_margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	msg_margin.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	outer_vbox.add_child(msg_margin)
 
 	_chat_container = VBoxContainer.new()
@@ -582,6 +606,47 @@ func _build_chat_log() -> void:
 	_chat_container.custom_minimum_size = Vector2(360, 0)
 	_chat_container.add_theme_constant_override("separation", 2)
 	msg_margin.add_child(_chat_container)
+
+	# ── Chat input field at the bottom ──
+	var input_margin: MarginContainer = MarginContainer.new()
+	input_margin.add_theme_constant_override("margin_left", 4)
+	input_margin.add_theme_constant_override("margin_right", 4)
+	input_margin.add_theme_constant_override("margin_bottom", 4)
+	input_margin.add_theme_constant_override("margin_top", 0)
+	outer_vbox.add_child(input_margin)
+
+	_chat_input = LineEdit.new()
+	_chat_input.name = "ChatInput"
+	_chat_input.placeholder_text = "Press Enter to chat..."
+	_chat_input.max_length = 200
+	_chat_input.add_theme_font_size_override("font_size", 12)
+	_chat_input.custom_minimum_size = Vector2(0, 26)
+
+	# Style the input to match the chat panel
+	var input_style: StyleBoxFlat = StyleBoxFlat.new()
+	input_style.bg_color = Color(0.04, 0.06, 0.10, 0.9)
+	input_style.border_color = Color(0.15, 0.30, 0.50, 0.6)
+	input_style.set_border_width_all(1)
+	input_style.set_corner_radius_all(3)
+	input_style.content_margin_left = 6
+	input_style.content_margin_right = 6
+	input_style.content_margin_top = 2
+	input_style.content_margin_bottom = 2
+	_chat_input.add_theme_stylebox_override("normal", input_style)
+
+	var focus_style: StyleBoxFlat = input_style.duplicate()
+	focus_style.border_color = Color(0.2, 0.5, 0.8, 0.9)
+	_chat_input.add_theme_stylebox_override("focus", focus_style)
+
+	_chat_input.add_theme_color_override("font_color", Color(0.85, 0.9, 0.95))
+	_chat_input.add_theme_color_override("font_placeholder_color", Color(0.4, 0.5, 0.6))
+
+	# Connect signals
+	_chat_input.text_submitted.connect(_on_chat_input_submitted)
+	_chat_input.focus_entered.connect(_on_chat_focus_entered)
+	_chat_input.focus_exited.connect(_on_chat_focus_exited)
+
+	input_margin.add_child(_chat_input)
 
 ## Create a styled sci-fi button with consistent dark theme
 func _make_sci_btn(text: String, width: float = 70, accent: Color = Color(0.2, 0.6, 0.8)) -> Button:
@@ -782,6 +847,63 @@ func _on_chat_message(text: String, channel: String) -> void:
 	var tween: Tween = create_tween()
 	tween.tween_interval(8.0)
 	tween.tween_property(label, "modulate:a", 0.0, 2.0)
+
+# ── Chat input handlers ──
+
+## Called when Enter is pressed while the chat input is focused
+func _on_chat_input_submitted(text: String) -> void:
+	var trimmed: String = text.strip_edges()
+	if trimmed.length() > 0:
+		# Send via multiplayer
+		var client: Node = get_tree().get_first_node_in_group("multiplayer_client")
+		if client and client.has_method("send_chat") and client.is_mp_connected():
+			client.send_chat(trimmed)
+			var own_name: String = str(GameState.settings.get("mp_name", "You"))
+			if own_name == "":
+				own_name = "You"
+			EventBus.chat_message.emit("%s: %s" % [own_name, trimmed], "multiplayer")
+		else:
+			# Not connected — show locally as system message
+			EventBus.chat_message.emit(trimmed, "system")
+	# Clear input and release focus
+	_chat_input.text = ""
+	_chat_input.release_focus()
+
+## Called when the chat input gains focus
+func _on_chat_focus_entered() -> void:
+	_chat_typing = true
+	_chat_input.placeholder_text = "Type a message..."
+	# Make the chat panel stop ignoring mouse so scrolling/clicking works
+	if _chat_bg:
+		_chat_bg.mouse_filter = Control.MOUSE_FILTER_STOP
+
+## Called when the chat input loses focus
+func _on_chat_focus_exited() -> void:
+	_chat_typing = false
+	_chat_input.placeholder_text = "Press Enter to chat..."
+	_chat_input.text = ""
+	# Return to mouse-transparent so clicks pass through to the game world
+	if _chat_bg:
+		_chat_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+## Focus the chat input (called from Enter key)
+func _focus_chat_input() -> void:
+	if _chat_input == null:
+		return
+	_chat_input.grab_focus()
+
+## Unfocus the chat input (called from Escape key)
+func _unfocus_chat_input() -> void:
+	if _chat_input == null:
+		return
+	_chat_input.release_focus()
+
+## Reposition the chat panel to bottom-left of current viewport
+func _reposition_chat() -> void:
+	if _chat_bg == null:
+		return
+	var vp_size: Vector2 = _get_viewport_size()
+	_chat_bg.position = Vector2(8, vp_size.y - 260)
 
 func _update_area_display(area_id: String) -> void:
 	if area_label == null:
@@ -2478,6 +2600,8 @@ func _on_window_resized() -> void:
 	_resize_minimap()
 	# Reposition action bar to bottom-center
 	_reposition_action_bar()
+	# Reposition chat to bottom-left
+	_reposition_chat()
 
 ## Reposition the bottom action bar to horizontal center
 func _reposition_action_bar() -> void:
