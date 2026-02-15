@@ -346,34 +346,6 @@ const WEATHER_CONFIGS: Dictionary = {
 		},
 	},
 
-	# ── Corrupted Mines: fiery dust with corruption ──
-	"corrupted-mines": {
-		"primary": {
-			"amount": 100,
-			"lifetime": 4.0,
-			"direction": Vector3(0.2, -0.8, 0.1),
-			"velocity_min": 0.5,
-			"velocity_max": 1.5,
-			"gravity": Vector3(0.0, -0.4, 0.0),
-			"scale_min": 0.05,
-			"scale_max": 0.15,
-			"color_start": Color(0.7, 0.2, 0.1, 0.5),
-			"color_end": Color(0.3, 0.05, 0.0, 0.0),
-		},
-		"secondary": {
-			"amount": 30,
-			"lifetime": 2.5,
-			"direction": Vector3(0.0, 0.5, 0.0),
-			"velocity_min": 0.3,
-			"velocity_max": 1.0,
-			"gravity": Vector3(0.0, -0.1, 0.0),
-			"scale_min": 0.02,
-			"scale_max": 0.08,
-			"color_start": Color(1.0, 0.3, 0.0, 0.6),
-			"color_end": Color(0.8, 0.1, 0.0, 0.0),
-		},
-	},
-
 	# ── Corrupted Lab: toxic green-red corruption ──
 	"corrupted-lab": {
 		"primary": {

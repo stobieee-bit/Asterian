@@ -164,12 +164,12 @@ func _ready() -> void:
 	add_child(dungeon_renderer)
 	print("Dungeon renderer ready.")
 
-	# Spawn weather system (per-area atmospheric particles)
-	var weather: Node3D = Node3D.new()
-	weather.name = "WeatherSystem"
-	weather.set_script(weather_system_script)
-	add_child(weather)
-	print("Weather system ready.")
+	# Weather system disabled — square particles were visually distracting
+	# var weather: Node3D = Node3D.new()
+	# weather.name = "WeatherSystem"
+	# weather.set_script(weather_system_script)
+	# add_child(weather)
+	# print("Weather system ready.")
 
 	# Spawn NPC spawner
 	var npc_spawner: Node3D = Node3D.new()

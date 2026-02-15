@@ -13,7 +13,7 @@
     "asteroid-mines": {
       "name": "Asteroid Mines",
       "center": {
-        "x": 300,
+        "x": 120,
         "z": 0
       },
       "radius": 80,
@@ -62,18 +62,6 @@
     }
   },
   "corrupted_areas": {
-    "corrupted-mines": {
-      "name": "Corrupted Mines",
-      "base": "asteroid-mines",
-      "center": {
-        "x": 300,
-        "z": 280
-      },
-      "radius": 60,
-      "groundColor": 3803658,
-      "floorY": -2,
-      "fogColor": 4456448
-    },
     "corrupted-wastes": {
       "name": "Corrupted Wastes",
       "base": "alien-wastes",
@@ -163,21 +151,6 @@
       "cgTint": 4513211,
       "cgTintStr": 0.03
     },
-    "corrupted-mines": {
-      "ambientColor": 2755082,
-      "ambientInt": 0.45,
-      "dirColor": 16737860,
-      "dirInt": 0.5,
-      "fogColor": 655874,
-      "fogDensity": 0.007,
-      "skyTop": 655360,
-      "skyBottom": 655874,
-      "cgSat": 1.2,
-      "cgContrast": 1.05,
-      "cgBright": 0.9,
-      "cgTint": 16729122,
-      "cgTintStr": 0.08
-    },
     "corrupted-wastes": {
       "ambientColor": 1705992,
       "ambientInt": 0.4,
@@ -215,14 +188,14 @@
       "from": "station-hub",
       "to": "asteroid-mines",
       "minX": 33,
-      "maxX": 222,
+      "maxX": 55,
       "minZ": -6,
       "maxZ": 6,
       "floorY": -1,
       "groundColor": 1710632,
       "label": "Asteroid Mines →",
       "labelPos": {
-        "x": 130,
+        "x": 44,
         "z": 0
       }
     },
@@ -305,11 +278,6 @@
       "min": 100,
       "max": 200,
       "label": "Lv 100-200 Combat"
-    },
-    "corrupted-mines": {
-      "min": 80,
-      "max": 99,
-      "label": "Lv 80-99 Prestige"
     },
     "corrupted-wastes": {
       "min": 80,

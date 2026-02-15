@@ -18,7 +18,7 @@ func _define_spawn_zones() -> void:
 	# Asteroid Mines — Ore nodes
 	_spawn_defs.append({
 		"area": "asteroid-mines",
-		"cx": 300.0, "cz": 0.0, "radius": 70.0,
+		"cx": 120.0, "cz": 0.0, "radius": 70.0,
 		"skill": "astromining",
 		"nodes": [
 			{"level": 1, "item": "stellarite_ore", "color": Color(0.6, 0.6, 0.55), "count": 12},

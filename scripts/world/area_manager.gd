@@ -541,7 +541,7 @@ func _add_crystals(area_id: String, cx: float, cz: float, radius: float,
 		base_color: Color, y_base: float) -> void:
 	var crystal_areas: Array[String] = [
 		"alien-wastes", "the-abyss", "asteroid-mines",
-		"corrupted-wastes", "corrupted-abyss", "corrupted-mines"
+		"corrupted-wastes", "corrupted-abyss"
 	]
 	if area_id not in crystal_areas:
 		return
@@ -802,7 +802,7 @@ func _add_ruined_walls(area_id: String, cx: float, cz: float, radius: float,
 		base_color: Color, y_base: float) -> void:
 	var ruin_areas: Array[String] = [
 		"alien-wastes", "the-abyss", "corrupted-wastes", "corrupted-abyss",
-		"asteroid-mines", "corrupted-mines"
+		"asteroid-mines"
 	]
 	if area_id not in ruin_areas:
 		return
