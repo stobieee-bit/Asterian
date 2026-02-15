@@ -137,6 +137,13 @@ func show_hover_tooltip() -> void:
 func hide_hover_tooltip() -> void:
 	EventBus.tooltip_hidden.emit()
 
+## Check if the player is within interaction range
+func _is_player_in_range() -> bool:
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+	if player == null:
+		return false
+	return player.global_position.distance_to(global_position) <= interact_radius + 1.0
+
 ## Show right-click context menu
 func show_context_menu(screen_pos: Vector2) -> void:
 	var skill_data: Dictionary = DataManager.get_skill(skill_id)
@@ -150,6 +157,9 @@ func show_context_menu(screen_pos: Vector2) -> void:
 		"icon": "U",
 		"color": _get_skill_color(),
 		"callback": func():
+			if not _is_player_in_range():
+				EventBus.chat_message.emit("You need to move closer to %s." % station_name, "system")
+				return
 			var hud: Node = get_tree().get_first_node_in_group("hud")
 			if hud and hud.has_method("open_crafting"):
 				hud.open_crafting(skill_id, station_name)

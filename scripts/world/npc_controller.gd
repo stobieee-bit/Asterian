@@ -340,6 +340,16 @@ func _animate_npc_idle(phase: float) -> void:
 		if mat:
 			mat.emission_energy_multiplier = 2.5 + sin(phase * 1.8) * 0.5
 
+## Max distance for NPC interactions (talk, bank, shop)
+const NPC_INTERACT_RANGE: float = 4.0
+
+## Check if the player is within interaction range
+func _is_player_in_range() -> bool:
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+	if player == null:
+		return false
+	return player.global_position.distance_to(global_position) <= NPC_INTERACT_RANGE
+
 ## Show right-click context menu for this NPC
 func show_context_menu(screen_pos: Vector2) -> void:
 	var options: Array = []
@@ -354,6 +364,9 @@ func show_context_menu(screen_pos: Vector2) -> void:
 		"icon": "T",
 		"color": Color(0.8, 0.85, 0.9),
 		"callback": func():
+			if not _is_player_in_range():
+				EventBus.chat_message.emit("You need to move closer to %s." % npc_name, "system")
+				return
 			var hud: Node = get_tree().get_first_node_in_group("hud")
 			if hud and hud.has_method("open_dialogue"):
 				hud.open_dialogue(self)
@@ -366,6 +379,9 @@ func show_context_menu(screen_pos: Vector2) -> void:
 			"icon": "B",
 			"color": Color(0.3, 0.9, 0.5),
 			"callback": func():
+				if not _is_player_in_range():
+					EventBus.chat_message.emit("You need to move closer to %s." % npc_name, "system")
+					return
 				var hud: Node = get_tree().get_first_node_in_group("hud")
 				if hud and hud.has_method("open_bank"):
 					hud.open_bank()
@@ -378,12 +394,15 @@ func show_context_menu(screen_pos: Vector2) -> void:
 			"icon": "S",
 			"color": Color(1.0, 0.85, 0.3),
 			"callback": func():
+				if not _is_player_in_range():
+					EventBus.chat_message.emit("You need to move closer to %s." % npc_name, "system")
+					return
 				var hud: Node = get_tree().get_first_node_in_group("hud")
 				if hud and hud.has_method("open_shop"):
 					hud.open_shop(self)
 		})
 
-	# Examine option
+	# Examine option (no range check — you can examine from afar)
 	options.append({
 		"label": "Examine",
 		"icon": "?",
