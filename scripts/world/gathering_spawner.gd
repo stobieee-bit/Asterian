@@ -21,14 +21,14 @@ func _define_spawn_zones() -> void:
 		"cx": 120.0, "cz": 0.0, "radius": 70.0,
 		"skill": "astromining",
 		"nodes": [
-			{"level": 1, "item": "stellarite_ore", "color": Color(0.6, 0.6, 0.55), "count": 12},
-			{"level": 10, "item": "ferrite_ore", "color": Color(0.4, 0.65, 0.45), "count": 10},
-			{"level": 20, "item": "cobaltium_ore", "color": Color(0.3, 0.45, 0.8), "count": 8},
-			{"level": 30, "item": "duranite_ore", "color": Color(0.35, 0.6, 0.7), "count": 6},
-			{"level": 40, "item": "titanex_ore", "color": Color(0.5, 0.7, 0.3), "count": 5},
-			{"level": 50, "item": "plasmite_ore", "color": Color(0.6, 0.3, 0.8), "count": 4},
-			{"level": 60, "item": "quantite_ore", "color": Color(0.8, 0.5, 0.2), "count": 3},
-			{"level": 70, "item": "neutronium_ore", "color": Color(0.8, 0.25, 0.45), "count": 3},
+			{"level": 1, "item": "stellarite_ore", "color": Color(0.85, 0.75, 0.5), "count": 12},
+			{"level": 10, "item": "ferrite_ore", "color": Color(0.2, 0.9, 0.3), "count": 10},
+			{"level": 20, "item": "cobaltium_ore", "color": Color(0.2, 0.4, 1.0), "count": 8},
+			{"level": 30, "item": "duranite_ore", "color": Color(0.1, 0.9, 0.9), "count": 6},
+			{"level": 40, "item": "titanex_ore", "color": Color(0.9, 0.95, 0.1), "count": 5},
+			{"level": 50, "item": "plasmite_ore", "color": Color(0.8, 0.15, 1.0), "count": 4},
+			{"level": 60, "item": "quantite_ore", "color": Color(1.0, 0.5, 0.0), "count": 3},
+			{"level": 70, "item": "neutronium_ore", "color": Color(1.0, 0.1, 0.3), "count": 3},
 		]
 	})
 

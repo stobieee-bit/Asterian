@@ -376,30 +376,30 @@ func _process(delta: float) -> void:
 			_respawn()
 
 func _apply_visuals() -> void:
-	# Body material — rocky base look
+	# Body material — strong saturated color
 	var body_mat: StandardMaterial3D = StandardMaterial3D.new()
 	body_mat.albedo_color = _node_color
-	body_mat.metallic = 0.2 + skill_level * 0.006  # Higher tiers more metallic
-	body_mat.roughness = 0.6 - skill_level * 0.004  # Higher tiers smoother
+	body_mat.metallic = 0.3 + skill_level * 0.005
+	body_mat.roughness = 0.5 - skill_level * 0.004
 	body_mat.emission_enabled = true
-	body_mat.emission = _node_color.lightened(0.2)
-	body_mat.emission_energy_multiplier = 0.8 + skill_level * 0.025
+	body_mat.emission = _node_color  # Pure color emission, no lightening
+	body_mat.emission_energy_multiplier = 1.2 + skill_level * 0.03
 
-	# Accent material — brighter crystal/highlight parts
+	# Accent material — brighter, high-glow crystal parts
 	var accent_mat: StandardMaterial3D = StandardMaterial3D.new()
-	accent_mat.albedo_color = _node_color.lightened(0.3)
-	accent_mat.metallic = 0.5 + skill_level * 0.005
-	accent_mat.roughness = 0.25
+	accent_mat.albedo_color = _node_color.lightened(0.15)
+	accent_mat.metallic = 0.6 + skill_level * 0.004
+	accent_mat.roughness = 0.2
 	accent_mat.emission_enabled = true
-	accent_mat.emission = _node_color.lightened(0.5)
-	accent_mat.emission_energy_multiplier = 2.5 + skill_level * 0.03
+	accent_mat.emission = _node_color.lightened(0.15)
+	accent_mat.emission_energy_multiplier = 3.0 + skill_level * 0.04
 
-	# Glow ring material
+	# Glow ring material — brightest
 	var ring_mat: StandardMaterial3D = StandardMaterial3D.new()
-	ring_mat.albedo_color = _node_color.lightened(0.4)
+	ring_mat.albedo_color = _node_color.lightened(0.2)
 	ring_mat.emission_enabled = true
-	ring_mat.emission = _node_color.lightened(0.5)
-	ring_mat.emission_energy_multiplier = 2.0
+	ring_mat.emission = _node_color.lightened(0.2)
+	ring_mat.emission_energy_multiplier = 3.5
 
 	# Apply materials to mesh parts
 	for part in _mesh_parts:
