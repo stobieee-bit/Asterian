@@ -152,31 +152,42 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	# ── Build all detail layers ──
 	# Bio-Lab is a small crafting hub — skip heavy clutter, keep it clean
 	var _is_clean_area: bool = area_id == "bio-lab"
-	# Asteroid Mines: sparse clutter so ore nodes are the visual focus
-	var _is_mines: bool = area_id == "asteroid-mines"
 
 	_add_ground_variation(area_id, center_x, center_z, radius, base_color, y_base)
-	if not _is_clean_area and not _is_mines:
+	if not _is_clean_area:
 		_add_terrain_bumps(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_concentric_rings(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_grid_lines(area_id, center_x, center_z, radius, base_color, y_base)
 	if not _is_clean_area:
 		_add_rocks_and_boulders(area_id, center_x, center_z, radius, base_color, y_base)
-		if not _is_mines:
-			_add_energy_pylons(area_id, center_x, center_z, radius, base_color, y_base)
-			_add_tech_panels(area_id, center_x, center_z, radius, base_color, y_base)
+		_add_energy_pylons(area_id, center_x, center_z, radius, base_color, y_base)
+		_add_tech_panels(area_id, center_x, center_z, radius, base_color, y_base)
 		_add_light_columns(area_id, center_x, center_z, radius, base_color, y_base)
-	if not _is_mines:
-		_add_crystals(area_id, center_x, center_z, radius, base_color, y_base)
+	_add_crystals(area_id, center_x, center_z, radius, base_color, y_base)
 	if not _is_clean_area:
 		_add_alien_flora(area_id, center_x, center_z, radius, base_color, y_base)
-		# Floating debris removed — will revisit with proper particle system later
-		if not _is_mines:
-			_add_pipe_structures(area_id, center_x, center_z, radius, base_color, y_base)
-	if not _is_mines:
-		_add_ruined_walls(area_id, center_x, center_z, radius, base_color, y_base)
+		_add_pipe_structures(area_id, center_x, center_z, radius, base_color, y_base)
+	_add_ruined_walls(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_area_unique_structures(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_point_lights(area_id, center_x, center_z, radius, base_color, y_base)
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  CLUTTER DENSITY — per-area multiplier so gathering/combat zones stay readable
+# ═══════════════════════════════════════════════════════════════════════════════
+
+## Returns a 0.0-1.0 density multiplier for generic decoration counts.
+## Areas where gameplay objects (ores, enemies, flora nodes) are the visual focus
+## get lower density so the important stuff isn't buried in scenery.
+func _clutter_density(area_id: String) -> float:
+	match area_id:
+		"asteroid-mines":    return 0.3   # ores are the stars
+		"gathering-grounds": return 0.4   # gathering nodes need visibility
+		"station-hub":       return 0.5   # town hub, keep some bustle but not overwhelming
+		"the-abyss":         return 0.35  # supposed to feel empty and ominous
+		"corrupted-wastes":  return 0.5   # small area, moderate clutter
+		"alien-wastes":      return 0.5   # huge area with sub-zones providing detail
+		"bio-lab":           return 0.0   # already handled by _is_clean_area
+		_:                   return 1.0
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  DETAIL LAYERS
@@ -224,8 +235,9 @@ func _add_terrain_bumps(area_id: String, cx: float, cz: float, radius: float,
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = area_id.hash()
 
-	# Raised bumps (3-8 per area depending on radius)
-	var bump_count: int = clampi(int(radius / 15.0) + 2, 3, 8)
+	# Raised bumps — scaled by area density
+	var density: float = _clutter_density(area_id)
+	var bump_count: int = maxi(int((int(radius / 15.0) + 2) * density), 2)
 	for i in range(bump_count):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(0.2, 0.75) * radius
@@ -249,8 +261,8 @@ func _add_terrain_bumps(area_id: String, cx: float, cz: float, radius: float,
 		bump.material = bump_mat
 		add_child(bump)
 
-	# Crater depressions (2-5 per area)
-	var crater_count: int = clampi(int(radius / 25.0) + 1, 2, 5)
+	# Crater depressions — scaled by density
+	var crater_count: int = maxi(int((int(radius / 25.0) + 1) * density), 1)
 	for i in range(crater_count):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(0.3, 0.65) * radius
@@ -333,11 +345,10 @@ func _add_rocks_and_boulders(area_id: String, cx: float, cz: float, radius: floa
 	rock_mat.roughness = 0.85
 	rock_mat.metallic = 0.1
 
-	# Scale count by area size — mines gets fewer so ore nodes stand out
-	var rock_count: int = int(12 + radius * 0.08)
-	if area_id == "asteroid-mines":
-		rock_count = 6
-	rock_count = mini(rock_count, 80)  # Cap for performance
+	# Scale count by area size, reduced by per-area clutter density
+	var rock_count: int = int((12 + radius * 0.08) * _clutter_density(area_id))
+	rock_count = maxi(rock_count, 2)  # Always at least a couple
+	rock_count = mini(rock_count, 40)  # Cap for performance
 
 	for i in range(rock_count):
 		var angle: float = rng.randf() * TAU
@@ -367,8 +378,8 @@ func _add_energy_pylons(area_id: String, cx: float, cz: float, radius: float,
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = (area_id + "_pylons").hash()
 
-	var pylon_count: int = int(4 + radius * 0.03)
-	pylon_count = mini(pylon_count, 30)
+	var pylon_count: int = int((4 + radius * 0.03) * _clutter_density(area_id))
+	pylon_count = mini(pylon_count, 15)
 
 	for i in range(pylon_count):
 		var angle: float = rng.randf() * TAU
@@ -450,8 +461,8 @@ func _add_tech_panels(area_id: String, cx: float, cz: float, radius: float,
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = (area_id + "_panels").hash()
 
-	var panel_count: int = int(6 + radius * 0.04)
-	panel_count = mini(panel_count, 35)
+	var panel_count: int = int((6 + radius * 0.04) * _clutter_density(area_id))
+	panel_count = mini(panel_count, 18)
 
 	for i in range(panel_count):
 		var angle: float = rng.randf() * TAU
@@ -496,6 +507,7 @@ func _add_light_columns(area_id: String, cx: float, cz: float, radius: float,
 	rng.seed = (area_id + "_lightcols").hash()
 
 	var col_count: int = 2 if radius < 60 else (4 if radius < 300 else 8)
+	col_count = maxi(int(col_count * _clutter_density(area_id)), 1)
 
 	for i in range(col_count):
 		var angle: float = rng.randf() * TAU
@@ -557,8 +569,8 @@ func _add_crystals(area_id: String, cx: float, cz: float, radius: float,
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = (area_id + "_crystals").hash()
 
-	var crystal_count: int = int(10 + radius * 0.06)
-	crystal_count = mini(crystal_count, 60)
+	var crystal_count: int = int((10 + radius * 0.06) * _clutter_density(area_id))
+	crystal_count = mini(crystal_count, 30)
 
 	for i in range(crystal_count):
 		var angle: float = rng.randf() * TAU
@@ -624,8 +636,8 @@ func _add_alien_flora(area_id: String, cx: float, cz: float, radius: float,
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = (area_id + "_flora").hash()
 
-	var flora_count: int = int(12 + radius * 0.06)
-	flora_count = mini(flora_count, 50)
+	var flora_count: int = int((12 + radius * 0.06) * _clutter_density(area_id))
+	flora_count = mini(flora_count, 25)
 
 	for i in range(flora_count):
 		var angle: float = rng.randf() * TAU
@@ -758,8 +770,8 @@ func _add_pipe_structures(area_id: String, cx: float, cz: float, radius: float,
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = (area_id + "_pipes").hash()
 
-	var pipe_count: int = int(3 + radius * 0.02)
-	pipe_count = mini(pipe_count, 15)
+	var pipe_count: int = int((3 + radius * 0.02) * _clutter_density(area_id))
+	pipe_count = mini(pipe_count, 8)
 
 	var pipe_mat: StandardMaterial3D = StandardMaterial3D.new()
 	pipe_mat.albedo_color = base_color.darkened(0.15)
@@ -818,8 +830,8 @@ func _add_ruined_walls(area_id: String, cx: float, cz: float, radius: float,
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = (area_id + "_ruins").hash()
 
-	var wall_count: int = int(3 + radius * 0.015)
-	wall_count = mini(wall_count, 15)
+	var wall_count: int = int((3 + radius * 0.015) * _clutter_density(area_id))
+	wall_count = mini(wall_count, 8)
 
 	var wall_mat: StandardMaterial3D = StandardMaterial3D.new()
 	wall_mat.albedo_color = base_color.darkened(0.25)
@@ -968,7 +980,7 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 	})
 
 	# ── Street lamps around center ──
-	for i in range(6):
+	for i in range(4):
 		var angle: float = float(i) / 6.0 * TAU
 		var lx: float = cx + cos(angle) * 10.0
 		var lz: float = cz + sin(angle) * 10.0
@@ -1190,9 +1202,6 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 		Vector3(cx + 22, y_base + 0.5, cz - 6),
 		Vector3(cx + 21, y_base + 1.0, cz - 7),
 		Vector3(cx + 23, y_base + 0.5, cz - 9),
-		Vector3(cx + 19, y_base + 0.5, cz - 5),
-		Vector3(cx + 24, y_base + 0.5, cz - 7),
-		Vector3(cx + 20, y_base + 1.5, cz - 7),
 	]
 	for pos in depot_positions:
 		var crate: CSGBox3D = CSGBox3D.new()
@@ -1221,9 +1230,9 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 	add_child(cont_strip)
 
 	# ── Perimeter barriers (low walls around hub edge) ──
-	for i in range(8):
-		var angle: float = float(i) / 8.0 * TAU
-		var next_a: float = float(i + 1) / 8.0 * TAU
+	for i in range(6):
+		var angle: float = float(i) / 6.0 * TAU
+		var next_a: float = float(i + 1) / 6.0 * TAU
 		# Skip angles near corridor exits (east and south)
 		var skip: bool = false
 		if absf(angle) < 0.5 or absf(angle - TAU) < 0.5:
@@ -1318,7 +1327,7 @@ func _build_gathering_structures(cx: float, cz: float, radius: float,
 	cap_mat.emission = Color(0.1, 0.4, 0.25)
 	cap_mat.emission_energy_multiplier = 1.5
 
-	for i in range(6):
+	for i in range(4):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(10.0, radius * 0.7)
 		var px: float = cx + cos(angle) * dist
@@ -1471,7 +1480,7 @@ func _build_wastes_spore_fields(y_base: float) -> void:
 		Color(0.04, 0.15, 0.1), Color(0.03, 0.1, 0.06), 0.3, 0.1, 0.7)
 
 	# Large spore pods — bulbous organic sacs that glow softly
-	var positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 18)
+	var positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 10)
 	for pos in positions:
 		var pod_r: float = rng.randf_range(0.8, 2.5)
 		var pod: CSGSphere3D = CSGSphere3D.new()
@@ -1501,7 +1510,7 @@ func _build_wastes_spore_fields(y_base: float) -> void:
 		})
 
 	# Tendril clusters — thin organic stalks reaching upward
-	var tendril_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 25)
+	var tendril_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 12)
 	for pos in tendril_positions:
 		var t_height: float = rng.randf_range(2.0, 5.0)
 		var tendril: CSGCylinder3D = CSGCylinder3D.new()
@@ -1545,7 +1554,7 @@ func _build_wastes_hive_perimeter(y_base: float) -> void:
 		Color(0.5, 0.3, 0.1), 0.4, Color(0.6, 0.3, 0.05), 1.5)
 
 	# Chitin wall segments — curved organic barriers
-	for i in range(8):
+	for i in range(5):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(15.0, zr * 0.75)
 		var px: float = zcx + cos(angle) * dist
@@ -1561,7 +1570,7 @@ func _build_wastes_hive_perimeter(y_base: float) -> void:
 		add_child(wall)
 
 	# Hive arch structures — paired pillars with organic arches
-	for i in range(6):
+	for i in range(3):
 		var angle: float = float(i) * TAU / 6.0 + rng.randf_range(-0.3, 0.3)
 		var dist: float = rng.randf_range(20.0, zr * 0.6)
 		var px: float = zcx + cos(angle) * dist
@@ -1591,7 +1600,7 @@ func _build_wastes_hive_perimeter(y_base: float) -> void:
 		add_child(arch)
 
 	# Hive mounds — large organic domes
-	var mound_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 10, 8.0)
+	var mound_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 6, 8.0)
 	for pos in mound_positions:
 		var mound_r: float = rng.randf_range(3.0, 7.0)
 		var mound: CSGSphere3D = CSGSphere3D.new()
@@ -1645,7 +1654,7 @@ func _build_wastes_fungal_depths(y_base: float) -> void:
 		Color(0.5, 0.15, 0.7), 0.12, Color(0.6, 0.2, 0.8), 2.0)
 
 	# Giant mushrooms — towering fungi with wide caps
-	var mushroom_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 14, 5.0)
+	var mushroom_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 8, 5.0)
 	for pos in mushroom_positions:
 		var stem_h: float = rng.randf_range(4.0, 14.0)
 		var cap_r: float = rng.randf_range(2.0, 6.0)
@@ -1684,7 +1693,7 @@ func _build_wastes_fungal_depths(y_base: float) -> void:
 			add_child(glow_ring)
 
 	# Mycelium ground networks — flat glowing veins on the ground
-	for i in range(10):
+	for i in range(5):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(5.0, zr * 0.75)
 		var length: float = rng.randf_range(5.0, 20.0)
@@ -1696,7 +1705,7 @@ func _build_wastes_fungal_depths(y_base: float) -> void:
 		add_child(vein)
 
 	# Spore clouds — large translucent spheres of haze
-	for i in range(6):
+	for i in range(3):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(10.0, zr * 0.6)
 		var cloud: CSGSphere3D = CSGSphere3D.new()
@@ -1738,7 +1747,7 @@ func _build_wastes_toxic_heart(y_base: float) -> void:
 		Color(0.4, 0.8, 0.1), 0.3, Color(0.5, 1.0, 0.15), 4.0)
 
 	# Acid pools — flat glowing discs on the ground
-	for i in range(8):
+	for i in range(5):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(8.0, zr * 0.7)
 		var pool_r: float = rng.randf_range(2.0, 6.0)
@@ -1751,7 +1760,7 @@ func _build_wastes_toxic_heart(y_base: float) -> void:
 		add_child(pool)
 
 	# Toxic geysers — tall translucent columns that pulse
-	for i in range(5):
+	for i in range(3):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(10.0, zr * 0.6)
 		var geyser_h: float = rng.randf_range(6.0, 15.0)
@@ -1772,7 +1781,7 @@ func _build_wastes_toxic_heart(y_base: float) -> void:
 		})
 
 	# Corroded bone pillars — weathered skeletal remains
-	var bone_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 12, 6.0)
+	var bone_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 7, 6.0)
 	for pos in bone_positions:
 		var bone_h: float = rng.randf_range(3.0, 10.0)
 		var bone: CSGCylinder3D = CSGCylinder3D.new()
@@ -1814,7 +1823,7 @@ func _build_wastes_stalker_dens(y_base: float) -> void:
 		Color(0.2, 0.12, 0.25), Color(0.15, 0.08, 0.2), 0.5, 0.2, 0.65)
 
 	# Web canopy sheets — large flat planes stretched between invisible anchor points
-	for i in range(8):
+	for i in range(5):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(10.0, zr * 0.7)
 		var web_w: float = rng.randf_range(5.0, 15.0)
@@ -1828,7 +1837,7 @@ func _build_wastes_stalker_dens(y_base: float) -> void:
 		add_child(web)
 
 	# Cocoons — elongated egg-like shapes hanging or resting
-	var cocoon_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 15, 4.0)
+	var cocoon_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 8, 4.0)
 	for pos in cocoon_positions:
 		var c_r: float = rng.randf_range(0.4, 1.2)
 		var cocoon: CSGSphere3D = CSGSphere3D.new()
@@ -1853,7 +1862,7 @@ func _build_wastes_stalker_dens(y_base: float) -> void:
 			add_child(strand)
 
 	# Trap tendrils — menacing stalks that sway
-	for i in range(12):
+	for i in range(6):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(5.0, zr * 0.8)
 		var t_h: float = rng.randf_range(2.0, 6.0)
@@ -1899,7 +1908,7 @@ func _build_wastes_aberration_wastes(y_base: float) -> void:
 		Color(0.3, 0.08, 0.12), Color(0.25, 0.06, 0.1), 0.5, 0.1, 0.7)
 
 	# Fleshy mounds — disturbing organic humps
-	var mound_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 12, 6.0)
+	var mound_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 7, 6.0)
 	for pos in mound_positions:
 		var m_r: float = rng.randf_range(1.5, 5.0)
 		var mound: CSGSphere3D = CSGSphere3D.new()
@@ -1923,7 +1932,7 @@ func _build_wastes_aberration_wastes(y_base: float) -> void:
 			add_child(eye)
 
 	# Pulsing vein networks on the ground
-	for i in range(15):
+	for i in range(8):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(4.0, zr * 0.8)
 		var length: float = rng.randf_range(4.0, 18.0)
@@ -1935,7 +1944,7 @@ func _build_wastes_aberration_wastes(y_base: float) -> void:
 		add_child(vein)
 
 	# Twisted growth pillars — organic columns warped by mutation
-	for i in range(8):
+	for i in range(5):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(10.0, zr * 0.7)
 		var g_h: float = rng.randf_range(3.0, 10.0)
@@ -1988,8 +1997,8 @@ func _build_wastes_eldritch_edge(y_base: float) -> void:
 	add_child(throne_base)
 
 	# Throne spires — tall spikes around the platform
-	for i in range(6):
-		var angle: float = float(i) * TAU / 6.0
+	for i in range(4):
+		var angle: float = float(i) * TAU / 4.0
 		var spire: CSGCylinder3D = CSGCylinder3D.new()
 		spire.radius = 0.5
 		spire.height = rng.randf_range(10.0, 18.0)
@@ -2017,7 +2026,7 @@ func _build_wastes_eldritch_edge(y_base: float) -> void:
 		})
 
 	# Reality tear rifts — vertical planes of crackling energy
-	for i in range(8):
+	for i in range(5):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(12.0, zr * 0.7)
 		var rift_h: float = rng.randf_range(4.0, 12.0)
@@ -2035,7 +2044,7 @@ func _build_wastes_eldritch_edge(y_base: float) -> void:
 		})
 
 	# Void cracks in the ground — dark lines with faint glow
-	for i in range(12):
+	for i in range(6):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(8.0, zr * 0.8)
 		var crack_len: float = rng.randf_range(3.0, 15.0)
@@ -2116,7 +2125,7 @@ func _build_abyss_structures(cx: float, cz: float, radius: float,
 	rift_mat.emission_energy_multiplier = 2.5
 
 	# Massive void pillars
-	for i in range(15):
+	for i in range(10):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(20.0, radius * 0.8)
 		var pillar_h: float = rng.randf_range(8.0, 25.0)
