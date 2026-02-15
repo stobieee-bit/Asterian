@@ -62,17 +62,40 @@ jobs:
           mkdir -p export/web
           godot --headless --export-release "Web" export/web/index.html 2>&1
 
-      - name: Add cross-origin isolation headers for SharedArrayBuffer
+      - name: Patch COEP and fix cross-origin WebSocket support
         run: |
           cd export/web
-          # Godot 4 web exports need SharedArrayBuffer which requires COOP/COEP headers.
-          # GitHub Pages doesn't allow custom headers, so we use a service worker approach.
-          # Inline a minimal coi-serviceworker script directly.
-          cat > coi-serviceworker.js << 'SWEOF'
-          /*! coi-serviceworker v0.1.7 - Guido Zuidhof, licensed under MIT */
-          if(typeof window==='undefined'){self.addEventListener("install",()=>self.skipWaiting());self.addEventListener("activate",(e)=>e.waitUntil(self.clients.claim()));self.addEventListener("fetch",(e)=>{if(e.request.cache==="only-if-cached"&&e.request.mode!=="same-origin")return;e.respondWith(fetch(e.request).then((r)=>{if(r.status===0)return r;const h=new Headers(r.headers);h.set("Cross-Origin-Embedder-Policy","credentialless");h.set("Cross-Origin-Opener-Policy","same-origin");return new Response(r.body,{status:r.status,statusText:r.statusText,headers:h})}));})}else{const r=window.location;if(window.crossOriginIsolated!==false){}else if(navigator.serviceWorker){navigator.serviceWorker.register(new URL("coi-serviceworker.js",r.href).href).then((reg)=>{reg.addEventListener("updatefound",()=>{const w=reg.installing;w.addEventListener("statechange",()=>{if(w.state==="activated"){window.location.reload()}})})},console.error)}}
-          SWEOF
-          sed -i 's|</head>|<script src="coi-serviceworker.js"></script></head>|' index.html
+
+          # 1. Godot 4.4 PWA service worker uses 'require-corp' COEP which can
+          #    block cross-origin resources. Patch to 'credentialless' which still
+          #    enables SharedArrayBuffer but allows cross-origin WebSocket etc.
+          sed -i "s/require-corp/credentialless/g" index.service.worker.js
+          sed -i "s/require-corp/credentialless/g" index.js 2>/dev/null || true
+
+          # 2. Remove the old coi-serviceworker (Godot's built-in one handles it)
+          rm -f coi-serviceworker.js
+          sed -i 's|<script src="coi-serviceworker.js"></script>||' index.html 2>/dev/null || true
+
+          # 3. Inject a cache-buster script that unregisters stale service workers
+          #    from previous deploys so the new code loads immediately.
+          cat > cache-buster.js << 'CBEOF'
+          (function(){
+            if('serviceWorker' in navigator){
+              navigator.serviceWorker.getRegistrations().then(function(regs){
+                regs.forEach(function(r){
+                  if(r.active && r.active.scriptURL.indexOf('coi-serviceworker')!==-1){
+                    r.unregister().then(function(){console.log('Removed stale coi-serviceworker');});
+                  }
+                });
+              });
+            }
+          })();
+          CBEOF
+          sed -i 's|</head>|<script src="cache-buster.js"></script></head>|' index.html
+
+          echo "=== Post-patch verification ==="
+          grep -c "credentialless" index.service.worker.js && echo "Service worker: credentialless OK"
+          grep -c "coi-serviceworker" index.html || echo "HTML: coi-serviceworker removed OK"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
