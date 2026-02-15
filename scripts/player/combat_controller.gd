@@ -317,8 +317,8 @@ func eat_food(item_id: String = "") -> bool:
 	if item_data.is_empty():
 		return false
 
-	# Get heal amount
-	var heal: int = int(item_data.get("healAmount", item_data.get("heal", 0)))
+	# Get heal amount (items use "heals", "healAmount", or "heal" field)
+	var heal: int = int(item_data.get("heals", item_data.get("healAmount", item_data.get("heal", 0))))
 	if heal <= 0:
 		return false
 
@@ -353,7 +353,7 @@ func _find_best_food() -> String:
 		var data: Dictionary = DataManager.get_item(sid)
 		if data.is_empty():
 			continue
-		var h: int = int(data.get("healAmount", data.get("heal", 0)))
+		var h: int = int(data.get("heals", data.get("healAmount", data.get("heal", 0))))
 		if h > best_heal:
 			best_heal = h
 			best_id = sid
