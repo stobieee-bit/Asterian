@@ -92,6 +92,9 @@ func _process(delta: float) -> void:
 		# Extend attack range by the target's collision radius so large bosses are reachable
 		var effective_range: float = attack_range + _get_target_collision_radius(target)
 		if dist <= effective_range:
+			# Stop the player from walking into the enemy — hold position at range
+			if _player.is_moving:
+				_player.stop_movement()
 			is_in_combat = true
 			_combat_exit_timer = 0.0
 			attack_timer -= delta
