@@ -76,34 +76,30 @@ jobs:
           rm -f coi-serviceworker.js
           sed -i 's|<script src="coi-serviceworker.js"></script>||' index.html 2>/dev/null || true
 
-          # 3. Force cache refresh on every deploy.
-          #    - Tell browsers not to cache the HTML page itself
-          #    - Auto-update the service worker and clear old caches on load
-          #    - Remove any stale coi-serviceworker registrations
+          # 3. Append build timestamp to service worker URL to bust browser HTTP cache
+          BUILD_TS=$(date +%s)
+          sed -i "s|index.service.worker.js|index.service.worker.js?v=${BUILD_TS}|g" index.html
+          sed -i "s|index.service.worker.js|index.service.worker.js?v=${BUILD_TS}|g" index.js 2>/dev/null || true
+
+          # 4. Nuclear cache-buster: wipe ALL caches and service workers on every load
+          #    First visit after deploy: clears everything and reloads
+          #    Second visit: clean slate, loads fresh assets
           cat > cache-buster.js << 'CBEOF'
           (function(){
-            if(!('serviceWorker' in navigator)) return;
-            // Remove stale coi-serviceworker from previous deploys
-            navigator.serviceWorker.getRegistrations().then(function(regs){
-              regs.forEach(function(r){
-                if(r.active && r.active.scriptURL.indexOf('coi-serviceworker')!==-1){
-                  r.unregister().then(function(){
-                    console.log('[cache-buster] Removed stale coi-serviceworker');
-                    window.location.reload();
-                  });
-                }
-                // Force the Godot service worker to check for updates immediately
-                if(r.active && r.active.scriptURL.indexOf('index.service.worker')!==-1){
-                  r.update().then(function(){
-                    console.log('[cache-buster] Service worker update check triggered');
-                  });
-                }
+            // Delete ALL browser caches to force fresh asset loading
+            if('caches' in window){
+              caches.keys().then(function(names){
+                names.forEach(function(n){ caches.delete(n); });
               });
-            });
-            // Listen for new service worker activation → auto-reload for fresh code
-            navigator.serviceWorker.addEventListener('controllerchange', function(){
-              console.log('[cache-buster] New service worker activated — reloading');
-              window.location.reload();
+            }
+            if(!('serviceWorker' in navigator)) return;
+            // Unregister ALL service workers and reload for clean slate
+            navigator.serviceWorker.getRegistrations().then(function(regs){
+              if(regs.length === 0) return;
+              Promise.all(regs.map(function(r){ return r.unregister(); })).then(function(){
+                console.log('[cache-buster] All service workers unregistered, reloading');
+                window.location.reload();
+              });
             });
           })();
           CBEOF
@@ -115,6 +111,7 @@ jobs:
           grep -c "credentialless" index.service.worker.js && echo "Service worker: credentialless OK"
           grep -c "coi-serviceworker" index.html || echo "HTML: coi-serviceworker removed OK"
           grep -c "no-cache" index.html && echo "HTML: no-cache meta tags OK"
+          echo "Build timestamp: ${BUILD_TS}"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
