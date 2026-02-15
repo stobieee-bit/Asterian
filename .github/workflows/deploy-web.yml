@@ -76,26 +76,45 @@ jobs:
           rm -f coi-serviceworker.js
           sed -i 's|<script src="coi-serviceworker.js"></script>||' index.html 2>/dev/null || true
 
-          # 3. Inject a cache-buster script that unregisters stale service workers
-          #    from previous deploys so the new code loads immediately.
+          # 3. Force cache refresh on every deploy.
+          #    - Tell browsers not to cache the HTML page itself
+          #    - Auto-update the service worker and clear old caches on load
+          #    - Remove any stale coi-serviceworker registrations
           cat > cache-buster.js << 'CBEOF'
           (function(){
-            if('serviceWorker' in navigator){
-              navigator.serviceWorker.getRegistrations().then(function(regs){
-                regs.forEach(function(r){
-                  if(r.active && r.active.scriptURL.indexOf('coi-serviceworker')!==-1){
-                    r.unregister().then(function(){console.log('Removed stale coi-serviceworker');});
-                  }
-                });
+            if(!('serviceWorker' in navigator)) return;
+            // Remove stale coi-serviceworker from previous deploys
+            navigator.serviceWorker.getRegistrations().then(function(regs){
+              regs.forEach(function(r){
+                if(r.active && r.active.scriptURL.indexOf('coi-serviceworker')!==-1){
+                  r.unregister().then(function(){
+                    console.log('[cache-buster] Removed stale coi-serviceworker');
+                    window.location.reload();
+                  });
+                }
+                // Force the Godot service worker to check for updates immediately
+                if(r.active && r.active.scriptURL.indexOf('index.service.worker')!==-1){
+                  r.update().then(function(){
+                    console.log('[cache-buster] Service worker update check triggered');
+                  });
+                }
               });
-            }
+            });
+            // Listen for new service worker activation → auto-reload for fresh code
+            navigator.serviceWorker.addEventListener('controllerchange', function(){
+              console.log('[cache-buster] New service worker activated — reloading');
+              window.location.reload();
+            });
           })();
           CBEOF
           sed -i 's|</head>|<script src="cache-buster.js"></script></head>|' index.html
+          # Add no-cache meta tag so the HTML page itself is always refetched
+          sed -i 's|<head>|<head><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">|' index.html
 
           echo "=== Post-patch verification ==="
           grep -c "credentialless" index.service.worker.js && echo "Service worker: credentialless OK"
           grep -c "coi-serviceworker" index.html || echo "HTML: coi-serviceworker removed OK"
+          grep -c "no-cache" index.html && echo "HTML: no-cache meta tags OK"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
