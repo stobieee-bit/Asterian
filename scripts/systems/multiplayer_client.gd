@@ -24,6 +24,7 @@ const MAX_RECONNECT_DELAY: float = 30.0           ## Cap for exponential backoff
 const INITIAL_RECONNECT_DELAY: float = 1.0        ## Starting backoff delay
 const CHAT_MAX_LENGTH: int = 200                  ## Max characters per chat message
 const NAMEPLATE_Y_OFFSET: float = 2.6             ## Height above remote player origin
+const CONNECTION_TIMEOUT: float = 15.0              ## Seconds before treating connect as failed
 
 ## Combat style → color mapping for remote player tinting
 const STYLE_COLORS: Dictionary = {
@@ -47,6 +48,7 @@ var _should_reconnect: bool = false
 var _reconnect_delay: float = INITIAL_RECONNECT_DELAY
 var _reconnect_timer: float = 0.0
 var _reconnecting: bool = false
+var _connect_timeout_timer: float = 0.0
 
 # ── Position sync ──
 
@@ -99,12 +101,15 @@ func _ready() -> void:
 	EventBus.dungeon_started.connect(_on_dungeon_visibility_changed)
 	EventBus.dungeon_exited.connect(_on_dungeon_visibility_changed_no_args)
 
-	# Auto-connect if settings have a multiplayer name stored
+	# Auto-connect on startup — use saved name or generate one
 	var mp_name: String = str(GameState.settings.get("mp_name", ""))
-	if mp_name != "":
-		var url: String = str(GameState.settings.get("mp_server", SERVER_URL_DEFAULT))
-		# Defer connection to let the rest of the scene tree finish loading
-		call_deferred("connect_to_server", url, mp_name)
+	if mp_name == "":
+		# Generate a default name: "Player" + random 4 digits
+		mp_name = "Player%04d" % (randi() % 10000)
+		GameState.settings["mp_name"] = mp_name
+	var url: String = str(GameState.settings.get("mp_server", SERVER_URL_DEFAULT))
+	# Defer connection to let the rest of the scene tree finish loading
+	call_deferred("connect_to_server", url, mp_name)
 
 
 func _process(delta: float) -> void:
@@ -140,6 +145,16 @@ func _process(delta: float) -> void:
 	elif state == WebSocketPeer.STATE_CLOSED:
 		if _connected:
 			_on_connection_closed()
+
+	elif state == WebSocketPeer.STATE_CONNECTING:
+		# Track connection timeout — server may be asleep (Render free tier)
+		_connect_timeout_timer += delta
+		if _connect_timeout_timer >= CONNECTION_TIMEOUT:
+			_connect_timeout_timer = 0.0
+			_ws.close()
+			EventBus.chat_message.emit("Connection timed out. Server may be waking up — retrying...", "system")
+			if _should_reconnect:
+				_schedule_reconnect()
 
 	# Handle reconnection timer
 	if _reconnecting:
@@ -250,8 +265,9 @@ func _attempt_connect() -> void:
 	print("MultiplayerClient: Connecting to %s ..." % _server_url)
 	EventBus.chat_message.emit("Connecting to multiplayer...", "system")
 
-	# Reset the peer so we get a clean state
+	# Reset the peer and timeout timer
 	_ws = WebSocketPeer.new()
+	_connect_timeout_timer = 0.0
 
 	var err: int = _ws.connect_to_url(_server_url)
 	if err != OK:

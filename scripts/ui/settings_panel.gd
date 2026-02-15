@@ -284,12 +284,16 @@ func _on_mp_connect_pressed() -> void:
 
 	var player_name: String = _mp_name_input.text.strip_edges()
 	if player_name.length() == 0:
-		EventBus.chat_message.emit("Please enter a name to connect.", "system")
-		return
+		player_name = "Player%04d" % (randi() % 10000)
+		_mp_name_input.text = player_name
+
+	# Save the name for future sessions
+	GameState.settings["mp_name"] = player_name
 
 	mp_client.connect_to_server(mp_client.SERVER_URL_DEFAULT, player_name)
-	_mp_status_label.text = "Connecting..."
-	_mp_status_label.add_theme_color_override("font_color", Color(0.8, 0.7, 0.3))
+	if _mp_status_label:
+		_mp_status_label.text = "Connecting..."
+		_mp_status_label.add_theme_color_override("font_color", Color(0.8, 0.7, 0.3))
 
 ## Called when multiplayer connects successfully
 func _on_mp_connected(player_count: int) -> void:

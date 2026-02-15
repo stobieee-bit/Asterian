@@ -166,25 +166,9 @@ func _style_top_bar() -> void:
 	# Let mouse events pass through the top bar to the 3D world
 	top_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	# Insert a dark background behind the top bar using a ColorRect
-	var top_bg: ColorRect = ColorRect.new()
-	top_bg.name = "TopBarBG"
-	top_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	top_bg.color = Color(0.02, 0.03, 0.06, 0.85)
-	top_bg.position = Vector2.ZERO
-	top_bg.size = Vector2(_design_size.x, 42)
-	add_child(top_bg)
-	move_child(top_bg, 0)  # Behind everything
+	# (top bar background removed — cleaner look)
 
-	# Thin cyan accent line at bottom of top bar
-	var accent_line: ColorRect = ColorRect.new()
-	accent_line.name = "TopBarAccent"
-	accent_line.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	accent_line.color = Color(0.1, 0.3, 0.45, 0.5)
-	accent_line.position = Vector2(0, 42)
-	accent_line.size = Vector2(_design_size.x, 1)
-	add_child(accent_line)
-	move_child(accent_line, 1)
+	# (accent line removed — cleaner look)
 
 	# Let all TopBar children pass through mouse events
 	if hp_bar:
@@ -280,15 +264,7 @@ func _style_bottom_bar() -> void:
 	if pos_label:
 		pos_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	# Insert a dark background behind the bottom bar
-	var bot_bg: ColorRect = ColorRect.new()
-	bot_bg.name = "BotBarBG"
-	bot_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bot_bg.color = Color(0.02, 0.03, 0.06, 0.7)
-	bot_bg.position = Vector2(0, _design_size.y - 30)
-	bot_bg.size = Vector2(_design_size.x, 30)
-	add_child(bot_bg)
-	move_child(bot_bg, 0)  # Behind everything
+	# (bottom bar background removed — cleaner look)
 
 func _process(delta: float) -> void:
 	# Update FPS counter
@@ -721,12 +697,7 @@ func _build_action_bar() -> void:
 	pet_btn.pressed.connect(func(): _toggle_panel(_pet_panel, "pets"))
 	bar.add_child(pet_btn)
 
-	# Multiplayer button
-	var mp_btn: Button = _make_sci_btn("MP", 44, Color(0.3, 0.7, 1.0))
-	mp_btn.tooltip_text = "Multiplayer"
-	mp_btn.pressed.connect(func(): _toggle_panel(_multiplayer_panel, "multiplayer"))
-	bar.add_child(mp_btn)
-	_mp_action_btn = mp_btn
+	# (MP button removed — multiplayer is in Settings panel now)
 
 	# Settings button
 	var set_btn: Button = _make_sci_btn("Settings", 68, Color(0.5, 0.5, 0.6))
