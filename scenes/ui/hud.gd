@@ -1226,13 +1226,13 @@ func _reposition_ability_bar() -> void:
 	await get_tree().process_frame
 	var bar_width: float = _ability_bar_bg.size.x
 	if bar_width < 10:
-		bar_width = 760.0  # Estimate for 5+1 buttons at larger size
+		bar_width = 830.0  # Estimate for 6 buttons × 120px + gaps + margins
 	_ability_bar_bg.position = Vector2(vp_size.x / 2.0 - bar_width / 2.0, vp_size.y - 104)
 
 ## Create a styled ability button with keybind + name + cost badge
 func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost: int, cost_text_override: String = "") -> Button:
 	var btn: Button = Button.new()
-	btn.custom_minimum_size = Vector2(108, 44)
+	btn.custom_minimum_size = Vector2(120, 44)
 	btn.mouse_filter = Control.MOUSE_FILTER_STOP
 	btn.focus_mode = Control.FOCUS_NONE
 
@@ -1281,14 +1281,16 @@ func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost:
 	key_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(key_lbl)
 
-	# Ability name — centered
+	# Ability name — centered, clipped to prevent overlap
 	var name_lbl: Label = Label.new()
 	name_lbl.text = label_text
 	name_lbl.position = Vector2(20, 2)
-	name_lbl.size = Vector2(84, 20)
+	name_lbl.size = Vector2(96, 20)
+	name_lbl.clip_text = true
+	name_lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	name_lbl.add_theme_font_size_override("font_size", 13)
+	name_lbl.add_theme_font_size_override("font_size", 11)
 	name_lbl.add_theme_color_override("font_color", accent)
 	name_lbl.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.4))
 	name_lbl.add_theme_constant_override("shadow_offset_x", 1)
@@ -1302,7 +1304,7 @@ func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost:
 		var cost_lbl: Label = Label.new()
 		cost_lbl.text = badge_text
 		cost_lbl.position = Vector2(0, 24)
-		cost_lbl.size = Vector2(108, 16)
+		cost_lbl.size = Vector2(120, 16)
 		cost_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		cost_lbl.add_theme_font_size_override("font_size", 10)
 		var badge_color: Color = Color(0.3, 0.75, 0.4, 0.7) if badge_text.begins_with("+") else Color(0.45, 0.55, 0.45, 0.6)
