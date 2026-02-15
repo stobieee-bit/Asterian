@@ -46,11 +46,6 @@ func _process(delta: float) -> void:
 			i -= 1
 			continue
 
-		# Auto pickup if close
-		var dist: float = _player.global_position.distance_to(gitem.global_position)
-		if dist <= auto_pickup_range:
-			_pickup_item(gitem, i)
-
 		i -= 1
 
 ## Roll loot for an enemy and spawn ground items

@@ -78,8 +78,13 @@ func _process(_delta: float) -> void:
 	if _is_showing and _follow_mouse:
 		_position_near_mouse()
 
-## Show tooltip with item data
+## Show tooltip with item data or generic data (stations, NPCs, etc.)
 func _on_tooltip_requested(data: Dictionary, _global_pos: Vector2) -> void:
+	# ── Generic tooltip (stations, NPCs, world objects) ──
+	if data.has("title") and data.has("lines"):
+		_show_generic_tooltip(data)
+		return
+
 	var item_data: Dictionary = data.get("item_data", {})
 	if item_data.is_empty():
 		_on_tooltip_hidden()
@@ -95,6 +100,10 @@ func _on_tooltip_requested(data: Dictionary, _global_pos: Vector2) -> void:
 	# Name (colored by tier)
 	_name_label.text = item_name
 	_name_label.add_theme_color_override("font_color", _tier_color(tier))
+
+	# Reset fields that generic tooltips may have changed
+	_type_label.visible = true
+	_stats_label.add_theme_color_override("font_color", Color(0.7, 0.85, 0.7))
 
 	# Type line
 	var tier_name: String = _tier_name(tier)
@@ -176,6 +185,37 @@ func _on_tooltip_requested(data: Dictionary, _global_pos: Vector2) -> void:
 	_desc_label.visible = desc != ""
 
 	# Show
+	visible = true
+	_is_showing = true
+	_position_near_mouse()
+
+## Show a generic tooltip with title + colored lines (for stations, NPCs, etc.)
+func _show_generic_tooltip(data: Dictionary) -> void:
+	var title: String = str(data.get("title", ""))
+	var title_color: Color = data.get("title_color", Color.WHITE)
+	var lines: Array = data.get("lines", [])
+
+	# Title
+	_name_label.text = title
+	_name_label.add_theme_color_override("font_color", title_color)
+
+	# Build lines into stats area
+	var line_texts: Array[String] = []
+	for line in lines:
+		if line is Dictionary:
+			line_texts.append(str(line.get("text", "")))
+		else:
+			line_texts.append(str(line))
+
+	_type_label.text = ""
+	_type_label.visible = false
+	_stats_label.text = "\n".join(line_texts) if line_texts.size() > 0 else ""
+	_stats_label.visible = line_texts.size() > 0
+	_stats_label.add_theme_color_override("font_color", Color(0.6, 0.7, 0.65))
+	_compare_label.visible = false
+	_desc_label.text = ""
+	_desc_label.visible = false
+
 	visible = true
 	_is_showing = true
 	_position_near_mouse()

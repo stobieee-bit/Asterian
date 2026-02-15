@@ -150,18 +150,24 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	var y_base: float = GROUND_Y + 0.1 + visual_y_bump
 
 	# ── Build all detail layers ──
+	# Bio-Lab is a small crafting hub — skip heavy clutter, keep it clean
+	var _is_clean_area: bool = area_id == "bio-lab"
+
 	_add_ground_variation(area_id, center_x, center_z, radius, base_color, y_base)
-	_add_terrain_bumps(area_id, center_x, center_z, radius, base_color, y_base)
+	if not _is_clean_area:
+		_add_terrain_bumps(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_concentric_rings(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_grid_lines(area_id, center_x, center_z, radius, base_color, y_base)
-	_add_rocks_and_boulders(area_id, center_x, center_z, radius, base_color, y_base)
-	_add_energy_pylons(area_id, center_x, center_z, radius, base_color, y_base)
-	_add_tech_panels(area_id, center_x, center_z, radius, base_color, y_base)
-	_add_light_columns(area_id, center_x, center_z, radius, base_color, y_base)
+	if not _is_clean_area:
+		_add_rocks_and_boulders(area_id, center_x, center_z, radius, base_color, y_base)
+		_add_energy_pylons(area_id, center_x, center_z, radius, base_color, y_base)
+		_add_tech_panels(area_id, center_x, center_z, radius, base_color, y_base)
+		_add_light_columns(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_crystals(area_id, center_x, center_z, radius, base_color, y_base)
-	_add_alien_flora(area_id, center_x, center_z, radius, base_color, y_base)
-	_add_floating_debris(area_id, center_x, center_z, radius, base_color, y_base)
-	_add_pipe_structures(area_id, center_x, center_z, radius, base_color, y_base)
+	if not _is_clean_area:
+		_add_alien_flora(area_id, center_x, center_z, radius, base_color, y_base)
+		_add_floating_debris(area_id, center_x, center_z, radius, base_color, y_base)
+		_add_pipe_structures(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_ruined_walls(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_area_unique_structures(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_point_lights(area_id, center_x, center_z, radius, base_color, y_base)

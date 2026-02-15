@@ -41,8 +41,7 @@ var _combat_exit_timer: float = 0.0  ## Time since last combat action
 const COMBAT_EXIT_DELAY: float = 8.0 ## Seconds without combat to start regen
 
 # ── Target highlight ──
-var _target_indicator: CSGCylinder3D = null
-var _target_indicator_ready: bool = false  ## Gates visibility until after first frame
+var _target_indicator: MeshInstance3D = null
 
 func _ready() -> void:
 	_player = get_parent()
@@ -53,32 +52,28 @@ func _ready() -> void:
 	# Listen for enemy attacks on player
 	EventBus.hit_landed.connect(_on_hit_landed)
 
-	# Create target indicator ring
-	_target_indicator = CSGCylinder3D.new()
-	_target_indicator.radius = 0.8
-	_target_indicator.height = 0.05
-	_target_indicator.sides = 16
+	# Create target indicator ring (MeshInstance3D — no CSG compile flash)
+	_target_indicator = MeshInstance3D.new()
+	var cyl_mesh: CylinderMesh = CylinderMesh.new()
+	cyl_mesh.top_radius = 0.8
+	cyl_mesh.bottom_radius = 0.8
+	cyl_mesh.height = 0.05
+	cyl_mesh.radial_segments = 16
+	_target_indicator.mesh = cyl_mesh
 	var ring_mat: StandardMaterial3D = StandardMaterial3D.new()
 	ring_mat.albedo_color = Color(1.0, 0.3, 0.1, 0.6)
 	ring_mat.emission_enabled = true
 	ring_mat.emission = Color(1.0, 0.2, 0.0)
 	ring_mat.emission_energy_multiplier = 1.0
 	ring_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_target_indicator.material = ring_mat
+	_target_indicator.material_override = ring_mat
 	_target_indicator.visible = false
 	_target_indicator.top_level = true
-	# Start far below world to prevent single-frame flash at origin on login
-	_target_indicator.position = Vector3(0, -100, 0)
 	_player.add_child(_target_indicator)
-	# Wait one frame before allowing visibility (prevents CSG compile flash)
-	await get_tree().process_frame
-	_target_indicator_ready = true
 
 func _process(delta: float) -> void:
-	# Update target indicator position (gated until after first frame)
-	if not _target_indicator_ready:
-		pass
-	elif target and is_instance_valid(target) and target.state != target.State.DEAD:
+	# Update target indicator position
+	if target and is_instance_valid(target) and target.state != target.State.DEAD:
 		_target_indicator.visible = true
 		_target_indicator.global_position = target.global_position
 		_target_indicator.global_position.y = target.global_position.y + 0.05
