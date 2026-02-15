@@ -147,7 +147,6 @@ func _ready() -> void:
 
 	# Build minimap
 	_build_minimap()
-	_build_mute_button()
 
 	# Build QoL overlays
 	_build_low_hp_vignette()
@@ -2900,46 +2899,6 @@ func _build_minimap() -> void:
 		lbl.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
 		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		legend.add_child(lbl)
-
-# ── Mute button ──
-var _mute_btn: Button = null
-
-func _build_mute_button() -> void:
-	_mute_btn = Button.new()
-	_mute_btn.name = "MuteBtn"
-	_mute_btn.add_theme_font_size_override("font_size", 10)
-	_mute_btn.custom_minimum_size = Vector2(44, 20)
-	# Position below minimap
-	var vp_size: Vector2 = _get_viewport_size()
-	_mute_btn.position = Vector2(vp_size.x - 60, 172)
-	_mute_btn.z_index = 50
-	var btn_style: StyleBoxFlat = StyleBoxFlat.new()
-	btn_style.bg_color = Color(0.08, 0.1, 0.18, 0.9)
-	btn_style.border_color = Color(0.2, 0.4, 0.5, 0.6)
-	btn_style.set_border_width_all(1)
-	btn_style.set_corner_radius_all(3)
-	btn_style.set_content_margin_all(2)
-	_mute_btn.add_theme_stylebox_override("normal", btn_style)
-	var btn_hover: StyleBoxFlat = btn_style.duplicate()
-	btn_hover.bg_color = Color(0.12, 0.16, 0.25, 0.9)
-	_mute_btn.add_theme_stylebox_override("hover", btn_hover)
-	_mute_btn.pressed.connect(_on_mute_pressed)
-	_update_mute_button_text()
-	add_child(_mute_btn)
-
-func _on_mute_pressed() -> void:
-	AudioManager.toggle_mute()
-	_update_mute_button_text()
-
-func _update_mute_button_text() -> void:
-	if _mute_btn == null:
-		return
-	if AudioManager.is_muted():
-		_mute_btn.text = "[MUTE]"
-		_mute_btn.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
-	else:
-		_mute_btn.text = "[VOL]"
-		_mute_btn.add_theme_color_override("font_color", Color(0.3, 0.9, 0.7))
 
 ## Handle click on minimap — convert to world position and walk there
 func _on_minimap_click(event: InputEvent) -> void:

@@ -8,6 +8,7 @@ extends PanelContainer
 # ── Node refs (audio) ──
 var _music_slider: HSlider = null
 var _sfx_slider: HSlider = null
+var _mute_check: CheckBox = null
 
 # ── Node refs (display) ──
 var _damage_numbers_check: CheckBox = null
@@ -49,6 +50,9 @@ func _ready() -> void:
 
 	_sfx_slider = _create_slider_row(vbox, "SFX Volume", 0.0, 1.0, 0.05)
 	_sfx_slider.value_changed.connect(_on_sfx_volume_changed)
+
+	_mute_check = _create_checkbox_row(vbox, "Mute All")
+	_mute_check.toggled.connect(_on_mute_toggled)
 
 	# ── Display section ──
 	vbox.add_child(_create_section_header("Display"))
@@ -199,6 +203,8 @@ func refresh() -> void:
 		_music_slider.set_value_no_signal(float(s.get("music_volume", 0.5)))
 	if _sfx_slider != null:
 		_sfx_slider.set_value_no_signal(float(s.get("sfx_volume", 0.7)))
+	if _mute_check != null:
+		_mute_check.set_pressed_no_signal(AudioManager.is_muted())
 
 	# Display
 	if _damage_numbers_check != null:
@@ -241,6 +247,10 @@ func _on_music_volume_changed(value: float) -> void:
 func _on_sfx_volume_changed(value: float) -> void:
 	GameState.settings["sfx_volume"] = value
 	EventBus.settings_changed.emit("sfx_volume", value)
+
+## Called when the "Mute All" checkbox is toggled
+func _on_mute_toggled(_pressed: bool) -> void:
+	AudioManager.toggle_mute()
 
 # ── Signal handlers (display) ──
 
