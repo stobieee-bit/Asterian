@@ -769,12 +769,6 @@ func _build_action_bar() -> void:
 	pet_btn.pressed.connect(func(): _toggle_panel(_pet_panel, "pets"))
 	bar.add_child(pet_btn)
 
-	# Craft button
-	var craft_btn: Button = _make_sci_btn("Craft", 56, Color(0.3, 0.8, 0.9))
-	craft_btn.tooltip_text = "Crafting Recipes"
-	craft_btn.pressed.connect(func(): _toggle_panel(_crafting_panel, "crafting"))
-	bar.add_child(craft_btn)
-
 	# Settings button
 	var set_btn: Button = _make_sci_btn("Settings", 68, Color(0.5, 0.5, 0.6))
 	set_btn.tooltip_text = "Settings"
