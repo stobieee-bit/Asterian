@@ -1,0 +1,67 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  export-web:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup export templates
+        run: |
+          mkdir -p /root/.local/share/godot/export_templates/4.4.stable
+          mv /root/.local/share/godot/templates/web_debug.zip /root/.local/share/godot/export_templates/4.4.stable/ || true
+          mv /root/.local/share/godot/templates/web_release.zip /root/.local/share/godot/export_templates/4.4.stable/ || true
+          # If templates are already in the right place, that's fine
+          ls -la /root/.local/share/godot/export_templates/4.4.stable/ || true
+
+      - name: Import project
+        run: |
+          godot --headless --import 2>&1 || true
+          # Run import a second time to ensure all resources are imported
+          godot --headless --import 2>&1 || true
+
+      - name: Export to Web
+        run: |
+          mkdir -p export/web
+          godot --headless --export-release "Web" export/web/index.html 2>&1
+
+      - name: Add coi-serviceworker for SharedArrayBuffer support
+        run: |
+          # Godot 4 web exports need SharedArrayBuffer which requires cross-origin isolation
+          cd export/web
+          wget -q https://raw.githubusercontent.com/nicolo-ribaudo/coi-serviceworker/master/coi-serviceworker.min.js -O coi-serviceworker.min.js
+          # Inject the service worker script into index.html before </head>
+          sed -i 's|</head>|<script src="coi-serviceworker.min.js"></script></head>|' index.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: export/web
+
+  deploy:
+    needs: export-web
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
