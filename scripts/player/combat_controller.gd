@@ -262,6 +262,9 @@ func _do_attack() -> void:
 	if to_target.length() > 0.1:
 		_player.rotation.y = atan2(-to_target.x, -to_target.z)
 
+	# Trigger attack animation
+	EventBus.player_attacked.emit()
+
 # ── Passive Regen ──
 
 ## HP and energy regeneration when out of combat
@@ -464,6 +467,9 @@ func use_ability(ability_slot: int) -> bool:
 	var to_target: Vector3 = target_pos - _player.global_position
 	if to_target.length() > 0.1:
 		_player.rotation.y = atan2(-to_target.x, -to_target.z)
+
+	# Trigger attack animation
+	EventBus.player_attacked.emit()
 
 	return true
 

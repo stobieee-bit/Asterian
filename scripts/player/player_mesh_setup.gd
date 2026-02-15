@@ -1,5 +1,5 @@
 ## PlayerMeshSetup — Replaces placeholder mesh children with the full
-## astronaut model built by PlayerMeshBuilder.  Also drives walk/idle
+## astronaut model built by PlayerMeshBuilder.  Also drives walk/idle/attack
 ## animation each frame based on the parent PlayerController state.
 ##
 ## Attach this script to the PlayerMesh Node3D inside the Player scene.
@@ -13,6 +13,11 @@ var _player: CharacterBody3D = null
 var _walk_phase: float = 0.0
 var _idle_phase: float = 0.0
 var _walk_intensity: float = 0.0   # Smoothly ramps 0..1
+
+# ── Attack animation state ─────────────────────────────────────────────
+var _attack_phase: float = -1.0    # -1 = not attacking, 0..1 = in progress
+var _attack_duration: float = 0.4  # Seconds for one attack swing
+var _attack_queued: bool = false    # Whether an attack was requested
 
 
 func _ready() -> void:
@@ -28,10 +33,24 @@ func _ready() -> void:
 	# Cache reference to the parent CharacterBody3D (PlayerController)
 	_player = get_parent() as CharacterBody3D
 
+	# Listen for attack events to trigger animation
+	if EventBus.has_signal("player_attacked"):
+		EventBus.player_attacked.connect(_on_player_attacked)
+
 
 func _process(delta: float) -> void:
 	if _mesh_root == null or _player == null:
 		return
+
+	# Process attack animation if active (takes priority over walk/idle)
+	if _attack_phase >= 0.0:
+		_attack_phase += delta / _attack_duration
+		if _attack_phase >= 1.0:
+			_attack_phase = -1.0  # Attack finished
+			PlayerMeshBuilder.reset_pose(_mesh_root)
+		else:
+			PlayerMeshBuilder.animate_attack(_mesh_root, _attack_phase)
+			return  # Don't blend with walk/idle during attack
 
 	var is_moving: bool = _player.get("is_moving") as bool if _player.get("is_moving") != null else false
 	var current_speed: float = _player.get("current_speed") as float if _player.get("current_speed") != null else 0.0
@@ -57,3 +76,13 @@ func _process(delta: float) -> void:
 		if _idle_phase > TAU * 100.0:
 			_idle_phase -= TAU * 100.0
 		PlayerMeshBuilder.animate_idle(_mesh_root, _idle_phase)
+
+
+## Trigger an attack animation swing. Called by CombatController.
+func play_attack() -> void:
+	_attack_phase = 0.0
+
+
+## Signal callback for player_attacked event
+func _on_player_attacked() -> void:
+	play_attack()

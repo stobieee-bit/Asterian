@@ -25,7 +25,7 @@ func _process(delta: float) -> void:
 		_player = get_tree().get_first_node_in_group("player")
 		return
 
-	# Check for auto-pickup proximity
+	# Check for auto-pickup proximity and lifetime despawn
 	var i: int = _ground_items.size() - 1
 	while i >= 0:
 		var gitem: Node3D = _ground_items[i]
@@ -43,6 +43,14 @@ func _process(delta: float) -> void:
 		if age > ground_item_lifetime:
 			_ground_items.remove_at(i)
 			gitem.queue_free()
+			i -= 1
+			continue
+
+		# Auto-pickup when player is close enough
+		var dist: float = _player.global_position.distance_to(gitem.global_position)
+		if dist <= auto_pickup_range:
+			_pickup_item(gitem, i)
+			# _pickup_item removes from array on success, so don't decrement
 			i -= 1
 			continue
 

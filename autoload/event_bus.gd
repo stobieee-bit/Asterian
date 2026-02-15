@@ -25,6 +25,7 @@ signal enemy_killed(enemy_id: String, enemy_type: String)
 signal enemy_spawned(enemy_node: Node)
 signal hit_landed(target: Node, damage: int, is_crit: bool)
 signal hit_missed(target: Node)
+signal player_attacked
 
 # ── Equipment & Inventory signals ──
 signal item_added(item_id: String, quantity: int)

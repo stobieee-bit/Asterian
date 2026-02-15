@@ -605,6 +605,80 @@ static func animate_idle(root: Node3D, phase: float) -> void:
 			mat.emission_energy_multiplier = 3.0 + sin(phase * 2.0) * 0.6
 
 
+## Attack animation — swings the right arm forward in a punching/striking motion.
+## `phase` goes from 0.0 to 1.0 over the attack duration.
+## 0.0-0.3: wind up (arm pulls back), 0.3-0.6: strike (arm thrusts forward),
+## 0.6-1.0: recover (arm returns to neutral).
+static func animate_attack(root: Node3D, phase: float) -> void:
+	var right_arm_upper: Node3D = root.get_meta("right_arm_upper") as Node3D
+	var right_arm_lower: Node3D = root.get_meta("right_arm_lower") as Node3D
+	var left_arm_upper: Node3D = root.get_meta("left_arm_upper") as Node3D
+	var left_arm_lower: Node3D = root.get_meta("left_arm_lower") as Node3D
+	var head_group: Node3D = root.get_meta("head_group") as Node3D
+
+	# Attack phases
+	var arm_x: float = 0.0  # Forward/back rotation
+	var arm_z: float = 0.0  # Outward spread
+	var elbow_bend: float = 0.0
+	var torso_lean: float = 0.0
+
+	if phase < 0.3:
+		# Wind up — pull right arm back, bend elbow
+		var t: float = phase / 0.3
+		arm_x = lerpf(0.0, 0.8, t)        # Pull back
+		arm_z = lerpf(0.0, -0.15, t)      # Slight outward
+		elbow_bend = lerpf(0.0, -0.9, t)  # Bend elbow
+		torso_lean = lerpf(0.0, 0.1, t)   # Lean back slightly
+	elif phase < 0.6:
+		# Strike — thrust arm forward hard
+		var t: float = (phase - 0.3) / 0.3
+		arm_x = lerpf(0.8, -1.2, t)       # Swing forward past center
+		arm_z = lerpf(-0.15, 0.1, t)      # Pull inward
+		elbow_bend = lerpf(-0.9, -0.2, t) # Straighten elbow
+		torso_lean = lerpf(0.1, -0.15, t) # Lean forward
+	else:
+		# Recover — return to neutral
+		var t: float = (phase - 0.6) / 0.4
+		arm_x = lerpf(-1.2, 0.0, t)
+		arm_z = lerpf(0.1, 0.0, t)
+		elbow_bend = lerpf(-0.2, 0.0, t)
+		torso_lean = lerpf(-0.15, 0.0, t)
+
+	# Apply right arm (attacking arm)
+	if right_arm_upper:
+		right_arm_upper.rotation.x = arm_x
+		right_arm_upper.rotation.z = arm_z
+	if right_arm_lower:
+		right_arm_lower.rotation.x = elbow_bend
+
+	# Left arm — slight guard position during strike
+	if left_arm_upper:
+		left_arm_upper.rotation.x = lerpf(0.0, -0.3, clampf(1.0 - phase * 2.0, 0.0, 1.0))
+		left_arm_upper.rotation.z = lerpf(0.0, 0.2, clampf(1.0 - phase * 2.0, 0.0, 1.0))
+	if left_arm_lower:
+		left_arm_lower.rotation.x = lerpf(0.0, -0.5, clampf(1.0 - phase * 2.0, 0.0, 1.0))
+
+	# Torso lean forward during strike
+	if head_group:
+		head_group.position.y = 1.65 + torso_lean * 0.08
+
+	# Legs stay planted but front foot steps forward slightly
+	var left_leg_upper: Node3D = root.get_meta("left_leg_upper") as Node3D
+	var right_leg_upper: Node3D = root.get_meta("right_leg_upper") as Node3D
+	if phase < 0.6:
+		var step: float = sinf(phase / 0.6 * PI) * 0.15
+		if right_leg_upper:
+			right_leg_upper.rotation.x = step  # Right foot steps forward with punch
+		if left_leg_upper:
+			left_leg_upper.rotation.x = -step * 0.3  # Left leg braces
+	else:
+		var t: float = (phase - 0.6) / 0.4
+		if right_leg_upper:
+			right_leg_upper.rotation.x = lerpf(0.0, 0.0, t)
+		if left_leg_upper:
+			left_leg_upper.rotation.x = 0.0
+
+
 ## Reset all animated parts to default pose.
 static func reset_pose(root: Node3D) -> void:
 	for meta_key: String in ["left_arm_upper", "right_arm_upper", "left_arm_lower",
