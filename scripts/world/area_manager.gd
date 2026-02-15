@@ -172,6 +172,42 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	_add_point_lights(area_id, center_x, center_z, radius, base_color, y_base)
 
 # ═══════════════════════════════════════════════════════════════════════════════
+#  DECORATION COLLISION — add physics bodies so the player can't walk through props
+# ═══════════════════════════════════════════════════════════════════════════════
+
+## Attach a cylindrical collision body to a node so the player bumps into it.
+## The shape is centered at the node's position; `col_radius` and `col_height`
+## define the cylinder dimensions.  Layer 1 matches the ground/wall layer that
+## the player's collision mask already checks.
+func _add_cylinder_collision(parent: Node3D, col_radius: float, col_height: float,
+		y_offset: float = 0.0) -> void:
+	var body: StaticBody3D = StaticBody3D.new()
+	body.collision_layer = 1
+	var col: CollisionShape3D = CollisionShape3D.new()
+	var shape: CylinderShape3D = CylinderShape3D.new()
+	shape.radius = col_radius
+	shape.height = col_height
+	col.shape = shape
+	if y_offset != 0.0:
+		col.position.y = y_offset
+	body.add_child(col)
+	parent.add_child(body)
+
+## Attach a box collision body (for walls, beams, etc.)
+func _add_box_collision(parent: Node3D, box_size: Vector3,
+		y_offset: float = 0.0) -> void:
+	var body: StaticBody3D = StaticBody3D.new()
+	body.collision_layer = 1
+	var col: CollisionShape3D = CollisionShape3D.new()
+	var shape: BoxShape3D = BoxShape3D.new()
+	shape.size = box_size
+	col.shape = shape
+	if y_offset != 0.0:
+		col.position.y = y_offset
+	body.add_child(col)
+	parent.add_child(body)
+
+# ═══════════════════════════════════════════════════════════════════════════════
 #  CLUTTER DENSITY — per-area multiplier so gathering/combat zones stay readable
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -371,6 +407,8 @@ func _add_rocks_and_boulders(area_id: String, cx: float, cz: float, radius: floa
 		rock.rotation.y = rng.randf() * TAU
 		rock.material = rock_mat
 		add_child(rock)
+		if rock_r >= 1.0:
+			_add_cylinder_collision(rock, rock_r * 0.8, rock_r * 0.6)
 
 ## Energy pylons — tall glowing pillars scattered through the area
 func _add_energy_pylons(area_id: String, cx: float, cz: float, radius: float,
@@ -400,6 +438,7 @@ func _add_energy_pylons(area_id: String, cx: float, cz: float, radius: float,
 		ped_mat.roughness = 0.3
 		pedestal.material = ped_mat
 		add_child(pedestal)
+		_add_cylinder_collision(pedestal, 0.8, height + 0.6)
 
 		# Main column
 		var column: CSGCylinder3D = CSGCylinder3D.new()
@@ -602,6 +641,8 @@ func _add_crystals(area_id: String, cx: float, cz: float, radius: float,
 		cryst_mat.emission_energy_multiplier = 1.8
 		crystal.material = cryst_mat
 		add_child(crystal)
+		if c_height >= 3.0:
+			_add_cylinder_collision(crystal, c_radius + 0.2, c_height * 0.8)
 
 		# Add cluster mates (2-3 smaller crystals near each large one)
 		if rng.randf() > 0.4:
@@ -853,6 +894,7 @@ func _add_ruined_walls(area_id: String, cx: float, cz: float, radius: float,
 		wall.rotation.y = rng.randf() * TAU
 		wall.material = wall_mat
 		add_child(wall)
+		_add_box_collision(wall, Vector3(wall_w, wall_h, 0.6))
 
 		# Broken top — irregular jagged silhouette (smaller boxes on top)
 		for j in range(rng.randi_range(2, 5)):
@@ -1031,6 +1073,7 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 		counter.position = Vector3(sx, y_base + 0.5, sz + 1.5)
 		counter.material = metal_mat
 		add_child(counter)
+		_add_box_collision(counter, Vector3(2.5, 0.9, 0.8))
 
 		# Awning roof
 		var awning: CSGBox3D = CSGBox3D.new()
@@ -1121,6 +1164,7 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 	tower_base.position = Vector3(cx - 20, y_base + 7.0, cz - 15)
 	tower_base.material = metal_mat
 	add_child(tower_base)
+	_add_cylinder_collision(tower_base, 2.0, 14.0)
 
 	# Tower windows (rings)
 	for wi in range(3):
@@ -1221,6 +1265,7 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 	container_mat.roughness = 0.35
 	container.material = container_mat
 	add_child(container)
+	_add_box_collision(container, Vector3(4.0, 2.5, 2.0))
 
 	# Container marking strip
 	var cont_strip: CSGBox3D = CSGBox3D.new()
@@ -1250,6 +1295,7 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 		barrier.rotation.y = angle + PI * 0.5
 		barrier.material = dark_metal
 		add_child(barrier)
+		_add_box_collision(barrier, Vector3(8.0, 1.5, 0.5))
 
 		# Barrier glow strip
 		var b_strip: CSGBox3D = CSGBox3D.new()
@@ -1345,6 +1391,7 @@ func _build_gathering_structures(cx: float, cz: float, radius: float,
 		stem_mat.roughness = 0.7
 		stem.material = stem_mat
 		add_child(stem)
+		_add_cylinder_collision(stem, 0.6, stem_h)
 
 		# Large cap
 		var cap: CSGCylinder3D = CSGCylinder3D.new()
@@ -1491,6 +1538,8 @@ func _build_wastes_spore_fields(y_base: float) -> void:
 		pod.scale = Vector3(1.0, rng.randf_range(0.6, 1.2), 1.0)
 		pod.material = pod_mat
 		add_child(pod)
+		if pod_r >= 1.5:
+			_add_cylinder_collision(pod, pod_r * 0.8, pod_r)
 
 		# Glowing tip on top
 		var tip: CSGSphere3D = CSGSphere3D.new()
@@ -1568,6 +1617,7 @@ func _build_wastes_hive_perimeter(y_base: float) -> void:
 		wall.rotation.y = angle + PI * 0.5
 		wall.material = chitin_mat
 		add_child(wall)
+		_add_box_collision(wall, Vector3(wall_w, wall_h, 1.2))
 
 	# Hive arch structures — paired pillars with organic arches
 	for i in range(3):
@@ -1611,6 +1661,7 @@ func _build_wastes_hive_perimeter(y_base: float) -> void:
 		mound.scale = Vector3(1.2, 0.35, 1.0)
 		mound.material = chitin_mat
 		add_child(mound)
+		_add_cylinder_collision(mound, mound_r * 1.0, mound_r * 0.5)
 
 		# Glowing openings on some mounds
 		if rng.randf() > 0.4:
@@ -1669,6 +1720,7 @@ func _build_wastes_fungal_depths(y_base: float) -> void:
 		stem.rotation = Vector3(rng.randf_range(-0.1, 0.1), 0, rng.randf_range(-0.1, 0.1))
 		stem.material = stem_mat
 		add_child(stem)
+		_add_cylinder_collision(stem, stem_r + 0.3, stem_h)
 
 		# Cap (flattened sphere on top)
 		var cap: CSGSphere3D = CSGSphere3D.new()
@@ -1793,6 +1845,8 @@ func _build_wastes_toxic_heart(y_base: float) -> void:
 		bone.rotation = Vector3(rng.randf_range(-0.25, 0.25), rng.randf() * TAU, rng.randf_range(-0.25, 0.25))
 		bone.material = bone_mat if rng.randf() > 0.4 else corroded_mat
 		add_child(bone)
+		if bone_h >= 3.0:
+			_add_cylinder_collision(bone, bone_r + 0.2, bone_h)
 
 	# Toxic green lights
 	for i in range(4):
@@ -1920,6 +1974,8 @@ func _build_wastes_aberration_wastes(y_base: float) -> void:
 			rng.randf_range(0.8, 1.3))
 		mound.material = flesh_mat
 		add_child(mound)
+		if m_r >= 2.5:
+			_add_cylinder_collision(mound, m_r * 0.8, m_r * 0.5)
 
 		# Random eye on some mounds
 		if rng.randf() > 0.6:
@@ -1995,6 +2051,7 @@ func _build_wastes_eldritch_edge(y_base: float) -> void:
 	throne_base.position = Vector3(zcx, y_base + 0.75, zcz)
 	throne_base.material = throne_mat
 	add_child(throne_base)
+	_add_cylinder_collision(throne_base, 8.0, 1.5)
 
 	# Throne spires — tall spikes around the platform
 	for i in range(4):
@@ -2009,6 +2066,7 @@ func _build_wastes_eldritch_edge(y_base: float) -> void:
 		spire.position = Vector3(sx, y_base + spire.height * 0.5 + 1.5, sz)
 		spire.material = void_mat
 		add_child(spire)
+		_add_cylinder_collision(spire, 0.6, spire.height)
 
 		# Crystal tip on each spire
 		var tip: CSGSphere3D = CSGSphere3D.new()
@@ -2143,6 +2201,7 @@ func _build_abyss_structures(cx: float, cz: float, radius: float,
 		)
 		pillar.material = void_mat
 		add_child(pillar)
+		_add_cylinder_collision(pillar, pillar.radius + 0.2, pillar_h)
 
 	# Reality tear rifts (thin vertical planes of energy)
 	for i in range(6):
@@ -2213,6 +2272,8 @@ func _build_mines_structures(cx: float, cz: float, radius: float,
 		top.position = Vector3(px, y_base + tower_h, pz)
 		top.material = metal_mat
 		add_child(top)
+		# Collision cylinder around the tower footprint
+		_add_cylinder_collision(top, 2.0, tower_h, -tower_h * 0.5)
 
 		# Drill bit
 		var drill: CSGCylinder3D = CSGCylinder3D.new()
