@@ -15,6 +15,7 @@ var _grid: GridContainer = null
 var _slots: Array[PanelContainer] = []
 var _title_label: Label = null
 var _close_btn: Button = null
+var _credits_label: Label = null
 
 # ── State ──
 var _is_dragging: bool = false
@@ -24,7 +25,7 @@ func _ready() -> void:
 	# Panel style
 	custom_minimum_size = Vector2(
 		COLS * (SLOT_SIZE + SLOT_PADDING) + 24,
-		ROWS * (SLOT_SIZE + SLOT_PADDING) + 60
+		ROWS * (SLOT_SIZE + SLOT_PADDING) + 80
 	)
 
 	# Build UI tree
@@ -49,14 +50,28 @@ func _ready() -> void:
 		_grid.add_child(slot)
 		_slots.append(slot)
 
+	# ── Credits row below grid ──
+	_credits_label = Label.new()
+	_credits_label.name = "CreditsLabel"
+	_credits_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_credits_label.add_theme_font_size_override("font_size", 15)
+	_credits_label.add_theme_color_override("font_color", Color(0.85, 0.75, 0.3, 0.95))
+	_credits_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.6))
+	_credits_label.add_theme_constant_override("shadow_offset_x", 1)
+	_credits_label.add_theme_constant_override("shadow_offset_y", 1)
+	_credits_label.text = "$0"
+	vbox.add_child(_credits_label)
+
 	# Connect to signals for live updates
 	EventBus.item_added.connect(_on_inventory_changed)
 	EventBus.item_removed.connect(_on_inventory_changed)
 	EventBus.item_equipped.connect(_on_equipment_changed)
 	EventBus.item_unequipped.connect(_on_equipment_changed)
+	EventBus.player_credits_changed.connect(_on_credits_changed)
 
 	# Initial refresh
 	refresh()
+	_update_credits_display(int(GameState.player.get("credits", 0)))
 
 ## Create a single inventory slot
 func _create_slot(index: int) -> PanelContainer:
@@ -257,6 +272,22 @@ func _on_slot_hover(index: int) -> void:
 
 func _on_slot_exit() -> void:
 	EventBus.tooltip_hidden.emit()
+
+func _on_credits_changed(new_total: int) -> void:
+	_update_credits_display(new_total)
+
+func _update_credits_display(amount: int) -> void:
+	if _credits_label == null:
+		return
+	var s: String = str(amount)
+	if amount >= 1000:
+		var parts: Array[String] = []
+		while s.length() > 3:
+			parts.push_front(s.right(3))
+			s = s.left(s.length() - 3)
+		parts.push_front(s)
+		s = ",".join(parts)
+	_credits_label.text = "$%s" % s
 
 func _on_close_pressed() -> void:
 	visible = false

@@ -120,12 +120,13 @@ func _ready() -> void:
 	# Window resize — reposition minimap and action bar
 	get_tree().root.size_changed.connect(_on_window_resized)
 
-	# Build stat bars (HP, EN, ADR, level, credits) — absolute positioned
+	# Build combat style indicator (must be before stat bars so label can be inserted)
+	_build_combat_style_indicator()
+
+	# Build stat bars (HP, EN, ADR) — absolute positioned
 	_build_stat_bars()
 
-	# Initial display
-	_update_credits_display(GameState.player["credits"])
-	_update_level_display()
+	# Initial display (level + credits now shown in skills/inventory panels)
 
 	# Build panels (hidden by default)
 	_build_panels()
@@ -163,7 +164,6 @@ func _ready() -> void:
 	_build_gather_label()
 	_build_quest_tracker()
 	_build_save_toast()
-	_build_combat_style_indicator()
 	_build_hover_label()
 
 ## Build stat bars + info labels with absolute positioning (no TopBar/BottomBar containers)
@@ -177,6 +177,10 @@ func _build_stat_bars() -> void:
 	_stat_bars_container.alignment = BoxContainer.ALIGNMENT_CENTER
 	_stat_bars_container.add_theme_constant_override("separation", 2)
 	add_child(_stat_bars_container)
+
+	# ── Style indicator label — centered above HP bar ──
+	if _style_indicator_label:
+		_stat_bars_container.add_child(_style_indicator_label)
 
 	# ── HP Bar ──
 	hp_bar = ProgressBar.new()
@@ -250,31 +254,7 @@ func _build_stat_bars() -> void:
 	_energy_text.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	energy_bar.add_child(_energy_text)
 
-	# ── Level label — top-left corner ──
-	level_label = Label.new()
-	level_label.name = "LevelLabel"
-	level_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	level_label.position = Vector2(14, 10)
-	level_label.add_theme_font_size_override("font_size", 14)
-	level_label.add_theme_color_override("font_color", Color(0.5, 0.6, 0.7, 0.8))
-	level_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
-	level_label.add_theme_constant_override("shadow_offset_x", 1)
-	level_label.add_theme_constant_override("shadow_offset_y", 1)
-	level_label.text = "Combat Lv 1 | Total Lv 7"
-	add_child(level_label)
-
-	# ── Credits label — below level ──
-	credits_label = Label.new()
-	credits_label.name = "CreditsLabel"
-	credits_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	credits_label.position = Vector2(14, 30)
-	credits_label.add_theme_font_size_override("font_size", 15)
-	credits_label.add_theme_color_override("font_color", Color(0.85, 0.75, 0.3, 0.9))
-	credits_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
-	credits_label.add_theme_constant_override("shadow_offset_x", 1)
-	credits_label.add_theme_constant_override("shadow_offset_y", 1)
-	credits_label.text = "$0"
-	add_child(credits_label)
+	# Level + credits now shown in Skills and Inventory panels respectively
 
 	# ── FPS label — bottom-right ──
 	fps_label = Label.new()
@@ -1249,10 +1229,11 @@ func _reposition_stat_bars() -> void:
 		return
 	var vp_size: Vector2 = _get_viewport_size()
 	# Stat bars sit centered above the ability bar (which is at vp.y - 104)
+	# Extra space for style indicator label above HP bar
 	var container_width: float = 280.0  # Width of widest bar (HP)
 	_stat_bars_container.position = Vector2(
 		vp_size.x / 2.0 - container_width / 2.0,
-		vp_size.y - 160
+		vp_size.y - 178
 	)
 
 ## Create a styled ability button with keybind + name + cost badge
@@ -2271,14 +2252,13 @@ func _build_combat_style_indicator() -> void:
 	_style_indicator_label = Label.new()
 	_style_indicator_label.name = "CombatStyleIndicator"
 	_style_indicator_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_style_indicator_label.add_theme_font_size_override("font_size", 14)
+	_style_indicator_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_style_indicator_label.add_theme_font_size_override("font_size", 13)
 	_style_indicator_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.6))
 	_style_indicator_label.add_theme_constant_override("shadow_offset_x", 1)
 	_style_indicator_label.add_theme_constant_override("shadow_offset_y", 1)
-	# Position right of adrenaline bar
-	_style_indicator_label.position = Vector2(268, 63)
-	_style_indicator_label.size = Vector2(140, 22)
-	add_child(_style_indicator_label)
+	_style_indicator_label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	# Added to stat bars container as first child (above HP bar) in _build_stat_bars
 	_update_style_indicator()
 
 func _update_style_indicator() -> void:

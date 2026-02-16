@@ -33,11 +33,29 @@ func _ready() -> void:
 	var drag_header: DraggableHeader = DraggableHeader.attach(self, "Skills", _on_close_pressed)
 	_main_vbox.add_child(drag_header)
 
+	# ── Level summary row (Combat Lv + Total Lv) ──
+	var level_row: HBoxContainer = HBoxContainer.new()
+	level_row.name = "LevelRow"
+	level_row.add_theme_constant_override("separation", 12)
+	_main_vbox.add_child(level_row)
+
+	var combat_label: Label = Label.new()
+	combat_label.name = "CombatLevel"
+	combat_label.add_theme_font_size_override("font_size", 14)
+	combat_label.add_theme_color_override("font_color", Color(0.8, 0.5, 0.5))
+	combat_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
+	combat_label.add_theme_constant_override("shadow_offset_x", 1)
+	combat_label.add_theme_constant_override("shadow_offset_y", 1)
+	level_row.add_child(combat_label)
+
 	var total_label: Label = Label.new()
 	total_label.name = "TotalLevel"
 	total_label.add_theme_font_size_override("font_size", 14)
 	total_label.add_theme_color_override("font_color", Color(0.5, 0.7, 0.5))
-	_main_vbox.add_child(total_label)
+	total_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
+	total_label.add_theme_constant_override("shadow_offset_x", 1)
+	total_label.add_theme_constant_override("shadow_offset_y", 1)
+	level_row.add_child(total_label)
 
 	# Build grouped skill rows
 	for group in _skill_groups:
@@ -440,10 +458,15 @@ func refresh() -> void:
 				_format_number(next_level_xp)
 			]
 
-	# Total level
-	var total_lbl: Label = _main_vbox.get_node_or_null("TotalLevel") as Label
-	if total_lbl:
-		total_lbl.text = "Total Level: %d" % GameState.get_total_level()
+	# Level summary
+	var level_row: HBoxContainer = _main_vbox.get_node_or_null("LevelRow") as HBoxContainer
+	if level_row:
+		var combat_lbl: Label = level_row.get_node_or_null("CombatLevel") as Label
+		if combat_lbl:
+			combat_lbl.text = "Combat Lv %d" % GameState.get_combat_level()
+		var total_lbl: Label = level_row.get_node_or_null("TotalLevel") as Label
+		if total_lbl:
+			total_lbl.text = "| Total Lv %d" % GameState.get_total_level()
 
 func _on_xp_gained(_skill: String, _amount: int) -> void:
 	refresh()
