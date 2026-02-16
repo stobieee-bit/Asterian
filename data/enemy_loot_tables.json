@@ -164,5 +164,27 @@
       200,
       "quantum_yeast"
     ]
+  ],
+  "prestige_mat": [
+    [
+      25,
+      49,
+      "star_dust"
+    ],
+    [
+      50,
+      69,
+      "temporal_dust"
+    ],
+    [
+      70,
+      99,
+      "psionic_crystal"
+    ],
+    [
+      80,
+      200,
+      "corrupted_essence"
+    ]
   ]
 }

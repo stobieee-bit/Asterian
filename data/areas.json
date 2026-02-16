@@ -342,7 +342,7 @@
       "cz": -670,
       "radius": 70,
       "levelMin": 40,
-      "levelMax": 50,
+      "levelMax": 65,
       "density": 1.0,
       "desc": "Dark dens where the deadliest stalkers and worms dwell."
     },
@@ -353,10 +353,10 @@
       "cx": -50,
       "cz": -790,
       "radius": 70,
-      "levelMin": 40,
-      "levelMax": 50,
+      "levelMin": 55,
+      "levelMax": 80,
       "density": 0.9,
-      "desc": "Warped terrain where golems and wraiths roam."
+      "desc": "Warped terrain where golems and wraiths roam among fissures of dark energy."
     },
     {
       "id": "eldritch-edge",
@@ -365,10 +365,10 @@
       "cx": 40,
       "cz": -880,
       "radius": 75,
-      "levelMin": 45,
-      "levelMax": 50,
+      "levelMin": 75,
+      "levelMax": 99,
       "density": 0.9,
-      "desc": "The boundary where reality frays and eldritch eyes watch."
+      "desc": "The boundary where reality frays and eldritch eyes watch from the void."
     },
     {
       "id": "shattered-edge",
@@ -377,10 +377,10 @@
       "cx": -60,
       "cz": -1130,
       "radius": 80,
-      "levelMin": 45,
-      "levelMax": 50,
+      "levelMin": 100,
+      "levelMax": 120,
       "density": 0.8,
-      "desc": "Crumbling platforms at the mouth of the abyss."
+      "desc": "Crumbling platforms at the mouth of the abyss where lurkers circle."
     },
     {
       "id": "pillar-ruins",
@@ -389,8 +389,8 @@
       "cx": 60,
       "cz": -1300,
       "radius": 90,
-      "levelMin": 45,
-      "levelMax": 50,
+      "levelMin": 120,
+      "levelMax": 145,
       "density": 0.85,
       "desc": "Ruins of ancient structures where reality tears and horrors patrol."
     },
@@ -401,8 +401,8 @@
       "cx": -50,
       "cz": -1470,
       "radius": 85,
-      "levelMin": 48,
-      "levelMax": 50,
+      "levelMin": 145,
+      "levelMax": 170,
       "density": 0.9,
       "desc": "The deep where massive serpents coil in darkness."
     },
@@ -413,8 +413,8 @@
       "cx": 50,
       "cz": -1630,
       "radius": 85,
-      "levelMin": 48,
-      "levelMax": 50,
+      "levelMin": 170,
+      "levelMax": 200,
       "density": 0.85,
       "desc": "The absolute bottom — domain of cosmic titans."
     }

@@ -6184,5 +6184,191 @@
     "rarity": "epic",
     "desc": "Contains a Shadow Mote. Use to unlock this companion.",
     "petId": "shadow_mote"
+  },
+  "void_moss": {
+    "id": "void_moss",
+    "name": "Void Moss",
+    "type": "resource",
+    "icon": "icon_plant",
+    "stackable": false,
+    "value": 65,
+    "tier": 4,
+    "desc": "Dark moss that thrives in low-gravity pockets."
+  },
+  "neural_bloom": {
+    "id": "neural_bloom",
+    "name": "Neural Bloom",
+    "type": "resource",
+    "icon": "icon_plant",
+    "stackable": false,
+    "value": 120,
+    "tier": 5,
+    "desc": "Bioluminescent flower pulsing with neural energy."
+  },
+  "quantum_vine": {
+    "id": "quantum_vine",
+    "name": "Quantum Vine",
+    "type": "resource",
+    "icon": "icon_plant",
+    "stackable": false,
+    "value": 180,
+    "tier": 6,
+    "desc": "Phase-shifting vine that exists in two states simultaneously."
+  },
+  "greater_chrono_elixir": {
+    "id": "greater_chrono_elixir",
+    "name": "Greater Chrono Elixir",
+    "type": "consumable",
+    "icon": "icon_elixir",
+    "stackable": false,
+    "value": 2200,
+    "tier": 10,
+    "buff": {
+      "type": "speed",
+      "value": 20,
+      "duration": 300
+    },
+    "desc": "+20 speed and +15% XP for 5 minutes."
+  },
+  "temporal_shard": {
+    "id": "temporal_shard",
+    "name": "Temporal Shard",
+    "type": "consumable",
+    "icon": "icon_dust",
+    "stackable": false,
+    "value": 5000,
+    "tier": 12,
+    "buff": {
+      "type": "all",
+      "value": 25,
+      "duration": 300
+    },
+    "desc": "+25 all stats and +100% gathering speed for 5 minutes. The pinnacle of chronomancy."
+  },
+  "psi_weave_robe": {
+    "id": "psi_weave_robe",
+    "name": "Psi-Weave Robe",
+    "type": "armor",
+    "icon": "icon_neural",
+    "slot": "body",
+    "armor": 45,
+    "accuracy": 12,
+    "value": 1800,
+    "tier": 7,
+    "desc": "Full body armor woven from neural fiber and psionic crystal."
+  },
+  "mind_shield": {
+    "id": "mind_shield",
+    "name": "Mind Shield",
+    "type": "offhand",
+    "icon": "icon_neural",
+    "slot": "offhand",
+    "armor": 35,
+    "accuracy": 8,
+    "value": 2400,
+    "tier": 9,
+    "desc": "Psionic barrier shield that absorbs incoming attacks."
+  },
+  "psi_blade": {
+    "id": "psi_blade",
+    "name": "Psi-Blade",
+    "type": "weapon",
+    "icon": "icon_neural",
+    "slot": "weapon",
+    "damage": 95,
+    "accuracy": 88,
+    "style": "nano",
+    "value": 3200,
+    "tier": 10,
+    "levelReq": 80,
+    "desc": "Neural-forged blade that cuts through matter and mind alike."
+  },
+  "transcendent_hood": {
+    "id": "transcendent_hood",
+    "name": "Transcendent Hood",
+    "type": "armor",
+    "icon": "icon_neural",
+    "slot": "head",
+    "armor": 62,
+    "accuracy": 18,
+    "value": 4500,
+    "tier": 11,
+    "desc": "Hood of pure psionic energy. Best-in-slot headgear."
+  },
+  "neural_nexus": {
+    "id": "neural_nexus",
+    "name": "Neural Nexus",
+    "type": "consumable",
+    "icon": "icon_neural",
+    "stackable": false,
+    "value": 6000,
+    "tier": 12,
+    "buff": {
+      "type": "all",
+      "value": 30,
+      "duration": 300
+    },
+    "desc": "+30 all stats for 5 minutes. The ultimate psionic consumable."
+  },
+  "endurance_serum": {
+    "id": "endurance_serum",
+    "name": "Endurance Serum",
+    "type": "consumable",
+    "icon": "icon_serum",
+    "stackable": false,
+    "value": 1400,
+    "tier": 8,
+    "buff": {
+      "type": "defense",
+      "value": 15,
+      "duration": 300
+    },
+    "desc": "+15 defense for 5 minutes."
+  },
+  "transcendence_serum": {
+    "id": "transcendence_serum",
+    "name": "Transcendence Serum",
+    "type": "consumable",
+    "icon": "icon_serum",
+    "stackable": false,
+    "value": 4000,
+    "tier": 11,
+    "buff": {
+      "type": "all",
+      "value": 20,
+      "duration": 300
+    },
+    "desc": "+20 all stats for 5 minutes."
+  },
+  "asterian_banquet": {
+    "id": "asterian_banquet",
+    "name": "Asterian Banquet",
+    "type": "food",
+    "icon": "icon_feast",
+    "stackable": false,
+    "value": 5000,
+    "tier": 12,
+    "heals": 800,
+    "desc": "The ultimate feast. Heals 800 HP. Requires mastery of every ingredient."
+  },
+  "masterwork_mining_laser": {
+    "id": "masterwork_mining_laser",
+    "name": "Masterwork Mining Laser",
+    "type": "tool",
+    "icon": "icon_tool",
+    "stackable": false,
+    "value": 4500,
+    "tier": 11,
+    "desc": "Ascendant-grade mining laser. Increases mining speed significantly."
+  },
+  "cosmic_alloy": {
+    "id": "cosmic_alloy",
+    "name": "Cosmic Alloy",
+    "type": "material",
+    "icon": "icon_alloy",
+    "stackable": false,
+    "value": 8000,
+    "tier": 12,
+    "desc": "The rarest alloy in the galaxy. Forged from corrupted ingots and harmony cores."
   }
 }

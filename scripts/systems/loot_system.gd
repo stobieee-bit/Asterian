@@ -188,7 +188,7 @@ func _roll_level_loot(enemy_level: int, spawn_pos: Vector3) -> void:
 		return
 
 	# Pick a random loot category
-	var categories: Array[String] = ["ore", "bio_mat", "food"]
+	var categories: Array[String] = ["ore", "bio_mat", "food", "prestige_mat"]
 	var cat: String = categories[randi() % categories.size()]
 
 	var table: Array = DataManager.enemy_loot_tables.get(cat, [])

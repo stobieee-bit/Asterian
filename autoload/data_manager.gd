@@ -223,7 +223,7 @@ func get_skill(skill_id: String) -> Dictionary:
 	return {}
 
 ## Current max skill level (capped for early game testing)
-const MAX_SKILL_LEVEL: int = 50
+const MAX_SKILL_LEVEL: int = 99
 
 ## Get XP required for a given level. Returns 0 if level exceeds cap.
 func xp_for_level(level: int) -> int:

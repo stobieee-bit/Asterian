@@ -213,7 +213,8 @@
     "input": {
       "solar_grain": 2,
       "quantum_yeast": 1,
-      "crystal_honey": 1
+      "crystal_honey": 1,
+      "star_dust": 1
     },
     "output": {
       "quantum_risotto": 1
@@ -242,7 +243,8 @@
     "input": {
       "void_truffle": 2,
       "quantum_yeast": 1,
-      "crystal_honey": 2
+      "crystal_honey": 2,
+      "chrono_essence": 1
     },
     "output": {
       "cosmic_ambrosia": 1
@@ -2148,7 +2150,8 @@
     "level": 60,
     "xp": 290,
     "input": {
-      "quantite_ore": 1
+      "quantite_ore": 1,
+      "refined_spore": 1
     },
     "output": {
       "quantite_bar": 1
@@ -2451,7 +2454,8 @@
     "level": 70,
     "xp": 380,
     "input": {
-      "neutronium_ore": 1
+      "neutronium_ore": 1,
+      "refined_gravity": 1
     },
     "output": {
       "neutronium_bar": 1
@@ -2754,7 +2758,8 @@
     "level": 80,
     "xp": 500,
     "input": {
-      "darkmatter_shard": 1
+      "darkmatter_shard": 1,
+      "refined_neural": 1
     },
     "output": {
       "darkmatter_bar": 1
@@ -3057,7 +3062,8 @@
     "level": 90,
     "xp": 650,
     "input": {
-      "voidsteel_ore": 1
+      "voidsteel_ore": 1,
+      "bio_catalyst": 1
     },
     "output": {
       "voidsteel_bar": 1
@@ -4748,5 +4754,193 @@
       "voidsteel_bar": 1
     },
     "name": "Transmute Voidsteel Bar"
+  },
+  "synthesize_corrupted_essence": {
+    "skill": "chronomancy",
+    "level": 80,
+    "xp": 350,
+    "input": {
+      "voidsteel_bar": 2,
+      "quantum_catalyst": 1
+    },
+    "output": {
+      "corrupted_essence": 1
+    },
+    "name": "Synthesize Corrupted Essence"
+  },
+  "brew_greater_chrono_elixir": {
+    "skill": "chronomancy",
+    "level": 90,
+    "xp": 500,
+    "input": {
+      "chrono_essence": 2,
+      "bio_catalyst": 1
+    },
+    "output": {
+      "greater_chrono_elixir": 1
+    },
+    "name": "Brew Greater Chrono Elixir"
+  },
+  "transmute_ascendant": {
+    "skill": "chronomancy",
+    "level": 95,
+    "xp": 600,
+    "input": {
+      "voidsteel_bar": 5,
+      "quantum_catalyst": 3
+    },
+    "output": {
+      "ascendant_alloy": 1
+    },
+    "name": "Transmute Ascendant Alloy"
+  },
+  "forge_temporal_shard": {
+    "skill": "chronomancy",
+    "level": 99,
+    "xp": 800,
+    "input": {
+      "quantum_catalyst": 2,
+      "corrupted_essence": 1,
+      "harmony_core": 1
+    },
+    "output": {
+      "temporal_shard": 1
+    },
+    "name": "Forge Temporal Shard"
+  },
+  "craft_psi_weave_robe": {
+    "skill": "psionics",
+    "level": 50,
+    "xp": 300,
+    "input": {
+      "neural_fiber": 5,
+      "psionic_crystal": 2,
+      "quantite_bar": 2
+    },
+    "output": {
+      "psi_weave_robe": 1
+    },
+    "name": "Craft Psi-Weave Robe"
+  },
+  "craft_mind_shield": {
+    "skill": "psionics",
+    "level": 70,
+    "xp": 400,
+    "input": {
+      "psionic_conduit": 2,
+      "darkmatter_bar": 2
+    },
+    "output": {
+      "mind_shield": 1
+    },
+    "name": "Craft Mind Shield"
+  },
+  "craft_psi_blade": {
+    "skill": "psionics",
+    "level": 80,
+    "xp": 500,
+    "input": {
+      "neural_fiber": 4,
+      "voidsteel_bar": 3
+    },
+    "output": {
+      "psi_blade": 1
+    },
+    "name": "Craft Psi-Blade"
+  },
+  "craft_transcendent_hood": {
+    "skill": "psionics",
+    "level": 90,
+    "xp": 600,
+    "input": {
+      "harmony_core": 1,
+      "ascendant_alloy": 2
+    },
+    "output": {
+      "transcendent_hood": 1
+    },
+    "name": "Craft Transcendent Hood"
+  },
+  "craft_neural_nexus": {
+    "skill": "psionics",
+    "level": 99,
+    "xp": 800,
+    "input": {
+      "harmony_core": 2,
+      "bio_catalyst": 2,
+      "corrupted_essence": 1
+    },
+    "output": {
+      "neural_nexus": 1
+    },
+    "name": "Craft Neural Nexus"
+  },
+  "brew_endurance_serum": {
+    "skill": "bioforge",
+    "level": 75,
+    "xp": 280,
+    "input": {
+      "bio_catalyst": 1,
+      "quantum_yeast": 2
+    },
+    "output": {
+      "endurance_serum": 1
+    },
+    "name": "Brew Endurance Serum"
+  },
+  "brew_transcendence_serum": {
+    "skill": "bioforge",
+    "level": 95,
+    "xp": 650,
+    "input": {
+      "harmony_core": 1,
+      "bio_catalyst": 2
+    },
+    "output": {
+      "transcendence_serum": 1
+    },
+    "name": "Brew Transcendence Serum"
+  },
+  "cook_asterian_banquet": {
+    "skill": "xenocook",
+    "level": 99,
+    "xp": 800,
+    "input": {
+      "alien_steak": 1,
+      "void_truffle": 1,
+      "quantum_yeast": 1,
+      "plasma_pepper": 1,
+      "chrono_essence": 1
+    },
+    "output": {
+      "asterian_banquet": 1
+    },
+    "name": "Prepare Asterian Banquet"
+  },
+  "forge_masterwork_laser": {
+    "skill": "circuitry",
+    "level": 95,
+    "xp": 650,
+    "input": {
+      "ascendant_alloy": 2,
+      "bio_catalyst": 1
+    },
+    "output": {
+      "masterwork_mining_laser": 1
+    },
+    "name": "Forge Masterwork Mining Laser"
+  },
+  "forge_cosmic_alloy": {
+    "skill": "circuitry",
+    "level": 99,
+    "xp": 800,
+    "input": {
+      "corrupted_ingot": 2,
+      "harmony_core": 1
+    },
+    "output": {
+      "cosmic_alloy": 1
+    },
+    "name": "Forge Cosmic Alloy"
   }
 }

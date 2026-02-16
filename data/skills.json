@@ -41,8 +41,8 @@
       "desc": "Extract ores and gems from asteroid deposits. Higher levels unlock rarer materials.",
       "trains": "Mine ore nodes in the Asteroid Mines.",
       "category": "Gathering",
-      "feeds": ["circuitry"],
-      "feedDesc": "Ores feed into Circuitry for smelting bars and forging gear"
+      "feeds": ["circuitry", "chronomancy"],
+      "feedDesc": "Ores feed into Circuitry for smelting. Star Dust and Temporal Dust fuel Chronomancy."
     },
     "xenobotany": {
       "name": "Xenobotany",
@@ -52,8 +52,8 @@
       "desc": "Harvest alien flora — lichens, kelps, fruits, and chitin from the Gathering Grounds. Supplies ingredients for Xenocook and Bioforge.",
       "trains": "Gather bio-resources in the Gathering Grounds.",
       "category": "Gathering",
-      "feeds": ["bioforge", "xenocook"],
-      "feedDesc": "Bio-resources feed into Bioforge for armor/serums and Xenocook for food"
+      "feeds": ["bioforge", "xenocook", "psionics"],
+      "feedDesc": "Bio-resources feed Bioforge (armor/serums), Xenocook (food), and Psionics (psionic crystals)."
     },
     "bioforge": {
       "name": "Bioforge",
@@ -101,8 +101,8 @@
       "category": "Prestige",
       "locked": true,
       "lockText": "Complete the Neural Awakening quest chain.",
-      "needs": ["nano", "tesla", "void"],
-      "feedDesc": "Boss drops from combat feed into endgame psi-weave gear crafting"
+      "needs": ["nano", "tesla", "void", "circuitry"],
+      "feedDesc": "Boss drops and metal bars feed into psi-weave gear and neural consumable crafting."
     },
     "chronomancy": {
       "name": "Quantum Synthesis",
@@ -114,8 +114,8 @@
       "category": "Prestige",
       "softGate": true,
       "softGateText": "Requires Level 10 in any combat skill.",
-      "needs": ["astromining"],
-      "feedDesc": "Transmute ores to skip tiers — shortcuts the Astromining pipeline"
+      "needs": ["astromining", "bioforge"],
+      "feedDesc": "Transmute ores to skip tiers and synthesize rare materials. Needs Bioforge catalysts at high levels."
     }
   },
   "unlocks": {
@@ -221,6 +221,26 @@
         "level": 60,
         "type": "item",
         "desc": "Harvest Quantum Vine"
+      },
+      {
+        "level": 65,
+        "type": "item",
+        "desc": "Harvest Gravity Residue deposits"
+      },
+      {
+        "level": 70,
+        "type": "item",
+        "desc": "Harvest Abyssal Lichen"
+      },
+      {
+        "level": 80,
+        "type": "item",
+        "desc": "Harvest Corrupted Flora"
+      },
+      {
+        "level": 90,
+        "type": "item",
+        "desc": "Harvest Primordial Blossom"
       }
     ],
     "circuitry": [
@@ -313,6 +333,16 @@
         "level": 93,
         "type": "item",
         "desc": "Forge Corrupted Ingot, Craft Corrupted gear"
+      },
+      {
+        "level": 95,
+        "type": "item",
+        "desc": "Forge Masterwork Mining Laser"
+      },
+      {
+        "level": 99,
+        "type": "item",
+        "desc": "Forge Cosmic Alloy"
       }
     ],
     "xenocook": [
@@ -405,6 +435,11 @@
         "level": 95,
         "type": "item",
         "desc": "Cook Cosmic Ambrosia"
+      },
+      {
+        "level": 99,
+        "type": "item",
+        "desc": "Prepare Asterian Banquet"
       }
     ],
     "bioforge": [
@@ -487,6 +522,26 @@
         "level": 93,
         "type": "item",
         "desc": "Corrupted style armor recipes"
+      },
+      {
+        "level": 70,
+        "type": "item",
+        "desc": "Synthesize Psi-Flux Compound"
+      },
+      {
+        "level": 75,
+        "type": "item",
+        "desc": "Brew Endurance Serum"
+      },
+      {
+        "level": 95,
+        "type": "item",
+        "desc": "Brew Transcendence Serum"
+      },
+      {
+        "level": 99,
+        "type": "item",
+        "desc": "Synthesize Primordial Weave"
       }
     ],
     "nano": [
@@ -720,6 +775,31 @@
         "level": 60,
         "type": "item",
         "desc": "Craft Harmony Core"
+      },
+      {
+        "level": 50,
+        "type": "item",
+        "desc": "Craft Psi-Weave Robe"
+      },
+      {
+        "level": 70,
+        "type": "item",
+        "desc": "Craft Mind Shield"
+      },
+      {
+        "level": 80,
+        "type": "item",
+        "desc": "Craft Psi-Blade"
+      },
+      {
+        "level": 90,
+        "type": "item",
+        "desc": "Craft Transcendent Hood"
+      },
+      {
+        "level": 99,
+        "type": "item",
+        "desc": "Craft Neural Nexus"
       }
     ],
     "chronomancy": [
@@ -787,6 +867,26 @@
         "level": 85,
         "type": "item",
         "desc": "Transmute Darkmatter to Voidsteel"
+      },
+      {
+        "level": 80,
+        "type": "item",
+        "desc": "Synthesize Corrupted Essence"
+      },
+      {
+        "level": 90,
+        "type": "item",
+        "desc": "Brew Greater Chrono Elixir"
+      },
+      {
+        "level": 95,
+        "type": "item",
+        "desc": "Transmute Ascendant Alloy"
+      },
+      {
+        "level": 99,
+        "type": "item",
+        "desc": "Forge Temporal Shard"
       }
     ]
   },

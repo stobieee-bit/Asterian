@@ -29,19 +29,31 @@ func _define_spawn_zones() -> void:
 			{"level": 50, "item": "plasmite_ore", "color": Color(0.8, 0.15, 1.0), "count": 4},
 			{"level": 60, "item": "quantite_ore", "color": Color(1.0, 0.5, 0.0), "count": 3},
 			{"level": 70, "item": "neutronium_ore", "color": Color(1.0, 0.1, 0.3), "count": 3},
+			{"level": 80, "item": "darkmatter_shard", "color": Color(0.15, 0.0, 0.35), "count": 2},
+			{"level": 90, "item": "voidsteel_ore", "color": Color(0.1, 0.0, 0.2), "count": 2},
 		]
 	})
 
 	# Gathering Grounds — Bio resources (spores, lichen, etc.)
 	_spawn_defs.append({
 		"area": "gathering-grounds",
-		"cx": 0.0, "cz": -100.0, "radius": 50.0,
+		"cx": 0.0, "cz": -100.0, "radius": 65.0,
 		"skill": "xenobotany",
 		"nodes": [
 			{"level": 1, "item": "space_lichen", "color": Color(0.3, 0.5, 0.25), "count": 10},
 			{"level": 5, "item": "cryo_kelp", "color": Color(0.2, 0.5, 0.6), "count": 8},
 			{"level": 10, "item": "nebula_fruit", "color": Color(0.6, 0.3, 0.7), "count": 6},
+			{"level": 15, "item": "solar_grain", "color": Color(0.8, 0.7, 0.2), "count": 6},
 			{"level": 20, "item": "chitin_shard", "color": Color(0.5, 0.4, 0.2), "count": 5},
+			{"level": 25, "item": "alien_steak", "color": Color(0.7, 0.3, 0.3), "count": 5},
+			{"level": 30, "item": "spore_cap", "color": Color(0.5, 0.6, 0.3), "count": 5},
+			{"level": 35, "item": "plasma_pepper", "color": Color(1.0, 0.3, 0.1), "count": 4},
+			{"level": 40, "item": "void_moss", "color": Color(0.25, 0.5, 0.3), "count": 3},
+			{"level": 45, "item": "crystal_honey", "color": Color(0.9, 0.8, 0.3), "count": 3},
+			{"level": 50, "item": "neural_bloom", "color": Color(0.6, 0.3, 0.8), "count": 3},
+			{"level": 55, "item": "void_truffle", "color": Color(0.3, 0.1, 0.4), "count": 2},
+			{"level": 60, "item": "quantum_vine", "color": Color(0.2, 0.8, 0.8), "count": 2},
+			{"level": 65, "item": "gravity_residue", "color": Color(0.4, 0.2, 0.6), "count": 2},
 		]
 	})
 
