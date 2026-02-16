@@ -26,15 +26,23 @@ func can_craft(recipe_id: String) -> bool:
 		if have < needed:
 			return false
 
-	# Check inventory space for outputs
+	# Check inventory space for outputs — account for slots freed by consumed inputs
 	var outputs: Dictionary = recipe.get("output", {})
+	var slots_freed: int = 0
+	for item_id in inputs:
+		var needed: int = int(inputs[item_id])
+		var have: int = GameState.count_item(item_id)
+		# Each consumed item frees a slot (items don't stack in this system)
+		slots_freed += mini(needed, have)
+
 	var slots_needed: int = 0
 	for item_id in outputs:
-		var idx: int = GameState.find_inventory_item(item_id)
-		if idx < 0:
-			slots_needed += 1
+		var qty: int = int(outputs[item_id])
+		# Items don't stack — each unit needs its own slot
+		slots_needed += qty
 
-	if GameState.inventory.size() + slots_needed > GameState.inventory_size:
+	var available_slots: int = GameState.inventory_size - GameState.inventory.size() + slots_freed
+	if slots_needed > available_slots:
 		return false
 
 	return true
