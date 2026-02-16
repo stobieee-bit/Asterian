@@ -47,6 +47,7 @@ var _prestige_panel: PanelContainer = null
 var _dungeon_panel: PanelContainer = null
 var _pet_panel: PanelContainer = null
 var _settings_panel: PanelContainer = null
+var _achievement_panel: PanelContainer = null
 var _multiplayer_panel: PanelContainer = null
 var _tooltip_panel: PanelContainer = null
 var _tutorial_panel: PanelContainer = null
@@ -68,6 +69,7 @@ var prestige_script: GDScript = preload("res://scripts/ui/prestige_panel.gd")
 var dungeon_script: GDScript = preload("res://scripts/ui/dungeon_panel.gd")
 var pet_script: GDScript = preload("res://scripts/ui/pet_panel.gd")
 var settings_script: GDScript = preload("res://scripts/ui/settings_panel.gd")
+var achievement_script: GDScript = preload("res://scripts/ui/achievement_panel.gd")
 var tooltip_script: GDScript = preload("res://scripts/ui/tooltip_panel.gd")
 var tutorial_script: GDScript = preload("res://scripts/ui/tutorial_panel.gd")
 # context_menu is built inline in _build_context_menu()
@@ -413,6 +415,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_N:
 				_toggle_panel(_dungeon_panel, "dungeon")
 				get_viewport().set_input_as_handled()
+			# Achievements (J)
+			KEY_J:
+				_toggle_panel(_achievement_panel, "achievements")
+				get_viewport().set_input_as_handled()
 			# Minimap zoom toggle (M)
 			KEY_M:
 				_cycle_minimap_zoom()
@@ -545,6 +551,14 @@ func _build_panels() -> void:
 	_settings_panel.visible = false
 	_settings_panel.position = Vector2(350, 100)
 	add_child(_settings_panel)
+
+	# Achievement panel (left-center)
+	_achievement_panel = PanelContainer.new()
+	_achievement_panel.set_script(achievement_script)
+	_achievement_panel.add_theme_stylebox_override("panel", panel_style.duplicate())
+	_achievement_panel.visible = false
+	_achievement_panel.position = Vector2(200, 60)
+	add_child(_achievement_panel)
 
 	# Multiplayer panel (bottom-right, always accessible)
 	_multiplayer_panel = PanelContainer.new()
@@ -2764,8 +2778,8 @@ func _close_all_panels() -> void:
 		_inventory_panel, _equipment_panel, _skills_panel,
 		_quest_panel, _bestiary_panel, _prestige_panel,
 		_dungeon_panel, _pet_panel, _settings_panel,
-		_multiplayer_panel, _dialogue_panel, _shop_panel,
-		_crafting_panel, _bank_panel, _tutorial_panel
+		_achievement_panel, _multiplayer_panel, _dialogue_panel,
+		_shop_panel, _crafting_panel, _bank_panel, _tutorial_panel
 	]
 	for panel in panels:
 		if panel and panel.visible:
