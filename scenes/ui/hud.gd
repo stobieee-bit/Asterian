@@ -1533,57 +1533,14 @@ func _build_combat_indicator() -> void:
 	_combat_label.visible = false
 	add_child(_combat_label)
 
-# ── Slayer task display ──
-var _slayer_panel: PanelContainer = null
+# ── Slayer task display (embedded in quest tracker panel) ──
+var _slayer_separator: HSeparator = null
 var _slayer_title: Label = null
 var _slayer_target: Label = null
 var _slayer_progress: Label = null
 var _slayer_streak: Label = null
 
 func _build_slayer_display() -> void:
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = Color(0.08, 0.04, 0.02, 0.75)
-	style.border_color = Color(1.0, 0.5, 0.2, 0.4)
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(4)
-	style.set_content_margin_all(6)
-
-	_slayer_panel = PanelContainer.new()
-	_slayer_panel.name = "SlayerTracker"
-	_slayer_panel.add_theme_stylebox_override("panel", style)
-	_slayer_panel.visible = false
-	_slayer_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_slayer_panel.custom_minimum_size = Vector2(260, 0)
-	add_child(_slayer_panel)
-
-	var vbox: VBoxContainer = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 3)
-	_slayer_panel.add_child(vbox)
-
-	_slayer_title = Label.new()
-	_slayer_title.text = "Slayer Task"
-	_slayer_title.add_theme_font_size_override("font_size", 14)
-	_slayer_title.add_theme_color_override("font_color", Color(1.0, 0.6, 0.2))
-	_slayer_title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.5))
-	_slayer_title.add_theme_constant_override("shadow_offset_x", 1)
-	_slayer_title.add_theme_constant_override("shadow_offset_y", 1)
-	vbox.add_child(_slayer_title)
-
-	_slayer_target = Label.new()
-	_slayer_target.add_theme_font_size_override("font_size", 13)
-	_slayer_target.add_theme_color_override("font_color", Color(0.85, 0.8, 0.7))
-	vbox.add_child(_slayer_target)
-
-	_slayer_progress = Label.new()
-	_slayer_progress.add_theme_font_size_override("font_size", 13)
-	_slayer_progress.add_theme_color_override("font_color", Color(0.9, 0.7, 0.3))
-	vbox.add_child(_slayer_progress)
-
-	_slayer_streak = Label.new()
-	_slayer_streak.add_theme_font_size_override("font_size", 11)
-	_slayer_streak.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7))
-	vbox.add_child(_slayer_streak)
-
 	# Connect to enemy killed to update
 	EventBus.enemy_killed.connect(_on_slayer_enemy_killed)
 	# Show initial state (if save had an active task)
@@ -1593,40 +1550,39 @@ func _on_slayer_enemy_killed(_eid: String, _etype: String) -> void:
 	_update_slayer_display()
 
 func _update_slayer_display() -> void:
-	if _slayer_panel == null:
-		return
+	var has_slayer: bool = false
 	var task: Dictionary = GameState.slayer_task
-	if task.is_empty() or not task.has("remaining"):
-		_slayer_panel.visible = false
-		return
-	var remaining: int = int(task.get("remaining", 0))
-	if remaining <= 0:
-		_slayer_panel.visible = false
-		return
-	var count: int = int(task.get("count", 0))
-	var enemy_type: String = str(task.get("enemy_type", ""))
-	var enemy_data: Dictionary = DataManager.get_enemy(enemy_type)
-	var enemy_name: String = str(enemy_data.get("name", enemy_type))
-	var area_name: String = str(task.get("area", "")).replace("-", " ").capitalize()
+	if not task.is_empty() and task.has("remaining"):
+		var remaining: int = int(task.get("remaining", 0))
+		if remaining > 0:
+			has_slayer = true
+			var count: int = int(task.get("count", 0))
+			var enemy_type: String = str(task.get("enemy_type", ""))
+			var enemy_data: Dictionary = DataManager.get_enemy(enemy_type)
+			var enemy_name: String = str(enemy_data.get("name", enemy_type))
+			var area_name: String = str(task.get("area", "")).replace("-", " ").capitalize()
 
-	_slayer_target.text = "Kill %s" % enemy_name
-	_slayer_progress.text = "%d / %d" % [count - remaining, count]
-	_slayer_streak.text = "Streak: %d | %s" % [GameState.slayer_streak, area_name]
-	_slayer_panel.visible = true
+			if _slayer_target:
+				_slayer_target.text = "Kill %s" % enemy_name
+			if _slayer_progress:
+				_slayer_progress.text = "%d / %d" % [count - remaining, count]
+			if _slayer_streak:
+				_slayer_streak.text = "Streak: %d | %s" % [GameState.slayer_streak, area_name]
 
-	# Position below the quest tracker
-	_reposition_slayer_tracker()
+	# Show/hide the slayer section within the quest tracker
+	if _slayer_separator:
+		_slayer_separator.visible = has_slayer
+	if _slayer_title:
+		_slayer_title.visible = has_slayer
+	if _slayer_target:
+		_slayer_target.visible = has_slayer
+	if _slayer_progress:
+		_slayer_progress.visible = has_slayer
+	if _slayer_streak:
+		_slayer_streak.visible = has_slayer
 
-
-func _reposition_slayer_tracker() -> void:
-	if _slayer_panel == null:
-		return
-	var vp_size: Vector2 = _get_viewport_size()
-	# Base Y: below the quest tracker if it's visible, otherwise at 200
-	var base_y: float = 200.0
-	if _quest_tracker_panel != null and _quest_tracker_panel.visible:
-		base_y = _quest_tracker_panel.position.y + _quest_tracker_panel.size.y + 8.0
-	_slayer_panel.position = Vector2(vp_size.x - 280, base_y)
+	# Refresh panel visibility (panel shows if quest OR slayer is active)
+	_refresh_quest_tracker()
 
 
 func _on_combat_started(_enemy_id: String) -> void:
@@ -2207,6 +2163,40 @@ func _build_quest_tracker() -> void:
 	_quest_tracker_progress.add_theme_color_override("font_color", Color(0.3, 0.9, 0.4))
 	vbox.add_child(_quest_tracker_progress)
 
+	# ── Slayer task section (inside same panel, below quest) ──
+	_slayer_separator = HSeparator.new()
+	_slayer_separator.add_theme_constant_override("separation", 4)
+	_slayer_separator.visible = false
+	vbox.add_child(_slayer_separator)
+
+	_slayer_title = Label.new()
+	_slayer_title.text = "Slayer Task"
+	_slayer_title.add_theme_font_size_override("font_size", 14)
+	_slayer_title.add_theme_color_override("font_color", Color(1.0, 0.6, 0.2))
+	_slayer_title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.5))
+	_slayer_title.add_theme_constant_override("shadow_offset_x", 1)
+	_slayer_title.add_theme_constant_override("shadow_offset_y", 1)
+	_slayer_title.visible = false
+	vbox.add_child(_slayer_title)
+
+	_slayer_target = Label.new()
+	_slayer_target.add_theme_font_size_override("font_size", 13)
+	_slayer_target.add_theme_color_override("font_color", Color(0.85, 0.8, 0.7))
+	_slayer_target.visible = false
+	vbox.add_child(_slayer_target)
+
+	_slayer_progress = Label.new()
+	_slayer_progress.add_theme_font_size_override("font_size", 13)
+	_slayer_progress.add_theme_color_override("font_color", Color(0.9, 0.7, 0.3))
+	_slayer_progress.visible = false
+	vbox.add_child(_slayer_progress)
+
+	_slayer_streak = Label.new()
+	_slayer_streak.add_theme_font_size_override("font_size", 11)
+	_slayer_streak.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7))
+	_slayer_streak.visible = false
+	vbox.add_child(_slayer_streak)
+
 	# Initial update
 	_refresh_quest_tracker()
 
@@ -2220,53 +2210,59 @@ func _refresh_quest_tracker() -> void:
 	if _quest_tracker_panel == null:
 		return
 
-	# Find the first active quest with progress info
-	if GameState.active_quests.is_empty():
-		_quest_tracker_panel.visible = false
-		return
+	# Determine if we have quest content to show
+	var has_quest: bool = false
 
-	var quest_sys: Node = get_tree().get_first_node_in_group("quest_system")
-	if quest_sys == null:
-		_quest_tracker_panel.visible = false
-		return
+	if not GameState.active_quests.is_empty():
+		var quest_sys: Node = get_tree().get_first_node_in_group("quest_system")
+		if quest_sys != null:
+			var quest_id: String = str(GameState.active_quests.keys()[0])
+			var progress: Dictionary = quest_sys.get_quest_progress(quest_id) if quest_sys.has_method("get_quest_progress") else {}
+			if not progress.is_empty():
+				has_quest = true
+				_quest_tracker_title.text = str(progress.get("name", quest_id))
 
-	# Show the first active quest
-	var quest_id: String = str(GameState.active_quests.keys()[0])
-	var progress: Dictionary = quest_sys.get_quest_progress(quest_id) if quest_sys.has_method("get_quest_progress") else {}
-	if progress.is_empty():
-		_quest_tracker_panel.visible = false
-		return
+				var steps: Array = progress.get("steps", [])
+				var current_step: int = int(progress.get("step", 0))
 
-	_quest_tracker_panel.visible = true
-	_quest_tracker_title.text = str(progress.get("name", quest_id))
+				if current_step < steps.size():
+					var step: Dictionary = steps[current_step]
+					var desc: String = str(step.get("desc", ""))
+					var paren_idx: int = desc.rfind(" (")
+					if paren_idx >= 0 and desc.ends_with(")"):
+						desc = desc.substr(0, paren_idx)
+					_quest_tracker_step.text = desc
+					var current_count: int = int(step.get("current", 0))
+					var required: int = int(step.get("required", 1))
+					_quest_tracker_progress.text = "%d / %d" % [current_count, required]
+					if step.get("done", false):
+						_quest_tracker_progress.add_theme_color_override("font_color", Color(0.3, 1.0, 0.3))
+					else:
+						_quest_tracker_progress.add_theme_color_override("font_color", Color(0.9, 0.7, 0.3))
+				elif progress.get("completable", false):
+					_quest_tracker_step.text = "All objectives complete!"
+					_quest_tracker_progress.text = "Return to turn in"
+					_quest_tracker_progress.add_theme_color_override("font_color", Color(0.3, 1.0, 0.3))
+				else:
+					has_quest = false
 
-	var steps: Array = progress.get("steps", [])
-	var current_step: int = int(progress.get("step", 0))
+	# Show/hide quest labels
+	if _quest_tracker_title:
+		_quest_tracker_title.visible = has_quest
+	if _quest_tracker_step:
+		_quest_tracker_step.visible = has_quest
+	if _quest_tracker_progress:
+		_quest_tracker_progress.visible = has_quest
 
-	if current_step < steps.size():
-		var step: Dictionary = steps[current_step]
-		var desc: String = str(step.get("desc", ""))
-		# Strip trailing (x/y) from desc if present
-		var paren_idx: int = desc.rfind(" (")
-		if paren_idx >= 0 and desc.ends_with(")"):
-			desc = desc.substr(0, paren_idx)
-		_quest_tracker_step.text = desc
-		var current_count: int = int(step.get("current", 0))
-		var required: int = int(step.get("required", 1))
-		_quest_tracker_progress.text = "%d / %d" % [current_count, required]
-		if step.get("done", false):
-			_quest_tracker_progress.add_theme_color_override("font_color", Color(0.3, 1.0, 0.3))
-		else:
-			_quest_tracker_progress.add_theme_color_override("font_color", Color(0.9, 0.7, 0.3))
-	elif progress.get("completable", false):
-		_quest_tracker_step.text = "All objectives complete!"
-		_quest_tracker_progress.text = "Return to turn in"
-		_quest_tracker_progress.add_theme_color_override("font_color", Color(0.3, 1.0, 0.3))
-	else:
-		_quest_tracker_panel.visible = false
+	# Check if slayer section is active
+	var has_slayer: bool = _slayer_title != null and _slayer_title.visible
 
-	# Reposition slayer tracker since quest tracker visibility may have changed
-	_reposition_slayer_tracker()
+	# Hide separator if there's no quest content above it
+	if _slayer_separator:
+		_slayer_separator.visible = has_slayer and has_quest
+
+	# Panel visible if either quest or slayer has content
+	_quest_tracker_panel.visible = has_quest or has_slayer
 
 # ══════════════════════════════════════════════════════════════════
 # QoL: AUTO-SAVE INDICATOR — Brief "Game Saved" toast
@@ -2867,8 +2863,6 @@ func _on_window_resized() -> void:
 	_reposition_chat()
 	# Reposition FPS/Pos labels to bottom-right
 	_reposition_bottom_labels()
-	# Reposition slayer tracker below quest tracker
-	_reposition_slayer_tracker()
 
 ## Reposition the bottom action bar to horizontal center
 func _reposition_action_bar() -> void:
@@ -2931,9 +2925,6 @@ func _resize_minimap() -> void:
 	# Move quest tracker below minimap
 	if _quest_tracker_panel:
 		_quest_tracker_panel.position.y = map_size + 12
-
-	# Reposition slayer tracker below quest tracker
-	_reposition_slayer_tracker()
 
 	EventBus.chat_message.emit("Minimap: %s" % ["Small", "Medium", "Large"][_minimap_zoom_level], "system")
 
