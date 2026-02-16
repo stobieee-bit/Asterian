@@ -1188,30 +1188,28 @@ func _process(delta: float) -> void:
 			_respawn()
 
 func _apply_visuals() -> void:
-	# Body material — strong saturated color
+	# Body material — NO emission so lighting reveals shape/silhouette
 	var body_mat: StandardMaterial3D = StandardMaterial3D.new()
 	body_mat.albedo_color = _node_color
 	body_mat.metallic = 0.3 + skill_level * 0.005
 	body_mat.roughness = 0.5 - skill_level * 0.004
-	body_mat.emission_enabled = true
-	body_mat.emission = _node_color  # Pure color emission, no lightening
-	body_mat.emission_energy_multiplier = 1.2 + skill_level * 0.03
+	# No emission on body — let scene lighting define edges and shadows
 
-	# Accent material — brighter, high-glow crystal parts
+	# Accent material — subtle glow to highlight detail parts without washing out shape
 	var accent_mat: StandardMaterial3D = StandardMaterial3D.new()
 	accent_mat.albedo_color = _node_color.lightened(0.15)
 	accent_mat.metallic = 0.6 + skill_level * 0.004
 	accent_mat.roughness = 0.2
 	accent_mat.emission_enabled = true
 	accent_mat.emission = _node_color.lightened(0.15)
-	accent_mat.emission_energy_multiplier = 3.0 + skill_level * 0.04
+	accent_mat.emission_energy_multiplier = 0.5 + skill_level * 0.005  # 0.505 to 0.95
 
-	# Glow ring material — brightest
+	# Glow ring material — ground beacon, moderately bright
 	var ring_mat: StandardMaterial3D = StandardMaterial3D.new()
 	ring_mat.albedo_color = _node_color.lightened(0.2)
 	ring_mat.emission_enabled = true
 	ring_mat.emission = _node_color.lightened(0.2)
-	ring_mat.emission_energy_multiplier = 3.5
+	ring_mat.emission_energy_multiplier = 1.8
 
 	# Apply materials to mesh parts
 	for part in _mesh_parts:
