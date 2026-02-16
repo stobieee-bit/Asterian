@@ -38,10 +38,9 @@ func setup(p_node_id: String, p_resource_id: String, p_skill: String, p_level: i
 	# (setup() is called after add_child() in spawner, so _ready() runs first
 	#  when resource_id is still empty — we must build here instead)
 	_build_mesh_for_tier()
-	_apply_visuals()
 
 	# Label — large, high-contrast, readable from distance
-	# Position above the tallest mesh part
+	# Must be created BEFORE _apply_visuals() so label text can be set
 	var max_y: float = 2.0
 	for part in _mesh_parts:
 		var top: float = part.position.y + 1.0
@@ -56,6 +55,8 @@ func setup(p_node_id: String, p_resource_id: String, p_skill: String, p_level: i
 	_label.outline_modulate = Color(0, 0, 0, 0.95)
 	_label.pixel_size = 0.01
 	add_child(_label)
+
+	_apply_visuals()
 
 func _ready() -> void:
 	add_to_group("gathering_nodes")
@@ -227,41 +228,72 @@ func _build_layered_deposit() -> void:
 
 	_add_glow_ring(1.2, 1.4)
 
-# ── Titanex Ore (lv40) — TALL hexagonal obelisk monolith ──
+# ── Titanex Ore (lv40) — WIDE angular archway gate with keystone ──
 func _build_obelisk() -> void:
-	# Very tall hexagonal pillar — dominant vertical landmark
-	var pillar: CSGCylinder3D = CSGCylinder3D.new()
-	pillar.radius = 0.6
-	pillar.height = 4.0
-	pillar.sides = 6
-	pillar.position.y = 2.0
-	add_child(pillar)
-	_mesh_parts.append(pillar)
+	# Two thick hexagonal pillars forming a gateway
+	var pillar_l: CSGCylinder3D = CSGCylinder3D.new()
+	pillar_l.radius = 0.4
+	pillar_l.height = 3.0
+	pillar_l.sides = 6
+	pillar_l.position = Vector3(-0.9, 1.5, 0.0)
+	add_child(pillar_l)
+	_mesh_parts.append(pillar_l)
 
-	# Pointed pyramid cap
-	var cap: CSGCylinder3D = CSGCylinder3D.new()
-	cap.radius = 0.55
-	cap.height = 1.2
-	cap.sides = 6
-	cap.cone = true
-	cap.position.y = 4.6
-	add_child(cap)
-	cap.name = "Accent1"
-	_mesh_parts.append(cap)
+	var pillar_r: CSGCylinder3D = CSGCylinder3D.new()
+	pillar_r.radius = 0.4
+	pillar_r.height = 3.0
+	pillar_r.sides = 6
+	pillar_r.position = Vector3(0.9, 1.5, 0.0)
+	add_child(pillar_r)
+	_mesh_parts.append(pillar_r)
 
-	# Three decorative collar rings at different heights
-	for i in range(3):
+	# Wide horizontal lintel across the top
+	var lintel: CSGBox3D = CSGBox3D.new()
+	lintel.size = Vector3(2.6, 0.5, 0.7)
+	lintel.position.y = 3.25
+	add_child(lintel)
+	lintel.name = "Accent1"
+	_mesh_parts.append(lintel)
+
+	# Angular keystone block at center top
+	var keystone: CSGBox3D = CSGBox3D.new()
+	keystone.size = Vector3(0.6, 0.7, 0.6)
+	keystone.position.y = 3.85
+	keystone.rotation.y = PI / 4.0
+	add_child(keystone)
+	keystone.name = "Accent2"
+	_mesh_parts.append(keystone)
+
+	# Base platform connecting the pillars
+	var base: CSGBox3D = CSGBox3D.new()
+	base.size = Vector3(2.4, 0.3, 1.0)
+	base.position.y = 0.15
+	add_child(base)
+	_mesh_parts.append(base)
+
+	# Two decorative collar rings on each pillar
+	for i in range(2):
 		var collar: CSGTorus3D = CSGTorus3D.new()
-		collar.inner_radius = 0.55
-		collar.outer_radius = 0.85
+		collar.inner_radius = 0.35
+		collar.outer_radius = 0.55
 		collar.ring_sides = 6
 		collar.sides = 6
-		collar.position.y = 0.8 + i * 1.3
+		collar.position = Vector3(-0.9, 1.0 + i * 1.2, 0.0)
 		add_child(collar)
-		collar.name = "Accent%d" % (i + 2)
+		collar.name = "Accent%d" % (i + 3)
 		_mesh_parts.append(collar)
 
-	_add_glow_ring(0.9, 1.1)
+		var collar2: CSGTorus3D = CSGTorus3D.new()
+		collar2.inner_radius = 0.35
+		collar2.outer_radius = 0.55
+		collar2.ring_sides = 6
+		collar2.sides = 6
+		collar2.position = Vector3(0.9, 1.0 + i * 1.2, 0.0)
+		add_child(collar2)
+		collar2.name = "Accent%d" % (i + 5)
+		_mesh_parts.append(collar2)
+
+	_add_glow_ring(1.3, 1.5)
 
 # ── Plasmite Ore (lv50) — FLOATING ORB with orbital rings, hovers high ──
 func _build_floating_orb() -> void:
