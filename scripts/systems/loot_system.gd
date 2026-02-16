@@ -19,6 +19,13 @@ var ground_item_lifetime: float = 45.0  # Despawn after 45 seconds
 func _ready() -> void:
 	# Listen for enemy kills to roll loot
 	EventBus.enemy_killed.connect(_on_enemy_killed)
+	# Listen for items dropped from inventory onto the ground
+	EventBus.item_dropped_to_ground.connect(_on_item_dropped_to_ground)
+
+
+## Called when player drops an item from inventory onto the ground
+func _on_item_dropped_to_ground(item_id: String, quantity: int, pos: Vector3) -> void:
+	_spawn_ground_item(item_id, quantity, pos)
 
 func _process(delta: float) -> void:
 	if _player == null:

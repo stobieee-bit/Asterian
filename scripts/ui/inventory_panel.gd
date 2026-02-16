@@ -17,9 +17,13 @@ var _title_label: Label = null
 var _close_btn: Button = null
 var _credits_label: Label = null
 
-# ── State ──
+# ── Drag state ──
 var _is_dragging: bool = false
 var _drag_index: int = -1
+var _drag_start_pos: Vector2 = Vector2.ZERO
+var _drag_pending: bool = false          # Left-click held, waiting for threshold
+var _drag_preview: PanelContainer = null  # Floating icon following cursor
+const DRAG_THRESHOLD: float = 6.0        # Pixels before drag starts
 
 func _ready() -> void:
 	# Panel style
@@ -198,23 +202,223 @@ func refresh() -> void:
 
 ## Handle slot click input
 func _on_slot_input(event: InputEvent, index: int) -> void:
-	if event is InputEventMouseButton and event.pressed:
-		if index >= GameState.inventory.size():
-			return
+	if event is InputEventMouseButton:
+		if event.pressed:
+			if index >= GameState.inventory.size():
+				return
 
-		var entry: Dictionary = GameState.inventory[index]
-		var item_id: String = str(entry.get("item_id", ""))
-		var item_data: Dictionary = DataManager.get_item(item_id)
-		var item_type: String = str(item_data.get("type", ""))
+			var entry: Dictionary = GameState.inventory[index]
+			var item_id: String = str(entry.get("item_id", ""))
+			var item_data: Dictionary = DataManager.get_item(item_id)
+			var item_type: String = str(item_data.get("type", ""))
 
-		if event.button_index == MOUSE_BUTTON_LEFT and event.double_click:
-			# Double-click to equip
-			if item_type in ["weapon", "armor", "offhand"]:
-				_equip_from_slot(item_id)
+			if event.button_index == MOUSE_BUTTON_LEFT and event.double_click:
+				# Double-click to equip — cancel any pending drag
+				_drag_pending = false
+				if item_type in ["weapon", "armor", "offhand"]:
+					_equip_from_slot(item_id)
 
-		elif event.button_index == MOUSE_BUTTON_RIGHT:
-			# Right-click context menu
-			_show_item_context_menu(item_id, item_data, item_type, index, get_global_mouse_position())
+			elif event.button_index == MOUSE_BUTTON_LEFT:
+				# Single left-click — start tracking for potential drag
+				_drag_pending = true
+				_drag_index = index
+				_drag_start_pos = get_global_mouse_position()
+
+			elif event.button_index == MOUSE_BUTTON_RIGHT:
+				# Right-click context menu
+				_show_item_context_menu(item_id, item_data, item_type, index, get_global_mouse_position())
+
+		elif not event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			# Release inside a slot while dragging — swap
+			if _is_dragging:
+				_finish_drag(index)
+
+
+## Global input to track mouse movement and release during drag
+func _input(event: InputEvent) -> void:
+	if not visible:
+		return
+
+	if event is InputEventMouseMotion:
+		if _drag_pending and not _is_dragging:
+			# Check if we've moved far enough to start dragging
+			var dist: float = get_global_mouse_position().distance_to(_drag_start_pos)
+			if dist >= DRAG_THRESHOLD:
+				_start_drag()
+		elif _is_dragging and _drag_preview:
+			# Move preview with cursor
+			_drag_preview.global_position = get_global_mouse_position() - Vector2(SLOT_SIZE * 0.5, SLOT_SIZE * 0.5)
+
+	elif event is InputEventMouseButton and not event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if _is_dragging:
+			# Released — check if over a slot or outside panel
+			var drop_slot: int = _get_slot_under_mouse()
+			if drop_slot >= 0:
+				_finish_drag(drop_slot)
+			else:
+				# Dropped outside inventory — drop item to ground
+				_drop_to_ground()
+		# Always reset drag state on release
+		_drag_pending = false
+
+
+## Begin dragging: create floating preview, dim source slot
+func _start_drag() -> void:
+	_drag_pending = false
+	if _drag_index < 0 or _drag_index >= GameState.inventory.size():
+		return
+
+	_is_dragging = true
+	EventBus.tooltip_hidden.emit()
+
+	var entry: Dictionary = GameState.inventory[_drag_index]
+	var item_id: String = str(entry.get("item_id", ""))
+	var item_data: Dictionary = DataManager.get_item(item_id)
+	var item_type: String = str(item_data.get("type", ""))
+
+	# Create floating preview
+	_drag_preview = PanelContainer.new()
+	_drag_preview.custom_minimum_size = Vector2(SLOT_SIZE, SLOT_SIZE)
+	_drag_preview.z_index = 200
+	_drag_preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var preview_style: StyleBoxFlat = StyleBoxFlat.new()
+	preview_style.bg_color = Color(0.06, 0.08, 0.12, 0.9)
+	preview_style.border_color = Color(0.4, 0.6, 0.9, 0.8)
+	preview_style.set_border_width_all(2)
+	preview_style.set_corner_radius_all(3)
+	_drag_preview.add_theme_stylebox_override("panel", preview_style)
+
+	var inner: Control = Control.new()
+	inner.custom_minimum_size = Vector2(SLOT_SIZE, SLOT_SIZE)
+	inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_drag_preview.add_child(inner)
+
+	var icon_rect: ColorRect = ColorRect.new()
+	icon_rect.position = Vector2(4, 4)
+	icon_rect.size = Vector2(40, 40)
+	icon_rect.color = _type_icon_color(item_type)
+	icon_rect.color.a = 0.85
+	icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(icon_rect)
+
+	var icon_sym: Label = Label.new()
+	icon_sym.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	icon_sym.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	icon_sym.add_theme_font_size_override("font_size", 24)
+	icon_sym.add_theme_color_override("font_color", Color.WHITE)
+	icon_sym.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
+	icon_sym.add_theme_constant_override("shadow_offset_x", 1)
+	icon_sym.add_theme_constant_override("shadow_offset_y", 1)
+	var icon_id: String = str(item_data.get("icon", ""))
+	icon_sym.text = _item_icon_symbol(icon_id, item_type)
+	icon_sym.position = Vector2(4, 2)
+	icon_sym.size = Vector2(40, 40)
+	icon_sym.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(icon_sym)
+
+	# Add preview as top-level so it draws above everything
+	_drag_preview.top_level = true
+	add_child(_drag_preview)
+	_drag_preview.global_position = get_global_mouse_position() - Vector2(SLOT_SIZE * 0.5, SLOT_SIZE * 0.5)
+
+	# Dim the source slot
+	_dim_slot(_drag_index, true)
+
+
+## Finish drag by swapping items between source and target slots
+func _finish_drag(target_index: int) -> void:
+	if _drag_index < 0:
+		_cancel_drag()
+		return
+
+	var src: int = _drag_index
+	var dst: int = target_index
+
+	if src != dst:
+		# Swap items in GameState.inventory
+		var inv: Array = GameState.inventory
+		if src < inv.size() and dst < inv.size():
+			# Both slots have items — swap
+			var tmp: Dictionary = inv[src]
+			inv[src] = inv[dst]
+			inv[dst] = tmp
+		elif src < inv.size() and dst >= inv.size():
+			# Moving to an empty slot — append + remove
+			var entry: Dictionary = inv[src]
+			inv.remove_at(src)
+			# Pad with empty slots if needed (shouldn't happen with 28 fixed slots,
+			# but the inventory array only contains occupied slots up to the last item)
+			while inv.size() < dst:
+				inv.append({"item_id": "", "quantity": 0})
+			inv.insert(dst, entry)
+			# Clean trailing empty entries
+			while inv.size() > 0 and str(inv[inv.size() - 1].get("item_id", "")) == "":
+				inv.remove_at(inv.size() - 1)
+
+	_cancel_drag()
+	refresh()
+
+
+## Drop item to ground at the player's position
+func _drop_to_ground() -> void:
+	if _drag_index < 0 or _drag_index >= GameState.inventory.size():
+		_cancel_drag()
+		return
+
+	var entry: Dictionary = GameState.inventory[_drag_index]
+	var item_id: String = str(entry.get("item_id", ""))
+	var quantity: int = int(entry.get("quantity", 1))
+	var item_data: Dictionary = DataManager.get_item(item_id)
+	var item_name: String = str(item_data.get("name", item_id))
+
+	# Remove from inventory by index (direct removal, not by item_id search)
+	GameState.inventory.remove_at(_drag_index)
+	EventBus.item_removed.emit(item_id, quantity)
+
+	# Spawn ground item at player position
+	var player: Node3D = get_tree().get_first_node_in_group("player")
+	if player:
+		var forward: Vector3 = -player.global_transform.basis.z.normalized()
+		var drop_pos: Vector3 = player.global_position + forward * 2.0
+		EventBus.item_dropped_to_ground.emit(item_id, quantity, drop_pos)
+
+	EventBus.chat_message.emit("Dropped %s." % item_name, "system")
+	_cancel_drag()
+	refresh()
+
+
+## Cancel drag, remove preview, restore slot appearance
+func _cancel_drag() -> void:
+	if _drag_preview and is_instance_valid(_drag_preview):
+		_drag_preview.queue_free()
+		_drag_preview = null
+
+	if _drag_index >= 0 and _drag_index < _slots.size():
+		_dim_slot(_drag_index, false)
+
+	_is_dragging = false
+	_drag_pending = false
+	_drag_index = -1
+
+
+## Dim or restore a slot's visual to indicate it's being dragged
+func _dim_slot(index: int, dimmed: bool) -> void:
+	if index < 0 or index >= _slots.size():
+		return
+	var slot: PanelContainer = _slots[index]
+	slot.modulate.a = 0.3 if dimmed else 1.0
+
+
+## Get the inventory slot index under the current mouse position, or -1 if none
+func _get_slot_under_mouse() -> int:
+	var mouse_pos: Vector2 = get_global_mouse_position()
+	for i in range(_slots.size()):
+		var slot: PanelContainer = _slots[i]
+		var rect: Rect2 = slot.get_global_rect()
+		if rect.has_point(mouse_pos):
+			return i
+	return -1
 
 ## Try to equip item
 func _equip_from_slot(item_id: String) -> void:
@@ -252,6 +456,8 @@ func _eat_food(item_id: String, _index: int) -> void:
 
 ## Show tooltip on hover
 func _on_slot_hover(index: int) -> void:
+	if _is_dragging:
+		return
 	if index >= GameState.inventory.size():
 		EventBus.tooltip_hidden.emit()
 		return
@@ -290,6 +496,7 @@ func _update_credits_display(amount: int) -> void:
 	_credits_label.text = "$%s" % s
 
 func _on_close_pressed() -> void:
+	_cancel_drag()
 	visible = false
 	EventBus.panel_closed.emit("inventory")
 
@@ -349,6 +556,10 @@ func _show_item_context_menu(item_id: String, item_data: Dictionary, item_type: 
 		"color": Color(0.8, 0.4, 0.3),
 		"callback": func():
 			GameState.remove_item(item_id, 1)
+			var player_node: Node3D = get_tree().get_first_node_in_group("player")
+			if player_node:
+				var fwd: Vector3 = -player_node.global_transform.basis.z.normalized()
+				EventBus.item_dropped_to_ground.emit(item_id, 1, player_node.global_position + fwd * 2.0)
 			EventBus.chat_message.emit("Dropped %s." % item_name, "system")
 			refresh()
 	})
