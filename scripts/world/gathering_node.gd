@@ -34,15 +34,11 @@ func setup(p_node_id: String, p_resource_id: String, p_skill: String, p_level: i
 	xp_reward = 15 + skill_level * 3
 	respawn_time = 10.0 + skill_level * 0.5
 
-	_apply_visuals()
-
-func _ready() -> void:
-	add_to_group("gathering_nodes")
-	collision_layer = 16  # Gathering layer (layer 5)
-	collision_mask = 0
-
-	# Build tier-specific mesh
+	# Build mesh and apply materials AFTER resource_id is set
+	# (setup() is called after add_child() in spawner, so _ready() runs first
+	#  when resource_id is still empty — we must build here instead)
 	_build_mesh_for_tier()
+	_apply_visuals()
 
 	# Label — large, high-contrast, readable from distance
 	# Position above the tallest mesh part
@@ -60,6 +56,11 @@ func _ready() -> void:
 	_label.outline_modulate = Color(0, 0, 0, 0.95)
 	_label.pixel_size = 0.01
 	add_child(_label)
+
+func _ready() -> void:
+	add_to_group("gathering_nodes")
+	collision_layer = 16  # Gathering layer (layer 5)
+	collision_mask = 0
 
 	# Collision
 	var collision: CollisionShape3D = CollisionShape3D.new()
