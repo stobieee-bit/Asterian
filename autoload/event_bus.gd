@@ -35,6 +35,7 @@ signal item_equipped(slot: String, item_id: String)
 signal item_unequipped(slot: String, item_id: String)
 signal inventory_full
 signal item_dropped_to_ground(item_id: String, quantity: int, position: Vector3)
+signal ground_item_pickup_requested(gitem: Node3D)
 
 # ── Skill signals ──
 signal gathering_started(skill: String, node_id: String)

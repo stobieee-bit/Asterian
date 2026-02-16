@@ -1094,10 +1094,10 @@ func _show_ground_item_context_menu(gitem: Node, screen_pos: Vector2) -> void:
 		"icon": "P",
 		"color": Color(0.3, 1.0, 0.6),
 		"callback": func():
-			# Walk to the item then pick it up
+			# Walk to the item and request pickup when in range
 			_player.move_target = gitem.global_position
 			_player.is_moving = true
-			# LootSystem handles auto-pickup when in range
+			EventBus.ground_item_pickup_requested.emit(gitem)
 	})
 	options.append({
 		"label": "Examine",

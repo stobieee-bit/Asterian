@@ -1,7 +1,8 @@
 ## LootSystem — Handles enemy loot drops and ground item management
 ##
 ## When an enemy dies, rolls its loot table and spawns ground items.
-## Ground items are clickable and auto-pickup when player walks near.
+## All pickups are click-only — no auto-pickup. Player right-clicks an item,
+## selects "Pick up", walks to it, and the item is collected on arrival.
 extends Node3D
 
 # Ground item scene
@@ -13,30 +14,48 @@ var _max_ground_items: int = 30
 var _player: Node3D = null
 
 # ── Pickup config ──
-var auto_pickup_range: float = 3.0  # Slightly larger pickup range
+var pickup_range: float = 3.0  # Max distance to collect an item
 var ground_item_lifetime: float = 45.0  # Despawn after 45 seconds
+
+# ── Pending pickup (player is walking toward this item) ──
+var _pending_pickup: Node3D = null
 
 func _ready() -> void:
 	# Listen for enemy kills to roll loot
 	EventBus.enemy_killed.connect(_on_enemy_killed)
 	# Listen for items dropped from inventory onto the ground
 	EventBus.item_dropped_to_ground.connect(_on_item_dropped_to_ground)
+	# Listen for click-to-pickup requests from context menu
+	EventBus.ground_item_pickup_requested.connect(_on_pickup_requested)
 
 
 ## Called when player drops an item from inventory onto the ground
 func _on_item_dropped_to_ground(item_id: String, quantity: int, pos: Vector3) -> void:
 	_spawn_ground_item(item_id, quantity, pos)
-	# Mark the most recently spawned ground item as player-dropped so it is
-	# never auto-picked back up — must be clicked to pick up
-	if _ground_items.size() > 0:
-		_ground_items[_ground_items.size() - 1].set_meta("player_dropped", true)
+
+## Called when the player selects "Pick up" from context menu
+func _on_pickup_requested(gitem: Node3D) -> void:
+	if is_instance_valid(gitem) and _ground_items.has(gitem):
+		_pending_pickup = gitem
 
 func _process(delta: float) -> void:
 	if _player == null:
 		_player = get_tree().get_first_node_in_group("player")
 		return
 
-	# Check for auto-pickup proximity and lifetime despawn
+	# ── Check pending pickup — player walked close enough to collect ──
+	if _pending_pickup != null:
+		if not is_instance_valid(_pending_pickup):
+			_pending_pickup = null
+		else:
+			var dist: float = _player.global_position.distance_to(_pending_pickup.global_position)
+			if dist <= pickup_range:
+				var idx: int = _ground_items.find(_pending_pickup)
+				if idx >= 0:
+					_pickup_item(_pending_pickup, idx)
+				_pending_pickup = null
+
+	# ── Lifetime despawn + cleanup ──
 	var i: int = _ground_items.size() - 1
 	while i >= 0:
 		var gitem: Node3D = _ground_items[i]
@@ -52,21 +71,10 @@ func _process(delta: float) -> void:
 
 		# Despawn if too old
 		if age > ground_item_lifetime:
+			if _pending_pickup == gitem:
+				_pending_pickup = null
 			_ground_items.remove_at(i)
 			gitem.queue_free()
-			i -= 1
-			continue
-
-		# Player-dropped items never auto-pickup — must be clicked
-		if gitem.get_meta("player_dropped", false):
-			i -= 1
-			continue
-
-		# Auto-pickup when player is close enough (enemy drops only)
-		var dist: float = _player.global_position.distance_to(gitem.global_position)
-		if dist <= auto_pickup_range:
-			_pickup_item(gitem, i)
-			# _pickup_item removes from array on success, so don't decrement
 			i -= 1
 			continue
 
