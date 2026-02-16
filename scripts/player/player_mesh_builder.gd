@@ -45,6 +45,128 @@ const COL_BACKPACK: Color = Color(0.13, 0.17, 0.25)         # Reactor housing
 # ── Head position constant for animations ──
 const HEAD_Y: float = 1.62
 
+# ═══════════════════════════════════════════════════════════════════════════
+#  STYLE THEMES — distinct colour palettes per combat style
+# ═══════════════════════════════════════════════════════════════════════════
+
+## Each theme maps semantic slot names to colors. apply_style_theme() walks
+## every MeshInstance3D child and recolors based on which slot it belongs to.
+
+static func _get_style_theme(style: String) -> Dictionary:
+	match style:
+		"nano":
+			# Cool cyan/teal — stealthy tech operative
+			return {
+				"suit": Color(0.1, 0.14, 0.22),
+				"suit_light": Color(0.14, 0.19, 0.3),
+				"plate": Color(0.22, 0.28, 0.4),
+				"plate_hi": Color(0.3, 0.36, 0.5),
+				"plate_dark": Color(0.15, 0.2, 0.3),
+				"energy": Color(0.0, 0.85, 0.65),
+				"energy_bright": Color(0.1, 1.0, 0.8),
+				"visor": Color(0.12, 0.7, 1.0),
+				"reactor": Color(0.0, 0.95, 0.85),
+				"trim": Color(0.4, 0.55, 0.6),
+				"thruster": Color(0.0, 0.8, 0.6),
+			}
+		"tesla":
+			# Crackling gold/amber — high-voltage shock trooper
+			return {
+				"suit": Color(0.14, 0.1, 0.06),
+				"suit_light": Color(0.2, 0.16, 0.08),
+				"plate": Color(0.38, 0.3, 0.14),
+				"plate_hi": Color(0.5, 0.4, 0.18),
+				"plate_dark": Color(0.25, 0.2, 0.1),
+				"energy": Color(1.0, 0.85, 0.1),
+				"energy_bright": Color(1.0, 0.95, 0.3),
+				"visor": Color(1.0, 0.8, 0.15),
+				"reactor": Color(1.0, 0.9, 0.2),
+				"trim": Color(0.7, 0.55, 0.1),
+				"thruster": Color(1.0, 0.7, 0.1),
+			}
+		"void":
+			# Deep violet/magenta — reality-warping psion
+			return {
+				"suit": Color(0.1, 0.06, 0.16),
+				"suit_light": Color(0.16, 0.1, 0.24),
+				"plate": Color(0.28, 0.15, 0.4),
+				"plate_hi": Color(0.38, 0.22, 0.52),
+				"plate_dark": Color(0.18, 0.1, 0.28),
+				"energy": Color(0.6, 0.15, 0.95),
+				"energy_bright": Color(0.75, 0.3, 1.0),
+				"visor": Color(0.55, 0.15, 0.9),
+				"reactor": Color(0.7, 0.2, 1.0),
+				"trim": Color(0.45, 0.2, 0.6),
+				"thruster": Color(0.5, 0.1, 0.8),
+			}
+		_:
+			# Fallback — neutral grey
+			return {
+				"suit": Color(0.12, 0.12, 0.14),
+				"suit_light": Color(0.18, 0.18, 0.2),
+				"plate": Color(0.3, 0.3, 0.32),
+				"plate_hi": Color(0.4, 0.4, 0.42),
+				"plate_dark": Color(0.2, 0.2, 0.22),
+				"energy": Color(0.5, 0.5, 0.5),
+				"energy_bright": Color(0.7, 0.7, 0.7),
+				"visor": Color(0.5, 0.5, 0.6),
+				"reactor": Color(0.6, 0.6, 0.65),
+				"trim": Color(0.4, 0.4, 0.4),
+				"thruster": Color(0.5, 0.5, 0.5),
+			}
+
+
+## Map a mesh's original material color to a semantic slot name.
+## Returns empty string if the mesh shouldn't be recolored.
+static func _color_to_slot(color: Color) -> String:
+	# Use approximate matching (within tolerance) to map original build colors to slots
+	if _color_close(color, COL_SUIT): return "suit"
+	if _color_close(color, COL_SUIT_LIGHT): return "suit_light"
+	if _color_close(color, COL_PLATE): return "plate"
+	if _color_close(color, COL_PLATE_HI): return "plate_hi"
+	if _color_close(color, COL_PLATE_DARK): return "plate_dark"
+	if _color_close(color, COL_ENERGY): return "energy"
+	if _color_close(color, COL_ENERGY_BRIGHT): return "energy_bright"
+	if _color_close(color, COL_VISOR): return "visor"
+	if _color_close(color, COL_REACTOR): return "reactor"
+	if _color_close(color, COL_TRIM): return "trim"
+	if _color_close(color, COL_THRUSTER): return "thruster"
+	return ""
+
+
+static func _color_close(a: Color, b: Color, tol: float = 0.05) -> bool:
+	return absf(a.r - b.r) < tol and absf(a.g - b.g) < tol and absf(a.b - b.b) < tol
+
+
+## Apply a combat style color theme to an already-built mesh root.
+## Walks all MeshInstance3D descendants, identifies which semantic slot each
+## material belongs to, and recolors it to the theme's palette.
+static func apply_style_theme(root: Node3D, style: String) -> void:
+	var theme: Dictionary = _get_style_theme(style)
+	if theme.is_empty():
+		return
+	_apply_theme_recursive(root, theme)
+
+
+static func _apply_theme_recursive(node: Node, theme: Dictionary) -> void:
+	if node is MeshInstance3D:
+		var mi: MeshInstance3D = node as MeshInstance3D
+		var mat: StandardMaterial3D = mi.get_surface_override_material(0) as StandardMaterial3D
+		if mat == null:
+			# Try material property
+			mat = mi.material_override as StandardMaterial3D
+		if mat != null:
+			var slot: String = _color_to_slot(mat.albedo_color)
+			if slot != "" and theme.has(slot):
+				var new_col: Color = theme[slot] as Color
+				var alpha: float = mat.albedo_color.a
+				mat.albedo_color = new_col
+				mat.albedo_color.a = alpha
+				if mat.emission_enabled:
+					mat.emission = new_col
+	for child in node.get_children():
+		_apply_theme_recursive(child, theme)
+
 
 # ═══════════════════════════════════════════════════════════════════════════
 #  BUILD

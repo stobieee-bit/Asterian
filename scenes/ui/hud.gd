@@ -2314,6 +2314,7 @@ func _cycle_combat_style() -> void:
 		if combat and combat.has_method("refresh_abilities"):
 			combat.refresh_abilities()
 	EventBus.chat_message.emit("Combat style: %s" % styles[next_idx].capitalize(), "combat")
+	EventBus.combat_style_changed.emit(styles[next_idx])
 	# Flash the label for feedback
 	if _style_indicator_label:
 		var tween: Tween = create_tween()

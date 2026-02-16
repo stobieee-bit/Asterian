@@ -30,12 +30,20 @@ func _ready() -> void:
 	add_child(_mesh_root)
 	set_meta("mesh_root", _mesh_root)
 
+	# Apply initial combat style theme
+	var initial_style: String = str(GameState.player.get("combat_style", "nano"))
+	PlayerMeshBuilder.apply_style_theme(_mesh_root, initial_style)
+
 	# Cache reference to the parent CharacterBody3D (PlayerController)
 	_player = get_parent() as CharacterBody3D
 
 	# Listen for attack events to trigger animation
 	if EventBus.has_signal("player_attacked"):
 		EventBus.player_attacked.connect(_on_player_attacked)
+
+	# Listen for combat style changes to recolor mesh
+	if EventBus.has_signal("combat_style_changed"):
+		EventBus.combat_style_changed.connect(_on_style_changed)
 
 
 func _process(delta: float) -> void:
@@ -86,3 +94,9 @@ func play_attack() -> void:
 ## Signal callback for player_attacked event
 func _on_player_attacked() -> void:
 	play_attack()
+
+
+## Signal callback for combat style change — recolor the mesh
+func _on_style_changed(new_style: String) -> void:
+	if _mesh_root:
+		PlayerMeshBuilder.apply_style_theme(_mesh_root, new_style)
