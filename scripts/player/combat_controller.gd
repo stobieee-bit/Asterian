@@ -270,6 +270,10 @@ func _do_attack() -> void:
 		elif buff_type == "all":
 			total_damage += int(buff_value)
 
+	# Dungeon: Berserker — player deals +20% damage
+	if _has_dungeon_modifier("berserker"):
+		total_damage = int(float(total_damage) * 1.2)
+
 	# Small random variance (±15%)
 	var variance: float = randf_range(0.85, 1.15)
 	total_damage = int(float(total_damage) * variance)
@@ -481,6 +485,10 @@ func use_ability(ability_slot: int) -> bool:
 		var bonuses: Dictionary = prestige_sys.get_prestige_bonuses()
 		total_damage = int(float(total_damage) * float(bonuses.get("damage_mult", 1.0)))
 
+	# Dungeon: Berserker — player deals +20% damage
+	if _has_dungeon_modifier("berserker"):
+		total_damage = int(float(total_damage) * 1.2)
+
 	# Variance
 	total_damage = int(float(total_damage) * randf_range(0.9, 1.1))
 
@@ -508,6 +516,14 @@ func use_ability(ability_slot: int) -> bool:
 
 	# Apply special effects
 	_apply_ability_effects(effects, target, target_pos, total_damage, style, ability_color)
+
+	# Record ability/ultimate use for achievements
+	var ach_sys: Node = get_tree().get_first_node_in_group("achievement_system")
+	if ach_sys:
+		if tier == "ultimate":
+			ach_sys.record_ultimate_use()
+		else:
+			ach_sys.record_ability_use()
 
 	# Screen shake for threshold/ultimate
 	if tier == "threshold" or tier == "ultimate":
@@ -776,6 +792,10 @@ func _on_hit_landed(hit_target: Node, dmg: int, _is_crit: bool) -> void:
 		if buff_type == "defense" or buff_type == "all":
 			actual = maxi(1, actual - int(buff_value))
 
+	# Dungeon: Berserker — player takes +15% more damage
+	if _has_dungeon_modifier("berserker"):
+		actual = int(float(actual) * 1.15)
+
 	GameState.player["hp"] -= actual
 	GameState.player["hp"] = maxi(0, GameState.player["hp"])
 
@@ -847,6 +867,10 @@ func _on_enemy_killed(eid: String, _etype: String) -> void:
 		var xp_reward: int = target.level * 4 + (target.level * target.level) / 2
 		if target.is_boss:
 			xp_reward *= 3
+			# Track boss kill for achievements
+			if not GameState.boss_kills.has(eid):
+				GameState.boss_kills[eid] = 0
+			GameState.boss_kills[eid] += 1
 
 		# Apply prestige XP bonus
 		var prestige_sys: Node = get_tree().get_first_node_in_group("prestige_system")
@@ -906,9 +930,15 @@ func _handle_dungeon_kill(killed_enemy: Node) -> void:
 	elif dungeon_sys.has_method("get_loot_for_enemy"):
 		loot = dungeon_sys.get_loot_for_enemy(floor_num)
 
+	# Dungeon: Treasure — +50% loot quantity
+	var treasure_active: bool = _has_dungeon_modifier("treasure")
+
 	for drop in loot:
 		var item_id: String = str(drop.get("item_id", ""))
 		var qty: int = int(drop.get("quantity", 1))
+		if treasure_active:
+			qty = int(float(qty) * 1.5)
+			qty = maxi(qty, 1)
 		if item_id != "" and GameState.add_item(item_id, qty):
 			var item_name: String = str(DataManager.get_item(item_id).get("name", item_id))
 			EventBus.chat_message.emit("Loot: %s x%d" % [item_name, qty], "loot")
@@ -1220,3 +1250,20 @@ func _show_gathering_context_menu(gnode: Node, screen_pos: Vector2) -> void:
 	})
 
 	EventBus.context_menu_requested.emit(options, screen_pos)
+
+
+# ──────────────────────────────────────────────
+#  Dungeon modifier helpers (player-side)
+# ──────────────────────────────────────────────
+
+## Check if a specific dungeon modifier is active in the current run.
+func _has_dungeon_modifier(mod_id: String) -> bool:
+	if not GameState.dungeon_active:
+		return false
+	var dungeon_sys: Node = get_tree().get_first_node_in_group("dungeon_system")
+	if dungeon_sys == null or not dungeon_sys.has_method("get_active_modifiers"):
+		return false
+	for mod in dungeon_sys.get_active_modifiers():
+		if str(mod.get("id", "")) == mod_id:
+			return true
+	return false

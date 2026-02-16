@@ -192,6 +192,21 @@ func complete_quest(quest_id: String) -> bool:
 	return true
 
 
+## Abandon an active quest — removes it from active_quests and resets progress.
+## The quest can be re-accepted afterwards if prerequisites are still met.
+func abandon_quest(quest_id: String) -> bool:
+	if not GameState.active_quests.has(quest_id):
+		return false
+
+	var quest_data: Dictionary = DataManager.get_quest(quest_id)
+	var quest_name: String = str(quest_data.get("name", quest_id))
+
+	GameState.active_quests.erase(quest_id)
+	EventBus.quest_abandoned.emit(quest_id)
+	EventBus.chat_message.emit("Quest abandoned: %s" % quest_name, "quest")
+	return true
+
+
 # ──────────────────────────────────────────────
 #  Signal handlers — advance matching quest steps
 # ──────────────────────────────────────────────

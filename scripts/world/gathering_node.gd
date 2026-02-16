@@ -1283,18 +1283,33 @@ func complete_gather() -> void:
 	if not success:
 		return  # Inventory full
 
-	# Give XP
-	if GameState.skills.has(skill_id):
-		GameState.skills[skill_id]["xp"] = int(GameState.skills[skill_id]["xp"]) + xp_reward
-		EventBus.player_xp_gained.emit(skill_id, xp_reward)
+	# Give XP (with prestige and pet bonuses)
+	var final_xp: int = xp_reward
 
-	# Check level up
-	var current_level: int = int(GameState.skills[skill_id]["level"])
-	var current_xp: int = int(GameState.skills[skill_id]["xp"])
-	var next_xp: int = DataManager.xp_for_level(current_level + 1)
-	if next_xp > 0 and current_xp >= next_xp:
-		GameState.skills[skill_id]["level"] = current_level + 1
-		EventBus.player_level_up.emit(skill_id, current_level + 1)
+	# Prestige XP bonus
+	var prestige_sys: Node = get_tree().get_first_node_in_group("prestige_system")
+	if prestige_sys and prestige_sys.has_method("get_prestige_bonuses"):
+		var bonuses: Dictionary = prestige_sys.get_prestige_bonuses()
+		final_xp = int(float(final_xp) * float(bonuses.get("xp_mult", 1.0)))
+
+	# Pet XP bonus
+	var pet_sys: Node = get_tree().get_first_node_in_group("pet_system")
+	if pet_sys and pet_sys.has_method("get_pet_buff"):
+		var buff: Dictionary = pet_sys.get_pet_buff()
+		if str(buff.get("type", "")) == "xp" or str(buff.get("type", "")) == "all":
+			final_xp = int(float(final_xp) * (1.0 + float(buff.get("value", 0.0))))
+
+	if GameState.skills.has(skill_id):
+		GameState.skills[skill_id]["xp"] = int(GameState.skills[skill_id]["xp"]) + final_xp
+		EventBus.player_xp_gained.emit(skill_id, final_xp)
+
+		# Check level up
+		var current_level: int = int(GameState.skills[skill_id]["level"])
+		var current_xp: int = int(GameState.skills[skill_id]["xp"])
+		var next_xp: int = DataManager.xp_for_level(current_level + 1)
+		if next_xp > 0 and current_xp >= next_xp:
+			GameState.skills[skill_id]["level"] = current_level + 1
+			EventBus.player_level_up.emit(skill_id, current_level + 1)
 
 	# Float text
 	var item_data: Dictionary = DataManager.get_item(resource_id)
@@ -1303,7 +1318,7 @@ func complete_gather() -> void:
 
 	var skill_data: Dictionary = DataManager.get_skill(skill_id)
 	var skill_name: String = str(skill_data.get("name", skill_id))
-	EventBus.float_text_requested.emit("+%d %s XP" % [xp_reward, skill_name], global_position + Vector3(0, 2.5, 0), Color(0.3, 0.9, 0.3))
+	EventBus.float_text_requested.emit("+%d %s XP" % [final_xp, skill_name], global_position + Vector3(0, 2.5, 0), Color(0.3, 0.9, 0.3))
 
 	EventBus.gathering_complete.emit(skill_id, resource_id)
 

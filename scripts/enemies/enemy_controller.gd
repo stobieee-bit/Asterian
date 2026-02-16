@@ -53,6 +53,10 @@ var _debuffs: Dictionary = {}  # { "defense": {value, duration, timer}, "damage"
 var _stun_timer: float = 0.0
 var _active_dots: Array = []   # Array of { damage_per_tick, tick_interval, ticks_remaining, tick_timer, from_style }
 
+# ── Dungeon Modifiers ──
+var _dungeon_modifiers: Array = []
+var _regen_timer: float = 0.0
+
 # ── Loot ──
 var loot_table: Array = []
 
@@ -139,6 +143,24 @@ func setup(type_id: String, spawn_pos: Vector3) -> void:
 		else:
 			nameplate.modulate = Color(1.0, 1.0, 0.6, 1.0)
 
+## Apply dungeon modifier stat changes. Called by dungeon_renderer after setup().
+func apply_dungeon_modifiers(modifiers: Array) -> void:
+	_dungeon_modifiers = modifiers
+	for mod in modifiers:
+		var mod_id: String = str(mod.get("id", ""))
+		match mod_id:
+			"armored":
+				defense = int(float(defense) * 1.3)
+			"frenzied":
+				attack_speed *= 0.75  # lower = faster attacks
+
+## Check if a specific dungeon modifier is active on this enemy.
+func _has_modifier(mod_id: String) -> bool:
+	for mod in _dungeon_modifiers:
+		if str(mod.get("id", "")) == mod_id:
+			return true
+	return false
+
 func _ready() -> void:
 	add_to_group("enemies")
 	# Initial wander target
@@ -169,6 +191,15 @@ func _physics_process(delta: float) -> void:
 
 	# ── Process DoTs ──
 	_process_dots(delta)
+
+	# ── Dungeon: Regenerating modifier ──
+	if _has_modifier("regenerating") and state != State.DEAD and hp < max_hp:
+		_regen_timer += delta
+		if _regen_timer >= 5.0:
+			_regen_timer -= 5.0
+			var heal_amount: int = int(float(max_hp) * 0.02)
+			hp = mini(max_hp, hp + heal_amount)
+			_update_hp_bar()
 
 	match state:
 		State.IDLE:
@@ -368,6 +399,12 @@ func _do_attack() -> void:
 	var eff_damage: int = get_effective_damage()
 	EventBus.hit_landed.emit(_player, eff_damage, false)
 
+	# Dungeon: Vampiric — heal 10% of damage dealt
+	if _has_modifier("vampiric") and state != State.DEAD:
+		var heal: int = int(float(eff_damage) * 0.1)
+		hp = mini(max_hp, hp + heal)
+		_update_hp_bar()
+
 ## Take damage from player. Returns actual damage dealt.
 func take_damage(amount: int, from_style: String = "") -> int:
 	if state == State.DEAD:
@@ -383,6 +420,11 @@ func take_damage(amount: int, from_style: String = "") -> int:
 	var actual: int = maxi(1, int(amount * style_mult) - eff_defense / 2)
 	hp -= actual
 	hp = maxi(0, hp)
+
+	# Dungeon: Reflective — reflect 10% of damage back to player
+	if _has_modifier("reflective") and _player != null:
+		var reflect_dmg: int = maxi(1, int(float(actual) * 0.1))
+		EventBus.hit_landed.emit(_player, reflect_dmg, false)
 
 	# Hit flash on template mesh
 	if _mesh_root != null:
@@ -403,6 +445,18 @@ func take_damage(amount: int, from_style: String = "") -> int:
 func _die() -> void:
 	_enter_state(State.DEAD)
 	_dead_timer = respawn_time
+
+	# Dungeon: Explosive — deal AoE damage on death
+	if _has_modifier("explosive") and _player != null:
+		var dist: float = global_position.distance_to(_player.global_position)
+		if dist < 6.0:  # Only hit player within 6 units
+			var explode_dmg: int = int(float(max_hp) * 0.15)
+			EventBus.hit_landed.emit(_player, explode_dmg, false)
+			EventBus.float_text_requested.emit(
+				"EXPLOSION %d" % explode_dmg,
+				global_position + Vector3(0, 2.5, 0),
+				Color(1.0, 0.4, 0.1)
+			)
 
 	# Emit signals
 	EventBus.enemy_killed.emit(enemy_id, enemy_id)
@@ -442,6 +496,7 @@ func _respawn() -> void:
 	_debuffs.clear()
 	_stun_timer = 0.0
 	_active_dots.clear()
+	_regen_timer = 0.0
 
 	# Reset template mesh after death animation
 	if _mesh_root != null:

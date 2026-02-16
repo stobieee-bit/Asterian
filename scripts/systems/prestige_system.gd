@@ -112,8 +112,8 @@ func prestige() -> void:
 	EventBus.player_credits_changed.emit(int(GameState.player["credits"]))
 
 
-## Returns a Dictionary of the current prestige bonuses.
-## Keys: "xp_rate", "damage", "reduction" — all floats representing multiplier bonuses.
+## Returns a Dictionary of the current prestige bonuses as direct multipliers.
+## Keys: "xp_mult" (>= 1.0), "damage_mult" (>= 1.0), "reduction_mult" (<= 1.0).
 ## Tier 9 "transcendent" enhances all bonuses by +20%.
 ## Tier 10 "ascended" doubles all bonuses.
 func get_prestige_bonuses() -> Dictionary:
@@ -140,9 +140,9 @@ func get_prestige_bonuses() -> Dictionary:
 		reduction *= 2.0
 
 	return {
-		"xp_rate": xp_rate,
-		"damage": damage,
-		"reduction": reduction,
+		"xp_mult": 1.0 + xp_rate,
+		"damage_mult": 1.0 + damage,
+		"reduction_mult": 1.0 - reduction,
 	}
 
 

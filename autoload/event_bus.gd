@@ -48,6 +48,7 @@ signal quest_accepted(quest_id: String)
 signal quest_progress(quest_id: String, step: int)
 signal quest_completed(quest_id: String)
 signal quest_reward_claimed(quest_id: String)
+signal quest_abandoned(quest_id: String)
 
 # ── UI signals ──
 signal panel_opened(panel_name: String)

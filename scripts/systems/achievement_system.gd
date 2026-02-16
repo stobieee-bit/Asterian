@@ -253,8 +253,7 @@ func _evaluate(ach_id: String) -> bool:
 
 		# ── Exploration ──
 		"explore_all":
-			# Not yet implemented — needs area visit tracking
-			return false
+			return GameState.visited_areas.size() >= DataManager.areas.size()
 		"dungeon_floor_10":
 			return GameState.dungeon_max_floor >= 10
 		"dungeon_floor_50":
@@ -280,8 +279,7 @@ func _evaluate(ach_id: String) -> bool:
 		"bestiary_100":
 			return GameState.collection_log.size() >= 100
 		"collect_50_items":
-			# Not yet implemented — needs unique item tracking
-			return false
+			return GameState.unique_items_found.size() >= 50
 
 	# Unknown achievement ID — leave locked
 	push_warning("AchievementSystem: No check defined for achievement '%s'" % ach_id)

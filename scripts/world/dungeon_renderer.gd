@@ -761,6 +761,14 @@ func _spawn_room_enemies(room: Dictionary) -> void:
 		var spawn_pos: Vector3 = room_pos + Vector3(offset_x, 1.0, offset_z)
 
 		enemy.setup(str(enemy_id), spawn_pos)
+
+		# Apply active dungeon modifiers to this enemy
+		var dungeon_sys: Node = get_tree().get_first_node_in_group("dungeon_system")
+		if dungeon_sys and dungeon_sys.has_method("get_active_modifiers"):
+			var active_mods: Array = dungeon_sys.get_active_modifiers()
+			if not active_mods.is_empty() and enemy.has_method("apply_dungeon_modifiers"):
+				enemy.apply_dungeon_modifiers(active_mods)
+
 		enemy.set_meta("dungeon_room", room_key)
 		_dungeon_enemies.append(enemy)
 

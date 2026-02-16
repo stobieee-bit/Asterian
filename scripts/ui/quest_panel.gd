@@ -192,7 +192,12 @@ func _build_quest_entry(quest_id: String) -> void:
 
 		quest_box.add_child(step_label)
 
-	# ── Turn In button (only when all steps are done) ──
+	# ── Button row ──
+	var btn_row: HBoxContainer = HBoxContainer.new()
+	btn_row.add_theme_constant_override("separation", 8)
+	quest_box.add_child(btn_row)
+
+	# Turn In button (only when all steps are done)
 	if completable:
 		var turn_in_btn: Button = Button.new()
 		turn_in_btn.text = "Turn In"
@@ -200,7 +205,16 @@ func _build_quest_entry(quest_id: String) -> void:
 		turn_in_btn.custom_minimum_size = Vector2(70, 26)
 		turn_in_btn.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
 		turn_in_btn.pressed.connect(_on_turn_in.bind(quest_id))
-		quest_box.add_child(turn_in_btn)
+		btn_row.add_child(turn_in_btn)
+
+	# Abandon button — always available for active quests
+	var abandon_btn: Button = Button.new()
+	abandon_btn.text = "Abandon"
+	abandon_btn.add_theme_font_size_override("font_size", 13)
+	abandon_btn.custom_minimum_size = Vector2(70, 26)
+	abandon_btn.add_theme_color_override("font_color", Color(0.9, 0.3, 0.3))
+	abandon_btn.pressed.connect(_on_abandon.bind(quest_id))
+	btn_row.add_child(abandon_btn)
 
 	# Separator between quests
 	var sep: HSeparator = HSeparator.new()
@@ -222,6 +236,20 @@ func _on_turn_in(quest_id: String) -> void:
 		quest_sys.complete_quest(quest_id)
 
 	# Rebuild after completion (quest will have moved to completed_quests)
+	refresh()
+
+
+## Abandon an active quest via the QuestSystem.
+func _on_abandon(quest_id: String) -> void:
+	var quest_sys: Node = get_tree().get_first_node_in_group("quest_system")
+	if quest_sys == null:
+		push_warning("QuestPanel: No quest_system node found in scene tree.")
+		return
+
+	if quest_sys.has_method("abandon_quest"):
+		quest_sys.abandon_quest(quest_id)
+
+	# Rebuild after abandonment
 	refresh()
 
 

@@ -74,6 +74,12 @@ var collection_log: Array[String] = []
 # ── Boss kill tracking ──
 var boss_kills: Dictionary = {}  # { enemy_id: kill_count }
 
+# ── Exploration tracking ──
+var visited_areas: Array[String] = []
+
+# ── Unique item tracking ──
+var unique_items_found: Array[String] = []
+
 # ── Dungeon state ──
 var dungeon_active: bool = false
 var dungeon_floor: int = 0
@@ -109,6 +115,8 @@ var session_start_time: float = 0.0
 
 func _ready() -> void:
 	session_start_time = Time.get_unix_time_from_system()
+	# Track area visits for exploration achievement
+	EventBus.area_entered.connect(_on_area_entered_tracking)
 
 func _process(delta: float) -> void:
 	total_play_time += delta
@@ -126,6 +134,11 @@ func get_total_level() -> int:
 	for skill_data in skills.values():
 		total += int(skill_data["level"])
 	return total
+
+## Track area visits for exploration achievement
+func _on_area_entered_tracking(area_id: String) -> void:
+	if not visited_areas.has(area_id):
+		visited_areas.append(area_id)
 
 ## Check if player has enough credits
 func has_credits(amount: int) -> bool:
@@ -166,6 +179,9 @@ func add_item(item_id: String, quantity: int = 1) -> bool:
 
 	if added > 0:
 		EventBus.item_added.emit(item_id, added)
+		# Track unique items for achievements
+		if not unique_items_found.has(item_id):
+			unique_items_found.append(item_id)
 
 	if added < quantity:
 		EventBus.inventory_full.emit()
@@ -225,6 +241,8 @@ func to_save_data() -> Dictionary:
 		"unlocked_achievements": unlocked_achievements.duplicate(true),
 		"collection_log": collection_log.duplicate(true),
 		"boss_kills": boss_kills.duplicate(true),
+		"visited_areas": visited_areas.duplicate(true),
+		"unique_items_found": unique_items_found.duplicate(true),
 		"dungeon_max_floor": dungeon_max_floor,
 		"active_pet": active_pet,
 		"owned_pets": owned_pets.duplicate(true),
@@ -272,6 +290,8 @@ func from_save_data(data: Dictionary) -> void:
 	unlocked_achievements.assign(data.get("unlocked_achievements", []))
 	collection_log.assign(data.get("collection_log", []))
 	boss_kills = data.get("boss_kills", {})
+	visited_areas.assign(data.get("visited_areas", []))
+	unique_items_found.assign(data.get("unique_items_found", []))
 	dungeon_max_floor = data.get("dungeon_max_floor", 0)
 	active_pet = data.get("active_pet", "")
 	owned_pets = data.get("owned_pets", {})
