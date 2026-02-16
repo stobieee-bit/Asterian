@@ -68,6 +68,18 @@ func equip_item(item_id: String) -> bool:
 
 	# Equip it
 	GameState.equipment[slot] = item_id
+
+	# If weapon, switch combat style to match
+	if slot == "weapon":
+		var weapon_style: String = str(item.get("style", ""))
+		if weapon_style != "":
+			GameState.player["combat_style"] = weapon_style
+			EventBus.combat_style_changed.emit(weapon_style)
+			# Refresh combat controller abilities
+			var combat: Node = get_node_or_null("../CombatController")
+			if combat and combat.has_method("refresh_abilities"):
+				combat.refresh_abilities()
+
 	EventBus.item_equipped.emit(slot, item_id)
 
 	# Recalculate stats

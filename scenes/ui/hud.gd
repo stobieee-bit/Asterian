@@ -385,10 +385,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_F:
 				_eat_food()
 				get_viewport().set_input_as_handled()
-			# Combat style cycle (C)
-			KEY_C:
-				_cycle_combat_style()
-				get_viewport().set_input_as_handled()
 			# Toggle run/walk (R)
 			KEY_R:
 				_toggle_run()
@@ -2243,7 +2239,7 @@ func _on_game_saved() -> void:
 	tween.tween_property(_save_toast_label, "modulate:a", 0.0, 0.8)
 
 # ══════════════════════════════════════════════════════════════════
-# QoL: COMBAT STYLE INDICATOR + KEYBIND — Show current style, [C] to swap
+# QoL: COMBAT STYLE INDICATOR — Shows current style (determined by weapon)
 # ══════════════════════════════════════════════════════════════════
 
 var _style_indicator_label: Label = null
@@ -2261,6 +2257,9 @@ func _build_combat_style_indicator() -> void:
 	# Added to stat bars container as first child (above HP bar) in _build_stat_bars
 	_update_style_indicator()
 
+	# Listen for weapon equip to update style indicator + abilities
+	EventBus.item_equipped.connect(_on_item_equipped_for_style)
+
 func _update_style_indicator() -> void:
 	if _style_indicator_label == null:
 		return
@@ -2275,26 +2274,16 @@ func _update_style_indicator() -> void:
 			color = Color(0.6, 0.2, 0.9)
 		_:
 			color = Color(0.6, 0.6, 0.6)
-	_style_indicator_label.text = "%s [C]" % style.capitalize()
+	_style_indicator_label.text = style.capitalize()
 	_style_indicator_label.add_theme_color_override("font_color", color)
 
-func _cycle_combat_style() -> void:
-	var current: String = str(GameState.player.get("combat_style", "nano"))
-	var styles: Array[String] = ["nano", "tesla", "void"]
-	var idx: int = styles.find(current)
-	var next_idx: int = (idx + 1) % styles.size()
-	GameState.player["combat_style"] = styles[next_idx]
+func _on_item_equipped_for_style(slot: String, _item_id: String) -> void:
+	if slot != "weapon":
+		return
+	# Style is set by equipment_system — just refresh UI
 	_update_style_indicator()
-	# Refresh ability bar to show new style's abilities
 	_refresh_ability_buttons()
 	_reposition_ability_bar()
-	# Refresh combat controller abilities
-	if _player:
-		var combat: Node = _player.get_node_or_null("CombatController")
-		if combat and combat.has_method("refresh_abilities"):
-			combat.refresh_abilities()
-	EventBus.chat_message.emit("Combat style: %s" % styles[next_idx].capitalize(), "combat")
-	EventBus.combat_style_changed.emit(styles[next_idx])
 	# Flash the label for feedback
 	if _style_indicator_label:
 		var tween: Tween = create_tween()

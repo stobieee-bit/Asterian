@@ -8,9 +8,34 @@
 extends Node
 
 # ── Combat settings ──
-@export var attack_range: float = 2.5      ## Must be within this to attack
-@export var base_attack_speed: float = 2.4 ## Auto-attack interval (RS-style: 2.4/3.0/3.6s)
 @export var base_damage: int = 3           ## Base damage (weapon adds more)
+
+# ── Per-style combat parameters ──
+# Nano: fast close-range precision strikes
+# Tesla: medium-range heavy arc swings
+# Void: slower long-range channeled attacks
+const STYLE_ATTACK_RANGE: Dictionary = {
+	"nano": 2.0,
+	"tesla": 2.8,
+	"void": 4.5,
+}
+const STYLE_ATTACK_SPEED: Dictionary = {
+	"nano": 2.0,    # Fast — 2.0s between autos
+	"tesla": 2.8,   # Medium — 2.8s between autos
+	"void": 3.2,    # Slow — 3.2s between autos
+}
+
+## Dynamic attack range based on current combat style
+var attack_range: float:
+	get:
+		var s: String = str(GameState.player.get("combat_style", "nano"))
+		return STYLE_ATTACK_RANGE.get(s, 2.5)
+
+## Dynamic attack speed based on current combat style
+var base_attack_speed: float:
+	get:
+		var s: String = str(GameState.player.get("combat_style", "nano"))
+		return STYLE_ATTACK_SPEED.get(s, 2.4)
 
 # ── Global cooldown (GCD) for abilities ──
 const GCD_TIME: float = 1.8           ## Minimum time between ability uses
