@@ -160,7 +160,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 # ── Targeting ──
 
-## Raycast from click to find an enemy
+## Raycast from click to find an enemy or ground item
 func _try_target_enemy(event: InputEvent) -> void:
 	var camera: Camera3D = _player.get_viewport().get_camera_3d()
 	if camera == null:
@@ -177,26 +177,33 @@ func _try_target_enemy(event: InputEvent) -> void:
 
 	var space_state: PhysicsDirectSpaceState3D = _player.get_world_3d().direct_space_state
 	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, from + dir * 500.0)
-	query.collision_mask = 4  # Enemy layer (layer 3)
+	query.collision_mask = 4 | 16  # Enemy layer (3) + Ground items layer (5)
 	query.exclude = [_player.get_rid()]
 
 	var result: Dictionary = space_state.intersect_ray(query)
 	if result:
 		var hit_node: Node = result.collider
-		# Walk up to find the enemy CharacterBody3D
-		while hit_node and not hit_node.is_in_group("enemies"):
-			hit_node = hit_node.get_parent()
 
-		if hit_node and hit_node.is_in_group("enemies"):
-			_set_target(hit_node)
-			# Stop player movement — they clicked an enemy, not ground
-			if _player.has_method("stop_movement"):
-				_player.stop_movement()
-			# Walk toward the enemy
-			_player.move_target = hit_node.global_position
-			_player.is_moving = true
-			# Consume the input so player_controller doesn't also process it
-			_player.get_viewport().set_input_as_handled()
+		# Walk up to find the entity root
+		var check_node: Node = hit_node
+		while check_node:
+			# Ground item — walk to it and pick up
+			if check_node.is_in_group("ground_items"):
+				_player.move_target = check_node.global_position
+				_player.is_moving = true
+				EventBus.ground_item_pickup_requested.emit(check_node)
+				_player.get_viewport().set_input_as_handled()
+				return
+			# Enemy — target and walk toward
+			if check_node.is_in_group("enemies"):
+				_set_target(check_node)
+				if _player.has_method("stop_movement"):
+					_player.stop_movement()
+				_player.move_target = check_node.global_position
+				_player.is_moving = true
+				_player.get_viewport().set_input_as_handled()
+				return
+			check_node = check_node.get_parent()
 
 ## Set the current target
 func _set_target(enemy: Node) -> void:
