@@ -37,6 +37,13 @@ var _move_marker_time: float = 0.0
 var _move_marker_active: bool = false
 
 func _ready() -> void:
+	# CharacterBody3D floor settings — prevent sinking into ground geometry
+	floor_snap_length = 0.3        # Snap to floor within this distance
+	floor_max_angle = deg_to_rad(50)  # Treat slopes up to 50° as walkable floor
+	wall_min_slide_angle = deg_to_rad(15)  # Avoid getting stuck sliding along walls
+	floor_block_on_wall = true     # Don't slide off floors into walls
+	floor_constant_speed = true    # Maintain speed on slopes
+
 	# Sync move_target to wherever the player was placed (by main.gd)
 	# Don't override global_position — main.gd handles spawn/save position
 	move_target = global_position
@@ -53,6 +60,10 @@ func _physics_process(delta: float) -> void:
 	_apply_gravity(delta)
 	_process_movement(delta)
 	move_and_slide()
+	# Safety net: prevent sinking below ground plane
+	if global_position.y < -0.5:
+		global_position.y = 0.0
+		velocity.y = 0.0
 	# Safety net: after physics, clamp position back inside world bounds
 	_clamp_position()
 	# Update move marker
@@ -68,8 +79,11 @@ func _unhandled_input(event: InputEvent) -> void:
 func _apply_gravity(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= gravity * delta
+		# Cap downward velocity to prevent tunneling through thin floors
+		velocity.y = maxf(velocity.y, -30.0)
 	else:
-		velocity.y = 0.0
+		# Small downward nudge keeps floor_snap_length engaged
+		velocity.y = -0.5
 
 func _process_movement(delta: float) -> void:
 	if not is_moving:
