@@ -26,6 +26,10 @@ func _ready() -> void:
 ## Called when player drops an item from inventory onto the ground
 func _on_item_dropped_to_ground(item_id: String, quantity: int, pos: Vector3) -> void:
 	_spawn_ground_item(item_id, quantity, pos)
+	# Mark the most recently spawned ground item as player-dropped so it isn't
+	# instantly auto-picked back up (2-second immunity window)
+	if _ground_items.size() > 0:
+		_ground_items[_ground_items.size() - 1].set_meta("pickup_immunity", 2.0)
 
 func _process(delta: float) -> void:
 	if _player == null:
@@ -50,6 +54,14 @@ func _process(delta: float) -> void:
 		if age > ground_item_lifetime:
 			_ground_items.remove_at(i)
 			gitem.queue_free()
+			i -= 1
+			continue
+
+		# Tick down pickup immunity for player-dropped items
+		var immunity: float = float(gitem.get_meta("pickup_immunity", 0.0))
+		if immunity > 0.0:
+			immunity -= delta
+			gitem.set_meta("pickup_immunity", immunity)
 			i -= 1
 			continue
 
