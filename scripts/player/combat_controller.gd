@@ -1053,9 +1053,15 @@ func _show_npc_context_menu(npc: Node, screen_pos: Vector2) -> void:
 		"icon": "T",
 		"color": Color(0.3, 0.9, 1.0),
 		"callback": func():
-			_player.move_target = npc.global_position
-			_player.is_moving = true
-			# NPC interaction is handled by proximity in the NPC controller
+			if npc.has_method("_walk_then_act"):
+				npc._walk_then_act(func():
+					var hud: Node = get_tree().get_first_node_in_group("hud")
+					if hud and hud.has_method("open_dialogue"):
+						hud.open_dialogue(npc)
+				)
+			else:
+				_player.move_target = npc.global_position
+				_player.is_moving = true
 	})
 	options.append({
 		"label": "Examine",

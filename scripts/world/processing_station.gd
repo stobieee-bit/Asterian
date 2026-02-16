@@ -16,6 +16,10 @@ var _mesh: CSGBox3D = null
 var _label: Label3D = null
 var _glow_light: OmniLight3D = null
 
+# ── Pending interaction (walk-then-act) ──
+var _pending_action: Callable = Callable()
+var _pending_timeout: float = 0.0
+
 ## Initialize from data
 func setup(data: Dictionary) -> void:
 	station_id = str(data.get("id", ""))
@@ -144,6 +148,31 @@ func _is_player_in_range() -> bool:
 		return false
 	return player.global_position.distance_to(global_position) <= interact_radius + 1.0
 
+func _process(delta: float) -> void:
+	# ── Walk-then-act: fire pending action when player arrives ──
+	if _pending_action.is_valid():
+		_pending_timeout -= delta
+		if _pending_timeout <= 0.0:
+			_pending_action = Callable()
+			return
+		if _is_player_in_range():
+			var action: Callable = _pending_action
+			_pending_action = Callable()
+			action.call()
+
+## Walk the player toward this station and fire the callback when in range.
+## If already in range, fires immediately.
+func _walk_then_act(action: Callable) -> void:
+	if _is_player_in_range():
+		action.call()
+		return
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+	if player:
+		player.move_target = global_position
+		player.is_moving = true
+	_pending_action = action
+	_pending_timeout = 8.0  # Give up after 8 seconds
+
 ## Show right-click context menu
 func show_context_menu(screen_pos: Vector2) -> void:
 	var skill_data: Dictionary = DataManager.get_skill(skill_id)
@@ -157,12 +186,11 @@ func show_context_menu(screen_pos: Vector2) -> void:
 		"icon": "U",
 		"color": _get_skill_color(),
 		"callback": func():
-			if not _is_player_in_range():
-				EventBus.chat_message.emit("You need to move closer to %s." % station_name, "system")
-				return
-			var hud: Node = get_tree().get_first_node_in_group("hud")
-			if hud and hud.has_method("open_crafting"):
-				hud.open_crafting(skill_id, station_name)
+			_walk_then_act(func():
+				var hud: Node = get_tree().get_first_node_in_group("hud")
+				if hud and hud.has_method("open_crafting"):
+					hud.open_crafting(skill_id, station_name)
+			)
 	})
 
 	options.append({

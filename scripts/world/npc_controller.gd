@@ -19,6 +19,10 @@ var _nameplate: Label3D = null
 var _mesh_root: Node3D = null
 var _idle_phase: float = 0.0
 
+# ── Pending interaction (walk-then-act) ──
+var _pending_action: Callable = Callable()
+var _pending_timeout: float = 0.0
+
 ## Initialize this NPC from DataManager data
 func setup(p_npc_id: String) -> void:
 	npc_id = p_npc_id
@@ -72,6 +76,30 @@ func _process(delta: float) -> void:
 	_idle_phase += delta
 	if _mesh_root:
 		_animate_npc_idle(_idle_phase)
+
+	# ── Walk-then-act: fire pending action when player arrives ──
+	if _pending_action.is_valid():
+		_pending_timeout -= delta
+		if _pending_timeout <= 0.0:
+			_pending_action = Callable()
+			return
+		if _is_player_in_range():
+			var action: Callable = _pending_action
+			_pending_action = Callable()
+			action.call()
+
+## Walk the player toward this NPC and fire the callback when in range.
+## If already in range, fires immediately.
+func _walk_then_act(action: Callable) -> void:
+	if _is_player_in_range():
+		action.call()
+		return
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+	if player:
+		player.move_target = global_position
+		player.is_moving = true
+	_pending_action = action
+	_pending_timeout = 8.0  # Give up after 8 seconds
 
 ## Build a full humanoid mesh matching the PlayerMeshBuilder style
 func _build_npc_mesh() -> void:
@@ -364,12 +392,11 @@ func show_context_menu(screen_pos: Vector2) -> void:
 		"icon": "T",
 		"color": Color(0.8, 0.85, 0.9),
 		"callback": func():
-			if not _is_player_in_range():
-				EventBus.chat_message.emit("You need to move closer to %s." % npc_name, "system")
-				return
-			var hud: Node = get_tree().get_first_node_in_group("hud")
-			if hud and hud.has_method("open_dialogue"):
-				hud.open_dialogue(self)
+			_walk_then_act(func():
+				var hud: Node = get_tree().get_first_node_in_group("hud")
+				if hud and hud.has_method("open_dialogue"):
+					hud.open_dialogue(self)
+			)
 	})
 
 	# Bank option — for banker NPCs (dialogue has openBank action)
@@ -379,12 +406,11 @@ func show_context_menu(screen_pos: Vector2) -> void:
 			"icon": "B",
 			"color": Color(0.3, 0.9, 0.5),
 			"callback": func():
-				if not _is_player_in_range():
-					EventBus.chat_message.emit("You need to move closer to %s." % npc_name, "system")
-					return
-				var hud: Node = get_tree().get_first_node_in_group("hud")
-				if hud and hud.has_method("open_bank"):
-					hud.open_bank()
+				_walk_then_act(func():
+					var hud: Node = get_tree().get_first_node_in_group("hud")
+					if hud and hud.has_method("open_bank"):
+						hud.open_bank()
+				)
 		})
 
 	# Shop option — for shop NPCs
@@ -394,12 +420,11 @@ func show_context_menu(screen_pos: Vector2) -> void:
 			"icon": "S",
 			"color": Color(1.0, 0.85, 0.3),
 			"callback": func():
-				if not _is_player_in_range():
-					EventBus.chat_message.emit("You need to move closer to %s." % npc_name, "system")
-					return
-				var hud: Node = get_tree().get_first_node_in_group("hud")
-				if hud and hud.has_method("open_shop"):
-					hud.open_shop(self)
+				_walk_then_act(func():
+					var hud: Node = get_tree().get_first_node_in_group("hud")
+					if hud and hud.has_method("open_shop"):
+						hud.open_shop(self)
+				)
 		})
 
 	# Examine option (no range check — you can examine from afar)
