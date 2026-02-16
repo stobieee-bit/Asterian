@@ -1348,7 +1348,8 @@ static func _build_coilgun() -> Node3D:
 static func _build_voidstaff() -> Node3D:
 	var root: Node3D = Node3D.new()
 	root.name = "VoidstaffRoot"
-	root.position = Vector3(0.0, -0.25, 0.0)
+	root.position = Vector3(0.0, -0.25, -0.06)  # Offset forward (Z) so staff doesn't clip into arm
+	root.rotation.x = deg_to_rad(10)  # Slight forward tilt for natural hold
 
 	# Lower shaft (extends downward)
 	var shaft_low: MeshInstance3D = _cylinder("ShaftLower", 0.012, 0.45, COL_PLATE_DARK, true)
