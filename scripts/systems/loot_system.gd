@@ -26,10 +26,10 @@ func _ready() -> void:
 ## Called when player drops an item from inventory onto the ground
 func _on_item_dropped_to_ground(item_id: String, quantity: int, pos: Vector3) -> void:
 	_spawn_ground_item(item_id, quantity, pos)
-	# Mark the most recently spawned ground item as player-dropped so it isn't
-	# instantly auto-picked back up (2-second immunity window)
+	# Mark the most recently spawned ground item as player-dropped so it is
+	# never auto-picked back up — must be clicked to pick up
 	if _ground_items.size() > 0:
-		_ground_items[_ground_items.size() - 1].set_meta("pickup_immunity", 2.0)
+		_ground_items[_ground_items.size() - 1].set_meta("player_dropped", true)
 
 func _process(delta: float) -> void:
 	if _player == null:
@@ -57,15 +57,12 @@ func _process(delta: float) -> void:
 			i -= 1
 			continue
 
-		# Tick down pickup immunity for player-dropped items
-		var immunity: float = float(gitem.get_meta("pickup_immunity", 0.0))
-		if immunity > 0.0:
-			immunity -= delta
-			gitem.set_meta("pickup_immunity", immunity)
+		# Player-dropped items never auto-pickup — must be clicked
+		if gitem.get_meta("player_dropped", false):
 			i -= 1
 			continue
 
-		# Auto-pickup when player is close enough
+		# Auto-pickup when player is close enough (enemy drops only)
 		var dist: float = _player.global_position.distance_to(gitem.global_position)
 		if dist <= auto_pickup_range:
 			_pickup_item(gitem, i)
