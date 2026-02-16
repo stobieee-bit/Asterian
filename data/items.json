@@ -3074,7 +3074,16 @@
     "accuracy": 85,
     "levelReq": 40,
     "value": 1200,
-    "desc": "Titanex blade infused with nanobot swarm."
+    "desc": "Titanex blade infused with nanobot swarm.",
+    "special": {
+      "name": "Nano Cleave",
+      "icon": "🌀",
+      "description": "Sweeping AoE hitting all enemies in range for 200% damage.",
+      "adr_cost": 25,
+      "cooldown": 30,
+      "damage_mult": 2.0,
+      "effects": [{ "type": "aoe", "radius": 5.0 }]
+    }
   },
   "titanex_coilgun": {
     "id": "titanex_coilgun",
@@ -3088,7 +3097,16 @@
     "accuracy": 89,
     "levelReq": 40,
     "value": 1200,
-    "desc": "Titanex coilgun with tesla capacitors."
+    "desc": "Titanex coilgun with tesla capacitors.",
+    "special": {
+      "name": "EMP Burst",
+      "icon": "💥",
+      "description": "Electromagnetic pulse stunning all nearby enemies for 3 seconds.",
+      "adr_cost": 35,
+      "cooldown": 45,
+      "damage_mult": 1.5,
+      "effects": [{ "type": "aoe", "radius": 5.0 }, { "type": "stun", "duration": 3.0 }]
+    }
   },
   "titanex_voidstaff": {
     "id": "titanex_voidstaff",
@@ -3102,7 +3120,16 @@
     "accuracy": 82,
     "levelReq": 40,
     "value": 1200,
-    "desc": "Titanex staff channeling dark energy."
+    "desc": "Titanex staff channeling dark energy.",
+    "special": {
+      "name": "Reality Shift",
+      "icon": "🌌",
+      "description": "Warps reality, dealing 300% damage and reducing target defense by 30%.",
+      "adr_cost": 50,
+      "cooldown": 60,
+      "damage_mult": 3.0,
+      "effects": [{ "type": "debuff", "debuff_type": "defense", "value": 0.3, "duration": 10.0 }]
+    }
   },
   "titanex_energy_shield": {
     "id": "titanex_energy_shield",

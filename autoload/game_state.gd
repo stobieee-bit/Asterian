@@ -43,6 +43,19 @@ var equipment: Dictionary = {
 	"offhand": "",
 }
 
+# ── Equipment condition: { slot_name: float 0.0-1.0 } ──
+# Tracks degradation for each equipped slot. 1.0 = full, 0.0 = broken.
+# Only tier 5+ items degrade. Lower tier items stay at 1.0.
+var equipment_condition: Dictionary = {
+	"head": 1.0,
+	"body": 1.0,
+	"legs": 1.0,
+	"boots": 1.0,
+	"gloves": 1.0,
+	"weapon": 1.0,
+	"offhand": 1.0,
+}
+
 # ── Inventory: Array of { item_id: String, quantity: int } ──
 var inventory: Array[Dictionary] = []
 var inventory_size: int = 28
@@ -89,6 +102,14 @@ var dungeon_max_floor: int = 0
 var active_pet: String = ""
 var owned_pets: Dictionary = {}  # { pet_id: { level: int, xp: int } }
 
+# ── Active buffs from food/consumables ──
+# Array of { type: String, value: float, remaining: float, source: String }
+# Types: "damage", "defense", "accuracy", "speed", "all", "healOverTime"
+var active_buffs: Array[Dictionary] = []
+
+# ── Weapon special cooldowns (runtime only, not saved — resets on load) ──
+var weapon_special_cooldowns: Dictionary = {}  # { weapon_id: remaining_seconds }
+
 # ── Settings ──
 var settings: Dictionary = {
 	"music_volume": 0.5,
@@ -96,6 +117,8 @@ var settings: Dictionary = {
 	"show_damage_numbers": true,
 	"show_hp_bars": true,
 	"auto_retaliate": true,
+	"revolution": false,
+	"ability_bar_order": {},  # { style: [ability_id, ...] } — custom ability bar order per style
 }
 
 # ── Panel layout: { panel_name: { x, y, visible, locked } } ──
@@ -120,6 +143,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	total_play_time += delta
+	_tick_buffs(delta)
 
 # ── Helper functions ──
 
@@ -139,6 +163,47 @@ func get_total_level() -> int:
 func _on_area_entered_tracking(area_id: String) -> void:
 	if not visited_areas.has(area_id):
 		visited_areas.append(area_id)
+
+## ── Buff system ──
+
+## Apply a timed buff from food or consumable. Replaces any existing buff of same type.
+func apply_buff(buff_type: String, value: float, duration: float, source_name: String = "") -> void:
+	# Remove existing buff of same type (don't stack, replace)
+	for i in range(active_buffs.size() - 1, -1, -1):
+		if active_buffs[i]["type"] == buff_type:
+			active_buffs.remove_at(i)
+	active_buffs.append({
+		"type": buff_type,
+		"value": value,
+		"remaining": duration,
+		"source": source_name,
+	})
+	EventBus.buff_applied.emit(buff_type, value, duration)
+
+## Get total buff value for a given type (sums "all" + specific type).
+func get_buff_value(buff_type: String) -> float:
+	var total: float = 0.0
+	for b in active_buffs:
+		if b["type"] == buff_type or b["type"] == "all":
+			total += float(b["value"])
+	return total
+
+## Tick down all buff timers, remove expired, apply healOverTime.
+func _tick_buffs(delta: float) -> void:
+	if active_buffs.is_empty():
+		return
+	for i in range(active_buffs.size() - 1, -1, -1):
+		active_buffs[i]["remaining"] -= delta
+		# healOverTime: heal every second (accumulate via delta)
+		if active_buffs[i]["type"] == "healOverTime":
+			var heal_per_sec: float = float(active_buffs[i]["value"])
+			var max_hp: int = int(player["max_hp"])
+			if player["hp"] < max_hp:
+				player["hp"] = mini(max_hp, int(player["hp"]) + maxi(1, int(heal_per_sec * delta)))
+		if active_buffs[i]["remaining"] <= 0:
+			var expired_type: String = active_buffs[i]["type"]
+			active_buffs.remove_at(i)
+			EventBus.buff_expired.emit(expired_type)
 
 ## Check if player has enough credits
 func has_credits(amount: int) -> bool:
@@ -228,6 +293,7 @@ func to_save_data() -> Dictionary:
 		"player": player_copy,
 		"skills": skills.duplicate(true),
 		"equipment": equipment.duplicate(true),
+		"equipment_condition": equipment_condition.duplicate(true),
 		"inventory": inventory.duplicate(true),
 		"bank": bank.duplicate(true),
 		"active_quests": active_quests.duplicate(true),
@@ -277,6 +343,10 @@ func from_save_data(data: Dictionary) -> void:
 		if not skills.has(skill_id):
 			skills[skill_id] = default_skills[skill_id]
 	equipment = data.get("equipment", equipment)
+	# Load equipment condition, ensuring all slots have defaults
+	var saved_condition: Dictionary = data.get("equipment_condition", {})
+	for slot in equipment_condition:
+		equipment_condition[slot] = float(saved_condition.get(slot, 1.0))
 	inventory.assign(data.get("inventory", []))
 	bank.assign(data.get("bank", []))
 	active_quests = data.get("active_quests", {})

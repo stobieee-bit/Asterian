@@ -28,6 +28,11 @@ const ROOM_SPACING: float = 22.0
 ## Room wall height
 const WALL_HEIGHT: float = 5.0
 
+## World-space offset applied to the entire dungeon so it doesn't overlap
+## with the overworld areas (hub at origin, areas span X ±600, Z to -1800).
+## Placed far east and below so no area detection circle can reach it.
+const DUNGEON_WORLD_OFFSET: Vector3 = Vector3(2000.0, -100.0, 2000.0)
+
 ## Wall thickness
 const WALL_THICKNESS: float = 0.5
 
@@ -117,9 +122,10 @@ func build_floor(floor_data: Dictionary) -> void:
 	if _player == null:
 		_player = get_tree().get_first_node_in_group("player") as CharacterBody3D
 
-	# Create the parent node for all dungeon geometry
+	# Create the parent node for all dungeon geometry, offset far from the overworld
 	_floor_node = Node3D.new()
 	_floor_node.name = "DungeonFloor"
+	_floor_node.position = DUNGEON_WORLD_OFFSET
 	add_child(_floor_node)
 
 	# Read theme from floor data
@@ -146,10 +152,10 @@ func build_floor(floor_data: Dictionary) -> void:
 	# Set up ambient light and fog
 	_setup_environment(theme)
 
-	# Teleport player to entrance
+	# Teleport player to entrance (offset by dungeon world position)
 	var entrance_pos: Vector3 = floor_data.get("entrance_pos", Vector3.ZERO)
 	if _player != null:
-		_player.global_position = entrance_pos + Vector3(0, 1, 0)
+		_player.global_position = DUNGEON_WORLD_OFFSET + entrance_pos + Vector3(0, 1.5, 0)
 
 	# Debug summary
 	var floor_num: int = int(floor_data.get("floor", 0))

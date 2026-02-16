@@ -100,9 +100,13 @@ func _on_enemy_killed(eid: String, _etype: String) -> void:
 	var loot_table: Array = enemy_data.get("lootTable", [])
 	var spawn_pos: Vector3 = (enemy_node as Node3D).global_position
 
+	# Bestiary loot bonus: +1% per 10 bestiary entries (max +10%)
+	var bestiary_bonus: float = minf(0.10, float(GameState.collection_log.size()) * 0.001)
+
 	# Roll each loot entry
 	for entry in loot_table:
 		var chance: float = float(entry.get("chance", 0.0))
+		chance += bestiary_bonus  # Bestiary completion bonus
 		if randf() > chance:
 			continue
 

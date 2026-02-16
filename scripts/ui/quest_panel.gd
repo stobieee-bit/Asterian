@@ -18,6 +18,7 @@ var _slayer_separator: HSeparator = null
 var _slayer_title: Label = null
 var _slayer_target: Label = null
 var _slayer_progress: Label = null
+var _slayer_location: Label = null
 var _slayer_streak: Label = null
 
 
@@ -87,6 +88,12 @@ func _ready() -> void:
 	_slayer_progress.visible = false
 	scroll_vbox.add_child(_slayer_progress)
 
+	_slayer_location = Label.new()
+	_slayer_location.add_theme_font_size_override("font_size", 12)
+	_slayer_location.add_theme_color_override("font_color", Color(0.5, 0.6, 0.7))
+	_slayer_location.visible = false
+	scroll_vbox.add_child(_slayer_location)
+
 	_slayer_streak = Label.new()
 	_slayer_streak.add_theme_font_size_override("font_size", 12)
 	_slayer_streak.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7))
@@ -99,6 +106,9 @@ func _ready() -> void:
 	EventBus.quest_completed.connect(_on_quest_completed)
 	EventBus.enemy_killed.connect(_on_enemy_killed)
 	EventBus.chat_message.connect(_on_chat_message)
+
+	# Refresh when panel becomes visible (updates turn-in proximity check)
+	visibility_changed.connect(_on_visibility_changed)
 
 	# Initial build
 	refresh()
@@ -197,15 +207,32 @@ func _build_quest_entry(quest_id: String) -> void:
 	btn_row.add_theme_constant_override("separation", 8)
 	quest_box.add_child(btn_row)
 
-	# Turn In button (only when all steps are done)
+	# Turn In button (only when all steps are done AND player is near the quest giver)
 	if completable:
 		var turn_in_btn: Button = Button.new()
-		turn_in_btn.text = "Turn In"
 		turn_in_btn.add_theme_font_size_override("font_size", 14)
 		turn_in_btn.custom_minimum_size = Vector2(70, 26)
-		turn_in_btn.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
-		turn_in_btn.pressed.connect(_on_turn_in.bind(quest_id))
+
+		var near_giver: bool = _is_player_near_quest_giver(quest_id)
+		if near_giver:
+			turn_in_btn.text = "Turn In"
+			turn_in_btn.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+			turn_in_btn.pressed.connect(_on_turn_in.bind(quest_id))
+		else:
+			var giver_name: String = _get_quest_giver_name(quest_id)
+			turn_in_btn.text = "Turn In"
+			turn_in_btn.disabled = true
+			turn_in_btn.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
+			turn_in_btn.tooltip_text = "Return to %s to turn in" % giver_name
 		btn_row.add_child(turn_in_btn)
+
+	# Hint: tell player to return to the quest giver when quest is completable but far away
+	if completable and not _is_player_near_quest_giver(quest_id):
+		var hint_label: Label = Label.new()
+		hint_label.text = "  ↩ Return to %s" % _get_quest_giver_name(quest_id)
+		hint_label.add_theme_font_size_override("font_size", 12)
+		hint_label.add_theme_color_override("font_color", Color(0.8, 0.65, 0.3, 0.8))
+		quest_box.add_child(hint_label)
 
 	# Abandon button — always available for active quests
 	var abandon_btn: Button = Button.new()
@@ -219,6 +246,48 @@ func _build_quest_entry(quest_id: String) -> void:
 	# Separator between quests
 	var sep: HSeparator = HSeparator.new()
 	_quests_container.add_child(sep)
+
+
+# ──────────────────────────────────────────────
+#  Quest giver proximity check
+# ──────────────────────────────────────────────
+
+## How close the player must be to the quest giver NPC to turn in (world units).
+const TURN_IN_DISTANCE: float = 12.0
+
+## Check if the player is within turn-in range of the quest's giver NPC.
+func _is_player_near_quest_giver(quest_id: String) -> bool:
+	var quest_data: Dictionary = DataManager.get_quest(quest_id)
+	var giver_id: String = str(quest_data.get("giver", ""))
+	if giver_id.is_empty():
+		return true  # No giver defined — allow turn-in anywhere
+
+	var npc_data: Dictionary = DataManager.npcs.get(giver_id, {})
+	if npc_data.is_empty():
+		return true  # NPC data missing — fallback to allowing
+
+	var npc_pos_data: Dictionary = npc_data.get("position", {})
+	var npc_x: float = float(npc_pos_data.get("x", 0))
+	var npc_z: float = float(npc_pos_data.get("z", 0))
+
+	var player: Node3D = get_tree().get_first_node_in_group("player")
+	if player == null:
+		return false
+
+	var px: float = player.global_position.x
+	var pz: float = player.global_position.z
+	var dist_sq: float = (px - npc_x) * (px - npc_x) + (pz - npc_z) * (pz - npc_z)
+	return dist_sq <= TURN_IN_DISTANCE * TURN_IN_DISTANCE
+
+
+## Get the display name of the quest giver NPC.
+func _get_quest_giver_name(quest_id: String) -> String:
+	var quest_data: Dictionary = DataManager.get_quest(quest_id)
+	var giver_id: String = str(quest_data.get("giver", ""))
+	if giver_id.is_empty():
+		return "the quest giver"
+	var npc_data: Dictionary = DataManager.npcs.get(giver_id, {})
+	return str(npc_data.get("name", giver_id.replace("_", " ").capitalize()))
 
 
 # ──────────────────────────────────────────────
@@ -270,6 +339,11 @@ func _on_close() -> void:
 	EventBus.panel_closed.emit("quests")
 
 
+func _on_visibility_changed() -> void:
+	if visible:
+		refresh()
+
+
 func _on_enemy_killed(_eid: String, _etype: String) -> void:
 	_refresh_slayer()
 
@@ -301,8 +375,21 @@ func _refresh_slayer() -> void:
 				_slayer_target.text = "  Kill %s" % enemy_name
 			if _slayer_progress:
 				_slayer_progress.text = "  %d / %d" % [count - remaining, count]
+
+			# Build location: zone + area
+			var enemy_level: int = int(enemy_data.get("level", 0))
+			var enemy_area: String = str(task.get("area", ""))
+			var zone_name: String = _find_zone_name(enemy_area, enemy_level)
+			var location_text: String
+			if zone_name != "":
+				location_text = "%s, %s" % [zone_name, area_name]
+			else:
+				location_text = area_name
+			if _slayer_location:
+				_slayer_location.text = "  📍 %s" % location_text
+
 			if _slayer_streak:
-				_slayer_streak.text = "  Streak: %d  |  %s" % [GameState.slayer_streak, area_name]
+				_slayer_streak.text = "  Streak: %d" % GameState.slayer_streak
 
 	var has_quests: bool = not GameState.active_quests.is_empty()
 
@@ -314,5 +401,24 @@ func _refresh_slayer() -> void:
 		_slayer_target.visible = has_slayer
 	if _slayer_progress:
 		_slayer_progress.visible = has_slayer
+	if _slayer_location:
+		_slayer_location.visible = has_slayer
 	if _slayer_streak:
 		_slayer_streak.visible = has_slayer
+
+## Find the sub-zone name for an enemy based on its area and level
+func _find_zone_name(enemy_area: String, enemy_level: int) -> String:
+	var best_name: String = ""
+	var best_range: int = 9999
+	for zone in DataManager.enemy_sub_zones:
+		var z_area: String = str(zone.get("area", ""))
+		if z_area != enemy_area:
+			continue
+		var z_min: int = int(zone.get("levelMin", 0))
+		var z_max: int = int(zone.get("levelMax", 0))
+		if enemy_level >= z_min and enemy_level <= z_max:
+			var range_span: int = z_max - z_min
+			if range_span < best_range:
+				best_range = range_span
+				best_name = str(zone.get("name", ""))
+	return best_name

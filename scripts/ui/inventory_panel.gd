@@ -420,8 +420,17 @@ func _equip_from_slot(item_id: String) -> void:
 		equip_sys.equip_item(item_id)
 	refresh()
 
-## Eat food to heal
+## Eat food to heal and apply buff
 func _eat_food(item_id: String, _index: int) -> void:
+	# Prefer combat_controller's eat_food() which handles cooldowns and buffs
+	var player_node: Node3D = get_tree().get_first_node_in_group("player")
+	if player_node:
+		var combat: Node = player_node.get_node_or_null("CombatController")
+		if combat and combat.has_method("eat_food"):
+			combat.eat_food(item_id)
+			refresh()
+			return
+	# Fallback: manual heal
 	var item_data: Dictionary = DataManager.get_item(item_id)
 	var heal: int = int(item_data.get("heals", int(item_data.get("heal", 10))))
 	if GameState.player["hp"] >= GameState.player["max_hp"]:
@@ -432,15 +441,42 @@ func _eat_food(item_id: String, _index: int) -> void:
 	EventBus.player_healed.emit(heal)
 	var item_name: String = str(item_data.get("name", item_id))
 	EventBus.chat_message.emit("Ate %s, healed %d HP." % [item_name, heal], "system")
+	refresh()
 
-	# Float text
-	var player: Node3D = get_tree().get_first_node_in_group("player")
-	if player:
-		EventBus.float_text_requested.emit(
-			"+%d" % heal,
-			player.global_position + Vector3(0, 2.8, 0),
-			Color(0.2, 1.0, 0.3)
-		)
+## Use a consumable item (apply buff and/or heal, then consume)
+func _use_consumable(item_id: String) -> void:
+	if GameState.count_item(item_id) <= 0:
+		return
+	var item_data: Dictionary = DataManager.get_item(item_id)
+	if item_data.is_empty():
+		return
+	var item_name: String = str(item_data.get("name", item_id))
+
+	# Heal if item has a heal field
+	var heal: int = int(item_data.get("heals", item_data.get("healAmount", item_data.get("heal", 0))))
+	if heal > 0:
+		var max_hp: int = int(GameState.player["max_hp"])
+		var old_hp: int = int(GameState.player["hp"])
+		GameState.player["hp"] = mini(max_hp, old_hp + heal)
+		var actual_heal: int = int(GameState.player["hp"]) - old_hp
+		if actual_heal > 0:
+			EventBus.player_healed.emit(actual_heal)
+
+	# Apply buff if defined
+	var buff_data: Dictionary = item_data.get("buff", {})
+	var buff_msg: String = ""
+	if not buff_data.is_empty():
+		var buff_type: String = str(buff_data.get("type", ""))
+		var buff_value: float = float(buff_data.get("value", 0))
+		var buff_duration: float = float(buff_data.get("duration", 60))
+		if buff_type != "" and buff_value > 0:
+			GameState.apply_buff(buff_type, buff_value, buff_duration, item_name)
+			var dur_text: String = "%ds" % int(buff_duration) if buff_duration < 120 else "%dm" % int(buff_duration / 60.0)
+			buff_msg = " +%.0f %s for %s" % [buff_value, buff_type, dur_text]
+
+	# Consume the item
+	GameState.remove_item(item_id, 1)
+	EventBus.chat_message.emit("Used %s.%s" % [item_name, buff_msg], "system")
 	refresh()
 
 ## Show tooltip on hover
@@ -528,14 +564,14 @@ func _show_item_context_menu(item_id: String, item_data: Dictionary, item_type: 
 			"callback": func(): _eat_food(item_id, index)
 		})
 
-	# Use option for consumables
+	# Use option for consumables (applies buff and/or heal)
 	if item_type == "consumable":
 		options.append({
 			"label": "Use",
 			"icon": "U",
 			"color": Color(0.9, 0.8, 0.2),
 			"callback": func():
-				EventBus.chat_message.emit("Used %s." % item_name, "system")
+				_use_consumable(item_id)
 		})
 
 	# Drop option for all items

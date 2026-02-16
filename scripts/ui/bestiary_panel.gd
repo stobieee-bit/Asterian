@@ -62,8 +62,14 @@ func refresh() -> void:
 	var total_count: int = all_enemies.size()
 	var discovered_count: int = GameState.collection_log.size()
 
+	# Bestiary loot bonus: +1% per 10 entries, max +10%
+	var loot_bonus: float = minf(10.0, float(discovered_count) * 0.1)
+	var next_milestone: int = (int(discovered_count / 10) + 1) * 10
+
 	# Update summary
-	_summary_label.text = "%d / %d Enemies Discovered" % [discovered_count, total_count]
+	_summary_label.text = "%d / %d Discovered  |  Loot Bonus: +%.1f%%\nNext bonus at %d entries" % [
+		discovered_count, total_count, loot_bonus, next_milestone
+	]
 
 	# Build a row for each enemy
 	for enemy_entry in all_enemies:
@@ -90,19 +96,19 @@ func _on_close_pressed() -> void:
 
 # ── Private helpers ─────────────────────────────────────────────────────────
 
-## Collect all enemies from DataManager and return sorted by combatLevel asc
+## Collect all enemies from DataManager and return sorted by level asc
 func _get_sorted_enemies() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for type_id in DataManager.enemies:
 		var data: Dictionary = DataManager.enemies[type_id]
 		result.append({
 			"type_id": type_id,
-			"combatLevel": int(data.get("combatLevel", 0)),
+			"level": int(data.get("level", 0)),
 		})
 
-	# Sort ascending by combat level
+	# Sort ascending by level
 	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
-		return a["combatLevel"] < b["combatLevel"]
+		return a["level"] < b["level"]
 	)
 	return result
 
@@ -113,13 +119,11 @@ func _add_discovered_row(type_id: String, _entry: Dictionary) -> void:
 		return
 
 	var enemy_name: String = str(data.get("name", type_id))
-	var combat_level: int = int(data.get("combatLevel", 0))
+	var combat_level: int = int(data.get("level", 0))
 	var hp: int = int(data.get("hp", 0))
 	var combat_style: String = str(data.get("combatStyle", ""))
 	var area: String = str(data.get("area", "unknown"))
-	var atk_range: Array = data.get("attackDamage", [0, 0])
-	var atk_min: int = int(atk_range[0]) if atk_range.size() > 0 else 0
-	var atk_max: int = int(atk_range[1]) if atk_range.size() > 1 else 0
+	var atk_damage: int = int(data.get("damage", 0))
 
 	# Container for this enemy entry
 	var row: VBoxContainer = VBoxContainer.new()
@@ -147,14 +151,64 @@ func _add_discovered_row(type_id: String, _entry: Dictionary) -> void:
 	var line2: HBoxContainer = HBoxContainer.new()
 	row.add_child(line2)
 
+	# Determine zone name from enemy level + area
+	var enemy_level: int = int(data.get("level", 0))
+	var zone_name: String = _find_zone_name(area, enemy_level)
+	var location_text: String
+	if zone_name != "":
+		location_text = "%s, %s" % [zone_name, _format_area(area)]
+	else:
+		location_text = _format_area(area)
+
 	var stats_label: Label = Label.new()
-	stats_label.text = "HP: %d  |  Atk: %d-%d  |  %s" % [hp, atk_min, atk_max, _format_area(area)]
+	stats_label.text = "HP: %d  |  Atk: %d" % [hp, atk_damage]
 	stats_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	stats_label.add_theme_font_size_override("font_size", 13)
 	stats_label.add_theme_color_override("font_color", Color(0.55, 0.65, 0.6))
 	line2.add_child(stats_label)
 
-	# ── Line 3 (optional): Kill count from boss_kills ──
+	# ── Location line: zone + area ──
+	var loc_label: Label = Label.new()
+	loc_label.text = "📍 %s" % location_text
+	loc_label.add_theme_font_size_override("font_size", 12)
+	loc_label.add_theme_color_override("font_color", Color(0.5, 0.6, 0.7))
+	row.add_child(loc_label)
+
+	# ── Line 3: Weakness + Defense info (unlocked at 10+ bestiary entries) ──
+	var entry_count: int = GameState.collection_log.size()
+	if entry_count >= 10:
+		var weakness: String = _get_weakness(combat_style)
+		var defense_val: int = int(data.get("defense", 0))
+		var weak_label: Label = Label.new()
+		weak_label.text = "Weak to: %s  |  Def: %d" % [weakness, defense_val]
+		weak_label.add_theme_font_size_override("font_size", 12)
+		weak_label.add_theme_color_override("font_color", Color(0.9, 0.5, 0.3))
+		row.add_child(weak_label)
+
+	# ── Line 4: Drop table (unlocked at 25+ bestiary entries) ──
+	if entry_count >= 25:
+		var loot_table: Array = data.get("lootTable", [])
+		if loot_table.size() > 0:
+			var drop_parts: Array[String] = []
+			for drop in loot_table:
+				var did: String = str(drop.get("itemId", ""))
+				var dchance: float = float(drop.get("chance", 0.0)) * 100.0
+				if did == "credits":
+					drop_parts.append("Credits (%d%%)" % int(dchance))
+				else:
+					var ditem: Dictionary = DataManager.get_item(did)
+					var dname: String = str(ditem.get("name", did))
+					drop_parts.append("%s (%d%%)" % [dname, int(dchance)])
+			var drops_label: Label = Label.new()
+			drops_label.text = "Drops: %s" % ", ".join(drop_parts)
+			drops_label.add_theme_font_size_override("font_size", 11)
+			drops_label.add_theme_color_override("font_color", Color(0.5, 0.7, 0.5))
+			drops_label.clip_text = true
+			drops_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			drops_label.custom_minimum_size.x = 310
+			row.add_child(drops_label)
+
+	# ── Kill count from boss_kills ──
 	var kill_count: int = int(GameState.boss_kills.get(type_id, 0))
 	if kill_count > 0:
 		var kill_label: Label = Label.new()
@@ -192,6 +246,32 @@ func _style_color(combat_style: String) -> Color:
 		"tesla": return Color(1.0, 0.9, 0.3)   # Yellow
 		"void":  return Color(0.7, 0.4, 1.0)   # Purple
 		_:       return Color(0.7, 0.7, 0.7)   # Fallback gray
+
+## Get the weakness of an enemy based on combat style triangle:
+## nano → weak to tesla, tesla → weak to void, void → weak to nano
+func _get_weakness(combat_style: String) -> String:
+	match combat_style:
+		"nano":  return "Tesla ⚡"
+		"tesla": return "Void 🌀"
+		"void":  return "Nano 🔬"
+		_:       return "None"
+
+## Find the sub-zone name for an enemy based on its area and level
+func _find_zone_name(enemy_area: String, enemy_level: int) -> String:
+	var best_name: String = ""
+	var best_range: int = 9999  # Tightest level range wins
+	for zone in DataManager.enemy_sub_zones:
+		var z_area: String = str(zone.get("area", ""))
+		if z_area != enemy_area:
+			continue
+		var z_min: int = int(zone.get("levelMin", 0))
+		var z_max: int = int(zone.get("levelMax", 0))
+		if enemy_level >= z_min and enemy_level <= z_max:
+			var range_span: int = z_max - z_min
+			if range_span < best_range:
+				best_range = range_span
+				best_name = str(zone.get("name", ""))
+	return best_name
 
 ## Format area slug to display name: "alien-wastes" → "Alien Wastes"
 func _format_area(area: String) -> String:

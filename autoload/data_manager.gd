@@ -282,3 +282,13 @@ func get_abilities_for_style(style: String) -> Array:
 	# Sort by slot number
 	result.sort_custom(func(a, b): return int(a.get("slot", 0)) < int(b.get("slot", 0)))
 	return result
+
+## Get all shared (defensive/utility) abilities, sorted by slot
+func get_shared_abilities() -> Array:
+	var result: Array = []
+	for ability_id in abilities:
+		var ab: Dictionary = abilities[ability_id]
+		if ab.get("shared", false):
+			result.append(ab)
+	result.sort_custom(func(a, b): return int(a.get("slot", 0)) < int(b.get("slot", 0)))
+	return result

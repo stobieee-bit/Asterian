@@ -82,10 +82,42 @@ var _chat_messages: Array[Label] = []
 var _max_chat_lines: int = 50
 var _chat_input: LineEdit = null
 var _chat_typing: bool = false  # True when chat input is focused
+var _chat_drag_header: DraggableHeader = null
+var _chat_resize_handle: Control = null
+var _chat_resizing: bool = false
+var _chat_resize_start: Vector2 = Vector2.ZERO
+var _chat_size_start: Vector2 = Vector2.ZERO
 
 ## Overlaid HP/Energy text labels (drawn on top of progress bars)
 var _hp_text: Label = null
 var _energy_text: Label = null
+
+## Buff display — shows active food/consumable buffs above stat bars
+var _buff_container: HBoxContainer = null
+var _buff_labels: Dictionary = {}  # { buff_type: { "panel": PanelContainer, "icon": Label, "text": Label } }
+
+## Chat filter state — which categories are visible
+var _chat_filters: Dictionary = {
+	"all": true, "combat": true, "loot": true, "xp": true,
+	"quest": true, "system": true,
+}
+var _chat_filter_buttons: Dictionary = {}  # { category: Button }
+const CHAT_FILTER_CATEGORIES: Array = [
+	{ "id": "all", "label": "All", "color": Color(0.7, 0.7, 0.7) },
+	{ "id": "combat", "label": "Combat", "color": Color(0.9, 0.35, 0.25) },
+	{ "id": "loot", "label": "Loot", "color": Color(0.3, 0.8, 0.9) },
+	{ "id": "xp", "label": "XP", "color": Color(0.3, 0.8, 0.35) },
+	{ "id": "quest", "label": "Quest", "color": Color(0.8, 0.55, 0.9) },
+	{ "id": "system", "label": "Sys", "color": Color(0.55, 0.6, 0.6) },
+]
+## Maps chat channels to filter categories
+const CHAT_CHANNEL_TO_FILTER: Dictionary = {
+	"combat": "combat", "loot": "loot", "xp": "xp", "levelup": "xp",
+	"quest": "quest", "slayer": "quest",
+	"system": "system", "equipment": "system", "prestige": "system",
+	"achievement": "system", "dungeon": "system", "pet": "system",
+	"multiplayer": "all",
+}
 
 ## Hover text — shows entity names when mouse hovers in 3D world
 var _hover_label: Label = null
@@ -152,6 +184,9 @@ func _ready() -> void:
 
 	# Build adrenaline bar + ability buttons
 	_build_adrenaline_bar()
+
+	# Build buff display (active food/consumable buffs)
+	_build_buff_display()
 	_build_ability_bar()
 
 	# Build minimap
@@ -336,6 +371,16 @@ func _process(delta: float) -> void:
 	# ── Ability queue indicator — highlight queued ability button ──
 	_update_ability_queue_highlight(delta)
 
+	# ── Ability cooldown overlays ──
+	_update_ability_cooldowns()
+
+	# ── Active buff display (food/consumable timers) ──
+	_update_buff_display()
+
+	# ── Keep chat resize handle pinned to chat panel corner ──
+	if _chat_resize_handle and _chat_bg:
+		_update_chat_resize_handle_pos()
+
 func _unhandled_input(event: InputEvent) -> void:
 	# ── Chat input: Enter to open, Escape to close ──
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -373,8 +418,32 @@ func _unhandled_input(event: InputEvent) -> void:
 		_toggle_panel(_bestiary_panel, "bestiary")
 		get_viewport().set_input_as_handled()
 	elif event is InputEventKey and event.pressed and not event.echo:
+		# Shift+1..5 → defense abilities
+		if event.shift_pressed:
+			match event.keycode:
+				KEY_1:
+					_use_defensive_ability(1)
+					get_viewport().set_input_as_handled()
+					return
+				KEY_2:
+					_use_defensive_ability(2)
+					get_viewport().set_input_as_handled()
+					return
+				KEY_3:
+					_use_defensive_ability(3)
+					get_viewport().set_input_as_handled()
+					return
+				KEY_4:
+					_use_defensive_ability(4)
+					get_viewport().set_input_as_handled()
+					return
+				KEY_5:
+					_use_defensive_ability(5)
+					get_viewport().set_input_as_handled()
+					return
+
 		match event.keycode:
-			# Ability keybinds (1-5)
+			# Ability keybinds (1-6)
 			KEY_1:
 				_use_ability(1)
 				get_viewport().set_input_as_handled()
@@ -390,9 +459,16 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_5:
 				_use_ability(5)
 				get_viewport().set_input_as_handled()
+			KEY_6:
+				_use_ability(6)
+				get_viewport().set_input_as_handled()
 			# Eat food (F)
 			KEY_F:
 				_eat_food()
+				get_viewport().set_input_as_handled()
+			# Weapon special attack (S)
+			KEY_S:
+				_use_weapon_special()
 				get_viewport().set_input_as_handled()
 			# Toggle run/walk (R)
 			KEY_R:
@@ -402,8 +478,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_TAB:
 				_target_nearest_enemy()
 				get_viewport().set_input_as_handled()
-			# Escape: close all panels, deselect target, close context menu
+			# Escape: cancel swap mode, close all panels, deselect target, close context menu
 			KEY_ESCAPE:
+				if _swap_mode:
+					_cancel_swap_mode()
 				_close_all_panels()
 				EventBus.context_menu_hidden.emit()
 				get_viewport().set_input_as_handled()
@@ -622,7 +700,8 @@ func _build_chat_log() -> void:
 	_chat_bg.add_theme_stylebox_override("panel", bg_style)
 	var vp_size: Vector2 = _get_viewport_size()
 	_chat_bg.position = Vector2(10, vp_size.y - 290)
-	_chat_bg.custom_minimum_size = Vector2(400, 220)
+	_chat_bg.custom_minimum_size = Vector2(300, 180)
+	_chat_bg.size = Vector2(400, 250)
 	_chat_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_chat_bg)
 
@@ -631,24 +710,55 @@ func _build_chat_log() -> void:
 	outer_vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_chat_bg.add_child(outer_vbox)
 
-	# Minimal header
-	var header: PanelContainer = PanelContainer.new()
-	var header_style: StyleBoxFlat = StyleBoxFlat.new()
-	header_style.bg_color = Color(0.02, 0.04, 0.08, 0.5)
-	header_style.corner_radius_top_left = 4
-	header_style.corner_radius_top_right = 4
-	header_style.set_content_margin_all(3)
-	header_style.content_margin_left = 8
-	header.add_theme_stylebox_override("panel", header_style)
-	header.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	outer_vbox.add_child(header)
+	# Draggable header — always interactive so player can drag even when chat is unfocused
+	var drag_header: DraggableHeader = DraggableHeader.attach(_chat_bg, "Chat", Callable())
+	drag_header.name = "ChatDragHeader"
+	drag_header.mouse_filter = Control.MOUSE_FILTER_STOP
+	outer_vbox.add_child(drag_header)
+	_chat_drag_header = drag_header
+	# Update resize handle position whenever drag ends
+	drag_header._on_drag_end = _update_chat_resize_handle_pos
 
-	var header_label: Label = Label.new()
-	header_label.text = "Chat"
-	header_label.add_theme_font_size_override("font_size", 12)
-	header_label.add_theme_color_override("font_color", Color(0.35, 0.55, 0.65, 0.7))
-	header_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	header.add_child(header_label)
+	# Resize handle at the bottom-right corner
+	_chat_resize_handle = _build_chat_resize_handle()
+
+	# ── Chat filter tabs ──
+	var filter_row: HBoxContainer = HBoxContainer.new()
+	filter_row.name = "ChatFilterRow"
+	filter_row.add_theme_constant_override("separation", 2)
+	filter_row.mouse_filter = Control.MOUSE_FILTER_STOP
+	var filter_margin: MarginContainer = MarginContainer.new()
+	filter_margin.add_theme_constant_override("margin_left", 6)
+	filter_margin.add_theme_constant_override("margin_right", 6)
+	filter_margin.add_theme_constant_override("margin_top", 1)
+	filter_margin.add_theme_constant_override("margin_bottom", 1)
+	filter_margin.add_child(filter_row)
+	outer_vbox.add_child(filter_margin)
+	for cat in CHAT_FILTER_CATEGORIES:
+		var cat_id: String = str(cat["id"])
+		var cat_color: Color = cat["color"]
+		var fbtn: Button = Button.new()
+		fbtn.text = str(cat["label"])
+		fbtn.add_theme_font_size_override("font_size", 10)
+		fbtn.custom_minimum_size = Vector2(0, 18)
+		fbtn.focus_mode = Control.FOCUS_NONE
+		var fbtn_style: StyleBoxFlat = StyleBoxFlat.new()
+		fbtn_style.bg_color = Color(cat_color.r * 0.15, cat_color.g * 0.15, cat_color.b * 0.15, 0.6)
+		fbtn_style.border_color = cat_color.darkened(0.3)
+		fbtn_style.border_color.a = 0.5
+		fbtn_style.set_border_width_all(1)
+		fbtn_style.set_corner_radius_all(3)
+		fbtn_style.content_margin_left = 4
+		fbtn_style.content_margin_right = 4
+		fbtn_style.content_margin_top = 0
+		fbtn_style.content_margin_bottom = 0
+		fbtn.add_theme_stylebox_override("normal", fbtn_style)
+		fbtn.add_theme_stylebox_override("hover", fbtn_style)
+		fbtn.add_theme_stylebox_override("pressed", fbtn_style)
+		fbtn.add_theme_color_override("font_color", cat_color)
+		fbtn.pressed.connect(_on_chat_filter_toggle.bind(cat_id))
+		filter_row.add_child(fbtn)
+		_chat_filter_buttons[cat_id] = fbtn
 
 	# Message area with padding
 	var msg_margin: MarginContainer = MarginContainer.new()
@@ -833,6 +943,12 @@ func _build_action_bar() -> void:
 	pet_btn.pressed.connect(func(): _toggle_panel(_pet_panel, "pets"))
 	bar.add_child(pet_btn)
 
+	# Achievements button
+	var ach_btn: Button = _make_sci_btn("Achieve [J]", 82, gold)
+	ach_btn.tooltip_text = "Achievements (J)"
+	ach_btn.pressed.connect(func(): _toggle_panel(_achievement_panel, "achievements"))
+	bar.add_child(ach_btn)
+
 	# Settings button
 	var set_btn: Button = _make_sci_btn("Settings", 68, Color(0.5, 0.5, 0.6))
 	set_btn.tooltip_text = "Settings"
@@ -923,6 +1039,14 @@ func _on_chat_message(text: String, channel: String) -> void:
 	label.add_theme_constant_override("shadow_offset_x", 1)
 	label.add_theme_constant_override("shadow_offset_y", 1)
 
+	# Store channel as metadata for filtering
+	label.set_meta("channel", channel)
+
+	# Check if this message passes the current filter
+	var filter_cat: String = CHAT_CHANNEL_TO_FILTER.get(channel, "system")
+	var is_visible: bool = _chat_filters.get("all", true) or _chat_filters.get(filter_cat, true)
+	label.visible = is_visible
+
 	_chat_container.add_child(label)
 	_chat_messages.append(label)
 
@@ -936,6 +1060,44 @@ func _on_chat_message(text: String, channel: String) -> void:
 	if _chat_scroll:
 		await get_tree().process_frame
 		_chat_scroll.scroll_vertical = int(_chat_scroll.get_v_scroll_bar().max_value)
+
+# ── Chat filter handlers ──
+
+## Toggle a chat filter category on/off
+func _on_chat_filter_toggle(category: String) -> void:
+	if category == "all":
+		# "All" toggles everything on and resets other filters
+		for key in _chat_filters:
+			_chat_filters[key] = true
+	else:
+		# Toggle this specific category; turn off "all" if it was on
+		_chat_filters[category] = not _chat_filters[category]
+		# Check if all individual categories are on → auto-enable "all"
+		var all_on: bool = true
+		for key in _chat_filters:
+			if key != "all" and not _chat_filters[key]:
+				all_on = false
+				break
+		_chat_filters["all"] = all_on
+
+	# Update button visuals
+	for cat_id in _chat_filter_buttons:
+		var fbtn: Button = _chat_filter_buttons[cat_id]
+		var enabled: bool = _chat_filters.get(cat_id, true)
+		fbtn.modulate.a = 1.0 if enabled else 0.35
+
+	# Re-filter all existing messages
+	_apply_chat_filters()
+
+## Re-filter all existing chat messages based on current filter state
+func _apply_chat_filters() -> void:
+	var show_all: bool = _chat_filters.get("all", true)
+	for msg in _chat_messages:
+		if not is_instance_valid(msg):
+			continue
+		var ch: String = str(msg.get_meta("channel", "system"))
+		var filter_cat: String = CHAT_CHANNEL_TO_FILTER.get(ch, "system")
+		msg.visible = show_all or _chat_filters.get(filter_cat, true)
 
 # ── Chat input handlers ──
 
@@ -988,12 +1150,67 @@ func _unfocus_chat_input() -> void:
 		return
 	_chat_input.release_focus()
 
+## Build a small resize handle for the chat window (bottom-right corner)
+## Added as sibling of _chat_bg on the HUD layer so PanelContainer layout isn't affected.
+func _build_chat_resize_handle() -> Control:
+	var handle: Control = Control.new()
+	handle.name = "ChatResizeHandle"
+	handle.custom_minimum_size = Vector2(18, 18)
+	handle.size = Vector2(18, 18)
+	handle.mouse_filter = Control.MOUSE_FILTER_STOP
+	handle.mouse_default_cursor_shape = Control.CURSOR_FDIAGSIZE
+	add_child(handle)
+
+	# Draw a small diagonal grip icon
+	var grip_label: Label = Label.new()
+	grip_label.text = "⋱"
+	grip_label.add_theme_font_size_override("font_size", 12)
+	grip_label.add_theme_color_override("font_color", Color(0.3, 0.5, 0.6, 0.5))
+	grip_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	handle.add_child(grip_label)
+
+	handle.gui_input.connect(_on_chat_resize_input)
+	_update_chat_resize_handle_pos()
+	return handle
+
+## Keep the resize handle in the bottom-right corner of the chat panel (global coords)
+func _update_chat_resize_handle_pos() -> void:
+	if _chat_resize_handle == null or _chat_bg == null:
+		return
+	var panel_pos: Vector2 = _chat_bg.position
+	var panel_size: Vector2 = _chat_bg.size
+	_chat_resize_handle.position = Vector2(panel_pos.x + panel_size.x - 18, panel_pos.y + panel_size.y - 18)
+
+## Handle mouse drag on the chat resize handle
+func _on_chat_resize_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				_chat_resizing = true
+				_chat_resize_start = event.global_position
+				_chat_size_start = _chat_bg.size
+			else:
+				_chat_resizing = false
+	elif event is InputEventMouseMotion and _chat_resizing:
+		var delta: Vector2 = event.global_position - _chat_resize_start
+		var new_size: Vector2 = _chat_size_start + delta
+		# Clamp to minimum size
+		new_size.x = maxf(new_size.x, _chat_bg.custom_minimum_size.x)
+		new_size.y = maxf(new_size.y, _chat_bg.custom_minimum_size.y)
+		# Clamp to viewport bounds
+		var vp_size: Vector2 = _get_viewport_size()
+		new_size.x = minf(new_size.x, vp_size.x - _chat_bg.position.x)
+		new_size.y = minf(new_size.y, vp_size.y - _chat_bg.position.y)
+		_chat_bg.size = new_size
+		_update_chat_resize_handle_pos()
+
 ## Reposition the chat panel to bottom-left of current viewport
 func _reposition_chat() -> void:
 	if _chat_bg == null:
 		return
 	var vp_size: Vector2 = _get_viewport_size()
 	_chat_bg.position = Vector2(10, vp_size.y - 310)
+	_update_chat_resize_handle_pos()
 
 func _update_area_display(_area_id: String) -> void:
 	# Area name is shown in minimap only now — no separate label
@@ -1211,14 +1428,177 @@ func _build_adrenaline_bar() -> void:
 	_adrenaline_text.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_adrenaline_bar.add_child(_adrenaline_text)
 
+# ── Buff display ──
+
+## Buff type → { icon emoji, color }
+const BUFF_DISPLAY_INFO: Dictionary = {
+	"damage": { "icon": "⚔", "color": Color(1.0, 0.45, 0.2) },
+	"defense": { "icon": "🛡", "color": Color(0.3, 0.7, 1.0) },
+	"accuracy": { "icon": "◎", "color": Color(0.9, 0.85, 0.3) },
+	"speed": { "icon": "⚡", "color": Color(0.4, 0.95, 0.5) },
+	"all": { "icon": "★", "color": Color(0.95, 0.75, 0.2) },
+	"healOverTime": { "icon": "♥", "color": Color(0.3, 0.95, 0.4) },
+}
+
+func _build_buff_display() -> void:
+	_buff_container = HBoxContainer.new()
+	_buff_container.name = "BuffDisplay"
+	_buff_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_buff_container.alignment = BoxContainer.ALIGNMENT_CENTER
+	_buff_container.add_theme_constant_override("separation", 6)
+	_buff_container.visible = false  # Hidden when no buffs active
+	add_child(_buff_container)
+
+func _reposition_buff_display() -> void:
+	if _buff_container == null:
+		return
+	var vp_size: Vector2 = _get_viewport_size()
+	# Position centered above stat bars (stat bars at vp.y - 178, buff display above that)
+	var container_width: float = _buff_container.size.x
+	if container_width < 10:
+		container_width = 200.0
+	_buff_container.position = Vector2(
+		vp_size.x / 2.0 - container_width / 2.0,
+		vp_size.y - 200
+	)
+
+func _update_buff_display() -> void:
+	if _buff_container == null:
+		return
+
+	var buffs: Array[Dictionary] = GameState.active_buffs
+
+	# Remove labels for expired buffs
+	var active_types: Array[String] = []
+	for b in buffs:
+		active_types.append(str(b["type"]))
+
+	var to_remove: Array[String] = []
+	for buff_type in _buff_labels:
+		if not active_types.has(buff_type):
+			to_remove.append(buff_type)
+	for buff_type in to_remove:
+		var info: Dictionary = _buff_labels[buff_type]
+		if info.has("panel") and info["panel"] is Node:
+			info["panel"].queue_free()
+		_buff_labels.erase(buff_type)
+
+	# Update or create labels for active buffs
+	for b in buffs:
+		var btype: String = str(b["type"])
+		var remaining: float = float(b["remaining"])
+		var value: float = float(b["value"])
+		var source: String = str(b.get("source", ""))
+
+		if not _buff_labels.has(btype):
+			# Create new buff chip
+			var chip: PanelContainer = PanelContainer.new()
+			chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			var chip_style: StyleBoxFlat = StyleBoxFlat.new()
+			var info: Dictionary = BUFF_DISPLAY_INFO.get(btype, { "icon": "●", "color": Color(0.7, 0.7, 0.7) })
+			var col: Color = info["color"]
+			chip_style.bg_color = Color(col.r * 0.15, col.g * 0.15, col.b * 0.15, 0.75)
+			chip_style.border_color = Color(col.r * 0.6, col.g * 0.6, col.b * 0.6, 0.5)
+			chip_style.set_border_width_all(1)
+			chip_style.set_corner_radius_all(4)
+			chip_style.content_margin_left = 4
+			chip_style.content_margin_right = 4
+			chip_style.content_margin_top = 1
+			chip_style.content_margin_bottom = 1
+			chip.add_theme_stylebox_override("panel", chip_style)
+
+			var hbox: HBoxContainer = HBoxContainer.new()
+			hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			hbox.add_theme_constant_override("separation", 3)
+			chip.add_child(hbox)
+
+			var icon_lbl: Label = Label.new()
+			icon_lbl.text = str(info["icon"])
+			icon_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			icon_lbl.add_theme_font_size_override("font_size", 12)
+			icon_lbl.add_theme_color_override("font_color", col)
+			hbox.add_child(icon_lbl)
+
+			var text_lbl: Label = Label.new()
+			text_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			text_lbl.add_theme_font_size_override("font_size", 10)
+			text_lbl.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9, 0.9))
+			text_lbl.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.5))
+			text_lbl.add_theme_constant_override("shadow_offset_x", 1)
+			text_lbl.add_theme_constant_override("shadow_offset_y", 1)
+			hbox.add_child(text_lbl)
+
+			_buff_container.add_child(chip)
+			_buff_labels[btype] = { "panel": chip, "icon": icon_lbl, "text": text_lbl }
+
+		# Update timer text
+		var label_info: Dictionary = _buff_labels[btype]
+		var text_lbl: Label = label_info["text"] as Label
+		if text_lbl:
+			var time_str: String
+			if remaining >= 60.0:
+				time_str = "%dm%02ds" % [int(remaining) / 60, int(remaining) % 60]
+			else:
+				time_str = "%ds" % int(ceilf(remaining))
+			# Show buff value context
+			var val_str: String = ""
+			if btype == "damage" or btype == "defense":
+				val_str = "+%d " % int(value)
+			elif btype == "speed" or btype == "accuracy":
+				val_str = "+%d%% " % int(value * 100.0)
+			elif btype == "all":
+				val_str = "+%d%% " % int(value * 100.0)
+			elif btype == "healOverTime":
+				val_str = "%d/s " % int(value)
+			text_lbl.text = "%s%s" % [val_str, time_str]
+
+		# Flash warning when buff is about to expire (< 5 seconds)
+		var icon_lbl: Label = label_info["icon"] as Label
+		if icon_lbl:
+			var info: Dictionary = BUFF_DISPLAY_INFO.get(btype, { "icon": "●", "color": Color(0.7, 0.7, 0.7) })
+			var col: Color = info["color"]
+			if remaining < 5.0:
+				# Blink effect — alternate alpha
+				var blink: float = 0.5 + 0.5 * sin(remaining * 6.0)
+				icon_lbl.modulate.a = blink
+				if text_lbl:
+					text_lbl.modulate.a = blink
+			else:
+				icon_lbl.modulate.a = 1.0
+				if text_lbl:
+					text_lbl.modulate.a = 1.0
+
+	# Show/hide container
+	_buff_container.visible = not buffs.is_empty()
+
+	# Re-center after adding/removing chips
+	if _buff_container.visible:
+		_reposition_buff_display()
+
 # ── Ability bar ──
 var _ability_bar: HBoxContainer = null
 var _ability_bar_bg: PanelContainer = null
 var _ability_buttons: Array[Button] = []
+var _ability_cd_overlays: Array[ColorRect] = []  # Dark cooldown overlay per button
+var _ability_cd_labels: Array[Label] = []  # Timer text per button
 var _queue_pulse_time: float = 0.0
 var _last_queued_slot: int = -1  # Track to restore buttons when queue clears
+var _revolution_btn: Button = null  # Revolution toggle button
+var _special_btn: Button = null  # Weapon special attack button
+var _special_cd_overlay: ColorRect = null
+var _special_cd_label: Label = null
 
-## Build 5 ability buttons + eat food button, centered above action bar
+# ── Ability bar swap mode (right-click to reorder) ──
+var _swap_mode: bool = false
+var _swap_source_idx: int = -1  # Index in _ability_buttons being swapped
+
+# ── Defense bar (shared abilities row above main bar) ──
+var _defense_bar: HBoxContainer = null
+var _defense_buttons: Array[Button] = []
+var _defense_cd_overlays: Array[ColorRect] = []
+var _defense_cd_labels: Array[Label] = []
+
+## Build ability bars (defense row + main row), centered above action bar
 func _build_ability_bar() -> void:
 	_ability_bar_bg = PanelContainer.new()
 	_ability_bar_bg.name = "AbilityBarBG"
@@ -1233,12 +1613,25 @@ func _build_ability_bar() -> void:
 	_ability_bar_bg.add_theme_stylebox_override("panel", bg_style)
 	add_child(_ability_bar_bg)
 
+	# Two-row layout: defense bar on top, main ability bar on bottom
+	var bar_vbox: VBoxContainer = VBoxContainer.new()
+	bar_vbox.add_theme_constant_override("separation", 3)
+	_ability_bar_bg.add_child(bar_vbox)
+
+	# Defense bar (compact shared abilities)
+	_defense_bar = HBoxContainer.new()
+	_defense_bar.add_theme_constant_override("separation", 3)
+	_defense_bar.alignment = BoxContainer.ALIGNMENT_CENTER
+	bar_vbox.add_child(_defense_bar)
+
+	# Main ability bar
 	_ability_bar = HBoxContainer.new()
 	_ability_bar.add_theme_constant_override("separation", 5)
-	_ability_bar_bg.add_child(_ability_bar)
+	bar_vbox.add_child(_ability_bar)
 
 	# Build buttons from data
 	_refresh_ability_buttons()
+	_refresh_defense_buttons()
 
 	# Position centered above action bar
 	_reposition_ability_bar()
@@ -1248,13 +1641,29 @@ func _refresh_ability_buttons() -> void:
 	if _ability_bar == null:
 		return
 
+	# Reset swap mode when rebuilding
+	_swap_mode = false
+	_swap_source_idx = -1
+
 	# Clear old buttons
 	for child in _ability_bar.get_children():
 		child.queue_free()
 	_ability_buttons.clear()
+	_ability_cd_overlays.clear()
+	_ability_cd_labels.clear()
 
-	var style: String = str(GameState.player.get("combat_style", "nano"))
-	var abilities: Array = DataManager.get_abilities_for_style(style) if DataManager.has_method("get_abilities_for_style") else []
+	# Use combat controller's active abilities (already in custom display order)
+	var abilities: Array = []
+	if _player == null:
+		_player = get_tree().get_first_node_in_group("player")
+	if _player:
+		var combat: Node = _player.get_node_or_null("CombatController")
+		if combat and "_active_abilities" in combat:
+			abilities = combat._active_abilities
+	# Fallback: load from DataManager if combat controller isn't ready
+	if abilities.is_empty():
+		abilities = DataManager.get_abilities_for_style(str(GameState.player.get("combat_style", "nano"))) if DataManager.has_method("get_abilities_for_style") else []
+		abilities.sort_custom(func(a, b): return int(a.get("slot", 0)) < int(b.get("slot", 0)))
 
 	# Accent colors by tier
 	var tier_colors: Dictionary = {
@@ -1264,8 +1673,6 @@ func _refresh_ability_buttons() -> void:
 	}
 
 	if abilities.size() > 0:
-		# Sort by slot
-		abilities.sort_custom(func(a, b): return int(a.get("slot", 0)) < int(b.get("slot", 0)))
 		for i in range(abilities.size()):
 			var ab: Dictionary = abilities[i]
 			var tier: String = str(ab.get("tier", "basic"))
@@ -1279,9 +1686,20 @@ func _refresh_ability_buttons() -> void:
 			var display: String = ab_icon if ab_icon != "" else ab_name
 
 			var btn: Button = _make_ability_btn(str(slot_num), display, accent, adr_cost, cost_text, ab_icon != "")
-			btn.tooltip_text = "%s — %.1fx damage\n%s" % [ab_name, float(ab.get("damage_mult", 1.0)), str(ab.get("description", ""))]
+			var cd_val: float = float(ab.get("cooldown", 0))
+			var cd_text: String = " | CD: %ds" % int(cd_val) if cd_val > 0 else ""
+			var dmg_min: float = float(ab.get("damage_min", 0))
+			var dmg_max: float = float(ab.get("damage_max", 0))
+			var dmg_text: String
+			if dmg_min > 0 and dmg_max > 0:
+				dmg_text = "%.1f-%.1fx damage" % [dmg_min, dmg_max]
+			else:
+				dmg_text = "%.1fx damage" % float(ab.get("damage_mult", 1.0))
+			btn.tooltip_text = "%s — %s%s\n%s" % [ab_name, dmg_text, cd_text, str(ab.get("description", ""))]
 			var slot_idx: int = slot_num
-			btn.pressed.connect(func(): _use_ability(slot_idx))
+			btn.pressed.connect(func(): _on_ability_btn_left_click(slot_idx))
+			var btn_idx: int = i
+			btn.gui_input.connect(func(event: InputEvent): _on_ability_btn_input(event, btn_idx))
 			_ability_bar.add_child(btn)
 			_ability_buttons.append(btn)
 	else:
@@ -1301,11 +1719,224 @@ func _refresh_ability_buttons() -> void:
 			_ability_bar.add_child(btn)
 			_ability_buttons.append(btn)
 
-	# Eat food button — always last, green
+	# Eat food button — green
 	var food_btn: Button = _make_ability_btn("F", "🍖", Color(0.3, 1.0, 0.3), 0, "", true)
 	food_btn.tooltip_text = "Eat Food — Heals HP\nUses best food in inventory"
 	food_btn.pressed.connect(func(): _eat_food())
 	_ability_bar.add_child(food_btn)
+
+	# Revolution toggle button — compact "R" button
+	var rev_active: bool = GameState.settings.get("revolution", false)
+	var rev_color: Color = Color(0.2, 0.9, 0.3) if rev_active else Color(0.4, 0.4, 0.4)
+	_revolution_btn = Button.new()
+	_revolution_btn.custom_minimum_size = Vector2(36, 44)
+	_revolution_btn.focus_mode = Control.FOCUS_NONE
+	_revolution_btn.text = "R"
+	_revolution_btn.tooltip_text = "Revolution — Auto-fire basic abilities\nClick or press R to toggle"
+	_revolution_btn.add_theme_font_size_override("font_size", 16)
+	var rev_normal: StyleBoxFlat = StyleBoxFlat.new()
+	rev_normal.bg_color = Color(0.02, 0.03, 0.06, 0.7)
+	rev_normal.border_color = rev_color
+	rev_normal.set_border_width_all(2)
+	rev_normal.set_corner_radius_all(4)
+	rev_normal.set_content_margin_all(3)
+	_revolution_btn.add_theme_stylebox_override("normal", rev_normal)
+	var rev_hover: StyleBoxFlat = rev_normal.duplicate()
+	rev_hover.bg_color = Color(0.04, 0.06, 0.12, 0.8)
+	_revolution_btn.add_theme_stylebox_override("hover", rev_hover)
+	var rev_pressed: StyleBoxFlat = rev_normal.duplicate()
+	rev_pressed.bg_color = rev_color.darkened(0.65)
+	rev_pressed.bg_color.a = 0.6
+	_revolution_btn.add_theme_stylebox_override("pressed", rev_pressed)
+	_revolution_btn.add_theme_color_override("font_color", rev_color)
+	_revolution_btn.pressed.connect(_toggle_revolution)
+	_ability_bar.add_child(_revolution_btn)
+
+	# Weapon Special attack button — gold accent
+	_special_btn = Button.new()
+	_special_btn.custom_minimum_size = Vector2(44, 44)
+	_special_btn.focus_mode = Control.FOCUS_NONE
+	_special_btn.text = ""
+	_special_btn.add_theme_font_size_override("font_size", 14)
+	var sp_accent: Color = Color(1.0, 0.85, 0.1)
+	var sp_normal: StyleBoxFlat = StyleBoxFlat.new()
+	sp_normal.bg_color = Color(0.04, 0.03, 0.01, 0.7)
+	sp_normal.border_color = sp_accent.darkened(0.35)
+	sp_normal.border_color.a = 0.5
+	sp_normal.set_border_width_all(0)
+	sp_normal.border_width_bottom = 2
+	sp_normal.set_corner_radius_all(4)
+	sp_normal.set_content_margin_all(3)
+	_special_btn.add_theme_stylebox_override("normal", sp_normal)
+	var sp_hover: StyleBoxFlat = sp_normal.duplicate()
+	sp_hover.bg_color = Color(0.08, 0.06, 0.02, 0.8)
+	sp_hover.border_color = sp_accent.darkened(0.1)
+	sp_hover.border_color.a = 0.7
+	sp_hover.border_width_bottom = 3
+	_special_btn.add_theme_stylebox_override("hover", sp_hover)
+	var sp_pressed: StyleBoxFlat = sp_normal.duplicate()
+	sp_pressed.bg_color = sp_accent.darkened(0.65)
+	sp_pressed.bg_color.a = 0.6
+	_special_btn.add_theme_stylebox_override("pressed", sp_pressed)
+	# Keybind label
+	var sp_key_lbl: Label = Label.new()
+	sp_key_lbl.text = "S"
+	sp_key_lbl.add_theme_font_size_override("font_size", 9)
+	sp_key_lbl.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5, 0.7))
+	sp_key_lbl.position = Vector2(2, 0)
+	sp_key_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_special_btn.add_child(sp_key_lbl)
+	# Icon label
+	var sp_icon_lbl: Label = Label.new()
+	sp_icon_lbl.text = "SP"
+	sp_icon_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sp_icon_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	sp_icon_lbl.add_theme_font_size_override("font_size", 16)
+	sp_icon_lbl.add_theme_color_override("font_color", sp_accent)
+	sp_icon_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	sp_icon_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_special_btn.add_child(sp_icon_lbl)
+	# CD overlay
+	_special_cd_overlay = ColorRect.new()
+	_special_cd_overlay.color = Color(0, 0, 0, 0.55)
+	_special_cd_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_special_cd_overlay.visible = false
+	_special_cd_overlay.size = Vector2(44, 44)
+	_special_btn.add_child(_special_cd_overlay)
+	# CD label
+	_special_cd_label = Label.new()
+	_special_cd_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_special_cd_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_special_cd_label.add_theme_font_size_override("font_size", 11)
+	_special_cd_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.9))
+	_special_cd_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_special_cd_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_special_cd_label.visible = false
+	_special_btn.add_child(_special_cd_label)
+	# Update tooltip based on weapon
+	_update_special_btn_tooltip()
+	_special_btn.pressed.connect(_use_weapon_special)
+	_ability_bar.add_child(_special_btn)
+
+## Refresh defense (shared ability) buttons
+func _refresh_defense_buttons() -> void:
+	if _defense_bar == null:
+		return
+
+	# Clear old buttons
+	for child in _defense_bar.get_children():
+		child.queue_free()
+	_defense_buttons.clear()
+	_defense_cd_overlays.clear()
+	_defense_cd_labels.clear()
+
+	var shared: Array = DataManager.get_shared_abilities() if DataManager.has_method("get_shared_abilities") else []
+	if shared.is_empty():
+		_defense_bar.visible = false
+		return
+	_defense_bar.visible = true
+
+	var keybinds: Array[String] = ["S1", "S2", "S3", "S4", "S5"]
+	var tier_colors: Dictionary = {
+		"basic": Color(0.3, 0.9, 1.0),
+		"threshold": Color(1.0, 0.6, 0.1),
+		"ultimate": Color(1.0, 0.2, 0.9),
+	}
+
+	for i in range(shared.size()):
+		var ab: Dictionary = shared[i]
+		var tier: String = str(ab.get("tier", "basic"))
+		var accent: Color = tier_colors.get(tier, Color(0.5, 0.5, 0.5))
+		var ab_icon: String = str(ab.get("icon", ""))
+		var ab_name: String = str(ab.get("name", ""))
+		var display: String = ab_icon if ab_icon != "" else ab_name
+		var keybind: String = keybinds[i] if i < keybinds.size() else ""
+
+		var btn: Button = _make_defense_btn(keybind, display, accent, ab)
+		var slot_idx: int = i + 1
+		btn.pressed.connect(func(): _use_defensive_ability(slot_idx))
+		_defense_bar.add_child(btn)
+		_defense_buttons.append(btn)
+
+## Create a compact defense ability button (90×36)
+func _make_defense_btn(keybind: String, label_text: String, accent: Color, ab: Dictionary) -> Button:
+	var btn: Button = Button.new()
+	btn.custom_minimum_size = Vector2(56, 36)
+	btn.mouse_filter = Control.MOUSE_FILTER_STOP
+	btn.focus_mode = Control.FOCUS_NONE
+
+	var normal: StyleBoxFlat = StyleBoxFlat.new()
+	normal.bg_color = Color(0.02, 0.03, 0.06, 0.6)
+	normal.border_color = accent.darkened(0.4)
+	normal.border_color.a = 0.4
+	normal.set_border_width_all(0)
+	normal.border_width_bottom = 1
+	normal.set_corner_radius_all(3)
+	normal.set_content_margin_all(2)
+	btn.add_theme_stylebox_override("normal", normal)
+
+	var hover: StyleBoxFlat = normal.duplicate()
+	hover.bg_color = Color(0.04, 0.06, 0.12, 0.7)
+	hover.border_color = accent.darkened(0.1)
+	hover.border_color.a = 0.5
+	btn.add_theme_stylebox_override("hover", hover)
+
+	var pressed: StyleBoxFlat = normal.duplicate()
+	pressed.bg_color = accent.darkened(0.65)
+	pressed.bg_color.a = 0.5
+	btn.add_theme_stylebox_override("pressed", pressed)
+
+	btn.text = ""
+
+	# Icon label
+	var icon_lbl: Label = Label.new()
+	icon_lbl.text = label_text
+	icon_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	icon_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	icon_lbl.add_theme_font_size_override("font_size", 16)
+	icon_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	icon_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	btn.add_child(icon_lbl)
+
+	# CD overlay
+	var cd_overlay: ColorRect = ColorRect.new()
+	cd_overlay.color = Color(0, 0, 0, 0.55)
+	cd_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cd_overlay.visible = false
+	cd_overlay.size = Vector2(56, 36)
+	btn.add_child(cd_overlay)
+	_defense_cd_overlays.append(cd_overlay)
+
+	# CD label
+	var cd_label: Label = Label.new()
+	cd_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	cd_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	cd_label.add_theme_font_size_override("font_size", 11)
+	cd_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.9))
+	cd_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	cd_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cd_label.visible = false
+	btn.add_child(cd_label)
+	_defense_cd_labels.append(cd_label)
+
+	# Tooltip
+	var ab_name: String = str(ab.get("name", ""))
+	var cd_val: float = float(ab.get("cooldown", 0))
+	var cd_text: String = " | CD: %ds" % int(cd_val) if cd_val > 0 else ""
+	var cost: int = int(ab.get("adr_cost", 0))
+	var cost_text: String = "%d ADR" % cost if cost > 0 else "+%d ADR" % int(ab.get("adr_gain", 0))
+	btn.tooltip_text = "%s — %s%s\n%s" % [ab_name, cost_text, cd_text, str(ab.get("description", ""))]
+
+	return btn
+
+## Use a defensive ability from the defense bar
+func _use_defensive_ability(slot: int) -> void:
+	if _player == null:
+		_player = get_tree().get_first_node_in_group("player")
+	if _player:
+		var combat: Node = _player.get_node_or_null("CombatController")
+		if combat and combat.has_method("use_defensive_ability"):
+			combat.use_defensive_ability(slot)
 
 ## Position the ability bar centered above the action bar
 func _reposition_ability_bar() -> void:
@@ -1317,7 +1948,8 @@ func _reposition_ability_bar() -> void:
 	var bar_width: float = _ability_bar_bg.size.x
 	if bar_width < 10:
 		bar_width = 830.0  # Estimate for 6 buttons × 120px + gaps + margins
-	_ability_bar_bg.position = Vector2(vp_size.x / 2.0 - bar_width / 2.0, vp_size.y - 104)
+	# Two-row bar is ~50px taller (defense row 36 + gap 3 + main row 44 + padding)
+	_ability_bar_bg.position = Vector2(vp_size.x / 2.0 - bar_width / 2.0, vp_size.y - 150)
 	# Also reposition stat bars above ability bar
 	_reposition_stat_bars()
 
@@ -1325,12 +1957,11 @@ func _reposition_stat_bars() -> void:
 	if _stat_bars_container == null:
 		return
 	var vp_size: Vector2 = _get_viewport_size()
-	# Stat bars sit centered above the ability bar (which is at vp.y - 104)
-	# Extra space for style indicator label above HP bar
+	# Stat bars sit centered above the ability bar (which is now taller with defense row)
 	var container_width: float = 280.0  # Width of widest bar (HP)
 	_stat_bars_container.position = Vector2(
 		vp_size.x / 2.0 - container_width / 2.0,
-		vp_size.y - 178
+		vp_size.y - 228
 	)
 
 ## Highlight the queued ability button with a pulsing glow border
@@ -1374,6 +2005,123 @@ func _update_ability_queue_highlight(delta: float) -> void:
 			normal_style.set_border_width_all(2)
 
 	_last_queued_slot = queued_slot
+
+## Update ability cooldown overlays based on GCD timer, per-ability CD, and food cooldown
+func _update_ability_cooldowns() -> void:
+	if _player == null:
+		return
+	var combat: Node = _player.get_node_or_null("CombatController")
+	if combat == null:
+		return
+
+	var gcd_timer: float = float(combat.get("_gcd_timer")) if "_gcd_timer" in combat else 0.0
+	var gcd_max: float = float(combat.get("GCD_TIME")) if "GCD_TIME" in combat else 1.8
+	var food_cd: float = float(combat.get("_food_cooldown_timer")) if "_food_cooldown_timer" in combat else 0.0
+
+	# Get current style abilities in display order (matches button order, respects custom reorder)
+	var abilities: Array = combat._active_abilities if "_active_abilities" in combat else []
+
+	var btn_count: int = _ability_cd_overlays.size()
+	for i in range(btn_count):
+		var overlay: ColorRect = _ability_cd_overlays[i]
+		var cd_label: Label = _ability_cd_labels[i]
+		if not is_instance_valid(overlay) or not is_instance_valid(cd_label):
+			continue
+
+		# Last button is always food — use food cooldown
+		var is_food: bool = (i == btn_count - 1)
+
+		if is_food:
+			var cd_remaining: float = food_cd
+			var cd_total: float = gcd_max
+			if cd_remaining > 0.01:
+				var frac: float = clampf(cd_remaining / cd_total, 0.0, 1.0)
+				overlay.size.y = 44.0 * frac
+				overlay.position.y = 0.0
+				overlay.visible = true
+				cd_label.text = "%.1f" % cd_remaining
+				cd_label.visible = true
+			else:
+				overlay.visible = false
+				cd_label.visible = false
+		else:
+			# Ability button — check both GCD and per-ability cooldown
+			var per_ab_cd: float = 0.0
+			var per_ab_cd_max: float = 0.0
+			if i < abilities.size() and combat.has_method("get_ability_cooldown"):
+				var ab: Dictionary = abilities[i]
+				var ab_id: String = str(ab.get("id", ""))
+				per_ab_cd = combat.get_ability_cooldown(ab_id)
+				per_ab_cd_max = float(ab.get("cooldown", 0))
+
+			# Use whichever cooldown is longer
+			var cd_remaining: float
+			var cd_total: float
+			if per_ab_cd > gcd_timer:
+				cd_remaining = per_ab_cd
+				cd_total = maxf(per_ab_cd_max, 1.0)  # Use ability's max CD for sweep
+			else:
+				cd_remaining = gcd_timer
+				cd_total = gcd_max
+
+			if cd_remaining > 0.01:
+				var frac: float = clampf(cd_remaining / cd_total, 0.0, 1.0)
+				overlay.size.y = 44.0 * frac
+				overlay.position.y = 0.0
+				overlay.visible = true
+				cd_label.text = "%.1f" % cd_remaining
+				cd_label.visible = true
+			else:
+				overlay.visible = false
+				cd_label.visible = false
+
+	# ── Defense bar cooldowns ──
+	var shared: Array = DataManager.get_shared_abilities() if DataManager.has_method("get_shared_abilities") else []
+	for i in range(_defense_cd_overlays.size()):
+		var def_overlay: ColorRect = _defense_cd_overlays[i]
+		var def_label: Label = _defense_cd_labels[i]
+		if not is_instance_valid(def_overlay) or not is_instance_valid(def_label):
+			continue
+
+		var def_cd: float = 0.0
+		var def_cd_max: float = 1.0
+		if i < shared.size() and combat.has_method("get_ability_cooldown"):
+			var def_ab: Dictionary = shared[i]
+			var def_id: String = str(def_ab.get("id", ""))
+			def_cd = maxf(combat.get_ability_cooldown(def_id), gcd_timer)
+			def_cd_max = maxf(float(def_ab.get("cooldown", 0)), gcd_max)
+
+		if def_cd > 0.01:
+			var frac: float = clampf(def_cd / def_cd_max, 0.0, 1.0)
+			def_overlay.size.y = 36.0 * frac
+			def_overlay.position.y = 0.0
+			def_overlay.visible = true
+			def_label.text = "%.0f" % def_cd if def_cd > 1.0 else "%.1f" % def_cd
+			def_label.visible = true
+		else:
+			def_overlay.visible = false
+			def_label.visible = false
+
+	# ── Weapon special cooldown ──
+	if _special_cd_overlay and is_instance_valid(_special_cd_overlay) and combat.has_method("get_weapon_special_cooldown"):
+		var ws_cd: float = combat.get_weapon_special_cooldown()
+		var ws_cd_max: float = 30.0  # Default, will use actual
+		var spec_data: Dictionary = combat.get_weapon_special_data() if combat.has_method("get_weapon_special_data") else {}
+		if not spec_data.is_empty():
+			ws_cd_max = maxf(float(spec_data.get("cooldown", 30)), 1.0)
+		# Also factor in GCD
+		ws_cd = maxf(ws_cd, gcd_timer)
+		ws_cd_max = maxf(ws_cd_max, gcd_max)
+		if ws_cd > 0.01:
+			var frac: float = clampf(ws_cd / ws_cd_max, 0.0, 1.0)
+			_special_cd_overlay.size.y = 44.0 * frac
+			_special_cd_overlay.position.y = 0.0
+			_special_cd_overlay.visible = true
+			_special_cd_label.text = "%.0f" % ws_cd if ws_cd > 1.0 else "%.1f" % ws_cd
+			_special_cd_label.visible = true
+		else:
+			_special_cd_overlay.visible = false
+			_special_cd_label.visible = false
 
 ## Create a styled ability button with keybind + name + cost badge
 func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost: int, cost_text_override: String = "", is_icon: bool = false) -> Button:
@@ -1468,7 +2216,135 @@ func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost:
 		cost_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		inner.add_child(cost_lbl)
 
+	# ── Cooldown overlay (dark sweep from top, covers button during GCD) ──
+	var cd_overlay: ColorRect = ColorRect.new()
+	cd_overlay.name = "CooldownOverlay"
+	cd_overlay.color = Color(0.0, 0.0, 0.0, 0.55)
+	cd_overlay.position = Vector2(0, 0)
+	cd_overlay.size = Vector2(120, 44)
+	cd_overlay.visible = false
+	cd_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(cd_overlay)
+	_ability_cd_overlays.append(cd_overlay)
+
+	# Timer text centered over the overlay
+	var cd_lbl: Label = Label.new()
+	cd_lbl.name = "CooldownLabel"
+	cd_lbl.position = Vector2(0, 12)
+	cd_lbl.size = Vector2(120, 20)
+	cd_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	cd_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	cd_lbl.add_theme_font_size_override("font_size", 14)
+	cd_lbl.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.9))
+	cd_lbl.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.8))
+	cd_lbl.add_theme_constant_override("shadow_offset_x", 1)
+	cd_lbl.add_theme_constant_override("shadow_offset_y", 1)
+	cd_lbl.visible = false
+	cd_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(cd_lbl)
+	_ability_cd_labels.append(cd_lbl)
+
 	return btn
+
+# ── Ability bar swap mode (right-click reorder) ──
+
+## Handle left-click on an ability button (fires ability or completes swap)
+func _on_ability_btn_left_click(slot: int) -> void:
+	if _swap_mode:
+		# In swap mode: left-click on a different button completes the swap
+		var target_idx: int = slot - 1
+		if target_idx != _swap_source_idx and target_idx >= 0 and target_idx < _ability_buttons.size():
+			_perform_ability_swap(_swap_source_idx, target_idx)
+		_cancel_swap_mode()
+		return
+	_use_ability(slot)
+
+## Handle gui_input on ability buttons (right-click to start/complete swap)
+func _on_ability_btn_input(event: InputEvent, btn_idx: int) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+		if _swap_mode:
+			if btn_idx == _swap_source_idx:
+				# Right-click same button → cancel
+				_cancel_swap_mode()
+			else:
+				# Right-click different button → swap
+				_perform_ability_swap(_swap_source_idx, btn_idx)
+				_cancel_swap_mode()
+		else:
+			# Enter swap mode
+			_swap_mode = true
+			_swap_source_idx = btn_idx
+			_update_swap_highlights()
+			EventBus.chat_message.emit("Click another ability to swap positions.", "system")
+		get_viewport().set_input_as_handled()
+
+## Perform the swap between two ability bar positions
+func _perform_ability_swap(from_idx: int, to_idx: int) -> void:
+	var style: String = str(GameState.player.get("combat_style", "nano"))
+
+	# Build current order as array of ability IDs
+	if _player == null:
+		_player = get_tree().get_first_node_in_group("player")
+	if _player == null:
+		return
+	var combat: Node = _player.get_node_or_null("CombatController")
+	if combat == null:
+		return
+	var active: Array = combat._active_abilities
+	if from_idx < 0 or from_idx >= active.size() or to_idx < 0 or to_idx >= active.size():
+		return
+
+	# Get names for chat feedback
+	var name_a: String = str(active[from_idx].get("name", "?"))
+	var name_b: String = str(active[to_idx].get("name", "?"))
+
+	# Build ID order and swap
+	var order: Array = []
+	for ab in active:
+		order.append(str(ab.get("id", "")))
+	var tmp: String = order[from_idx]
+	order[from_idx] = order[to_idx]
+	order[to_idx] = tmp
+
+	# Save to GameState
+	var bar_orders: Dictionary = GameState.settings.get("ability_bar_order", {})
+	if not bar_orders is Dictionary:
+		bar_orders = {}
+	bar_orders[style] = order
+	GameState.settings["ability_bar_order"] = bar_orders
+
+	# Refresh combat controller and HUD
+	combat.refresh_abilities()
+	_refresh_ability_buttons()
+
+	EventBus.chat_message.emit("Swapped %s and %s." % [name_a, name_b], "system")
+
+## Cancel swap mode and clear highlights
+func _cancel_swap_mode() -> void:
+	_swap_mode = false
+	_swap_source_idx = -1
+	_update_swap_highlights()
+
+## Update visual highlights for swap mode
+func _update_swap_highlights() -> void:
+	for i in range(_ability_buttons.size()):
+		if not is_instance_valid(_ability_buttons[i]):
+			continue
+		var btn: Button = _ability_buttons[i]
+		var style_box: StyleBoxFlat = btn.get_theme_stylebox("normal") as StyleBoxFlat
+		if style_box == null:
+			continue
+		if _swap_mode and i == _swap_source_idx:
+			# Highlight the source button with white pulsing border
+			style_box.border_width_top = 2
+			style_box.border_width_left = 2
+			style_box.border_width_right = 2
+			style_box.border_color = Color(1.0, 1.0, 1.0, 0.9)
+		else:
+			# Reset to normal
+			style_box.border_width_top = 0
+			style_box.border_width_left = 0
+			style_box.border_width_right = 0
 
 # ── Combat helpers (called from keybinds and buttons) ──
 
@@ -1489,6 +2365,55 @@ func _eat_food() -> void:
 		var combat: Node = _player.get_node_or_null("CombatController")
 		if combat and combat.has_method("eat_food"):
 			combat.eat_food()
+
+## Toggle Revolution (auto-fire basic abilities)
+func _toggle_revolution() -> void:
+	var current: bool = GameState.settings.get("revolution", false)
+	GameState.settings["revolution"] = not current
+	var active: bool = not current
+	# Update button appearance
+	if _revolution_btn:
+		var rev_color: Color = Color(0.2, 0.9, 0.3) if active else Color(0.4, 0.4, 0.4)
+		var style_box: StyleBoxFlat = _revolution_btn.get_theme_stylebox("normal") as StyleBoxFlat
+		if style_box:
+			style_box.border_color = rev_color
+		_revolution_btn.add_theme_color_override("font_color", rev_color)
+	var status: String = "ON" if active else "OFF"
+	EventBus.chat_message.emit("Revolution %s." % status, "system")
+
+## Use the equipped weapon's special attack
+func _use_weapon_special() -> void:
+	if _player == null:
+		_player = get_tree().get_first_node_in_group("player")
+	if _player:
+		var combat: Node = _player.get_node_or_null("CombatController")
+		if combat and combat.has_method("use_weapon_special"):
+			combat.use_weapon_special()
+
+## Update the special button tooltip based on equipped weapon
+func _update_special_btn_tooltip() -> void:
+	if _special_btn == null:
+		return
+	var weapon_id: String = str(GameState.equipment.get("weapon", ""))
+	if weapon_id == "":
+		_special_btn.tooltip_text = "Weapon Special (S)\nNo weapon equipped"
+		return
+	var weapon_data: Dictionary = DataManager.get_item(weapon_id)
+	var special: Variant = weapon_data.get("special", {})
+	if special is Dictionary and not special.is_empty():
+		var spec_name: String = str(special.get("name", "Special"))
+		var spec_icon: String = str(special.get("icon", ""))
+		var spec_desc: String = str(special.get("description", ""))
+		var spec_cost: int = int(special.get("adr_cost", 0))
+		var spec_cd: int = int(special.get("cooldown", 0))
+		_special_btn.tooltip_text = "%s %s — %d ADR | CD: %ds\n%s" % [spec_icon, spec_name, spec_cost, spec_cd, spec_desc]
+		# Update icon label to show weapon special icon
+		for child in _special_btn.get_children():
+			if child is Label and child.text == "SP":
+				child.text = spec_icon if spec_icon != "" else "SP"
+				break
+	else:
+		_special_btn.tooltip_text = "Weapon Special (S)\nNo special attack on this weapon"
 
 # ══════════════════════════════════════════════════════════════════
 # QoL: LOW HP WARNING — Red vignette that pulses when below 25% HP
@@ -2276,6 +3201,7 @@ func _on_item_equipped_for_style(slot: String, _item_id: String) -> void:
 	# Style is set by equipment_system — just refresh UI
 	_update_style_indicator()
 	_refresh_ability_buttons()
+	_update_special_btn_tooltip()
 	_reposition_ability_bar()
 	# Flash the label for feedback
 	if _style_indicator_label:
@@ -2798,6 +3724,8 @@ func _on_window_resized() -> void:
 	_reposition_ability_bar()
 	# Reposition stat bars above ability bar
 	_reposition_stat_bars()
+	# Reposition buff display above stat bars
+	_reposition_buff_display()
 	# Reposition chat to bottom-left
 	_reposition_chat()
 	# Reposition FPS/Pos labels to bottom-right
@@ -2863,12 +3791,12 @@ func _resize_minimap() -> void:
 	if _minimap_tex_rect:
 		_minimap_tex_rect.custom_minimum_size = Vector2(map_size - 6, map_size - 22)
 
-	# Update player dot position (centered)
+	# Update player dot/arrow position (centered)
+	var center_pos: Vector2 = Vector2((map_size - 6) / 2.0, -((map_size - 22) / 2.0))
 	if _minimap_player_dot:
-		_minimap_player_dot.position = Vector2(
-			(map_size - 6) / 2.0 - 3,
-			-((map_size - 22) / 2.0) - 3
-		)
+		_minimap_player_dot.position = center_pos
+	if _minimap_player_arrow:
+		_minimap_player_arrow.position = center_pos
 
 	EventBus.chat_message.emit("Minimap: %s" % ["Small", "Medium", "Large"][_minimap_zoom_level], "system")
 
@@ -2884,8 +3812,11 @@ var _minimap_area_label: Label = null
 var _minimap_tex_rect: TextureRect = null
 var _minimap_enemy_dots: Array[ColorRect] = []
 var _minimap_npc_dots: Array[ColorRect] = []
+var _minimap_gather_dots: Array[ColorRect] = []
 var _minimap_dot_container: Control = null
+var _minimap_player_arrow: Polygon2D = null
 const MINIMAP_DOT_POOL_SIZE: int = 30
+const MINIMAP_GATHER_POOL_SIZE: int = 20
 
 # ── Full map panel ──
 var _full_map_panel: PanelContainer = null
@@ -2951,18 +3882,31 @@ func _build_minimap() -> void:
 	_minimap_tex_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(_minimap_tex_rect)
 
-	# Centered player dot overlay (triangle pointing forward)
+	# Centered player arrow overlay (triangle pointing up = forward)
 	var dot_container: Control = Control.new()
 	dot_container.custom_minimum_size = Vector2(map_size - 6, 0)
 	dot_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(dot_container)
 
+	# Keep the old ColorRect hidden as a position anchor
 	_minimap_player_dot = ColorRect.new()
-	_minimap_player_dot.color = Color(0.1, 1.0, 0.3, 0.9)
-	_minimap_player_dot.size = Vector2(6, 6)
-	_minimap_player_dot.position = Vector2((map_size - 6) / 2.0 - 3, -((map_size - 22) / 2.0) - 3)
+	_minimap_player_dot.color = Color(0, 0, 0, 0)  # Invisible anchor
+	_minimap_player_dot.size = Vector2(1, 1)
+	_minimap_player_dot.position = Vector2((map_size - 6) / 2.0, -((map_size - 22) / 2.0))
 	_minimap_player_dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	dot_container.add_child(_minimap_player_dot)
+
+	# Directional arrow using Polygon2D — points upward by default
+	_minimap_player_arrow = Polygon2D.new()
+	_minimap_player_arrow.polygon = PackedVector2Array([
+		Vector2(0, -5),   # Tip (forward/up)
+		Vector2(-4, 4),   # Bottom-left
+		Vector2(0, 2),    # Notch
+		Vector2(4, 4),    # Bottom-right
+	])
+	_minimap_player_arrow.color = Color(0.1, 1.0, 0.3, 0.95)
+	_minimap_player_arrow.position = _minimap_player_dot.position
+	dot_container.add_child(_minimap_player_arrow)
 
 	# Entity dot overlay container (for enemies and NPCs)
 	_minimap_dot_container = Control.new()
@@ -2990,6 +3934,16 @@ func _build_minimap() -> void:
 		ndot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_minimap_dot_container.add_child(ndot)
 		_minimap_npc_dots.append(ndot)
+
+	# Pre-create gathering node dots (yellow)
+	for _i in range(MINIMAP_GATHER_POOL_SIZE):
+		var gdot: ColorRect = ColorRect.new()
+		gdot.color = Color(1.0, 0.85, 0.15, 0.85)
+		gdot.size = Vector2(4, 4)
+		gdot.visible = false
+		gdot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_minimap_dot_container.add_child(gdot)
+		_minimap_gather_dots.append(gdot)
 
 	# Bottom row: area label + legend + map button
 	var bottom_row: HBoxContainer = HBoxContainer.new()
@@ -3033,6 +3987,7 @@ func _build_minimap() -> void:
 		{"color": Color(0.1, 0.85, 0.3, 0.8), "label": "You"},
 		{"color": Color(0.9, 0.2, 0.1, 0.8), "label": "Foe"},
 		{"color": Color(0.2, 0.8, 0.9, 0.8), "label": "NPC"},
+		{"color": Color(1.0, 0.85, 0.15, 0.8), "label": "Node"},
 	]
 	for item in legend_items:
 		var ldot: ColorRect = ColorRect.new()
@@ -3228,6 +4183,13 @@ func _update_minimap_dots() -> void:
 		dot.visible = false
 	for dot in _minimap_npc_dots:
 		dot.visible = false
+	for dot in _minimap_gather_dots:
+		dot.visible = false
+
+	# Aspect ratio correction — orthographic cam.size is vertical extent
+	var aspect: float = tex_size.x / tex_size.y if tex_size.y > 0 else 1.0
+	var cam_h: float = cam_size           # vertical world units
+	var cam_w: float = cam_size * aspect   # horizontal world units
 
 	# Plot enemies (red dots)
 	var idx: int = 0
@@ -3242,8 +4204,8 @@ func _update_minimap_dots() -> void:
 		var dz: float = enemy.global_position.z - player_pos.z
 		var rx: float = dx * cos_r - dz * sin_r
 		var rz: float = dx * sin_r + dz * cos_r
-		var px: float = (rx / cam_size) * tex_size.x + tex_size.x * 0.5
-		var py: float = (rz / cam_size) * tex_size.y + tex_size.y * 0.5
+		var px: float = (rx / cam_w) * tex_size.x + tex_size.x * 0.5
+		var py: float = (rz / cam_h) * tex_size.y + tex_size.y * 0.5
 		if px >= 0 and px < tex_size.x and py >= 0 and py < tex_size.y:
 			_minimap_enemy_dots[idx].position = Vector2(px - 2, -(tex_size.y) + py - 2)
 			_minimap_enemy_dots[idx].visible = true
@@ -3260,9 +4222,29 @@ func _update_minimap_dots() -> void:
 		var dz: float = npc.global_position.z - player_pos.z
 		var rx: float = dx * cos_r - dz * sin_r
 		var rz: float = dx * sin_r + dz * cos_r
-		var px: float = (rx / cam_size) * tex_size.x + tex_size.x * 0.5
-		var py: float = (rz / cam_size) * tex_size.y + tex_size.y * 0.5
+		var px: float = (rx / cam_w) * tex_size.x + tex_size.x * 0.5
+		var py: float = (rz / cam_h) * tex_size.y + tex_size.y * 0.5
 		if px >= 0 and px < tex_size.x and py >= 0 and py < tex_size.y:
 			_minimap_npc_dots[idx].position = Vector2(px - 2, -(tex_size.y) + py - 2)
 			_minimap_npc_dots[idx].visible = true
+			idx += 1
+
+	# Plot gathering nodes (yellow dots) — skip depleted ones
+	idx = 0
+	for gnode in get_tree().get_nodes_in_group("gathering_nodes"):
+		if idx >= _minimap_gather_dots.size():
+			break
+		if not is_instance_valid(gnode):
+			continue
+		if "_is_depleted" in gnode and gnode._is_depleted:
+			continue
+		var dx: float = gnode.global_position.x - player_pos.x
+		var dz: float = gnode.global_position.z - player_pos.z
+		var rx: float = dx * cos_r - dz * sin_r
+		var rz: float = dx * sin_r + dz * cos_r
+		var px: float = (rx / cam_w) * tex_size.x + tex_size.x * 0.5
+		var py: float = (rz / cam_h) * tex_size.y + tex_size.y * 0.5
+		if px >= 0 and px < tex_size.x and py >= 0 and py < tex_size.y:
+			_minimap_gather_dots[idx].position = Vector2(px - 2, -(tex_size.y) + py - 2)
+			_minimap_gather_dots[idx].visible = true
 			idx += 1

@@ -397,7 +397,7 @@ func _do_attack() -> void:
 		return
 	# Emit attack signal with effective damage (reduced by debuffs)
 	var eff_damage: int = get_effective_damage()
-	EventBus.hit_landed.emit(_player, eff_damage, false)
+	EventBus.hit_landed.emit(_player, eff_damage, false, self)
 
 	# Dungeon: Vampiric — heal 10% of damage dealt
 	if _has_modifier("vampiric") and state != State.DEAD:
@@ -424,7 +424,7 @@ func take_damage(amount: int, from_style: String = "") -> int:
 	# Dungeon: Reflective — reflect 10% of damage back to player
 	if _has_modifier("reflective") and _player != null:
 		var reflect_dmg: int = maxi(1, int(float(actual) * 0.1))
-		EventBus.hit_landed.emit(_player, reflect_dmg, false)
+		EventBus.hit_landed.emit(_player, reflect_dmg, false, self)
 
 	# Hit flash on template mesh
 	if _mesh_root != null:
@@ -451,7 +451,7 @@ func _die() -> void:
 		var dist: float = global_position.distance_to(_player.global_position)
 		if dist < 6.0:  # Only hit player within 6 units
 			var explode_dmg: int = int(float(max_hp) * 0.15)
-			EventBus.hit_landed.emit(_player, explode_dmg, false)
+			EventBus.hit_landed.emit(_player, explode_dmg, false, self)
 			EventBus.float_text_requested.emit(
 				"EXPLOSION %d" % explode_dmg,
 				global_position + Vector3(0, 2.5, 0),
@@ -614,6 +614,9 @@ func get_effective_damage() -> int:
 	if _debuffs.has("damage"):
 		var reduction: float = float(_debuffs["damage"].get("value", 0.0))
 		eff = int(float(eff) * (1.0 - reduction))
+	if _debuffs.has("debilitate"):
+		var reduction: float = float(_debuffs["debilitate"].get("value", 0.0))
+		eff = int(float(eff) * (1.0 - reduction))
 	return maxi(1, eff)
 
 ## Process debuff timers (called each physics frame)
@@ -647,8 +650,8 @@ func _process_dots(delta: float) -> void:
 			var actual: int = maxi(1, int(float(tick_dmg) * style_mult) - eff_def / 4)
 			hp -= actual
 			hp = maxi(0, hp)
-			# Float text for DoT damage
-			EventBus.float_text_requested.emit(str(actual), global_position + Vector3(randf_range(-0.3, 0.3), 2.3, 0), Color(0.6, 0.9, 0.3))
+			# Float text for DoT damage (blood drop prefix, red-orange)
+			EventBus.float_text_requested.emit("🩸 %d" % actual, global_position + Vector3(randf_range(-0.3, 0.3), 2.3, 0), Color(0.8, 0.3, 0.2))
 			dot["ticks_remaining"] = int(dot["ticks_remaining"]) - 1
 			dot["tick_timer"] = float(dot["tick_interval"])
 			if int(dot["ticks_remaining"]) <= 0:

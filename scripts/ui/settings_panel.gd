@@ -16,6 +16,7 @@ var _hp_bars_check: CheckBox = null
 
 # ── Node refs (combat) ──
 var _auto_retaliate_check: CheckBox = null
+var _revolution_check: CheckBox = null
 
 # ── Node refs (multiplayer) ──
 var _mp_name_input: LineEdit = null
@@ -68,6 +69,9 @@ func _ready() -> void:
 
 	_auto_retaliate_check = _create_checkbox_row(vbox, "Auto Retaliate")
 	_auto_retaliate_check.toggled.connect(_on_auto_retaliate_toggled)
+
+	_revolution_check = _create_checkbox_row(vbox, "Revolution (Auto-Basics)")
+	_revolution_check.toggled.connect(_on_revolution_toggled)
 
 	# ── Game section ──
 	vbox.add_child(_create_section_header("Game"))
@@ -215,6 +219,8 @@ func refresh() -> void:
 	# Combat
 	if _auto_retaliate_check != null:
 		_auto_retaliate_check.set_pressed_no_signal(bool(s.get("auto_retaliate", true)))
+	if _revolution_check != null:
+		_revolution_check.set_pressed_no_signal(bool(s.get("revolution", false)))
 
 	# Multiplayer
 	if _mp_name_input != null:
@@ -270,6 +276,10 @@ func _on_hp_bars_toggled(pressed: bool) -> void:
 func _on_auto_retaliate_toggled(pressed: bool) -> void:
 	GameState.settings["auto_retaliate"] = pressed
 	EventBus.settings_changed.emit("auto_retaliate", pressed)
+
+func _on_revolution_toggled(pressed: bool) -> void:
+	GameState.settings["revolution"] = pressed
+	EventBus.settings_changed.emit("revolution", pressed)
 
 # ── Signal handlers (game) ──
 

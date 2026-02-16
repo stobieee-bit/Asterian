@@ -7,6 +7,8 @@
     "tier": "basic",
     "slot": 1,
     "damage_mult": 1.5,
+    "damage_min": 0.3,
+    "damage_max": 1.5,
     "adr_cost": 0,
     "adr_gain": 8,
     "cooldown": 0,
@@ -21,6 +23,8 @@
     "tier": "basic",
     "slot": 2,
     "damage_mult": 1.2,
+    "damage_min": 0.2,
+    "damage_max": 1.2,
     "adr_cost": 0,
     "adr_gain": 8,
     "cooldown": 0,
@@ -37,9 +41,11 @@
     "tier": "threshold",
     "slot": 3,
     "damage_mult": 2.8,
+    "damage_min": 2.0,
+    "damage_max": 3.2,
     "adr_cost": 50,
     "adr_gain": 0,
-    "cooldown": 0,
+    "cooldown": 20,
     "description": "Erupts in a storm of deconstructing nanites, hitting all nearby enemies.",
     "effects": [
       { "type": "aoe", "radius": 5.0 }
@@ -53,9 +59,11 @@
     "tier": "threshold",
     "slot": 4,
     "damage_mult": 2.0,
+    "damage_min": 1.5,
+    "damage_max": 2.5,
     "adr_cost": 50,
     "adr_gain": 0,
-    "cooldown": 0,
+    "cooldown": 15,
     "description": "Nano-parasites leech life force, healing you for a portion of damage dealt.",
     "effects": [
       { "type": "heal", "heal_percent": 0.5 }
@@ -69,13 +77,33 @@
     "tier": "ultimate",
     "slot": 5,
     "damage_mult": 5.0,
+    "damage_min": 4.0,
+    "damage_max": 5.5,
     "adr_cost": 100,
     "adr_gain": 0,
-    "cooldown": 0,
+    "cooldown": 60,
     "description": "Unleashes a catastrophic nano-swarm that consumes everything nearby.",
     "effects": [
       { "type": "aoe", "radius": 3.0 },
       { "type": "dot", "ticks": 5, "tick_damage_mult": 1.0, "duration": 10.0 }
+    ]
+  },
+  "nano_frenzy": {
+    "id": "nano_frenzy",
+    "name": "Nano Frenzy",
+    "icon": "🔄",
+    "style": "nano",
+    "tier": "threshold",
+    "slot": 6,
+    "damage_mult": 0,
+    "damage_min": 0,
+    "damage_max": 0,
+    "adr_cost": 50,
+    "adr_gain": 0,
+    "cooldown": 20,
+    "description": "Unleashes a rapid flurry of nano-strikes, hitting 4 times over 3.6 seconds.",
+    "effects": [
+      { "type": "channel", "hits": 4, "hit_mult": 1.2, "interval": 0.9 }
     ]
   },
   "arc_bolt": {
@@ -86,6 +114,8 @@
     "tier": "basic",
     "slot": 1,
     "damage_mult": 1.5,
+    "damage_min": 0.3,
+    "damage_max": 1.5,
     "adr_cost": 0,
     "adr_gain": 8,
     "cooldown": 0,
@@ -100,6 +130,8 @@
     "tier": "basic",
     "slot": 2,
     "damage_mult": 1.0,
+    "damage_min": 0.2,
+    "damage_max": 1.0,
     "adr_cost": 0,
     "adr_gain": 8,
     "cooldown": 0,
@@ -116,9 +148,11 @@
     "tier": "threshold",
     "slot": 3,
     "damage_mult": 3.2,
+    "damage_min": 2.2,
+    "damage_max": 3.6,
     "adr_cost": 50,
     "adr_gain": 0,
-    "cooldown": 0,
+    "cooldown": 20,
     "description": "Overloads the target with electricity, stunning them briefly.",
     "effects": [
       { "type": "stun", "duration": 2.0 }
@@ -132,9 +166,11 @@
     "tier": "threshold",
     "slot": 4,
     "damage_mult": 2.0,
+    "damage_min": 1.5,
+    "damage_max": 2.5,
     "adr_cost": 50,
     "adr_gain": 0,
-    "cooldown": 0,
+    "cooldown": 25,
     "description": "Creates an electrified zone that damages enemies standing within it.",
     "effects": [
       { "type": "ground_aoe", "radius": 4.0, "tick_damage_mult": 0.5, "duration": 5.0 }
@@ -148,12 +184,32 @@
     "tier": "ultimate",
     "slot": 5,
     "damage_mult": 5.5,
+    "damage_min": 4.5,
+    "damage_max": 6.0,
     "adr_cost": 100,
     "adr_gain": 0,
-    "cooldown": 0,
+    "cooldown": 60,
     "description": "Calls a massive lightning strike that chains to all nearby enemies.",
     "effects": [
       { "type": "chain", "chain_count": 99, "chain_range": 8.0, "chain_damage_mult": 0.45 }
+    ]
+  },
+  "rapid_discharge": {
+    "id": "rapid_discharge",
+    "name": "Rapid Discharge",
+    "icon": "⚡",
+    "style": "tesla",
+    "tier": "threshold",
+    "slot": 6,
+    "damage_mult": 0,
+    "damage_min": 0,
+    "damage_max": 0,
+    "adr_cost": 50,
+    "adr_gain": 0,
+    "cooldown": 20,
+    "description": "Channels rapid electrical discharges, hitting 5 times over 3 seconds.",
+    "effects": [
+      { "type": "channel", "hits": 5, "hit_mult": 0.9, "interval": 0.6 }
     ]
   },
   "void_bolt": {
@@ -164,6 +220,8 @@
     "tier": "basic",
     "slot": 1,
     "damage_mult": 1.5,
+    "damage_min": 0.3,
+    "damage_max": 1.5,
     "adr_cost": 0,
     "adr_gain": 8,
     "cooldown": 0,
@@ -178,6 +236,8 @@
     "tier": "basic",
     "slot": 2,
     "damage_mult": 1.3,
+    "damage_min": 0.3,
+    "damage_max": 1.3,
     "adr_cost": 0,
     "adr_gain": 8,
     "cooldown": 0,
@@ -194,9 +254,11 @@
     "tier": "threshold",
     "slot": 3,
     "damage_mult": 3.0,
+    "damage_min": 2.0,
+    "damage_max": 3.4,
     "adr_cost": 50,
     "adr_gain": 0,
-    "cooldown": 0,
+    "cooldown": 20,
     "description": "Tears at the target's essence, reducing their damage output.",
     "effects": [
       { "type": "debuff", "debuff_type": "damage", "value": 0.25, "duration": 6.0 }
@@ -210,9 +272,11 @@
     "tier": "threshold",
     "slot": 4,
     "damage_mult": 2.5,
+    "damage_min": 1.8,
+    "damage_max": 3.0,
     "adr_cost": 50,
     "adr_gain": 0,
-    "cooldown": 0,
+    "cooldown": 25,
     "description": "Opens a miniature singularity that pulls in and damages all nearby foes.",
     "effects": [
       { "type": "aoe", "radius": 6.0 }
@@ -226,14 +290,129 @@
     "tier": "ultimate",
     "slot": 5,
     "damage_mult": 6.0,
+    "damage_min": 5.0,
+    "damage_max": 6.5,
     "adr_cost": 100,
     "adr_gain": 0,
-    "cooldown": 0,
+    "cooldown": 60,
     "description": "Erases the target from reality, applying all void afflictions at once.",
     "effects": [
       { "type": "debuff", "debuff_type": "defense", "value": 0.2, "duration": 8.0 },
       { "type": "debuff", "debuff_type": "damage", "value": 0.25, "duration": 6.0 },
       { "type": "dot", "ticks": 3, "tick_damage_mult": 0.8, "duration": 6.0 }
+    ]
+  },
+  "void_channel": {
+    "id": "void_channel",
+    "name": "Void Channel",
+    "icon": "🌑",
+    "style": "void",
+    "tier": "threshold",
+    "slot": 6,
+    "damage_mult": 0,
+    "damage_min": 0,
+    "damage_max": 0,
+    "adr_cost": 50,
+    "adr_gain": 0,
+    "cooldown": 20,
+    "description": "Channels void energy into devastating blasts, hitting 3 times over 4.2 seconds.",
+    "effects": [
+      { "type": "channel", "hits": 3, "hit_mult": 1.8, "interval": 1.4 }
+    ]
+  },
+  "natural_instinct": {
+    "id": "natural_instinct",
+    "name": "Natural Instinct",
+    "icon": "🧬",
+    "style": "shared",
+    "tier": "ultimate",
+    "slot": 10,
+    "damage_mult": 0,
+    "damage_min": 0,
+    "damage_max": 0,
+    "adr_cost": 50,
+    "adr_gain": 0,
+    "cooldown": 60,
+    "shared": true,
+    "description": "Doubles adrenaline gain from all sources for 20 seconds.",
+    "effects": [
+      { "type": "natural_instinct", "duration": 20.0, "adr_mult": 2.0 }
+    ]
+  },
+  "resonance": {
+    "id": "resonance",
+    "name": "Resonance",
+    "icon": "💚",
+    "style": "shared",
+    "tier": "threshold",
+    "slot": 6,
+    "damage_mult": 0,
+    "damage_min": 0,
+    "damage_max": 0,
+    "adr_cost": 15,
+    "adr_gain": 0,
+    "cooldown": 30,
+    "shared": true,
+    "description": "Converts the next incoming hit into healing instead of damage.",
+    "effects": [
+      { "type": "resonance", "duration": 30.0 }
+    ]
+  },
+  "debilitate": {
+    "id": "debilitate",
+    "name": "Debilitate",
+    "icon": "🔻",
+    "style": "shared",
+    "tier": "threshold",
+    "slot": 7,
+    "damage_mult": 0,
+    "damage_min": 0,
+    "damage_max": 0,
+    "adr_cost": 50,
+    "adr_gain": 0,
+    "cooldown": 30,
+    "shared": true,
+    "description": "Reduces your target's damage by 50% for 8 seconds.",
+    "effects": [
+      { "type": "debuff", "debuff_type": "debilitate", "value": 0.5, "duration": 8.0 }
+    ]
+  },
+  "reflect": {
+    "id": "reflect",
+    "name": "Reflect",
+    "icon": "🪞",
+    "style": "shared",
+    "tier": "threshold",
+    "slot": 8,
+    "damage_mult": 0,
+    "damage_min": 0,
+    "damage_max": 0,
+    "adr_cost": 50,
+    "adr_gain": 0,
+    "cooldown": 25,
+    "shared": true,
+    "description": "Reflects 50% of incoming damage back to attackers for 10 seconds.",
+    "effects": [
+      { "type": "reflect", "value": 0.5, "duration": 10.0 }
+    ]
+  },
+  "freedom": {
+    "id": "freedom",
+    "name": "Freedom",
+    "icon": "🔓",
+    "style": "shared",
+    "tier": "basic",
+    "slot": 9,
+    "damage_mult": 0,
+    "damage_min": 0,
+    "damage_max": 0,
+    "adr_cost": 0,
+    "adr_gain": 8,
+    "cooldown": 30,
+    "shared": true,
+    "description": "Clears all damage-over-time effects and stuns on you.",
+    "effects": [
+      { "type": "freedom" }
     ]
   }
 }

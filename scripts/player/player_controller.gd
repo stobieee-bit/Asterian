@@ -60,12 +60,14 @@ func _physics_process(delta: float) -> void:
 	_apply_gravity(delta)
 	_process_movement(delta)
 	move_and_slide()
-	# Safety net: prevent sinking below ground plane
-	if global_position.y < -0.5:
-		global_position.y = 0.0
-		velocity.y = 0.0
-	# Safety net: after physics, clamp position back inside world bounds
-	_clamp_position()
+	# Safety nets are disabled inside dungeons (dungeon has its own floor/walls)
+	if not GameState.dungeon_active:
+		# Safety net: prevent sinking below ground plane
+		if global_position.y < -0.5:
+			global_position.y = 0.0
+			velocity.y = 0.0
+		# Safety net: after physics, clamp position back inside world bounds
+		_clamp_position()
 	# Update move marker
 	_update_move_marker(delta)
 
@@ -109,6 +111,11 @@ func _process_movement(delta: float) -> void:
 	var direction: Vector2 = (target_2d - pos_2d).normalized()
 	var target_speed: float = run_speed if is_running else move_speed
 
+	# Apply food/consumable speed buff
+	var speed_buff: float = GameState.get_buff_value("speed")
+	if speed_buff > 0:
+		target_speed *= (1.0 + speed_buff)
+
 	# Accelerate smoothly
 	current_speed = move_toward(current_speed, target_speed, target_speed * delta * 4.0)
 
@@ -149,8 +156,9 @@ func _handle_move_click(event: InputEvent) -> void:
 
 	if result:
 		move_target = result.position
-		move_target.y = 0.0  # Keep on ground plane
-		move_target = _clamp_move_target(move_target)
+		if not GameState.dungeon_active:
+			move_target.y = 0.0  # Keep on ground plane
+			move_target = _clamp_move_target(move_target)
 		is_moving = true
 		_show_move_marker(move_target)
 	else:
@@ -158,8 +166,9 @@ func _handle_move_click(event: InputEvent) -> void:
 		var hit = _ground_plane.intersects_ray(from, dir)
 		if hit:
 			move_target = hit
-			move_target.y = 0.0
-			move_target = _clamp_move_target(move_target)
+			if not GameState.dungeon_active:
+				move_target.y = 0.0
+				move_target = _clamp_move_target(move_target)
 			is_moving = true
 			_show_move_marker(move_target)
 

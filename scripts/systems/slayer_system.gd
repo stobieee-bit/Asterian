@@ -43,12 +43,22 @@ func assign_task() -> bool:
 		EventBus.chat_message.emit("No suitable enemies found for your level.", "system")
 		return false
 
-	# Pick a random enemy from the filtered pool
-	var chosen: Dictionary = pool[randi() % pool.size()]
+	# Weighted selection: enemies closer to combat level are more likely
+	var chosen: Dictionary = _weighted_pick(pool, combat_level)
 	var enemy_type: String = str(chosen.get("type_id", ""))
 	var enemy_name: String = str(chosen.get("name", enemy_type))
 	var area: String = str(chosen.get("area", ""))
-	var count: int = randi_range(TASK_COUNT_MIN, TASK_COUNT_MAX)
+
+	# Scale task count — stronger enemies require fewer kills
+	var enemy_lv: int = int(chosen.get("level", 1))
+	var lv_diff: int = enemy_lv - combat_level
+	var count: int
+	if lv_diff >= 5:
+		count = randi_range(TASK_COUNT_MIN, TASK_COUNT_MIN + 8)  # 15-23 for hard targets
+	elif lv_diff <= -10:
+		count = randi_range(TASK_COUNT_MAX - 8, TASK_COUNT_MAX)  # 32-40 for easy targets
+	else:
+		count = randi_range(TASK_COUNT_MIN, TASK_COUNT_MAX)      # 15-40 normal range
 
 	# Store the task on GameState
 	GameState.slayer_task = {
@@ -142,13 +152,25 @@ func _on_enemy_killed(_enemy_id: String, enemy_type: String) -> void:
 # ──────────────────────────────────────────────
 
 ## Build a pool of enemies whose combat level is within an acceptable window
-## of the player's combat level.
+## of the player's combat level. The window scales with level — low-level
+## players get a tight range so they never face impossible enemies, while
+## high-level players have a wider pool.
 func _build_enemy_pool(combat_level: int) -> Array[Dictionary]:
 	var pool: Array[Dictionary] = []
 	var all_enemies: Dictionary = DataManager.enemies
 
-	var level_floor: int = combat_level - 20
-	var level_ceil: int = combat_level + 10
+	# ── Scaling level window ──
+	# Low levels: tight range keeps tasks achievable
+	# High levels: wider range gives variety
+	#   Level  1  → window [1, 5]    (+0 / +4)
+	#   Level 10  → window [4, 15]   (-6 / +5)
+	#   Level 30  → window [18, 38]  (-12 / +8)
+	#   Level 60  → window [40, 70]  (-20 / +10)
+	#   Level 99  → window [79, 109] (-20 / +10)
+	var low_spread: int = mini(20, int(combat_level * 0.6))   # grows to cap of 20
+	var high_spread: int = mini(10, 3 + int(combat_level * 0.2))  # starts tight, grows to 10
+	var level_floor: int = maxi(1, combat_level - low_spread)
+	var level_ceil: int = combat_level + high_spread
 
 	for type_id in all_enemies:
 		var data: Dictionary = all_enemies[type_id]
@@ -239,3 +261,28 @@ func _complete_task() -> void:
 
 	# ── Clear the task ──
 	GameState.slayer_task = {}
+
+
+## Weighted random pick — enemies closer to the player's level have higher weight.
+## Weight = 1 / (1 + |level_diff|)^1.5, so ±0 diff = 1.0, ±5 diff ≈ 0.07
+func _weighted_pick(pool: Array[Dictionary], combat_level: int) -> Dictionary:
+	var weights: Array[float] = []
+	var total_weight: float = 0.0
+
+	for entry in pool:
+		var elv: int = int(entry.get("level", 0))
+		var diff: float = absf(float(elv - combat_level))
+		var w: float = 1.0 / pow(1.0 + diff, 1.5)
+		weights.append(w)
+		total_weight += w
+
+	# Roulette selection
+	var roll: float = randf() * total_weight
+	var cumulative: float = 0.0
+	for i in range(pool.size()):
+		cumulative += weights[i]
+		if roll <= cumulative:
+			return pool[i]
+
+	# Fallback (shouldn't happen)
+	return pool[pool.size() - 1]

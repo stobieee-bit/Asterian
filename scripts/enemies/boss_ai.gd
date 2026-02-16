@@ -559,7 +559,7 @@ func _resolve_telegraph() -> void:
 	if player_hit:
 		var raw_damage: int = int(float(_parent.damage) * dmg_pct * _enrage_multiplier)
 		var final_damage: int = maxi(1, raw_damage)
-		EventBus.hit_landed.emit(_player, final_damage, false)
+		EventBus.hit_landed.emit(_player, final_damage, false, _parent)
 
 	# Show impact float text at telegraph position.
 	var impact_pos: Vector3 = _telegraph_target_pos + Vector3.UP * 1.0

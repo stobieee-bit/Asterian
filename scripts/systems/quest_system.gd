@@ -14,7 +14,7 @@ func _ready() -> void:
 
 	# Connect gameplay signals that can advance quest steps
 	EventBus.enemy_killed.connect(_on_enemy_killed)
-	EventBus.gathering_complete.connect(_on_gathering_complete)
+	EventBus.item_added.connect(_on_item_added)
 	EventBus.crafting_complete.connect(_on_crafting_complete)
 
 
@@ -217,10 +217,12 @@ func _on_enemy_killed(_enemy_id: String, enemy_type: String) -> void:
 	_advance_steps("kill", "target", enemy_type)
 
 
-## Called when a gathering action completes. Checks for "gather" steps matching
-## the gathered item_id.
-func _on_gathering_complete(_skill: String, item_id: String) -> void:
-	_advance_steps("gather", "item", item_id)
+## Called when any item enters the player's inventory (gathering nodes, loot
+## drops, purchases, ground pickups, bank withdrawals, etc.).  Replaces the
+## old gathering_complete handler so "gather" quest steps track correctly
+## regardless of how the item was obtained (e.g. chitin shards from enemies).
+func _on_item_added(item_id: String, quantity: int) -> void:
+	_advance_steps("gather", "item", item_id, quantity)
 
 
 ## Called when a crafting action completes. Checks for "craft" steps matching
@@ -235,9 +237,9 @@ func _on_crafting_complete(recipe_id: String) -> void:
 
 ## Generic step advancement. Iterates every active quest and every step to find
 ## steps of `step_type` whose `match_key` field equals `match_value`.
-## Increments the count and auto-advances `tracking.step` when the current step
-## is finished.
-func _advance_steps(step_type: String, match_key: String, match_value: String) -> void:
+## Increments the count by `amount` and auto-advances `tracking.step` when the
+## current step is finished.
+func _advance_steps(step_type: String, match_key: String, match_value: String, amount: int = 1) -> void:
 	# Snapshot keys so we can safely modify the dict during iteration
 	var quest_ids: Array = GameState.active_quests.keys().duplicate()
 
@@ -278,8 +280,8 @@ func _advance_steps(step_type: String, match_key: String, match_value: String) -
 			# Step already done, nothing to do
 			continue
 
-		# Increment progress
-		current_count += 1
+		# Increment progress (clamp to required so we don't overshoot)
+		current_count = mini(current_count + amount, required)
 		progress[step_key]["count"] = current_count
 		changed = true
 

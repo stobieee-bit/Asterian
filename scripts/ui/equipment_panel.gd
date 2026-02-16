@@ -14,10 +14,11 @@ const SLOT_GAP: int = 6
 
 # ── Node refs ──
 var _slot_nodes: Dictionary = {}  # { slot_name: PanelContainer }
+var _condition_bars: Dictionary = {}  # { slot_name: ProgressBar }
 var _stats_label: Label = null
+var _repair_btn: Button = null
 var _title_label: Label = null
 var _close_btn: Button = null
-var _style_btn: Button = null
 
 # Slot order for layout
 var _slot_names: Array[String] = ["head", "body", "weapon", "offhand", "legs", "boots", "gloves"]
@@ -32,22 +33,6 @@ func _ready() -> void:
 	# Draggable header
 	var drag_header: DraggableHeader = DraggableHeader.attach(self, "Equipment", _on_close_pressed)
 	vbox.add_child(drag_header)
-
-	# Combat style toggle
-	var style_row: HBoxContainer = HBoxContainer.new()
-	vbox.add_child(style_row)
-
-	var style_label: Label = Label.new()
-	style_label.text = "Style: "
-	style_label.add_theme_font_size_override("font_size", 14)
-	style_label.add_theme_color_override("font_color", Color(0.6, 0.7, 0.8))
-	style_row.add_child(style_label)
-
-	_style_btn = Button.new()
-	_style_btn.text = _style_display_name(GameState.player["combat_style"])
-	_style_btn.add_theme_font_size_override("font_size", 14)
-	_style_btn.pressed.connect(_on_style_toggle)
-	style_row.add_child(_style_btn)
 
 	# Paper doll layout
 	var doll: VBoxContainer = VBoxContainer.new()
@@ -84,9 +69,19 @@ func _ready() -> void:
 	_stats_label.add_theme_color_override("font_color", Color(0.6, 0.8, 0.7))
 	vbox.add_child(_stats_label)
 
+	# Repair All button
+	_repair_btn = Button.new()
+	_repair_btn.text = "Repair All"
+	_repair_btn.add_theme_font_size_override("font_size", 13)
+	_repair_btn.custom_minimum_size = Vector2(0, 28)
+	_repair_btn.visible = false  # Only shown when gear is degraded
+	_repair_btn.pressed.connect(_on_repair_all)
+	vbox.add_child(_repair_btn)
+
 	# Connect signals
 	EventBus.item_equipped.connect(_on_equipment_changed)
 	EventBus.item_unequipped.connect(_on_equipment_changed)
+	visibility_changed.connect(_on_visibility_changed)
 
 	refresh()
 
@@ -141,6 +136,27 @@ func _create_slot(slot_name: String, display_name: String) -> PanelContainer:
 	item_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(item_label)
 
+	# Condition bar overlay (small bar at bottom of slot, hidden by default)
+	var cond_bar: ProgressBar = ProgressBar.new()
+	cond_bar.name = "CondBar"
+	cond_bar.position = Vector2(2, SLOT_SIZE - 7)
+	cond_bar.size = Vector2(SLOT_SIZE - 4, 5)
+	cond_bar.max_value = 100.0
+	cond_bar.value = 100.0
+	cond_bar.show_percentage = false
+	cond_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cond_bar.visible = false
+	var cond_bg: StyleBoxFlat = StyleBoxFlat.new()
+	cond_bg.bg_color = Color(0.05, 0.05, 0.05, 0.8)
+	cond_bg.set_corner_radius_all(2)
+	cond_bar.add_theme_stylebox_override("background", cond_bg)
+	var cond_fill: StyleBoxFlat = StyleBoxFlat.new()
+	cond_fill.bg_color = Color(0.2, 0.8, 0.3, 0.9)
+	cond_fill.set_corner_radius_all(2)
+	cond_bar.add_theme_stylebox_override("fill", cond_fill)
+	inner.add_child(cond_bar)
+	_condition_bars[slot_name] = cond_bar
+
 	# Click handler
 	slot.gui_input.connect(_on_slot_input.bind(slot_name))
 	slot.mouse_entered.connect(_on_slot_hover.bind(slot_name))
@@ -191,12 +207,15 @@ func refresh() -> void:
 			if style:
 				style.border_color = Color(0.2, 0.4, 0.5, 0.7)
 
+	# Update condition bars
+	_update_condition_bars()
+
 	# Update stats
 	_update_stats()
 
-	# Update style button
-	if _style_btn:
-		_style_btn.text = _style_display_name(GameState.player["combat_style"])
+	# Update repair button
+	_update_repair_button()
+
 
 ## Update the stats summary
 func _update_stats() -> void:
@@ -210,14 +229,25 @@ func _update_stats() -> void:
 
 	var armor: int = 0
 	var weapon_dmg: int = 0
+	var set_bonus_text: String = ""
 	if equip_sys:
 		armor = equip_sys.get_total_armor()
 		weapon_dmg = equip_sys.get_weapon_damage()
 
-	_stats_label.text = "Armor: %d  |  Weapon: +%d dmg\nHP: %d/%d  |  Combat Lv: %d" % [
+		# Check for set bonus
+		if equip_sys.has_method("get_current_set_bonus"):
+			var bonus: Dictionary = equip_sys.get_current_set_bonus()
+			var pieces: int = int(bonus.get("pieces", 0))
+			var style: String = str(bonus.get("style", ""))
+			if pieces >= 3 and style != "":
+				var desc: String = str(bonus.get("desc", ""))
+				set_bonus_text = "\nSet (%s %d/5): %s" % [style.capitalize(), pieces, desc]
+
+	_stats_label.text = "Armor: %d  |  Weapon: +%d dmg\nHP: %d/%d  |  Combat Lv: %d%s" % [
 		armor, weapon_dmg,
 		GameState.player["hp"], GameState.player["max_hp"],
-		GameState.get_combat_level()
+		GameState.get_combat_level(),
+		set_bonus_text,
 	]
 
 ## Handle click on equipment slot
@@ -261,6 +291,27 @@ func _show_equip_context_menu(item_id: String, slot_name: String, screen_pos: Ve
 		"callback": func(): _unequip_slot(slot_name)
 	})
 
+	# Show Repair option if item is degraded (tier 5+)
+	if tier >= 5:
+		var cond: float = float(GameState.equipment_condition.get(slot_name, 1.0))
+		if cond < 1.0:
+			var player: Node = get_tree().get_first_node_in_group("player")
+			var equip_sys: Node = null
+			if player:
+				equip_sys = player.get_node_or_null("EquipmentSystem")
+			var cost: int = 0
+			if equip_sys and equip_sys.has_method("get_repair_cost"):
+				cost = equip_sys.get_repair_cost(slot_name)
+			options.append({
+				"label": "Repair (%d cr)" % cost,
+				"icon": "R",
+				"color": Color(0.3, 0.8, 0.5),
+				"callback": func():
+					if equip_sys and equip_sys.has_method("repair_slot"):
+						equip_sys.repair_slot(slot_name)
+					refresh()
+			})
+
 	options.append({
 		"label": "Examine",
 		"icon": "?",
@@ -269,8 +320,13 @@ func _show_equip_context_menu(item_id: String, slot_name: String, screen_pos: Ve
 			var desc: String = str(item_data.get("desc", ""))
 			if desc == "":
 				desc = "Equipped %s." % slot_name
+			# Add condition info for degradable items
+			var cond_str: String = ""
+			if tier >= 5:
+				var cond2: float = float(GameState.equipment_condition.get(slot_name, 1.0))
+				cond_str = " | Condition: %d%%" % int(cond2 * 100.0)
 			EventBus.chat_message.emit(
-				"Examine: %s — %s" % [item_name, desc], "system"
+				"Examine: %s — %s%s" % [item_name, desc, cond_str], "system"
 			)
 	})
 
@@ -299,22 +355,6 @@ func _on_slot_hover(slot_name: String) -> void:
 func _on_slot_exit() -> void:
 	EventBus.tooltip_hidden.emit()
 
-## Toggle combat style: nano → tesla → void → nano
-func _on_style_toggle() -> void:
-	var current: String = str(GameState.player["combat_style"])
-	match current:
-		"nano":
-			GameState.player["combat_style"] = "tesla"
-		"tesla":
-			GameState.player["combat_style"] = "void"
-		_:
-			GameState.player["combat_style"] = "nano"
-	refresh()
-	EventBus.chat_message.emit(
-		"Combat style: %s" % _style_display_name(GameState.player["combat_style"]),
-		"system"
-	)
-
 func _on_close_pressed() -> void:
 	visible = false
 	EventBus.panel_closed.emit("equipment")
@@ -322,13 +362,78 @@ func _on_close_pressed() -> void:
 func _on_equipment_changed(_slot: String, _item_id: String) -> void:
 	refresh()
 
-## Style name with color hint
-func _style_display_name(style: String) -> String:
-	match style:
-		"nano": return "Nano"
-		"tesla": return "Tesla"
-		"void": return "Void"
-		_: return style.capitalize()
+func _on_visibility_changed() -> void:
+	if visible:
+		refresh()
+
+## Update condition bars on each equipment slot
+func _update_condition_bars() -> void:
+	var player: Node = get_tree().get_first_node_in_group("player")
+	var equip_sys: Node = null
+	if player:
+		equip_sys = player.get_node_or_null("EquipmentSystem")
+
+	for slot_name in _condition_bars:
+		var cond_bar: ProgressBar = _condition_bars[slot_name]
+		var item_id: String = str(GameState.equipment.get(slot_name, ""))
+		if item_id == "":
+			cond_bar.visible = false
+			continue
+
+		var item_data: Dictionary = DataManager.get_item(item_id)
+		var tier: int = int(item_data.get("tier", 1))
+		if tier < 5:
+			cond_bar.visible = false
+			continue
+
+		var cond: float = float(GameState.equipment_condition.get(slot_name, 1.0))
+		cond_bar.value = cond * 100.0
+		cond_bar.visible = true
+
+		# Color the fill based on condition
+		var fill_style: StyleBoxFlat = cond_bar.get_theme_stylebox("fill") as StyleBoxFlat
+		if fill_style:
+			if cond > 0.5:
+				fill_style.bg_color = Color(0.2, 0.8, 0.3, 0.9)  # Green
+			elif cond > 0.25:
+				fill_style.bg_color = Color(0.9, 0.7, 0.1, 0.9)  # Yellow
+			else:
+				fill_style.bg_color = Color(0.9, 0.2, 0.15, 0.9)  # Red
+
+## Update the Repair All button visibility and text
+func _update_repair_button() -> void:
+	if _repair_btn == null:
+		return
+	var player: Node = get_tree().get_first_node_in_group("player")
+	if player == null:
+		_repair_btn.visible = false
+		return
+	var equip_sys: Node = player.get_node_or_null("EquipmentSystem")
+	if equip_sys == null or not equip_sys.has_method("has_degraded_equipment"):
+		_repair_btn.visible = false
+		return
+
+	if equip_sys.has_degraded_equipment():
+		var cost: int = equip_sys.get_total_repair_cost()
+		_repair_btn.text = "Repair All (%d cr)" % cost
+		_repair_btn.visible = true
+		# Dim if can't afford
+		if GameState.has_credits(cost):
+			_repair_btn.add_theme_color_override("font_color", Color(0.3, 0.9, 0.4))
+		else:
+			_repair_btn.add_theme_color_override("font_color", Color(0.6, 0.4, 0.4))
+	else:
+		_repair_btn.visible = false
+
+## Handle Repair All button press
+func _on_repair_all() -> void:
+	var player: Node = get_tree().get_first_node_in_group("player")
+	if player == null:
+		return
+	var equip_sys: Node = player.get_node_or_null("EquipmentSystem")
+	if equip_sys and equip_sys.has_method("repair_all"):
+		equip_sys.repair_all()
+	refresh()
 
 ## Tier color lookup
 func _tier_color(tier: int) -> Color:

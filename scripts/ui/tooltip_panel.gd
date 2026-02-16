@@ -9,7 +9,7 @@ extends PanelContainer
 var _name_label: Label = null
 var _type_label: Label = null
 var _stats_label: Label = null
-var _compare_label: Label = null  # Stat comparison vs equipped
+var _compare_label: RichTextLabel = null  # Stat comparison vs equipped
 var _desc_label: Label = null
 var _vbox: VBoxContainer = null
 
@@ -45,10 +45,14 @@ func _ready() -> void:
 	_stats_label.add_theme_color_override("font_color", Color(0.6, 0.75, 0.6, 0.9))
 	_vbox.add_child(_stats_label)
 
-	_compare_label = Label.new()
-	_compare_label.add_theme_font_size_override("font_size", 13)
-	_compare_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7, 0.85))
+	_compare_label = RichTextLabel.new()
+	_compare_label.bbcode_enabled = true
+	_compare_label.fit_content = true
+	_compare_label.scroll_active = false
+	_compare_label.add_theme_font_size_override("normal_font_size", 13)
+	_compare_label.add_theme_color_override("default_color", Color(0.6, 0.6, 0.7, 0.85))
 	_compare_label.visible = false
+	_compare_label.custom_minimum_size = Vector2(200, 0)
 	_vbox.add_child(_compare_label)
 
 	_desc_label = Label.new()
@@ -162,6 +166,14 @@ func _on_tooltip_requested(data: Dictionary, _global_pos: Vector2) -> void:
 	if special != "":
 		stats_lines.append("Special: %s" % special.capitalize())
 
+	# Equipment condition (for equipped tier 5+ items)
+	if source == "equipment":
+		var eq_slot: String = str(data.get("slot", ""))
+		if tier >= 5 and eq_slot != "":
+			var cond: float = float(GameState.equipment_condition.get(eq_slot, 1.0))
+			var cond_pct: int = int(cond * 100.0)
+			stats_lines.append("Condition: %d%%" % cond_pct)
+
 	_stats_label.text = "\n".join(stats_lines) if stats_lines.size() > 0 else ""
 	_stats_label.visible = stats_lines.size() > 0
 
@@ -170,7 +182,14 @@ func _on_tooltip_requested(data: Dictionary, _global_pos: Vector2) -> void:
 	if source == "inventory" and item_type in ["weapon", "armor", "offhand"]:
 		var compare_text: String = _build_comparison(item_data, item_type)
 		if compare_text != "":
-			_compare_label.text = compare_text
+			_compare_label.clear()
+			_compare_label.append_text(compare_text)
+			_compare_label.visible = true
+	elif source == "shop" and item_type in ["weapon", "armor", "offhand"]:
+		var compare_text: String = _build_comparison(item_data, item_type)
+		if compare_text != "":
+			_compare_label.clear()
+			_compare_label.append_text(compare_text)
 			_compare_label.visible = true
 
 	# Description
@@ -217,7 +236,7 @@ func _on_tooltip_hidden() -> void:
 	visible = false
 	_is_showing = false
 
-## Build stat comparison text between hovered item and currently equipped item
+## Build stat comparison BBCode between hovered item and currently equipped item
 func _build_comparison(item_data: Dictionary, item_type: String) -> String:
 	# Determine which equipment slot(s) this item would fill
 	var target_slot: String = _get_equip_slot(item_data, item_type)
@@ -227,7 +246,7 @@ func _build_comparison(item_data: Dictionary, item_type: String) -> String:
 	# Get currently equipped item in that slot
 	var equipped_id: String = str(GameState.equipment.get(target_slot, ""))
 	if equipped_id == "":
-		return "-- vs: (empty slot) --"
+		return "[color=#999]-- vs: (empty slot) --[/color]"
 
 	var equipped_data: Dictionary = DataManager.get_item(equipped_id)
 	if equipped_data.is_empty():
@@ -235,7 +254,7 @@ func _build_comparison(item_data: Dictionary, item_type: String) -> String:
 
 	var lines: Array[String] = []
 	var equipped_name: String = str(equipped_data.get("name", equipped_id))
-	lines.append("-- vs %s --" % equipped_name)
+	lines.append("[color=#8899aa]-- vs %s --[/color]" % equipped_name)
 
 	# Compare key stats
 	var stats_to_compare: Array[Array] = [
@@ -246,7 +265,7 @@ func _build_comparison(item_data: Dictionary, item_type: String) -> String:
 
 	for stat_pair in stats_to_compare:
 		var key: String = stat_pair[0]
-		var label: String = stat_pair[1]
+		var label_text: String = stat_pair[1]
 		var new_val: int = int(item_data.get(key, 0))
 		var old_val: int = int(equipped_data.get(key, 0))
 
@@ -255,11 +274,11 @@ func _build_comparison(item_data: Dictionary, item_type: String) -> String:
 
 		var diff: int = new_val - old_val
 		if diff > 0:
-			lines.append("  %s: +%d (better)" % [label, diff])
+			lines.append("  %s: [color=#44dd44]+%d[/color] [color=#559955](upgrade)[/color]" % [label_text, diff])
 		elif diff < 0:
-			lines.append("  %s: %d (worse)" % [label, diff])
+			lines.append("  %s: [color=#dd4444]%d[/color] [color=#995555](downgrade)[/color]" % [label_text, diff])
 		else:
-			lines.append("  %s: same" % label)
+			lines.append("  %s: [color=#888888]same[/color]" % label_text)
 
 	if lines.size() <= 1:
 		return ""
