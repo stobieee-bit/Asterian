@@ -625,24 +625,24 @@ static func animate_attack(root: Node3D, phase: float) -> void:
 	if phase < 0.3:
 		# Wind up — pull right arm back, bend elbow
 		var t: float = phase / 0.3
-		arm_x = lerpf(0.0, 0.8, t)        # Pull back
+		arm_x = lerpf(0.0, -0.8, t)       # Pull back (positive = back in arm space)
 		arm_z = lerpf(0.0, -0.15, t)      # Slight outward
 		elbow_bend = lerpf(0.0, -0.9, t)  # Bend elbow
-		torso_lean = lerpf(0.0, 0.1, t)   # Lean back slightly
+		torso_lean = lerpf(0.0, -0.1, t)  # Lean back slightly
 	elif phase < 0.6:
 		# Strike — thrust arm forward hard
 		var t: float = (phase - 0.3) / 0.3
-		arm_x = lerpf(0.8, -1.2, t)       # Swing forward past center
+		arm_x = lerpf(-0.8, 1.2, t)       # Swing forward past center
 		arm_z = lerpf(-0.15, 0.1, t)      # Pull inward
 		elbow_bend = lerpf(-0.9, -0.2, t) # Straighten elbow
-		torso_lean = lerpf(0.1, -0.15, t) # Lean forward
+		torso_lean = lerpf(-0.1, 0.15, t) # Lean forward
 	else:
 		# Recover — return to neutral
 		var t: float = (phase - 0.6) / 0.4
-		arm_x = lerpf(-1.2, 0.0, t)
+		arm_x = lerpf(1.2, 0.0, t)
 		arm_z = lerpf(0.1, 0.0, t)
 		elbow_bend = lerpf(-0.2, 0.0, t)
-		torso_lean = lerpf(-0.15, 0.0, t)
+		torso_lean = lerpf(0.15, 0.0, t)
 
 	# Apply right arm (attacking arm)
 	if right_arm_upper:
@@ -652,11 +652,12 @@ static func animate_attack(root: Node3D, phase: float) -> void:
 		right_arm_lower.rotation.x = elbow_bend
 
 	# Left arm — slight guard position during strike
+	var guard: float = clampf(1.0 - phase * 2.0, 0.0, 1.0)
 	if left_arm_upper:
-		left_arm_upper.rotation.x = lerpf(0.0, -0.3, clampf(1.0 - phase * 2.0, 0.0, 1.0))
-		left_arm_upper.rotation.z = lerpf(0.0, 0.2, clampf(1.0 - phase * 2.0, 0.0, 1.0))
+		left_arm_upper.rotation.x = lerpf(0.0, 0.3, guard)
+		left_arm_upper.rotation.z = lerpf(0.0, 0.2, guard)
 	if left_arm_lower:
-		left_arm_lower.rotation.x = lerpf(0.0, -0.5, clampf(1.0 - phase * 2.0, 0.0, 1.0))
+		left_arm_lower.rotation.x = lerpf(0.0, -0.5, guard)
 
 	# Torso lean forward during strike
 	if head_group:
@@ -668,13 +669,12 @@ static func animate_attack(root: Node3D, phase: float) -> void:
 	if phase < 0.6:
 		var step: float = sin(phase / 0.6 * PI) * 0.15
 		if right_leg_upper:
-			right_leg_upper.rotation.x = step  # Right foot steps forward with punch
+			right_leg_upper.rotation.x = -step  # Right foot steps forward with punch
 		if left_leg_upper:
-			left_leg_upper.rotation.x = -step * 0.3  # Left leg braces
+			left_leg_upper.rotation.x = step * 0.3  # Left leg braces
 	else:
-		var t: float = (phase - 0.6) / 0.4
 		if right_leg_upper:
-			right_leg_upper.rotation.x = lerpf(0.0, 0.0, t)
+			right_leg_upper.rotation.x = 0.0
 		if left_leg_upper:
 			left_leg_upper.rotation.x = 0.0
 
