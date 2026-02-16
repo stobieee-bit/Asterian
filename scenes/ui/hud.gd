@@ -322,6 +322,9 @@ func _process(delta: float) -> void:
 	# ── Distance check: close interaction panels if player walks away ──
 	_check_interaction_distance()
 
+	# ── Ability queue indicator — highlight queued ability button ──
+	_update_ability_queue_highlight(delta)
+
 func _unhandled_input(event: InputEvent) -> void:
 	# ── Chat input: Enter to open, Escape to close ──
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -1111,6 +1114,8 @@ func _build_adrenaline_bar() -> void:
 var _ability_bar: HBoxContainer = null
 var _ability_bar_bg: PanelContainer = null
 var _ability_buttons: Array[Button] = []
+var _queue_pulse_time: float = 0.0
+var _last_queued_slot: int = -1  # Track to restore buttons when queue clears
 
 ## Build 5 ability buttons + eat food button, centered above action bar
 func _build_ability_bar() -> void:
@@ -1226,6 +1231,48 @@ func _reposition_stat_bars() -> void:
 		vp_size.x / 2.0 - container_width / 2.0,
 		vp_size.y - 178
 	)
+
+## Highlight the queued ability button with a pulsing glow border
+func _update_ability_queue_highlight(delta: float) -> void:
+	if _player == null:
+		return
+	var combat: Node = _player.get_node_or_null("CombatController")
+	if combat == null:
+		return
+
+	var queued_slot: int = int(combat.get("_queued_ability_slot")) if "_queued_ability_slot" in combat else -1
+
+	# If queue cleared, restore the previously highlighted button
+	if queued_slot <= 0 and _last_queued_slot > 0:
+		var prev_idx: int = _last_queued_slot - 1
+		if prev_idx >= 0 and prev_idx < _ability_buttons.size():
+			var btn: Button = _ability_buttons[prev_idx]
+			var normal_style: StyleBoxFlat = btn.get_theme_stylebox("normal") as StyleBoxFlat
+			if normal_style:
+				normal_style.border_color.a = 0.4
+				normal_style.set_border_width_all(0)
+				normal_style.border_width_bottom = 2
+		_last_queued_slot = -1
+		_queue_pulse_time = 0.0
+		return
+
+	if queued_slot <= 0:
+		return
+
+	# Pulse animation
+	_queue_pulse_time += delta * 5.0
+	var pulse: float = 0.5 + sin(_queue_pulse_time) * 0.5  # 0.0 to 1.0
+
+	var btn_idx: int = queued_slot - 1
+	if btn_idx >= 0 and btn_idx < _ability_buttons.size():
+		var btn: Button = _ability_buttons[btn_idx]
+		var normal_style: StyleBoxFlat = btn.get_theme_stylebox("normal") as StyleBoxFlat
+		if normal_style:
+			# Pulsing bright border on all sides
+			normal_style.border_color = Color(1.0, 1.0, 1.0, 0.4 + pulse * 0.5)
+			normal_style.set_border_width_all(2)
+
+	_last_queued_slot = queued_slot
 
 ## Create a styled ability button with keybind + name + cost badge
 func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost: int, cost_text_override: String = "", is_icon: bool = false) -> Button:

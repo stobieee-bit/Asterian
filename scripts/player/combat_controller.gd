@@ -41,6 +41,12 @@ var base_attack_speed: float:
 const GCD_TIME: float = 1.8           ## Minimum time between ability uses
 var _gcd_timer: float = 0.0
 
+# ── Ability queue (RS3-style) ──
+var _queued_ability_slot: int = -1        ## -1 = no queue, 1-5 = queued slot
+var _queued_ability_timeout: float = 0.0  ## Clear queue if it sits too long
+const QUEUE_TIMEOUT: float = 3.0          ## Max seconds an ability can sit in queue
+var _ability_fired_this_frame: bool = false  ## Suppress auto-attack on ability tick
+
 # ── Regen settings ──
 const REGEN_INTERVAL: float = 5.0    ## Seconds between passive HP/energy ticks
 const REGEN_HP_PERCENT: float = 0.02 ## 2% max HP per tick (out of combat only)
@@ -100,6 +106,9 @@ func _ready() -> void:
 	_player.add_child(_target_indicator)
 
 func _process(delta: float) -> void:
+	# Reset per-frame flag
+	_ability_fired_this_frame = false
+
 	# Update target indicator position
 	if target and is_instance_valid(target) and target.state != target.State.DEAD:
 		_target_indicator.visible = true
@@ -110,7 +119,24 @@ func _process(delta: float) -> void:
 		if target and (not is_instance_valid(target) or target.state == target.State.DEAD):
 			_clear_target()
 
-	# Auto-attack (use XZ distance so large boss Y offset doesn't prevent melee)
+	# ── Tick down ability queue timeout ──
+	if _queued_ability_slot > 0:
+		_queued_ability_timeout -= delta
+		if _queued_ability_timeout <= 0.0:
+			_queued_ability_slot = -1  # Queue expired
+
+	# ── Tick down GCD ──
+	if _gcd_timer > 0:
+		_gcd_timer -= delta
+
+	# ── Fire queued ability as soon as GCD expires ──
+	if _queued_ability_slot > 0 and _gcd_timer <= 0:
+		var queued_slot: int = _queued_ability_slot
+		_queued_ability_slot = -1  # Clear before firing (prevents re-queue loop)
+		use_ability(queued_slot)
+		# use_ability sets _ability_fired_this_frame = true on success
+
+	# ── Auto-attack (use XZ distance so large boss Y offset doesn't prevent melee) ──
 	if target and is_instance_valid(target) and target.state != target.State.DEAD:
 		var to_target_xz: Vector2 = Vector2(target.global_position.x - _player.global_position.x, target.global_position.z - _player.global_position.z)
 		var dist: float = to_target_xz.length()
@@ -123,7 +149,8 @@ func _process(delta: float) -> void:
 			is_in_combat = true
 			_combat_exit_timer = 0.0
 			attack_timer -= delta
-			if attack_timer <= 0:
+			# Only auto-attack if no ability fired this tick (ability replaces auto)
+			if attack_timer <= 0 and not _ability_fired_this_frame:
 				_do_attack()
 				attack_timer = base_attack_speed
 		else:
@@ -141,10 +168,6 @@ func _process(delta: float) -> void:
 
 	# Passive HP/energy regen (only out of combat)
 	_process_regen(delta)
-
-	# GCD cooldown
-	if _gcd_timer > 0:
-		_gcd_timer -= delta
 
 	# Food cooldown
 	if _food_cooldown_timer > 0:
@@ -404,6 +427,7 @@ func refresh_abilities() -> void:
 
 ## Use style-based ability (data-driven from abilities.json).
 ## Slot 1-5 corresponds to current style's abilities sorted by slot.
+## If GCD is active, queues the ability to fire when GCD expires (RS3-style).
 func use_ability(ability_slot: int) -> bool:
 	if target == null or not is_instance_valid(target):
 		EventBus.chat_message.emit("No target selected.", "system")
@@ -411,25 +435,28 @@ func use_ability(ability_slot: int) -> bool:
 	if target.state == target.State.DEAD:
 		return false
 
-	# Check GCD
-	if _gcd_timer > 0:
-		return false
-
 	# Refresh if empty
 	if _active_abilities.is_empty():
 		refresh_abilities()
 
-	# Find the ability for this slot
+	# Find the ability for this slot (need name before GCD check for queue message)
 	var slot_idx: int = ability_slot - 1
 	if slot_idx < 0 or slot_idx >= _active_abilities.size():
 		return false
 
 	var ab: Dictionary = _active_abilities[slot_idx]
+	var ability_name: String = str(ab.get("name", "Ability"))
+
+	# Check GCD — if active, queue this ability instead of rejecting
+	if _gcd_timer > 0:
+		_queued_ability_slot = ability_slot
+		_queued_ability_timeout = QUEUE_TIMEOUT
+		return false
+
 	var adrenaline: float = float(GameState.player["adrenaline"])
 	var cost: float = float(ab.get("adr_cost", 0))
 	var adr_gain: float = float(ab.get("adr_gain", 0))
 	var damage_mult: float = float(ab.get("damage_mult", 1.0))
-	var ability_name: String = str(ab.get("name", "Ability"))
 	var tier: String = str(ab.get("tier", "basic"))
 	var style: String = str(GameState.player["combat_style"])
 	var effects: Array = ab.get("effects", [])
@@ -494,9 +521,10 @@ func use_ability(ability_slot: int) -> bool:
 		var ring_slot: int = 2 if tier == "threshold" else 3
 		_spawn_impact_ring(target_pos, ability_color, ring_slot)
 
-	# Reset attack timer and start GCD
+	# Reset attack timer and start GCD — ability replaces the next auto-attack
 	attack_timer = base_attack_speed
 	_gcd_timer = GCD_TIME
+	_ability_fired_this_frame = true  # Suppress auto-attack this tick
 
 	# Face target
 	var to_target: Vector3 = target_pos - _player.global_position
