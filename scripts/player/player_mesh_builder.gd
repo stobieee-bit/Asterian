@@ -139,24 +139,33 @@ static func _color_close(a: Color, b: Color, tol: float = 0.05) -> bool:
 
 
 ## Apply a combat style color theme to an already-built mesh root.
-## Walks all MeshInstance3D descendants, identifies which semantic slot each
-## material belongs to, and recolors it to the theme's palette.
+## First call tags each mesh with its semantic slot (via metadata).
+## Subsequent calls use the stored slot tag to recolor correctly.
 static func apply_style_theme(root: Node3D, style: String) -> void:
 	var theme: Dictionary = _get_style_theme(style)
 	if theme.is_empty():
 		return
-	_apply_theme_recursive(root, theme)
+	var needs_tagging: bool = not root.has_meta("_style_tagged")
+	_apply_theme_recursive(root, theme, needs_tagging)
+	if needs_tagging:
+		root.set_meta("_style_tagged", true)
 
 
-static func _apply_theme_recursive(node: Node, theme: Dictionary) -> void:
+static func _apply_theme_recursive(node: Node, theme: Dictionary, tag: bool) -> void:
 	if node is MeshInstance3D:
 		var mi: MeshInstance3D = node as MeshInstance3D
 		var mat: StandardMaterial3D = mi.get_surface_override_material(0) as StandardMaterial3D
 		if mat == null:
-			# Try material property
 			mat = mi.material_override as StandardMaterial3D
 		if mat != null:
-			var slot: String = _color_to_slot(mat.albedo_color)
+			var slot: String = ""
+			# Use stored slot tag if available, otherwise detect from original color
+			if mi.has_meta("_color_slot"):
+				slot = str(mi.get_meta("_color_slot"))
+			else:
+				slot = _color_to_slot(mat.albedo_color)
+				if slot != "" and tag:
+					mi.set_meta("_color_slot", slot)
 			if slot != "" and theme.has(slot):
 				var new_col: Color = theme[slot] as Color
 				var alpha: float = mat.albedo_color.a
@@ -165,7 +174,7 @@ static func _apply_theme_recursive(node: Node, theme: Dictionary) -> void:
 				if mat.emission_enabled:
 					mat.emission = new_col
 	for child in node.get_children():
-		_apply_theme_recursive(child, theme)
+		_apply_theme_recursive(child, theme, tag)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
