@@ -3,7 +3,8 @@
 ## A being that warps reality around it. Fractured outer shell with an inner
 ## void sphere, bright emissive "reality cracks" leaking through, orbiting
 ## debris fragments, and spinning distortion rings at various angles.
-## ~35-40 mesh nodes. Animates fragment orbits, ring spins, body pulse.
+## ~78 mesh nodes. Animates fragment orbits, ring spins, body pulse,
+## void eye rotation, tendril wave, glitch flicker.
 class_name RealityWarperMesh
 extends EnemyMeshBuilder
 
@@ -45,6 +46,17 @@ func build_mesh(params: Dictionary) -> Node3D:
 		EnemyMeshBuilder.lighten(base_color, 0.15), 0.3, 0.3,
 		EnemyMeshBuilder.lighten(base_color, 0.2), 2.0,
 		true, 0.5)
+	var mat_void_eye: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(1.0, 0.0, 0.5), 0.0, 0.2,
+		Color(1.0, 0.0, 0.5), 4.0,
+		true, 0.5)
+	var mat_tendril: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(base_color, 0.1), 0.2, 0.4,
+		base_color, 1.2,
+		true, 0.4)
+	var mat_glitch: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.0, 1.0, 0.5), 0.0, 0.2,
+		Color(0.0, 1.0, 0.5), 3.0)
 
 	# ══════════════════════════════════════════════════════════════
 	# INNER VOID — dark core sphere
@@ -236,6 +248,171 @@ func build_mesh(params: Dictionary) -> Node3D:
 		root, 0.6 * s, Vector3(0.0, body_y, 0.0), mat_outer_shell)
 	outer_shell.name = "OuterShell"
 
+	# ══════════════════════════════════════════════════════════════
+	# CENTRAL VOID EYE — iris torus, pupil sphere, eye glow
+	# ══════════════════════════════════════════════════════════════
+
+	var void_eye: Array[MeshInstance3D] = []
+	var eye_pos: Vector3 = Vector3(0.0, body_y + 0.05 * s, -0.33 * s)
+	var iris_torus: MeshInstance3D = EnemyMeshBuilder.add_torus(
+		root, 0.015 * s, 0.06 * s, eye_pos, mat_void_eye,
+		Vector3(PI * 0.5, 0.0, 0.0))
+	iris_torus.name = "IrisTorus"
+	void_eye.append(iris_torus)
+	var pupil_sphere: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.03 * s,
+		Vector3(eye_pos.x, eye_pos.y, eye_pos.z - 0.02 * s), mat_void)
+	pupil_sphere.name = "Pupil"
+	var eye_glow: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.04 * s,
+		Vector3(eye_pos.x, eye_pos.y, eye_pos.z + 0.01 * s), mat_void_eye)
+	eye_glow.name = "EyeGlow"
+
+	# ══════════════════════════════════════════════════════════════
+	# REALITY TENDRILS — reaching capsules radiating from the body
+	# ══════════════════════════════════════════════════════════════
+
+	# Each tendril: [position_offset, rotation]
+	var tendril_data: Array = [
+		[Vector3(0.25, 0.1, 0.15),   Vector3(0.3, 0.0, -0.8)],
+		[Vector3(-0.22, 0.12, 0.18), Vector3(0.4, 0.0, 0.7)],
+		[Vector3(0.18, -0.1, -0.22), Vector3(-0.5, 0.0, -0.4)],
+		[Vector3(-0.2, -0.08, -0.2), Vector3(-0.3, 0.0, 0.6)],
+		[Vector3(0.0, 0.25, 0.2),    Vector3(0.8, 0.0, 0.0)],
+		[Vector3(0.0, -0.22, -0.18), Vector3(-0.7, 0.0, 0.2)],
+	]
+	var tendrils: Array[MeshInstance3D] = []
+	for ti: int in range(tendril_data.size()):
+		var td: Array = tendril_data[ti]
+		var t_pos: Vector3 = (td[0] as Vector3) * s + Vector3(0.0, body_y, 0.0)
+		var t_rot: Vector3 = td[1] as Vector3
+		var tendril: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.015 * s, 0.2 * s, t_pos, mat_tendril, t_rot)
+		tendril.name = "Tendril%d" % ti
+		tendrils.append(tendril)
+
+	# ══════════════════════════════════════════════════════════════
+	# ADDITIONAL REALITY CRACKS — 6 more crack capsules
+	# ══════════════════════════════════════════════════════════════
+
+	var extra_crack_data: Array = [
+		[Vector3(0.1, 0.06, 0.05),    Vector3(0.6, -0.3, 0.9),   0.36],
+		[Vector3(-0.09, 0.0, -0.08),  Vector3(-0.4, 0.7, -0.2),  0.40],
+		[Vector3(0.05, -0.07, 0.1),   Vector3(1.0, 0.1, -0.5),   0.33],
+		[Vector3(-0.07, 0.1, 0.06),   Vector3(-0.8, -0.5, 0.3),  0.38],
+		[Vector3(0.02, -0.06, -0.12), Vector3(0.5, 0.9, 0.1),    0.42],
+		[Vector3(-0.1, 0.04, 0.0),    Vector3(-0.1, -0.7, 0.8),  0.35],
+	]
+	for eci: int in range(extra_crack_data.size()):
+		var ecd: Array = extra_crack_data[eci]
+		var ec_pos: Vector3 = (ecd[0] as Vector3) * s + Vector3(0.0, body_y, 0.0)
+		var ec_rot: Vector3 = ecd[1] as Vector3
+		var ec_len: float = (ecd[2] as float) * s
+		var ec_mat: StandardMaterial3D = mat_crack if eci % 2 == 0 else mat_crack_warm
+		var extra_crack: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.012 * s, ec_len, ec_pos, ec_mat, ec_rot)
+		extra_crack.name = "Crack%d" % (5 + eci)
+		cracks.append(extra_crack)
+
+	# ══════════════════════════════════════════════════════════════
+	# ADDITIONAL DEBRIS — 6 more fragments on the fragment pivot
+	# ══════════════════════════════════════════════════════════════
+
+	var extra_frag_data: Array = [
+		[0.62, 0.08,  0.52,  true,  0.045],
+		[0.47, -0.18, 1.18,  false, 0.05],
+		[0.54, 0.2,   2.0,   true,  0.04],
+		[0.59, -0.1,  2.75,  false, 0.035],
+		[0.51, 0.14,  4.2,   true,  0.05],
+		[0.57, -0.06, 5.1,   false, 0.04],
+	]
+	for efi: int in range(extra_frag_data.size()):
+		var efd: Array = extra_frag_data[efi]
+		var e_orbit_r: float = (efd[0] as float) * s
+		var e_h_off: float = (efd[1] as float) * s
+		var e_angle: float = efd[2] as float
+		var e_is_box: bool = efd[3] as bool
+		var e_frag_size: float = (efd[4] as float) * s
+		var e_frag_pos: Vector3 = Vector3(
+			cos(e_angle) * e_orbit_r,
+			e_h_off,
+			sin(e_angle) * e_orbit_r)
+		var e_frag_mat: StandardMaterial3D = mat_fragment if efi % 2 == 0 else mat_fragment_dark
+		var e_frag_rot: Vector3 = Vector3(e_angle * 0.4, e_angle * 1.1, e_angle * 0.6)
+		var extra_frag: MeshInstance3D
+		if e_is_box:
+			var e_box_size: Vector3 = Vector3(e_frag_size, e_frag_size * 1.3, e_frag_size * 0.8)
+			extra_frag = EnemyMeshBuilder.add_box(
+				frag_pivot, e_box_size, e_frag_pos, e_frag_mat, e_frag_rot)
+		else:
+			extra_frag = EnemyMeshBuilder.add_sphere(
+				frag_pivot, e_frag_size, e_frag_pos, e_frag_mat,
+				Vector3(1.0, 0.8, 1.2))
+		extra_frag.name = "Fragment%d" % (8 + efi)
+		fragments.append(extra_frag)
+
+	# ══════════════════════════════════════════════════════════════
+	# ADDITIONAL DISTORTION RINGS — 2 more torus rings
+	# ══════════════════════════════════════════════════════════════
+
+	var extra_ring_data: Array = [
+		[Vector3(0.7, -0.5, 0.9),  0.045, 0.44],
+		[Vector3(-0.9, 0.6, -0.3), 0.05,  0.40],
+	]
+	for eri: int in range(extra_ring_data.size()):
+		var erd: Array = extra_ring_data[eri]
+		var er_tilt: Vector3 = erd[0] as Vector3
+		var er_inner: float = (erd[1] as float) * s
+		var er_outer: float = (erd[2] as float) * s
+		var extra_ring_pivot: Node3D = Node3D.new()
+		extra_ring_pivot.name = "RingPivot%d" % (3 + eri)
+		extra_ring_pivot.position = Vector3(0.0, body_y, 0.0)
+		extra_ring_pivot.rotation = er_tilt
+		root.add_child(extra_ring_pivot)
+		var extra_ring: MeshInstance3D = EnemyMeshBuilder.add_torus(
+			extra_ring_pivot, er_inner, er_outer,
+			Vector3.ZERO, mat_ring)
+		extra_ring.name = "Ring%d" % (3 + eri)
+		ring_pivots.append(extra_ring_pivot)
+
+	# ══════════════════════════════════════════════════════════════
+	# GLITCH FRAGMENTS — flickering boxes floating around the body
+	# ══════════════════════════════════════════════════════════════
+
+	var glitch_positions: Array = [
+		Vector3(0.3, 0.15, -0.1),
+		Vector3(-0.28, -0.1, 0.22),
+		Vector3(0.12, -0.2, -0.28),
+		Vector3(-0.18, 0.25, 0.12),
+	]
+	var glitch_frags: Array[MeshInstance3D] = []
+	for gi: int in range(glitch_positions.size()):
+		var g_pos: Vector3 = (glitch_positions[gi] as Vector3) * s + Vector3(0.0, body_y, 0.0)
+		var g_rot: Vector3 = Vector3(float(gi) * 0.7, float(gi) * 1.3, float(gi) * 0.4)
+		var g_size: Vector3 = Vector3(0.03 * s, 0.03 * s, 0.03 * s)
+		var glitch_frag: MeshInstance3D = EnemyMeshBuilder.add_box(
+			root, g_size, g_pos, mat_glitch, g_rot)
+		glitch_frag.name = "GlitchFrag%d" % gi
+		glitch_frags.append(glitch_frag)
+
+	# ══════════════════════════════════════════════════════════════
+	# SHELL SURFACE RIDGES — thin capsules on the main shell
+	# ══════════════════════════════════════════════════════════════
+
+	var ridge_data: Array = [
+		[Vector3(0.0, 0.15, -0.3),   Vector3(0.2, 0.0, 0.6)],
+		[Vector3(0.28, 0.05, 0.12),  Vector3(-0.4, 0.7, 0.0)],
+		[Vector3(-0.26, -0.08, 0.1), Vector3(0.5, -0.3, -0.5)],
+		[Vector3(0.1, -0.14, -0.25), Vector3(-0.6, 0.4, 0.3)],
+	]
+	for rdi: int in range(ridge_data.size()):
+		var rdd: Array = ridge_data[rdi]
+		var rd_pos: Vector3 = (rdd[0] as Vector3) * s + Vector3(0.0, body_y, 0.0)
+		var rd_rot: Vector3 = rdd[1] as Vector3
+		var ridge: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.006 * s, 0.2 * s, rd_pos, mat_shell, rd_rot)
+		ridge.name = "ShellRidge%d" % rdi
+
 	# ── Store animatable parts ──
 	root.set_meta("frag_pivot", frag_pivot)
 	root.set_meta("fragments", fragments)
@@ -245,6 +422,9 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("core_glow", core_glow)
 	root.set_meta("motes", motes)
 	root.set_meta("outer_shell", outer_shell)
+	root.set_meta("void_eye", void_eye)
+	root.set_meta("tendrils", tendrils)
+	root.set_meta("glitch_frags", glitch_frags)
 	root.set_meta("body_y", body_y)
 	root.set_meta("scale", s)
 
@@ -282,16 +462,16 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 	# ── Distortion rings — each ring spins at its own rate/axis ──
 	if root.has_meta("ring_pivots"):
 		var ring_pivots: Array = root.get_meta("ring_pivots") as Array
-		var ring_speeds: Array = [0.8, -0.6, 1.1]
+		var ring_speeds: Array = [0.8, -0.6, 1.1, -0.9, 0.7]
 		for i: int in range(ring_pivots.size()):
 			var pivot: Node3D = ring_pivots[i] as Node3D
 			if pivot == null:
 				continue
-			var spd: float = ring_speeds[i] as float
+			var spd: float = ring_speeds[i % ring_speeds.size()] as float
 			if is_moving:
 				spd *= 1.5
 			# Spin around a different axis per ring for variety
-			match i:
+			match i % 3:
 				0:
 					pivot.rotation.y += spd * delta
 				1:
@@ -339,3 +519,33 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 			mote.scale = Vector3(mote_pulse, mote_pulse, mote_pulse)
 			# Subtle positional drift
 			mote.position.y += sin(mote_phase * 0.7) * delta * 0.01
+
+	# ── Void eye iris — steady rotation ──
+	if root.has_meta("void_eye"):
+		var void_eye: Array = root.get_meta("void_eye") as Array
+		for i: int in range(void_eye.size()):
+			var eye_part: MeshInstance3D = void_eye[i] as MeshInstance3D
+			if eye_part == null:
+				continue
+			eye_part.rotation.z = phase * 2.0
+
+	# ── Reality tendrils — wave motion ──
+	if root.has_meta("tendrils"):
+		var tendrils: Array = root.get_meta("tendrils") as Array
+		for i: int in range(tendrils.size()):
+			var tendril: MeshInstance3D = tendrils[i] as MeshInstance3D
+			if tendril == null:
+				continue
+			tendril.rotation.x = sin(phase * 1.5 + float(i) * 1.0) * 0.3
+
+	# ── Glitch fragments — visibility flicker via scale ──
+	if root.has_meta("glitch_frags"):
+		var glitch_frags: Array = root.get_meta("glitch_frags") as Array
+		for i: int in range(glitch_frags.size()):
+			var gf: MeshInstance3D = glitch_frags[i] as MeshInstance3D
+			if gf == null:
+				continue
+			if sin(phase * 8.0 + float(i) * 2.0) > 0.3:
+				gf.scale = Vector3.ZERO
+			else:
+				gf.scale = Vector3(1.0, 1.0, 1.0)

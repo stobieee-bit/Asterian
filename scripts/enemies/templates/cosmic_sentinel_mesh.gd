@@ -4,7 +4,7 @@
 ## geometric head with glowing eye visor, bulky arms with pauldrons,
 ## thick legs with cube feet, energy core in chest, and floating
 ## cosmic shards near the shoulders.
-## ~45-55 mesh nodes. Heavy march walk, core pulse, shard orbit.
+## ~83 mesh nodes. Heavy march walk, core pulse, shard orbit, exhaust vent pulse.
 class_name CosmicSentinelMesh
 extends EnemyMeshBuilder
 
@@ -46,6 +46,15 @@ func build_mesh(params: Dictionary) -> Node3D:
 	# Joint/undersuit material (dark, matte)
 	var mat_joint: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
 		EnemyMeshBuilder.darken(base_color, 0.2), 0.3, 0.7)
+	# Exhaust vent material (warm emissive glow)
+	var mat_exhaust: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.darken(glow_color, 0.1), 0.3, 0.4,
+		EnemyMeshBuilder.darken(glow_color, 0.1), 2.0)
+	# Visor reflection material (translucent cyan)
+	var mat_visor_reflect: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.5, 1.0, 1.0), 0.1, 0.15,
+		Color(0.5, 1.0, 1.0), 1.5,
+		true, 0.3)
 
 	# ── Body layout ──
 	var body_y: float = 1.2 * s  # center of torso height
@@ -304,6 +313,188 @@ func build_mesh(params: Dictionary) -> Node3D:
 			Vector3(0.4, 0.6 + float(i) * 0.3, 0.2))
 		shards.append(shard)
 
+	# ══════════════════════════════════════════════════════
+	# PANEL LINES ON TORSO -- 6 thin capsules as surface detail
+	# ══════════════════════════════════════════════════════
+	var panel_line_0: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.004 * s, 0.15 * s,
+		Vector3(-0.12 * s, body_y + 0.15 * s, 0.3 * s),
+		mat_armor_dark,
+		Vector3(0.0, 0.0, 0.3))
+	var panel_line_1: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.004 * s, 0.15 * s,
+		Vector3(0.12 * s, body_y + 0.15 * s, 0.3 * s),
+		mat_armor_dark,
+		Vector3(0.0, 0.0, -0.3))
+	var panel_line_2: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.004 * s, 0.15 * s,
+		Vector3(-0.28 * s, body_y, 0.18 * s),
+		mat_armor_dark,
+		Vector3(0.5, 0.0, 0.0))
+	var panel_line_3: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.004 * s, 0.15 * s,
+		Vector3(0.28 * s, body_y, 0.18 * s),
+		mat_armor_dark,
+		Vector3(-0.5, 0.0, 0.0))
+	var panel_line_4: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.004 * s, 0.15 * s,
+		Vector3(0.0, body_y - 0.1 * s, 0.32 * s),
+		mat_armor_dark,
+		Vector3(0.0, 0.0, PI / 2.0))
+	var panel_line_5: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.004 * s, 0.15 * s,
+		Vector3(0.0, body_y + 0.2 * s, -0.3 * s),
+		mat_armor_dark,
+		Vector3(0.0, 0.0, PI / 2.0))
+
+	# ══════════════════════════════════════════════════════
+	# ARMOR RIVETS -- 8 tiny spheres at armor plate corners
+	# ══════════════════════════════════════════════════════
+	# Chest plate left corners
+	var rivet_0: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.012 * s,
+		Vector3(-0.28 * s, body_y + 0.2 * s, 0.32 * s),
+		mat_armor_dark)
+	var rivet_1: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.012 * s,
+		Vector3(-0.08 * s, body_y - 0.06 * s, 0.32 * s),
+		mat_armor_dark)
+	# Chest plate right corners
+	var rivet_2: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.012 * s,
+		Vector3(0.28 * s, body_y + 0.2 * s, 0.32 * s),
+		mat_armor_dark)
+	var rivet_3: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.012 * s,
+		Vector3(0.08 * s, body_y - 0.06 * s, 0.32 * s),
+		mat_armor_dark)
+	# Back plate corners
+	var rivet_4: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.012 * s,
+		Vector3(-0.16 * s, body_y + 0.18 * s, -0.34 * s),
+		mat_armor_dark)
+	var rivet_5: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.012 * s,
+		Vector3(0.16 * s, body_y + 0.18 * s, -0.34 * s),
+		mat_armor_dark)
+	# Side plate corners
+	var rivet_6: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.012 * s,
+		Vector3(-0.38 * s, body_y + 0.1 * s, 0.08 * s),
+		mat_armor_dark)
+	var rivet_7: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.012 * s,
+		Vector3(0.38 * s, body_y + 0.1 * s, 0.08 * s),
+		mat_armor_dark)
+
+	# ══════════════════════════════════════════════════════
+	# EXHAUST VENTS ON BACK -- 3 emissive cylinders
+	# ══════════════════════════════════════════════════════
+	var exhaust_vents: Array[MeshInstance3D] = []
+	var vent_0: MeshInstance3D = EnemyMeshBuilder.add_cylinder(
+		root, 0.02 * s, 0.03 * s, 0.06 * s,
+		Vector3(-0.1 * s, body_y + 0.1 * s, -0.38 * s),
+		mat_exhaust)
+	exhaust_vents.append(vent_0)
+	var vent_1: MeshInstance3D = EnemyMeshBuilder.add_cylinder(
+		root, 0.02 * s, 0.03 * s, 0.06 * s,
+		Vector3(0.1 * s, body_y + 0.1 * s, -0.38 * s),
+		mat_exhaust)
+	exhaust_vents.append(vent_1)
+	var vent_2: MeshInstance3D = EnemyMeshBuilder.add_cylinder(
+		root, 0.02 * s, 0.03 * s, 0.06 * s,
+		Vector3(0.0, body_y + 0.2 * s, -0.38 * s),
+		mat_exhaust)
+	exhaust_vents.append(vent_2)
+
+	# ══════════════════════════════════════════════════════
+	# SHIELD RUNES ON PAULDRONS -- 4 flat emissive spheres
+	# ══════════════════════════════════════════════════════
+	# Left pauldron runes (front face)
+	var rune_l0: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.015 * s,
+		Vector3(-0.44 * s, arm_attach_y + 0.08 * s, 0.08 * s),
+		mat_glow,
+		Vector3(0.8, 0.8, 0.3))
+	var rune_l1: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.015 * s,
+		Vector3(-0.52 * s, arm_attach_y + 0.04 * s, 0.08 * s),
+		mat_glow,
+		Vector3(0.8, 0.8, 0.3))
+	# Right pauldron runes (front face)
+	var rune_r0: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.015 * s,
+		Vector3(0.44 * s, arm_attach_y + 0.08 * s, 0.08 * s),
+		mat_glow,
+		Vector3(0.8, 0.8, 0.3))
+	var rune_r1: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.015 * s,
+		Vector3(0.52 * s, arm_attach_y + 0.04 * s, 0.08 * s),
+		mat_glow,
+		Vector3(0.8, 0.8, 0.3))
+
+	# ══════════════════════════════════════════════════════
+	# KNEE PAD DETAILS -- 2 flattened boxes at knee positions
+	# ══════════════════════════════════════════════════════
+	var knee_pad_l: MeshInstance3D = EnemyMeshBuilder.add_box(
+		root, Vector3(0.06 * s, 0.04 * s, 0.06 * s),
+		Vector3(-0.18 * s, hip_y - 0.42 * s, 0.04 * s),
+		mat_armor_dark)
+	var knee_pad_r: MeshInstance3D = EnemyMeshBuilder.add_box(
+		root, Vector3(0.06 * s, 0.04 * s, 0.06 * s),
+		Vector3(0.18 * s, hip_y - 0.42 * s, 0.04 * s),
+		mat_armor_dark)
+
+	# ══════════════════════════════════════════════════════
+	# ADDITIONAL COSMIC SHARDS -- 4 more floating boxes
+	# ══════════════════════════════════════════════════════
+	var extra_shard_angles: Array[float] = [0.8, 2.4, 4.0, 5.6]
+	for i: int in range(4):
+		var angle: float = extra_shard_angles[i]
+		var shard_x: float = cos(angle) * shard_radius
+		var shard_z: float = sin(angle) * shard_radius
+		var shard_y: float = body_y + 0.35 * s + float((i + 1) % 2) * 0.12 * s
+		var shard: MeshInstance3D = EnemyMeshBuilder.add_box(
+			root, Vector3(0.05 * s, 0.08 * s, 0.04 * s),
+			Vector3(shard_x, shard_y, shard_z),
+			mat_shard,
+			Vector3(0.6, 0.3 + float(i) * 0.4, 0.5))
+		shards.append(shard)
+
+	# ══════════════════════════════════════════════════════
+	# VISOR REFLECTION -- 2 translucent spheres behind visor
+	# ══════════════════════════════════════════════════════
+	var visor_refl_l: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.015 * s,
+		Vector3(-0.04 * s, head_y + 0.02 * s, 0.13 * s),
+		mat_visor_reflect)
+	var visor_refl_r: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.015 * s,
+		Vector3(0.04 * s, head_y + 0.02 * s, 0.13 * s),
+		mat_visor_reflect)
+
+	# ══════════════════════════════════════════════════════
+	# ANKLE/WRIST JOINTS -- 4 glowing joint spheres
+	# ══════════════════════════════════════════════════════
+	# Ankle joints (above feet)
+	var ankle_l: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.025 * s,
+		Vector3(-0.18 * s, hip_y - 0.78 * s, 0.0),
+		mat_glow)
+	var ankle_r: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.025 * s,
+		Vector3(0.18 * s, hip_y - 0.78 * s, 0.0),
+		mat_glow)
+	# Wrist joints (above fists)
+	var wrist_l: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.025 * s,
+		Vector3(-0.48 * s, arm_attach_y - 0.64 * s, 0.0),
+		mat_glow)
+	var wrist_r: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.025 * s,
+		Vector3(0.48 * s, arm_attach_y - 0.64 * s, 0.0),
+		mat_glow)
+
 	# ── Store animatable parts ──
 	root.set_meta("left_arm", [upper_arm_l, elbow_l, forearm_l, fist_l, pauldron_l])
 	root.set_meta("right_arm", [upper_arm_r, elbow_r, forearm_r, fist_r, pauldron_r])
@@ -313,6 +504,7 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("shards", shards)
 	root.set_meta("visor", [visor])
 	root.set_meta("head_parts", [head, crest, chin, visor, neck])
+	root.set_meta("exhaust_vents", exhaust_vents)
 	root.set_meta("scale", s)
 	root.set_meta("body_y", body_y)
 
@@ -424,3 +616,10 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 		# Spin the shards on their own axis
 		shard.rotation.y = phase * 2.0 + float(i)
 		shard.rotation.x = phase * 1.5
+
+	# ── Exhaust vent pulse ──
+	var exhaust_vents: Array = root.get_meta("exhaust_vents", []) as Array
+	for i: int in range(exhaust_vents.size()):
+		var vent: MeshInstance3D = exhaust_vents[i] as MeshInstance3D
+		var vent_pulse: float = 1.0 + sin(phase * 3.0 + float(i) * 1.5) * 0.15
+		vent.scale = Vector3(vent_pulse, vent_pulse, vent_pulse)

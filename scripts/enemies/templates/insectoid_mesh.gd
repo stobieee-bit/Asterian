@@ -51,6 +51,20 @@ func build_mesh(params: Dictionary) -> Node3D:
 		Color.BLACK, 0.0,
 		true, 0.45  # Semi-transparent wing covers
 	)
+	var mat_spiracle: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.darken(base_color, 0.15), 0.4, 0.7
+	)
+	var mat_marking: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(base_color, 0.12), 0.6, 0.3
+	)
+	var mat_biolum: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.2, 0.8, 0.3), 0.3, 0.4,
+		Color(0.2, 0.8, 0.3), 1.5
+	)
+	var mat_antenna_tip: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(base_color, 0.1), 0.4, 0.4,
+		EnemyMeshBuilder.lighten(base_color, 0.1), 0.5
+	)
 
 	# ── Body layout offsets (scaled) ──
 	# The insect faces -Z by default. Origin at ground level.
@@ -116,6 +130,32 @@ func build_mesh(params: Dictionary) -> Node3D:
 	)
 	antenna_seg_r.name = "AntennaR"
 
+	# Antenna tip clubs (sensory spheres at antenna ends)
+	var _antenna_tip_l: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		antenna_pivot_l, 0.02 * s,
+		Vector3(-0.05 * s + (-0.05 * s), 0.08 * s + 0.06 * s, -0.1 * s - 0.08 * s),
+		mat_antenna_tip
+	)
+	_antenna_tip_l.name = "AntennaTipL"
+	var _antenna_tip_r: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		antenna_pivot_r, 0.02 * s,
+		Vector3(0.05 * s + 0.05 * s, 0.08 * s + 0.06 * s, -0.1 * s - 0.08 * s),
+		mat_antenna_tip
+	)
+	_antenna_tip_r.name = "AntennaTipR"
+
+	# Head ocelli (3 simple eyes in triangle on top of head)
+	var ocelli_positions: Array[Vector3] = [
+		Vector3(0.0, body_y + 0.18 * s, head_z - 0.02 * s),
+		Vector3(-0.03 * s, body_y + 0.18 * s, head_z + 0.03 * s),
+		Vector3(0.03 * s, body_y + 0.18 * s, head_z + 0.03 * s),
+	]
+	for oi: int in range(3):
+		var ocellus: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+			root, 0.025 * s, ocelli_positions[oi], mat_eye
+		)
+		ocellus.name = "Ocellus%d" % oi
+
 	# ── THORAX (3 segments: prothorax, mesothorax, metathorax) ──
 	var thorax_start_z: float = -0.35 * s
 	var thorax_radii: Array = [0.16, 0.2, 0.19]
@@ -139,6 +179,31 @@ func build_mesh(params: Dictionary) -> Node3D:
 		)
 		plate.name = "ChitinPlate%d" % i
 
+	# Spiracles (breathing pores along thorax sides)
+	for si: int in range(3):
+		var spiracle_z: float = thorax_start_z + float(si) * thorax_spacing
+		var spiracle_x: float = 0.18 * s * thorax_radii[si] / 0.2
+		var spiracle_l: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+			root, 0.012 * s,
+			Vector3(-spiracle_x, body_y - 0.06 * s, spiracle_z), mat_spiracle
+		)
+		spiracle_l.name = "SpiracleL%d" % si
+		var spiracle_r: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+			root, 0.012 * s,
+			Vector3(spiracle_x, body_y - 0.06 * s, spiracle_z), mat_spiracle
+		)
+		spiracle_r.name = "SpiracleR%d" % si
+
+	# Thorax suture lines (dark capsule boundaries between segments)
+	for ti: int in range(3):
+		var suture_z: float = thorax_start_z + (float(ti) + 0.5) * thorax_spacing
+		var suture: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.006 * s, 0.1 * s,
+			Vector3(0, body_y, suture_z), mat_chitin_dark,
+			Vector3(0.0, 0.0, PI * 0.5)
+		)
+		suture.name = "ThoraxSuture%d" % ti
+
 	# ── ABDOMEN (5 segments, tapering) ──
 	var abd_start_z: float = thorax_start_z + 3.0 * thorax_spacing + 0.05 * s
 	var abd_spacing: float = 0.18 * s
@@ -161,6 +226,35 @@ func build_mesh(params: Dictionary) -> Node3D:
 			abd_scale
 		)
 		seg.name = "Abdomen%d" % i
+
+	# Abdomen dorsal markings (racing-stripe spheres on top of each segment)
+	for mi: int in range(5):
+		var mark_taper: float = 1.0 - float(mi) * 0.16
+		var mark_r: float = abd_base_radius * mark_taper
+		var mark_z: float = abd_start_z + float(mi) * abd_spacing
+		var marking: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+			root, 0.03 * s,
+			Vector3(0, body_y - 0.02 * s * float(mi) + mark_r * 0.85, mark_z),
+			mat_marking, Vector3(0.5, 0.2, 1.2)
+		)
+		marking.name = "AbdMarking%d" % mi
+
+	# Bioluminescent markers (emissive side spots on first 2 abdomen segments)
+	for bi: int in range(2):
+		var biolum_taper: float = 1.0 - float(bi) * 0.16
+		var biolum_r: float = abd_base_radius * biolum_taper
+		var biolum_z: float = abd_start_z + float(bi) * abd_spacing
+		var biolum_y: float = body_y - 0.02 * s * float(bi)
+		var biolum_l: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+			root, 0.015 * s,
+			Vector3(-biolum_r * 0.8, biolum_y, biolum_z), mat_biolum
+		)
+		biolum_l.name = "BiolumL%d" % bi
+		var biolum_rv: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+			root, 0.015 * s,
+			Vector3(biolum_r * 0.8, biolum_y, biolum_z), mat_biolum
+		)
+		biolum_rv.name = "BiolumR%d" % bi
 
 	# ── LEGS ──
 	var leg_count: int = 6
@@ -227,6 +321,19 @@ func build_mesh(params: Dictionary) -> Node3D:
 			)
 			tarsus.name = "Tarsus"
 
+		# Leg joint spheres (coxa-femur and femur-tibia junctions)
+		if i < 6:
+			var joint_coxa: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+				leg_pivot, 0.02 * s,
+				Vector3(side * 0.1 * s, -0.06 * s, 0.0), mat_leg
+			)
+			joint_coxa.name = "JointCoxa%d" % i
+			var joint_femur: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+				leg_pivot, 0.02 * s,
+				Vector3(side * 0.22 * s, -0.22 * s, 0.0), mat_leg
+			)
+			joint_femur.name = "JointFemur%d" % i
+
 		legs_array.append(leg_pivot)
 
 	# ── VARIANT-SPECIFIC FEATURES ──
@@ -246,6 +353,19 @@ func build_mesh(params: Dictionary) -> Node3D:
 			Vector3(0.6, 0.15, 1.8)
 		)
 		elytra_r.name = "ElytraR"
+		# Elytra veins (thin capsule markings on wing covers)
+		var elytra_vein_l: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.005 * s, 0.15 * s,
+			Vector3(-0.1 * s, body_y + 0.17 * s, elytra_z + 0.15 * s), mat_chitin_dark,
+			Vector3(PI * 0.5, 0.0, 0.15)
+		)
+		elytra_vein_l.name = "ElytraVeinL"
+		var elytra_vein_r: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.005 * s, 0.15 * s,
+			Vector3(0.1 * s, body_y + 0.17 * s, elytra_z + 0.15 * s), mat_chitin_dark,
+			Vector3(PI * 0.5, 0.0, -0.15)
+		)
+		elytra_vein_r.name = "ElytraVeinR"
 
 	elif variant == "queen":
 		# Crown (torus on top of head)

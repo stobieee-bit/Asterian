@@ -94,19 +94,20 @@ func _process(delta: float) -> void:
 	# Smooth ramp up/down
 	_walk_intensity = move_toward(_walk_intensity, target_intensity, delta * 4.0)
 
+	var current_style: String = str(GameState.player.get("combat_style", "nano"))
 	if _walk_intensity > 0.01:
 		# Walk animation
 		var walk_speed: float = 6.0 + current_speed * 1.5
 		_walk_phase += delta * walk_speed
 		if _walk_phase > TAU * 100.0:
 			_walk_phase -= TAU * 100.0
-		PlayerMeshBuilder.animate_walk(_mesh_root, _walk_phase, _walk_intensity)
+		PlayerMeshBuilder.animate_walk(_mesh_root, _walk_phase, _walk_intensity, current_style)
 	else:
 		# Idle animation
 		_idle_phase += delta
 		if _idle_phase > TAU * 100.0:
 			_idle_phase -= TAU * 100.0
-		PlayerMeshBuilder.animate_idle(_mesh_root, _idle_phase)
+		PlayerMeshBuilder.animate_idle(_mesh_root, _idle_phase, current_style)
 
 
 ## Trigger an attack animation swing

@@ -3,7 +3,9 @@
 ## A menacing dark mass with shadow tendrils, a glowing inner core,
 ## orbiting shadow particles, piercing eyes, shadow puddle below,
 ## and a wispy aura envelope. Tendrils wave, particles orbit, body pulses.
-## ~27 mesh nodes.
+## Surface veins, shadow spikes, extra eyes, ground corruption, energy arcs,
+## and aura ripple rings add menacing detail.
+## ~64 mesh nodes.
 class_name DarkEntityMesh
 extends EnemyMeshBuilder
 
@@ -55,6 +57,27 @@ func build_mesh(params: Dictionary) -> Node3D:
 		base_color, 0.5,
 		true, 0.1)
 
+	# Surface veins -- dark red-purple, emissive, transparent
+	var mat_vein: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.5, 0.1, 0.2), 0.1, 0.5,
+		Color(0.5, 0.1, 0.2), 1.2,
+		true, 0.6)
+
+	# Ground corruption -- very dark near-black
+	var mat_corruption: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.05, 0.02, 0.06), 0.0, 0.95)
+
+	# Inner energy arcs -- bright emissive matching core
+	var mat_arc: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(base_color, 0.30), 0.5, 0.3,
+		EnemyMeshBuilder.lighten(base_color, 0.40), 3.0)
+
+	# Aura ripple rings -- semi-transparent, faint emission
+	var mat_ripple: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		base_color, 0.0, 0.3,
+		base_color, 0.6,
+		true, 0.15)
+
 	# ── Body center height ──
 	var body_y: float = 0.75 * s
 
@@ -87,6 +110,64 @@ func build_mesh(params: Dictionary) -> Node3D:
 		Vector3(0.0, body_y + 0.02 * s, 0.0),
 		mat_tendril,
 		Vector3(1.05, 0.95, 1.05))
+
+	# ── Surface veins/cracks (8 thin emissive capsules on body surface) ──
+	var vein_data: Array[Array] = [
+		[Vector3(0.18 * s, body_y + 0.15 * s, 0.30 * s), Vector3(0.5, 0.2, 0.0)],
+		[Vector3(-0.20 * s, body_y + 0.10 * s, 0.28 * s), Vector3(-0.3, 0.8, 0.1)],
+		[Vector3(0.30 * s, body_y - 0.05 * s, 0.18 * s), Vector3(0.1, -0.4, 0.6)],
+		[Vector3(-0.28 * s, body_y - 0.10 * s, 0.20 * s), Vector3(0.7, 1.2, -0.2)],
+		[Vector3(0.10 * s, body_y + 0.22 * s, -0.28 * s), Vector3(-0.6, 0.3, 0.4)],
+		[Vector3(-0.15 * s, body_y + 0.18 * s, -0.25 * s), Vector3(0.4, -0.7, 0.2)],
+		[Vector3(0.25 * s, body_y - 0.15 * s, -0.22 * s), Vector3(-0.2, 1.0, -0.5)],
+		[Vector3(-0.10 * s, body_y + 0.25 * s, 0.10 * s), Vector3(0.8, 0.5, 0.3)],
+	]
+	for vd: Array in vein_data:
+		var vpos: Vector3 = vd[0] as Vector3
+		var vrot: Vector3 = vd[1] as Vector3
+		EnemyMeshBuilder.add_capsule(
+			root, 0.006 * s, 0.15 * s,
+			vpos,
+			mat_vein,
+			vrot)
+
+	# ── Shadow spikes (6 cones pointing outward from body) ──
+	var shadow_spikes: Array[MeshInstance3D] = []
+	var spike_data: Array[Array] = [
+		[Vector3(0.32 * s, body_y + 0.08 * s, 0.20 * s), Vector3(0.3, 0.0, -0.5)],
+		[Vector3(-0.30 * s, body_y + 0.05 * s, 0.22 * s), Vector3(0.2, PI, 0.6)],
+		[Vector3(0.20 * s, body_y - 0.12 * s, 0.30 * s), Vector3(0.7, 0.5, 0.0)],
+		[Vector3(-0.22 * s, body_y - 0.08 * s, -0.28 * s), Vector3(-0.4, -0.6, 0.3)],
+		[Vector3(0.28 * s, body_y + 0.15 * s, -0.18 * s), Vector3(-0.2, 1.0, -0.4)],
+		[Vector3(-0.10 * s, body_y + 0.20 * s, -0.32 * s), Vector3(0.5, -1.2, 0.2)],
+	]
+	for sd: Array in spike_data:
+		var spos: Vector3 = sd[0] as Vector3
+		var srot: Vector3 = sd[1] as Vector3
+		var spike: MeshInstance3D = EnemyMeshBuilder.add_cone(
+			root, 0.025 * s, 0.12 * s,
+			spos,
+			mat_tendril,
+			srot)
+		shadow_spikes.append(spike)
+
+	# ── Additional eyes (4 smaller emissive eye spheres) ──
+	EnemyMeshBuilder.add_sphere(
+		root, 0.025 * s,
+		Vector3(0.16 * s, body_y + 0.12 * s, 0.32 * s),
+		mat_eye)
+	EnemyMeshBuilder.add_sphere(
+		root, 0.025 * s,
+		Vector3(-0.14 * s, body_y + 0.10 * s, 0.33 * s),
+		mat_eye)
+	EnemyMeshBuilder.add_sphere(
+		root, 0.025 * s,
+		Vector3(0.05 * s, body_y - 0.04 * s, 0.36 * s),
+		mat_eye)
+	EnemyMeshBuilder.add_sphere(
+		root, 0.025 * s,
+		Vector3(-0.04 * s, body_y + 0.16 * s, 0.30 * s),
+		mat_eye)
 
 	# ── Shadow tendrils (6 capsules radiating outward) ──
 	var tendrils: Array[MeshInstance3D] = []
@@ -136,11 +217,56 @@ func build_mesh(params: Dictionary) -> Node3D:
 			Vector3(angle * 0.5, angle, 0.3))
 		particles.append(particle)
 
+	# ── Additional orbiting particles (3 more cubes) ──
+	var extra_particle_angles: Array[float] = [TAU * 0.1, TAU * 0.37, TAU * 0.63]
+	for i: int in range(extra_particle_angles.size()):
+		var angle: float = extra_particle_angles[i]
+		var orbit_r: float = 0.55 * s
+		var px: float = cos(angle) * orbit_r
+		var pz: float = sin(angle) * orbit_r
+		var py: float = body_y + sin(angle * 2.0) * 0.10 * s
+		var cube_size: float = (0.035 + float(i % 2) * 0.015) * s
+		var extra_p: MeshInstance3D = EnemyMeshBuilder.add_box(
+			root, Vector3(cube_size, cube_size, cube_size),
+			Vector3(px, py, pz),
+			mat_particle,
+			Vector3(angle * 0.5, angle, 0.3))
+		particles.append(extra_p)
+	particle_count = 8
+
 	# ── Shadow puddle (flat cylinder under body) ──
 	var puddle: MeshInstance3D = EnemyMeshBuilder.add_cylinder(
 		root, 0.50 * s, 0.55 * s, 0.02 * s,
 		Vector3(0.0, 0.01 * s, 0.0),
 		mat_shadow)
+
+	# ── Ground corruption (6 crack capsules radiating from puddle) ──
+	var corruption_angles: Array[float] = [0.0, 1.05, 2.1, 3.14, 4.19, 5.24]
+	for i: int in range(corruption_angles.size()):
+		var ca: float = corruption_angles[i]
+		var cx: float = cos(ca) * 0.35 * s
+		var cz: float = sin(ca) * 0.35 * s
+		EnemyMeshBuilder.add_capsule(
+			root, 0.008 * s, 0.2 * s,
+			Vector3(cx, 0.02 * s, cz),
+			mat_corruption,
+			Vector3(PI * 0.5, ca, 0.0))
+
+	# ── Inner energy arcs (4 capsules between core and shell) ──
+	var arc_data: Array[Array] = [
+		[Vector3(0.08 * s, body_y + 0.10 * s, 0.06 * s), Vector3(0.4, 0.2, 0.8)],
+		[Vector3(-0.06 * s, body_y + 0.05 * s, -0.08 * s), Vector3(-0.3, 1.0, -0.5)],
+		[Vector3(0.05 * s, body_y - 0.08 * s, -0.07 * s), Vector3(0.7, -0.4, 0.3)],
+		[Vector3(-0.07 * s, body_y - 0.05 * s, 0.09 * s), Vector3(-0.6, 0.8, -0.2)],
+	]
+	for ad: Array in arc_data:
+		var apos: Vector3 = ad[0] as Vector3
+		var arot: Vector3 = ad[1] as Vector3
+		EnemyMeshBuilder.add_capsule(
+			root, 0.005 * s, 0.18 * s,
+			apos,
+			mat_arc,
+			arot)
 
 	# ── Wispy aura (large transparent sphere around everything) ──
 	var aura: MeshInstance3D = EnemyMeshBuilder.add_sphere(
@@ -167,6 +293,41 @@ func build_mesh(params: Dictionary) -> Node3D:
 		mat_particle)
 	motes.append(mote3)
 
+	# ── Additional dark motes (4 more shadow spheres above body) ──
+	var mote4: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.016 * s,
+		Vector3(-0.18 * s, body_y + 0.42 * s, 0.05 * s),
+		mat_particle)
+	motes.append(mote4)
+	var mote5: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.014 * s,
+		Vector3(0.08 * s, body_y + 0.60 * s, -0.10 * s),
+		mat_particle)
+	motes.append(mote5)
+	var mote6: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.017 * s,
+		Vector3(-0.06 * s, body_y + 0.48 * s, 0.15 * s),
+		mat_particle)
+	motes.append(mote6)
+	var mote7: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.013 * s,
+		Vector3(0.12 * s, body_y + 0.52 * s, -0.06 * s),
+		mat_particle)
+	motes.append(mote7)
+
+	# ── Aura ripple rings (2 torus rings around body) ──
+	var aura_rings: Array[MeshInstance3D] = []
+	var ring1: MeshInstance3D = EnemyMeshBuilder.add_torus(
+		root, 0.01 * s, 0.45 * s,
+		Vector3(0.0, body_y + 0.1 * s, 0.0),
+		mat_ripple)
+	aura_rings.append(ring1)
+	var ring2: MeshInstance3D = EnemyMeshBuilder.add_torus(
+		root, 0.01 * s, 0.45 * s,
+		Vector3(0.0, body_y - 0.1 * s, 0.0),
+		mat_ripple)
+	aura_rings.append(ring2)
+
 	# ── Store animatable parts ──
 	root.set_meta("body", [body, body_shell])
 	root.set_meta("core", [core])
@@ -178,6 +339,8 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("particle_count", particle_count)
 	root.set_meta("orbit_radius", 0.55 * s)
 	root.set_meta("body_y", body_y)
+	root.set_meta("shadow_spikes", shadow_spikes)
+	root.set_meta("aura_rings", aura_rings)
 
 	# Built facing +Z, rotate to face -Z (Godot forward)
 	root.rotation.y = PI
@@ -249,3 +412,20 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 			var mote_phase: float = phase * 0.8 + float(i) * 2.2
 			mote.position.y += sin(mote_phase) * 0.002
 			mote.position.x += cos(mote_phase * 1.3) * 0.001
+
+	# ── Shadow spikes -- growth/shrink pulse ──
+	if root.has_meta("shadow_spikes"):
+		var spikes: Array = root.get_meta("shadow_spikes") as Array
+		for i: int in range(spikes.size()):
+			var spike: MeshInstance3D = spikes[i] as MeshInstance3D
+			var spike_scale: float = 1.0 + sin(phase * 2.5 + float(i) * 1.0) * 0.3
+			spike.scale = Vector3(spike_scale, spike_scale, spike_scale)
+
+	# ── Aura ripple rings -- slow rotation and scale pulse ──
+	if root.has_meta("aura_rings"):
+		var rings: Array = root.get_meta("aura_rings") as Array
+		for i: int in range(rings.size()):
+			var ring: MeshInstance3D = rings[i] as MeshInstance3D
+			ring.rotation.y = phase * 0.5 + float(i) * PI
+			var ring_pulse: float = 1.0 + sin(phase * 1.8 + float(i) * 1.5) * 0.05
+			ring.scale = Vector3(ring_pulse, ring_pulse, ring_pulse)

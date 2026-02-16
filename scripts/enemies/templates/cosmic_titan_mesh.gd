@@ -4,7 +4,8 @@
 ## crown of spikes, massive multi-segment arms with energy joints,
 ## pillar legs with energy boots, three glowing eyes on a void face,
 ## cosmic aura rings, orbiting celestial debris, and energy veins.
-## ~55-65 mesh nodes. Cosmic ring rotation, debris orbit, energy pulse, stomp walk.
+## ~108 mesh nodes. Cosmic ring rotation, debris orbit, energy pulse, stomp walk,
+## nebula wisp drift, ring star orbit.
 class_name CosmicTitanMesh
 extends EnemyMeshBuilder
 
@@ -73,6 +74,19 @@ func build_mesh(params: Dictionary) -> Node3D:
 		energy_color, 0.1, 0.2,
 		energy_color, 3.0,
 		true, 0.6)
+	# Nebula wisp material (semi-transparent cosmic haze)
+	var mat_nebula: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(cosmic_glow, 0.15), 0.0, 0.2,
+		EnemyMeshBuilder.lighten(cosmic_glow, 0.15), 0.8,
+		true, 0.2)
+	# Ancient rune marking material (bright emissive glyphs)
+	var mat_rune: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		energy_color, 0.1, 0.1,
+		energy_color, 2.0)
+	# Aura ring star material (tiny intense emissive points)
+	var mat_star: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color.WHITE, 0.0, 0.0,
+		Color.WHITE, 5.0)
 
 	# ── Body layout ──
 	var body_y: float = 1.8 * s  # center of massive torso
@@ -344,6 +358,193 @@ func build_mesh(params: Dictionary) -> Node3D:
 		Vector3(0.0, body_y + 0.42 * s, 0.0),
 		mat_vein)
 
+	# ══════════════════════════════════════════════════════
+	# NEBULA WISPS -- 6 semi-transparent capsules drifting around body
+	# ══════════════════════════════════════════════════════
+	var nebula_wisps: Array[MeshInstance3D] = []
+	var wisp_positions: Array[Vector3] = [
+		Vector3(-0.5 * s, body_y + 0.3 * s, 0.3 * s),
+		Vector3(0.5 * s, body_y + 0.1 * s, -0.3 * s),
+		Vector3(-0.3 * s, body_y - 0.2 * s, 0.5 * s),
+		Vector3(0.4 * s, body_y + 0.4 * s, 0.2 * s),
+		Vector3(-0.2 * s, body_y - 0.1 * s, -0.5 * s),
+		Vector3(0.3 * s, body_y - 0.3 * s, 0.4 * s),
+	]
+	for i: int in range(6):
+		var wisp: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.025 * s, 0.15 * s,
+			wisp_positions[i],
+			mat_nebula,
+			Vector3(0.4 + float(i) * 0.3, float(i) * 0.5, 0.2 * float(i)))
+		nebula_wisps.append(wisp)
+
+	# ══════════════════════════════════════════════════════
+	# ANCIENT RUNE MARKINGS -- 6 emissive flat spheres on body surface
+	# ══════════════════════════════════════════════════════
+	# Torso front
+	var _rune_1: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.025 * s,
+		Vector3(0.0, body_y + 0.2 * s, 0.48 * s),
+		mat_rune,
+		Vector3(0.8, 0.8, 0.2))
+	# Torso back
+	var _rune_2: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.025 * s,
+		Vector3(0.0, body_y + 0.1 * s, -0.48 * s),
+		mat_rune,
+		Vector3(0.8, 0.8, 0.2))
+	# Left shoulder
+	var _rune_3: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.025 * s,
+		Vector3(-0.55 * s, arm_y + 0.05 * s, 0.0),
+		mat_rune,
+		Vector3(0.8, 0.8, 0.2))
+	# Right shoulder
+	var _rune_4: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.025 * s,
+		Vector3(0.55 * s, arm_y + 0.05 * s, 0.0),
+		mat_rune,
+		Vector3(0.8, 0.8, 0.2))
+	# Left upper leg
+	var _rune_5: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.025 * s,
+		Vector3(-0.25 * s, hip_y - 0.1 * s, 0.12 * s),
+		mat_rune,
+		Vector3(0.8, 0.8, 0.2))
+	# Right upper leg
+	var _rune_6: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.025 * s,
+		Vector3(0.25 * s, hip_y - 0.1 * s, 0.12 * s),
+		mat_rune,
+		Vector3(0.8, 0.8, 0.2))
+
+	# ══════════════════════════════════════════════════════
+	# ENERGY CHAINS -- 4 thin capsules linking arm segments
+	# ══════════════════════════════════════════════════════
+	# Left arm: joint1 -> arm2 midpoint
+	var _chain_l1: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.01 * s, 0.15 * s,
+		Vector3(-0.925 * s, arm_y - 0.275 * s, 0.0),
+		mat_vein,
+		Vector3(0.0, 0.0, 0.2))
+	# Left arm: joint2 -> arm3 midpoint
+	var _chain_l2: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.01 * s, 0.15 * s,
+		Vector3(-0.935 * s, arm_y - 0.735 * s, 0.0),
+		mat_vein,
+		Vector3(0.0, 0.0, 0.1))
+	# Right arm: joint1 -> arm2 midpoint
+	var _chain_r1: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.01 * s, 0.15 * s,
+		Vector3(0.925 * s, arm_y - 0.275 * s, 0.0),
+		mat_vein,
+		Vector3(0.0, 0.0, -0.2))
+	# Right arm: joint2 -> arm3 midpoint
+	var _chain_r2: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.01 * s, 0.15 * s,
+		Vector3(0.935 * s, arm_y - 0.735 * s, 0.0),
+		mat_vein,
+		Vector3(0.0, 0.0, -0.1))
+
+	# ══════════════════════════════════════════════════════
+	# CROWN SPIKE DETAIL -- 6 secondary spikes between existing 8
+	# ══════════════════════════════════════════════════════
+	var secondary_spike_count: int = 6
+	for i: int in range(secondary_spike_count):
+		# Place at intermediate angles between existing spikes
+		var angle: float = ((float(i) + 0.5) / float(spike_count)) * TAU
+		var sp_x: float = cos(angle) * spike_ring_radius * 0.9
+		var sp_z: float = sin(angle) * spike_ring_radius * 0.9
+		var tilt_x: float = -sin(angle) * 0.35
+		var tilt_z: float = cos(angle) * 0.35
+		var sec_spike: MeshInstance3D = EnemyMeshBuilder.add_cone(
+			root, 0.035 * s, 0.18 * s,
+			Vector3(sp_x, spike_base_y + 0.08 * s, sp_z),
+			mat_spike,
+			Vector3(tilt_x, 0.0, tilt_z))
+		spikes.append(sec_spike)
+
+	# ══════════════════════════════════════════════════════
+	# ADDITIONAL DEBRIS -- 4 more orbiting chunks
+	# ══════════════════════════════════════════════════════
+	var extra_debris_count: int = 4
+	for i: int in range(extra_debris_count):
+		var idx: int = debris.size()
+		var angle: float = (float(idx) / float(debris_count + extra_debris_count)) * TAU + 0.4
+		var d_x: float = cos(angle) * debris_orbit_radius * 1.1
+		var d_z: float = sin(angle) * debris_orbit_radius * 1.1
+		var d_y: float = body_y + sin(angle * 2.0) * 0.25 * s
+		var chunk_size: float = (0.055 + float(i % 3) * 0.02) * s
+		var chunk: MeshInstance3D = EnemyMeshBuilder.add_box(
+			root, Vector3(chunk_size, chunk_size * 0.75, chunk_size * 1.1),
+			Vector3(d_x, d_y, d_z),
+			mat_debris,
+			Vector3(0.4 + float(i) * 0.25, 0.6 + float(i) * 0.2, 0.15 * float(i)))
+		debris.append(chunk)
+
+	# ══════════════════════════════════════════════════════
+	# FACIAL DETAIL -- brow ridges, mouth slit, chin piece
+	# ══════════════════════════════════════════════════════
+	# Left brow ridge (above left eye)
+	var _brow_l: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.015 * s, 0.08 * s,
+		Vector3(-0.1 * s, face_y + 0.07 * s, face_z + 0.035 * s),
+		mat_void,
+		Vector3(0.0, 0.0, 1.4))
+	# Right brow ridge (above right eye)
+	var _brow_r: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.015 * s, 0.08 * s,
+		Vector3(0.1 * s, face_y + 0.07 * s, face_z + 0.035 * s),
+		mat_void,
+		Vector3(0.0, 0.0, 1.4))
+	# Mouth slit (horizontal capsule below eyes)
+	var _mouth: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.012 * s, 0.1 * s,
+		Vector3(0.0, face_y - 0.1 * s, face_z + 0.025 * s),
+		mat_void,
+		Vector3(0.0, 0.0, 1.57))
+	# Chin piece (small sphere below face)
+	var _chin: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.03 * s,
+		Vector3(0.0, face_y - 0.18 * s, face_z - 0.02 * s),
+		mat_body)
+
+	# ══════════════════════════════════════════════════════
+	# KNEE/ELBOW ENERGY JOINTS -- 4 spheres at joint midpoints
+	# ══════════════════════════════════════════════════════
+	# Left elbow (between arm1 and arm2)
+	var _elbow_l: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.04 * s,
+		Vector3(-0.85 * s, arm_y - 0.275 * s, 0.0),
+		mat_energy)
+	# Right elbow (between arm1 and arm2)
+	var _elbow_r: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.04 * s,
+		Vector3(0.85 * s, arm_y - 0.275 * s, 0.0),
+		mat_energy)
+	# Left knee (between upper and lower leg)
+	var _knee_glow_l: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.04 * s,
+		Vector3(-0.25 * s, hip_y - 0.48 * s, 0.08 * s),
+		mat_energy)
+	# Right knee (between upper and lower leg)
+	var _knee_glow_r: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.04 * s,
+		Vector3(0.25 * s, hip_y - 0.48 * s, 0.08 * s),
+		mat_energy)
+
+	# ══════════════════════════════════════════════════════
+	# AURA RING SURFACE STARS -- 4 tiny emissive points near rings
+	# ══════════════════════════════════════════════════════
+	var ring_stars: Array[MeshInstance3D] = []
+	for i: int in range(4):
+		var angle: float = float(i) * TAU / 4.0
+		var star: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+			root, 0.015 * s,
+			Vector3(cos(angle) * 0.9 * s, body_y + sin(angle) * 0.15 * s, sin(angle) * 0.9 * s),
+			mat_star)
+		ring_stars.append(star)
+
 	# ── Store animatable parts ──
 	root.set_meta("core", [core])
 	root.set_meta("shell", [shell])
@@ -356,6 +557,8 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("right_leg", [r_leg_upper, r_knee, r_leg_lower, r_boot, r_foot])
 	root.set_meta("energy_joints", [l_joint_1, l_joint_2, r_joint_1, r_joint_2, l_knee, r_knee])
 	root.set_meta("veins", [vein_l_shoulder, vein_r_shoulder, vein_l_hip, vein_r_hip, vein_crown])
+	root.set_meta("nebula_wisps", nebula_wisps)
+	root.set_meta("ring_stars", ring_stars)
 	root.set_meta("scale", s)
 	root.set_meta("body_y", body_y)
 
@@ -443,6 +646,25 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 			# Traveling pulse effect along veins
 			var vein_pulse: float = 2.5 + sin(phase * 3.0 + float(i) * 1.3) * 1.5
 			mat.emission_energy_multiplier = vein_pulse
+
+	# ── Nebula wisp drift ──
+	var nebula_wisps: Array = root.get_meta("nebula_wisps", []) as Array
+	for i: int in range(nebula_wisps.size()):
+		var wisp: MeshInstance3D = nebula_wisps[i] as MeshInstance3D
+		wisp.position.y += sin(phase * 0.8 + float(i) * 1.5) * 0.003
+		wisp.position.x += cos(phase * 0.6 + float(i) * 2.0) * 0.002
+		wisp.rotation.z += delta * (0.15 + float(i) * 0.05)
+		wisp.rotation.x += delta * (0.1 + float(i) * 0.03)
+
+	# ── Ring star orbit ──
+	var ring_stars: Array = root.get_meta("ring_stars", []) as Array
+	for i: int in range(ring_stars.size()):
+		var star: MeshInstance3D = ring_stars[i] as MeshInstance3D
+		var star_angle: float = phase * 0.6 + float(i) * TAU / 4.0
+		star.position = Vector3(
+			cos(star_angle) * 0.9 * s,
+			body_y + sin(phase * 0.8 + float(i)) * 0.15 * s,
+			sin(star_angle) * 0.9 * s)
 
 	# ── Heavy stomp walk ──
 	var walk_speed: float = 3.0

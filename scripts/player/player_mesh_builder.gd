@@ -823,7 +823,7 @@ static func build_player_mesh() -> Node3D:
 ## Walk cycle — swing arms and legs in alternating pattern.
 ## `phase` should increase by delta * speed each frame (e.g. 0..2*PI loops).
 ## `intensity` 0..1 controls amplitude (ramp up/down when starting/stopping).
-static func animate_walk(root: Node3D, phase: float, intensity: float = 1.0) -> void:
+static func animate_walk(root: Node3D, phase: float, intensity: float = 1.0, style: String = "") -> void:
 	var swing: float = sin(phase) * 0.45 * intensity
 	var half_swing: float = sin(phase) * 0.2 * intensity
 	var knee_bend: float = maxf(0.0, -sin(phase)) * 0.5 * intensity
@@ -852,15 +852,17 @@ static func animate_walk(root: Node3D, phase: float, intensity: float = 1.0) -> 
 
 	if left_arm_upper:
 		left_arm_upper.rotation.x = -half_swing
-	if right_arm_upper:
-		right_arm_upper.rotation.x = half_swing
 	# Slight elbow bend during swing
 	var elbow_l: float = absf(sin(phase)) * 0.25 * intensity
-	var elbow_r: float = absf(sin(phase + PI)) * 0.25 * intensity
 	if left_arm_lower:
 		left_arm_lower.rotation.x = -elbow_l
+
+	if right_arm_upper:
+		right_arm_upper.rotation.x = half_swing
+	var elbow_r: float = absf(sin(phase + PI)) * 0.25 * intensity
 	if right_arm_lower:
 		right_arm_lower.rotation.x = -elbow_r
+		right_arm_lower.rotation.z = 0.0
 
 	# -- Subtle torso/head bob --
 	var head_group: Node3D = root.get_meta("head_group") as Node3D
@@ -870,7 +872,8 @@ static func animate_walk(root: Node3D, phase: float, intensity: float = 1.0) -> 
 
 ## Idle animation — gentle breathing bob, slight arm sway, energy core pulse.
 ## `phase` should increase by delta each frame (slow continuous counter).
-static func animate_idle(root: Node3D, phase: float) -> void:
+## `style` is the combat style so void mages hold their staff-arm outward.
+static func animate_idle(root: Node3D, phase: float, style: String = "") -> void:
 	var breath: float = sin(phase * 1.5) * 0.008
 	var sway: float = sin(phase * 0.8) * 0.03
 
@@ -882,12 +885,17 @@ static func animate_idle(root: Node3D, phase: float) -> void:
 	# Arms dangle slightly
 	var left_arm_upper: Node3D = root.get_meta("left_arm_upper") as Node3D
 	var right_arm_upper: Node3D = root.get_meta("right_arm_upper") as Node3D
+	var right_arm_lower: Node3D = root.get_meta("right_arm_lower") as Node3D
 	if left_arm_upper:
 		left_arm_upper.rotation.x = sway
 		left_arm_upper.rotation.z = sin(phase * 0.6) * 0.015
+
 	if right_arm_upper:
 		right_arm_upper.rotation.x = -sway
 		right_arm_upper.rotation.z = -sin(phase * 0.6) * 0.015
+	if right_arm_lower:
+		right_arm_lower.rotation.x = 0.0
+		right_arm_lower.rotation.z = 0.0
 
 	# Reset legs to standing
 	var left_leg_upper: Node3D = root.get_meta("left_leg_upper") as Node3D
@@ -1348,8 +1356,9 @@ static func _build_coilgun() -> Node3D:
 static func _build_voidstaff() -> Node3D:
 	var root: Node3D = Node3D.new()
 	root.name = "VoidstaffRoot"
-	root.position = Vector3(0.0, -0.25, -0.06)  # Offset forward (Z) so staff doesn't clip into arm
-	root.rotation.x = deg_to_rad(10)  # Slight forward tilt for natural hold
+	root.position = Vector3(0.12, -0.22, -0.25)  # Outward (X) + forward (Z) — telepathic hold
+	root.rotation.x = deg_to_rad(5)    # Gentle forward tilt
+	root.rotation.z = deg_to_rad(-8)   # Slight outward lean away from body
 
 	# Lower shaft (extends downward)
 	var shaft_low: MeshInstance3D = _cylinder("ShaftLower", 0.012, 0.45, COL_PLATE_DARK, true)

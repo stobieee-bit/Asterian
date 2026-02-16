@@ -91,3 +91,8 @@ signal multiplayer_connected(player_count: int)
 signal multiplayer_disconnected
 signal multiplayer_player_joined(player_name: String)
 signal multiplayer_player_left(player_name: String)
+
+# ── Tutorial signals ──
+signal tutorial_step_completed(step_id: String)
+signal tutorial_skipped
+signal tutorial_completed

@@ -71,7 +71,7 @@ func _process(delta: float) -> void:
 				_gather_timer += delta
 				var progress: float = _gather_timer / _gather_total
 				if _hud and _hud.has_method("show_gather_progress"):
-					_hud.show_gather_progress(progress)
+					_hud.show_gather_progress(progress, _target_gather as Node3D)
 				if _gather_timer >= _gather_total:
 					_complete_gathering()
 		else:
@@ -202,9 +202,9 @@ func _start_gathering() -> void:
 	if _player.has_method("stop_movement"):
 		_player.stop_movement()
 
-	# Show progress bar via HUD
+	# Show progress bar via HUD (floating above the resource node)
 	if _hud and _hud.has_method("show_gather_progress"):
-		_hud.show_gather_progress(0.0)
+		_hud.show_gather_progress(0.0, _target_gather as Node3D)
 
 	EventBus.chat_message.emit("Gathering...", "system")
 

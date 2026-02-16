@@ -4,7 +4,7 @@
 ## spectral arms reaching forward, and ghostly wisp trails. Floats above
 ## ground with a gentle bob and rotation. Everything semi-transparent
 ## with emissive glow.
-## ~25 mesh nodes.
+## ~72 mesh nodes.
 class_name VoidWraithMesh
 extends EnemyMeshBuilder
 
@@ -57,6 +57,22 @@ func build_mesh(params: Dictionary) -> Node3D:
 		EnemyMeshBuilder.lighten(base_color, 0.20), 2.0,
 		true, 0.2)
 
+	# Robe surface runes -- bright emissive glyphs
+	var mat_rune: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(base_color, 0.3), 0.2, 0.3,
+		EnemyMeshBuilder.lighten(base_color, 0.3), 2.5)
+
+	# Spectral chains -- dark metallic links
+	var mat_chain: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.darken(base_color, 0.2), 0.7, 0.3,
+		EnemyMeshBuilder.darken(base_color, 0.2), 0.5)
+
+	# Soul wisps -- bright transparent orbs
+	var mat_soul: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.85, 0.85, 1.0), 0.1, 0.2,
+		Color(0.85, 0.85, 1.0), 3.0,
+		true, 0.4)
+
 	# ── Float offset -- wraith hovers above ground ──
 	var float_y: float = 0.3 * s
 
@@ -72,6 +88,22 @@ func build_mesh(params: Dictionary) -> Node3D:
 		Vector3(0.0, 0.6 * s + float_y, 0.0),
 		mat_void)
 
+	# ── Robe surface runes (emissive flat spheres on the cone surface) ──
+	var rune_positions: Array[Vector3] = [
+		Vector3(0.20 * s, 0.55 * s + float_y, 0.28 * s),
+		Vector3(-0.18 * s, 0.70 * s + float_y, 0.30 * s),
+		Vector3(0.25 * s, 0.90 * s + float_y, 0.18 * s),
+		Vector3(-0.22 * s, 0.45 * s + float_y, 0.25 * s),
+		Vector3(0.10 * s, 0.60 * s + float_y, 0.35 * s),
+		Vector3(-0.12 * s, 0.85 * s + float_y, 0.32 * s),
+	]
+	for rune_pos: Vector3 in rune_positions:
+		EnemyMeshBuilder.add_sphere(
+			root, 0.02 * s,
+			rune_pos,
+			mat_rune,
+			Vector3(0.8, 0.8, 0.15))
+
 	# ── Tattered hem strips (capsules hanging at robe bottom) ──
 	var hem_strips: Array[MeshInstance3D] = []
 	var hem_count: int = 6
@@ -85,6 +117,19 @@ func build_mesh(params: Dictionary) -> Node3D:
 			mat_hem,
 			Vector3(randf_range(-0.2, 0.2), 0.0, randf_range(-0.2, 0.2)))
 		hem_strips.append(strip)
+
+	# ── Additional tattered hem strips (offset angles for fuller skirt) ──
+	var extra_hem_count: int = 4
+	for i: int in range(extra_hem_count):
+		var angle: float = (float(i) / float(extra_hem_count)) * TAU + (TAU / float(hem_count) * 0.5)
+		var hx: float = cos(angle) * 0.35 * s
+		var hz: float = sin(angle) * 0.35 * s
+		var extra_strip: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.03 * s, 0.22 * s,
+			Vector3(hx, 0.03 * s + float_y, hz),
+			mat_hem,
+			Vector3(randf_range(-0.25, 0.25), 0.0, randf_range(-0.25, 0.25)))
+		hem_strips.append(extra_strip)
 
 	# ── Hooded head (semi-transparent sphere at top of robe) ──
 	var hood: MeshInstance3D = EnemyMeshBuilder.add_sphere(
@@ -102,6 +147,40 @@ func build_mesh(params: Dictionary) -> Node3D:
 		root, 0.03 * s,
 		Vector3(-0.055 * s, 1.35 * s + float_y, 0.12 * s),
 		mat_eye)
+
+	# ── Skull face detail (inside hood) ──
+	# Eye sockets -- dark recesses behind the glowing eyes
+	var socket_l: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.04 * s,
+		Vector3(0.055 * s, 1.35 * s + float_y, 0.09 * s),
+		mat_void)
+	var socket_r: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.04 * s,
+		Vector3(-0.055 * s, 1.35 * s + float_y, 0.09 * s),
+		mat_void)
+	# Nose cavity
+	var nose_cavity: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.015 * s,
+		Vector3(0.0, 1.32 * s + float_y, 0.11 * s),
+		mat_void)
+	# Jaw ridge
+	var jaw_ridge: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.02 * s, 0.06 * s,
+		Vector3(0.0, 1.28 * s + float_y, 0.10 * s),
+		mat_void,
+		Vector3(0.0, 0.0, PI / 2.0))
+	# Brow ridge
+	var brow_ridge: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.018 * s, 0.08 * s,
+		Vector3(0.0, 1.39 * s + float_y, 0.10 * s),
+		mat_void,
+		Vector3(0.0, 0.0, PI / 2.0))
+
+	# ── Cowl interior shadow (dark sphere inside hood behind eyes) ──
+	var cowl_shadow: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.12 * s,
+		Vector3(0.0, 1.33 * s + float_y, -0.04 * s),
+		mat_void)
 
 	# ── Spectral arms (thin capsules reaching forward) ──
 	# Upper arm segments
@@ -150,6 +229,40 @@ func build_mesh(params: Dictionary) -> Node3D:
 		mat_arm,
 		Vector3(-0.9, 0.0, 0.1))
 
+	# ── Additional finger detail (2 extra per hand) ──
+	var finger_l3: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.008 * s, 0.06 * s,
+		Vector3(0.44 * s, 0.74 * s + float_y, 0.48 * s),
+		mat_arm,
+		Vector3(-0.7, 0.3, -0.3))
+	var finger_l4: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.008 * s, 0.06 * s,
+		Vector3(0.39 * s, 0.68 * s + float_y, 0.53 * s),
+		mat_arm,
+		Vector3(-1.0, 0.1, 0.0))
+	var finger_r3: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.008 * s, 0.06 * s,
+		Vector3(-0.44 * s, 0.74 * s + float_y, 0.48 * s),
+		mat_arm,
+		Vector3(-0.7, -0.3, 0.3))
+	var finger_r4: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.008 * s, 0.06 * s,
+		Vector3(-0.39 * s, 0.68 * s + float_y, 0.53 * s),
+		mat_arm,
+		Vector3(-1.0, -0.1, 0.0))
+
+	# ── Shoulder pad shapes (flattened spheres) ──
+	var shoulder_l: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.1 * s,
+		Vector3(0.22 * s, 1.15 * s + float_y, 0.0),
+		mat_robe,
+		Vector3(0.8, 0.6, 0.5))
+	var shoulder_r: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.1 * s,
+		Vector3(-0.22 * s, 1.15 * s + float_y, 0.0),
+		mat_robe,
+		Vector3(0.8, 0.6, 0.5))
+
 	# ── Cowl / collar around hood (torus for dimensional ring) ──
 	var cowl: MeshInstance3D = EnemyMeshBuilder.add_torus(
 		root, 0.10 * s, 0.16 * s,
@@ -195,14 +308,47 @@ func build_mesh(params: Dictionary) -> Node3D:
 		Vector3(0.35, -0.2, 0.15))
 	wisps.append(wisp5)
 
+	# ── Spectral chains (torus links dangling from arms) ──
+	var chains: Array[MeshInstance3D] = []
+	var chain_positions: Array[Vector3] = [
+		Vector3(0.32 * s, 0.95 * s + float_y, 0.20 * s),
+		Vector3(0.34 * s, 0.85 * s + float_y, 0.30 * s),
+		Vector3(0.30 * s, 0.75 * s + float_y, 0.40 * s),
+		Vector3(-0.32 * s, 0.95 * s + float_y, 0.20 * s),
+		Vector3(-0.34 * s, 0.85 * s + float_y, 0.30 * s),
+		Vector3(-0.30 * s, 0.75 * s + float_y, 0.40 * s),
+	]
+	for chain_pos: Vector3 in chain_positions:
+		var chain_link: MeshInstance3D = EnemyMeshBuilder.add_torus(
+			root, 0.008 * s, 0.02 * s,
+			chain_pos,
+			mat_chain,
+			Vector3(randf_range(-0.3, 0.3), 0.0, randf_range(-0.3, 0.3)))
+		chains.append(chain_link)
+
+	# ── Soul wisps (orbiting emissive spheres) ──
+	var soul_wisps: Array[MeshInstance3D] = []
+	for i: int in range(4):
+		var orbit_angle: float = (float(i) / 4.0) * TAU
+		var sx: float = cos(orbit_angle) * 0.5 * s
+		var sz: float = sin(orbit_angle) * 0.5 * s
+		var soul: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+			root, 0.015 * s,
+			Vector3(sx, 0.9 * s + float_y, sz),
+			mat_soul)
+		soul_wisps.append(soul)
+
 	# ── Store animatable parts ──
 	root.set_meta("robe", [robe, void_core, cowl])
 	root.set_meta("hood", [hood])
 	root.set_meta("eyes", [eye_l, eye_r])
 	root.set_meta("arms", [arm_l_upper, arm_r_upper, arm_l_lower, arm_r_lower])
-	root.set_meta("fingers", [finger_l1, finger_l2, finger_r1, finger_r2])
+	root.set_meta("fingers", [finger_l1, finger_l2, finger_r1, finger_r2, finger_l3, finger_l4, finger_r3, finger_r4])
 	root.set_meta("hem_strips", hem_strips)
 	root.set_meta("wisps", wisps)
+	root.set_meta("chains", chains)
+	root.set_meta("soul_wisps", soul_wisps)
+	root.set_meta("mesh_scale", s)
 
 	# Built facing +Z, rotate to face -Z (Godot forward)
 	root.rotation.y = PI
@@ -254,3 +400,21 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 			wisp.position.y += sin(wisp_phase) * 0.003
 			wisp.position.x += cos(wisp_phase * 0.8) * 0.002
 			wisp.rotation.z = sin(wisp_phase * 0.6) * 0.2
+
+	# ── Chains -- pendulum swing ──
+	if root.has_meta("chains"):
+		var chains: Array = root.get_meta("chains") as Array
+		for i: int in range(chains.size()):
+			var chain: MeshInstance3D = chains[i] as MeshInstance3D
+			chain.rotation.x = sin(phase * 1.2 + float(i) * 1.5) * 0.3
+
+	# ── Soul wisps -- orbit around body ──
+	if root.has_meta("soul_wisps"):
+		var soul_wisps: Array = root.get_meta("soul_wisps") as Array
+		var s: float = root.get_meta("mesh_scale", 1.0) as float
+		for i: int in range(soul_wisps.size()):
+			var soul: MeshInstance3D = soul_wisps[i] as MeshInstance3D
+			var orbit_angle: float = phase * 0.8 + float(i) * (TAU / 4.0)
+			soul.position.x = cos(orbit_angle) * 0.5 * s
+			soul.position.z = sin(orbit_angle) * 0.5 * s
+			soul.position.y += sin(phase * 1.5 + float(i)) * 0.002

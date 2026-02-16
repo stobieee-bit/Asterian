@@ -4,7 +4,7 @@
 ## ringed with teeth, writhing tentacles with bioluminescent tips, multiple
 ## scattered eyes, barnacle growths, and membrane fins.
 ##
-## ~45-55 mesh nodes. Animate: tentacle writhing, body pulse, eye blink.
+## ~85-90 mesh nodes. Animate: tentacle writhing, body pulse, eye blink, organ glow throb.
 class_name AbyssalHorrorMesh
 extends EnemyMeshBuilder
 
@@ -51,6 +51,24 @@ func build_mesh(params: Dictionary) -> Node3D:
 	var mat_membrane: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
 		EnemyMeshBuilder.lighten(base_color, 0.06), 0.15, 0.7,
 		Color.BLACK, 0.0, true, 0.4  # Translucent membrane
+	)
+	var mat_pockmark: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.darken(base_color, 0.1), 0.2, 0.95  # Dark surface depressions
+	)
+	var mat_slime: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(base_color, 0.15), 0.0, 0.1,
+		Color.BLACK, 0.0, true, 0.15  # Semi-transparent slime coating
+	)
+	var mat_scar: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(base_color, 0.08), 0.2, 0.7  # Raised scar tissue
+	)
+	var mat_parasite: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.3, 0.5, 0.2), 0.15, 0.8,
+		Color(0.2, 0.4, 0.1), 0.4  # Contrasting parasitic organisms
+	)
+	var mat_organ_glow: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.1, 0.5, 0.3), 0.1, 0.5,
+		Color(0.1, 0.5, 0.3), 2.0, true, 0.5  # Deep bioluminescent organs
 	)
 
 	# ── Central body — floats slightly above ground ──
@@ -223,6 +241,131 @@ func build_mesh(params: Dictionary) -> Node3D:
 	)
 	fin_r.name = "MembraneFinR"
 
+	# ── BODY POCKMARKS — 8 dark flattened depressions across the surface ──
+	var pockmark_positions: Array[Vector3] = [
+		Vector3(0.20 * s,  body_y + 0.15 * s, -0.15 * s),
+		Vector3(-0.15 * s, body_y + 0.25 * s,  0.10 * s),
+		Vector3(0.10 * s,  body_y - 0.08 * s,  0.22 * s),
+		Vector3(-0.22 * s, body_y + 0.02 * s, -0.12 * s),
+		Vector3(0.05 * s,  body_y + 0.28 * s, -0.08 * s),
+		Vector3(-0.12 * s, body_y - 0.10 * s, -0.20 * s),
+		Vector3(0.18 * s,  body_y + 0.08 * s,  0.18 * s),
+		Vector3(-0.08 * s, body_y + 0.20 * s,  0.20 * s),
+	]
+	for i: int in range(pockmark_positions.size()):
+		var pockmark: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+			root, 0.025 * s, pockmark_positions[i],
+			mat_pockmark, Vector3(1.0, 0.3, 1.0)
+		)
+		pockmark.name = "Pockmark%d" % i
+
+	# ── SLIME COATING — 4 semi-transparent overlay spheres ──
+	var slime_configs: Array[Dictionary] = [
+		{"pos": Vector3(0.12 * s,  body_y + 0.18 * s, -0.10 * s), "r": 0.13},
+		{"pos": Vector3(-0.10 * s, body_y - 0.05 * s,  0.15 * s), "r": 0.12},
+		{"pos": Vector3(0.05 * s,  body_y + 0.10 * s,  0.20 * s), "r": 0.15},
+		{"pos": Vector3(-0.15 * s, body_y + 0.22 * s, -0.05 * s), "r": 0.14},
+	]
+	for i: int in range(slime_configs.size()):
+		var cfg_sl: Dictionary = slime_configs[i]
+		var slime: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+			root, float(cfg_sl["r"]) * s, cfg_sl["pos"] as Vector3,
+			mat_slime
+		)
+		slime.name = "Slime%d" % i
+
+	# ── ADDITIONAL BARNACLES — 6 growths near tentacle bases ──
+	var extra_barnacle_indices: Array[int] = [0, 1, 3, 4, 6, 7]
+	for i: int in range(extra_barnacle_indices.size()):
+		var tidx: int = extra_barnacle_indices[i]
+		var pivot_pos: Vector3 = tentacle_pivots[tidx].position
+		var barnacle_offset: Vector3 = Vector3(0.02 * s, -0.015 * s, 0.01 * s)
+		var extra_barnacle: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+			root, 0.03 * s, pivot_pos + barnacle_offset,
+			mat_barnacle, Vector3(1.2, 0.8, 1.1)
+		)
+		extra_barnacle.name = "TentacleBarnacle%d" % i
+
+	# ── SCAR TISSUE — 4 thin capsule markings across the body ──
+	var scar_configs: Array[Dictionary] = [
+		{"pos": Vector3(0.15 * s,  body_y + 0.12 * s, -0.18 * s), "rot": Vector3(0.3, 0.8, 0.2)},
+		{"pos": Vector3(-0.18 * s, body_y + 0.05 * s,  0.12 * s), "rot": Vector3(-0.5, 0.2, 1.0)},
+		{"pos": Vector3(0.08 * s,  body_y + 0.26 * s,  0.05 * s), "rot": Vector3(0.1, -0.4, 0.7)},
+		{"pos": Vector3(-0.10 * s, body_y - 0.06 * s, -0.22 * s), "rot": Vector3(0.8, 0.5, -0.3)},
+	]
+	for i: int in range(scar_configs.size()):
+		var cfg_sc: Dictionary = scar_configs[i]
+		var scar: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.006 * s, 0.1 * s,
+			cfg_sc["pos"] as Vector3,
+			mat_scar, cfg_sc["rot"] as Vector3
+		)
+		scar.name = "Scar%d" % i
+
+	# ── PARASITIC ORGANISMS — 4 small contrasting spheres ──
+	var parasite_positions: Array[Vector3] = [
+		Vector3(0.22 * s,  body_y + 0.18 * s, -0.08 * s),
+		Vector3(-0.16 * s, body_y + 0.10 * s,  0.18 * s),
+		Vector3(0.10 * s,  body_y - 0.05 * s, -0.24 * s),
+		Vector3(-0.20 * s, body_y + 0.24 * s,  0.02 * s),
+	]
+	for i: int in range(parasite_positions.size()):
+		var parasite: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+			root, 0.02 * s, parasite_positions[i],
+			mat_parasite
+		)
+		parasite.name = "Parasite%d" % i
+
+	# ── INNER BIOLUMINESCENT ORGANS — 3 deep glow spheres inside body ──
+	var organ_glows: Array[MeshInstance3D] = []
+	var organ_positions: Array[Vector3] = [
+		Vector3(0.06 * s,  body_y + 0.05 * s, -0.04 * s),
+		Vector3(-0.05 * s, body_y - 0.03 * s,  0.06 * s),
+		Vector3(0.02 * s,  body_y + 0.10 * s,  0.02 * s),
+	]
+	for i: int in range(organ_positions.size()):
+		var organ: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+			root, 0.06 * s, organ_positions[i],
+			mat_organ_glow
+		)
+		organ.name = "OrganGlow%d" % i
+		organ_glows.append(organ)
+
+	# ── ADDITIONAL TEETH — 6 smaller irregular cones between existing teeth ──
+	var extra_tooth_count: int = 6
+	for i: int in range(extra_tooth_count):
+		# Place between existing teeth by offsetting half a tooth spacing
+		var angle: float = (float(i) + 0.5) / float(tooth_count) * TAU + 0.15
+		var tooth_r: float = 0.15 * s
+		var tx: float = cos(angle) * tooth_r
+		var ty: float = sin(angle) * tooth_r
+		var inward_rot: Vector3 = Vector3(
+			sin(angle) * 0.8,
+			0.0,
+			-cos(angle) * 0.8
+		)
+		var extra_tooth: MeshInstance3D = EnemyMeshBuilder.add_cone(
+			root, 0.012 * s, 0.06 * s,
+			maw_pos + Vector3(tx, ty, -0.02 * s),
+			mat_tooth, inward_rot
+		)
+		extra_tooth.name = "ExtraTooth%d" % i
+
+	# ── MEMBRANE FIN WEBBING — 4 flattened spheres between tentacles ──
+	var webbing_pairs: Array[Array] = [
+		[0, 1], [2, 3], [4, 5], [6, 7],
+	]
+	for i: int in range(webbing_pairs.size()):
+		var pair: Array = webbing_pairs[i]
+		var pos_a: Vector3 = tentacle_pivots[int(pair[0])].position
+		var pos_b: Vector3 = tentacle_pivots[int(pair[1])].position
+		var mid_pos: Vector3 = (pos_a + pos_b) * 0.5
+		var webbing: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+			root, 0.06 * s, mid_pos,
+			mat_membrane, Vector3(0.15, 0.5, 0.8)
+		)
+		webbing.name = "FinWebbing%d" % i
+
 	# ── Store animatable parts as metadata ──
 	root.set_meta("body", body)
 	root.set_meta("body_lump", body_lump)
@@ -232,6 +375,7 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("fins", [fin_l, fin_r])
 	root.set_meta("teeth", teeth)
 	root.set_meta("maw", maw)
+	root.set_meta("organ_glows", organ_glows)
 	root.set_meta("scale", s)
 	root.set_meta("body_y", body_y)
 
@@ -342,6 +486,17 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 			var maw_pulse: float = 1.0 + sin(phase * 2.0) * 0.06
 			var maw_target: Vector3 = Vector3(maw_pulse, maw_pulse, 1.0)
 			maw.scale = maw.scale.lerp(maw_target, delta * 4.0)
+
+	# ── Organ glow throb — inner organs pulse with bioluminescence ──
+	if root.has_meta("organ_glows"):
+		var organ_glows: Array = root.get_meta("organ_glows") as Array
+		for i: int in range(organ_glows.size()):
+			var organ: MeshInstance3D = organ_glows[i] as MeshInstance3D
+			if organ == null:
+				continue
+			var throb: float = 1.0 + sin(phase * 1.8 + float(i) * 2.0) * 0.3
+			var target_organ_scale: Vector3 = Vector3(throb, throb, throb)
+			organ.scale = organ.scale.lerp(target_organ_scale, delta * 3.0)
 
 	# ── Whole-body gentle drift (idle) or forward bob (moving) ──
 	var drift_speed: float = 0.8 if not is_moving else 1.8

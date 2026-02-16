@@ -3,8 +3,11 @@
 ## Triangular head with bulging compound eyes, long prothorax neck,
 ## wide mesothorax, 4-segment abdomen, 2 raptorial forelegs (signature),
 ## 4 walking legs, vestigial wing stubs, 2 antennae.
+## Compound eye facets, prothorax ridges, tibia serrations, femoral
+## grooming brushes, wing stub veins, tarsal hooks, inter-segment
+## membranes, ootheca egg case.
 ## Raptorial arms sway/strike, walking legs cycle.
-## ~45-55 mesh nodes.
+## ~87 mesh nodes, 11 materials.
 class_name MantisMesh
 extends EnemyMeshBuilder
 
@@ -52,6 +55,27 @@ func build_mesh(params: Dictionary) -> Node3D:
 		EnemyMeshBuilder.darken(base_color, 0.08), 0.2, 0.6,
 		Color.BLACK, 0.0
 	)
+	# Compound eye facet — darker red for textured facet look
+	var mat_eye_facet: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.75, 0.08, 0.04), 0.7, 0.15,
+		Color(0.75, 0.08, 0.04), 1.5
+	)
+	# Inter-segment membrane — dark, semi-transparent
+	var mat_membrane: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.darken(base_color, 0.3), 0.15, 0.7,
+		Color.BLACK, 0.0,
+		true, 0.6
+	)
+	# Grooming brush — lighter green, soft matte
+	var mat_brush: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(base_color, 0.15), 0.1, 0.8,
+		Color.BLACK, 0.0
+	)
+	# Ootheca (egg case) — brownish tan
+	var mat_ootheca: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.55, 0.38, 0.18), 0.15, 0.75,
+		Color.BLACK, 0.0
+	)
 
 	# ── HEAD ──
 	# Triangular head (flattened sphere, wider than tall)
@@ -74,6 +98,40 @@ func build_mesh(params: Dictionary) -> Node3D:
 		Vector3(0.12 * s, 0.78 * s, 0.7 * s),
 		mat_eye,
 		Vector3(0.8, 1.0, 1.0)
+	)
+
+	# ── COMPOUND EYE FACETS (3 per eye = 6 total) ──
+	# Left eye facets — tiny overlapping spheres for faceted texture
+	var _facet_l0: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.035 * s,
+		Vector3(-0.14 * s, 0.82 * s, 0.72 * s),
+		mat_eye_facet
+	)
+	var _facet_l1: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.032 * s,
+		Vector3(-0.10 * s, 0.81 * s, 0.74 * s),
+		mat_eye_facet
+	)
+	var _facet_l2: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.03 * s,
+		Vector3(-0.13 * s, 0.76 * s, 0.73 * s),
+		mat_eye_facet
+	)
+	# Right eye facets
+	var _facet_r0: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.035 * s,
+		Vector3(0.14 * s, 0.82 * s, 0.72 * s),
+		mat_eye_facet
+	)
+	var _facet_r1: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.032 * s,
+		Vector3(0.10 * s, 0.81 * s, 0.74 * s),
+		mat_eye_facet
+	)
+	var _facet_r2: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.03 * s,
+		Vector3(0.13 * s, 0.76 * s, 0.73 * s),
+		mat_eye_facet
 	)
 
 	# Mandibles — two small cones at front of head
@@ -110,6 +168,19 @@ func build_mesh(params: Dictionary) -> Node3D:
 		Vector3(0.4, 0.0, 0.0)
 	)
 
+	# ── PROTHORAX RIDGES (3 torus rings along neck) ──
+	for i: int in range(3):
+		var ridge_t: float = float(i) / 2.0
+		# Spaced along the prothorax capsule from head-end to body-end
+		var ridge_z: float = (0.48 - ridge_t * 0.13) * s
+		var ridge_y: float = (0.72 - ridge_t * 0.02) * s
+		var _ridge: MeshInstance3D = EnemyMeshBuilder.add_torus(
+			root, 0.012 * s, 0.065 * s,
+			Vector3(0.0, ridge_y, ridge_z),
+			mat_chitin_dark,
+			Vector3(0.4, 0.0, 0.0)
+		)
+
 	# ── MESOTHORAX (wider mid-body) ──
 	var mesothorax: MeshInstance3D = EnemyMeshBuilder.add_sphere(
 		root, 0.18 * s,
@@ -133,7 +204,37 @@ func build_mesh(params: Dictionary) -> Node3D:
 		)
 		abdomen_segs.append(seg)
 
-	# ── VESTIGIAL WING STUBS (2) ──
+	# ── ABDOMEN INTER-SEGMENT MEMBRANES (3 torus rings between segments) ──
+	for i: int in range(3):
+		# Position between segment i and segment i+1
+		var mem_z: float = (-0.29 - float(i) * 0.18) * s
+		var mem_y: float = (0.43 - float(i) * 0.04) * s
+		var mem_r: float = (0.14 - 0.025 * (float(i) / 2.0)) * s
+		var _membrane: MeshInstance3D = EnemyMeshBuilder.add_torus(
+			root, 0.008 * s, mem_r,
+			Vector3(0.0, mem_y, mem_z),
+			mat_membrane,
+			Vector3(0.0, 0.0, 0.0)
+		)
+
+	# ── OOTHECA — egg case at abdomen tip (1 sphere + 1 capsule) ──
+	# Position at the rear of the last abdomen segment
+	var oo_z: float = (-0.2 - 3.0 * 0.18 - 0.12) * s
+	var oo_y: float = (0.45 - 3.0 * 0.04 - 0.04) * s
+	var _ootheca_body: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.06 * s,
+		Vector3(0.0, oo_y, oo_z),
+		mat_ootheca,
+		Vector3(0.9, 0.8, 1.2)
+	)
+	var _ootheca_tip: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.03 * s, 0.07 * s,
+		Vector3(0.0, oo_y - 0.02 * s, oo_z - 0.06 * s),
+		mat_ootheca,
+		Vector3(0.2, 0.0, 0.0)
+	)
+
+	# ── VESTIGIAL WING STUBS (2) with vein detail ──
 	for side: int in [-1, 1]:
 		var sf: float = float(side)
 		var _wing: MeshInstance3D = EnemyMeshBuilder.add_capsule(
@@ -141,6 +242,32 @@ func build_mesh(params: Dictionary) -> Node3D:
 			Vector3(sf * 0.18 * s, 0.58 * s, -0.08 * s),
 			mat_wing,
 			Vector3(-0.3, sf * 0.2, sf * 0.8)
+		)
+
+		# Wing stub veins — 4 thin capsules radiating through wing
+		var _vein0: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.005 * s, 0.14 * s,
+			Vector3(sf * 0.17 * s, 0.59 * s, -0.07 * s),
+			mat_chitin_dark,
+			Vector3(-0.3, sf * 0.15, sf * 0.8)
+		)
+		var _vein1: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.004 * s, 0.12 * s,
+			Vector3(sf * 0.19 * s, 0.58 * s, -0.09 * s),
+			mat_chitin_dark,
+			Vector3(-0.25, sf * 0.3, sf * 0.75)
+		)
+		var _vein2: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.004 * s, 0.10 * s,
+			Vector3(sf * 0.20 * s, 0.57 * s, -0.06 * s),
+			mat_chitin_dark,
+			Vector3(-0.35, sf * 0.1, sf * 0.85)
+		)
+		var _vein3: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.003 * s, 0.08 * s,
+			Vector3(sf * 0.16 * s, 0.60 * s, -0.10 * s),
+			mat_chitin_dark,
+			Vector3(-0.2, sf * 0.35, sf * 0.7)
 		)
 
 	# ── RAPTORIAL FORELEGS (2, 3-segment each with serrated edges) ──
@@ -190,6 +317,34 @@ func build_mesh(params: Dictionary) -> Node3D:
 				Vector3(0.0, 0.0, sf * 1.2)
 			)
 
+		# Additional serration spines along tibia inner edge (3 more)
+		for j: int in range(3):
+			var tspine_t: float = float(j) / 2.0
+			var _tibia_spine: MeshInstance3D = EnemyMeshBuilder.add_cone(
+				arm_pivot, 0.01 * s, 0.04 * s,
+				Vector3(
+					sf * (0.08 + tspine_t * 0.015) * s,
+					(-0.2 - tspine_t * 0.06) * s,
+					(0.32 + tspine_t * 0.04) * s
+				),
+				mat_serr,
+				Vector3(0.0, 0.0, sf * 1.0)
+			)
+
+		# Femoral grooming brushes — 2 small capsules on inner femur surface
+		var _brush0: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			arm_pivot, 0.008 * s, 0.04 * s,
+			Vector3(sf * 0.06 * s, -0.06 * s, 0.23 * s),
+			mat_brush,
+			Vector3(-0.3, 0.0, sf * 0.5)
+		)
+		var _brush1: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			arm_pivot, 0.008 * s, 0.04 * s,
+			Vector3(sf * 0.065 * s, -0.12 * s, 0.27 * s),
+			mat_brush,
+			Vector3(-0.25, 0.0, sf * 0.45)
+		)
+
 		rapt_arms.append(arm_pivot)
 
 	# ── WALKING LEGS (4, two pairs from mesothorax) ──
@@ -224,6 +379,14 @@ func build_mesh(params: Dictionary) -> Node3D:
 				Vector3(sf * 0.25 * s, -0.28 * s, 0.02 * s),
 				mat_chitin_dark,
 				Vector3(0.5, 0.0, 0.0)
+			)
+
+			# Tarsal hook — tiny cone at tarsus tip for grip
+			var _tarsal_hook: MeshInstance3D = EnemyMeshBuilder.add_cone(
+				leg_pivot, 0.008 * s, 0.025 * s,
+				Vector3(sf * 0.27 * s, -0.32 * s, 0.03 * s),
+				mat_chitin_dark,
+				Vector3(0.8, 0.0, sf * 0.2)
 			)
 
 			walk_legs.append(leg_pivot)

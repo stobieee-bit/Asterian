@@ -6,7 +6,7 @@
 ## Dorsal spines on alternating segments, bioluminescent belly spots,
 ## and a tail fin at the terminus.
 ##
-## ~45-55 mesh nodes. Animate: sine-wave body undulation, jaw open/close, fin flutter.
+## ~95-98 mesh nodes. Animate: sine-wave body undulation, jaw open/close, fin flutter.
 class_name AbyssalSerpentMesh
 extends EnemyMeshBuilder
 
@@ -50,6 +50,23 @@ func build_mesh(params: Dictionary) -> Node3D:
 	var mat_tail_fin: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
 		EnemyMeshBuilder.lighten(base_color, 0.06), 0.3, 0.45,
 		Color.BLACK, 0.0, true, 0.55
+	)
+	var mat_scale: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(base_color, 0.1), 0.7, 0.3
+	)
+	var mat_lateral: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.15, 0.7, 0.85), 0.3, 0.45,
+		Color(0.1, 0.6, 0.9), 0.8
+	)
+	var mat_barbel: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(base_color, 0.06), 0.2, 0.5,
+		Color(0.05, 0.4, 0.7), 0.6, true, 0.7
+	)
+	var mat_gill: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.darken(base_color, 0.2), 0.4, 0.5
+	)
+	var mat_fin_vein: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.darken(base_color, 0.05), 0.35, 0.5
 	)
 
 	# ── Body layout ──
@@ -240,6 +257,138 @@ func build_mesh(params: Dictionary) -> Node3D:
 	tail_fin2.name = "TailFin2"
 	tail_fin2.scale = Vector3(0.25, 1.0, 0.8)
 
+	# ── DORSAL SCALE PLATES — flattened boxes on top of each segment ──
+	for i: int in range(segment_count):
+		var seg_pos: Vector3 = segments[i].position
+		var taper: float = 1.0 - float(i) * 0.065
+		var scale_plate: MeshInstance3D = EnemyMeshBuilder.add_box(
+			root, Vector3(0.12 * s * taper, 0.02 * s, 0.08 * s * taper),
+			seg_pos + Vector3(0.0, head_radius * taper * 0.55, 0.0),
+			mat_scale
+		)
+		scale_plate.name = "ScalePlate%d" % i
+
+	# ── LATERAL LINE ORGANS — sensory capsules on even segments ──
+	for i: int in [0, 2, 4, 6, 8, 10]:
+		var seg_pos: Vector3 = segments[i].position
+		var taper: float = 1.0 - float(i) * 0.065
+		var lat_l: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.01 * s, 0.06 * s,
+			seg_pos + Vector3(-head_radius * taper * 0.8, 0.0, 0.0),
+			mat_lateral, Vector3(0.0, 0.0, PI * 0.5)
+		)
+		lat_l.name = "LateralL%d" % i
+		var lat_r: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.01 * s, 0.06 * s,
+			seg_pos + Vector3(head_radius * taper * 0.8, 0.0, 0.0),
+			mat_lateral, Vector3(0.0, 0.0, PI * 0.5)
+		)
+		lat_r.name = "LateralR%d" % i
+
+	# ── HEAD BARBELS — thin dangling capsules from head underside ──
+	var barbels: Array[MeshInstance3D] = []
+	var barbel_offsets: Array[Vector3] = [
+		Vector3(-0.06 * s, -0.16 * s, -0.1 * s),   # front-left
+		Vector3(0.06 * s, -0.16 * s, -0.1 * s),    # front-right
+		Vector3(-0.08 * s, -0.14 * s, 0.02 * s),   # back-left
+		Vector3(0.08 * s, -0.14 * s, 0.02 * s),    # back-right
+	]
+	for i: int in range(barbel_offsets.size()):
+		var barbel: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.008 * s, 0.12 * s,
+			head_pos + barbel_offsets[i],
+			mat_barbel, Vector3(0.0, 0.0, 0.0)
+		)
+		barbel.name = "Barbel%d" % i
+		barbels.append(barbel)
+
+	# ── GILL SLIT DETAILS — thin capsules behind the head ──
+	var gill_l1: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.008 * s, 0.06 * s,
+		head_pos + Vector3(-0.15 * s, -0.08 * s, 0.08 * s),
+		mat_gill, Vector3(PI * 0.5, 0.0, 0.3)
+	)
+	gill_l1.name = "GillL1"
+	var gill_r1: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.008 * s, 0.06 * s,
+		head_pos + Vector3(0.15 * s, -0.08 * s, 0.08 * s),
+		mat_gill, Vector3(PI * 0.5, 0.0, -0.3)
+	)
+	gill_r1.name = "GillR1"
+	var gill_l2: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.008 * s, 0.06 * s,
+		head_pos + Vector3(-0.15 * s, -0.04 * s, 0.12 * s),
+		mat_gill, Vector3(PI * 0.5, 0.0, 0.3)
+	)
+	gill_l2.name = "GillL2"
+	var gill_r2: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.008 * s, 0.06 * s,
+		head_pos + Vector3(0.15 * s, -0.04 * s, 0.12 * s),
+		mat_gill, Vector3(PI * 0.5, 0.0, -0.3)
+	)
+	gill_r2.name = "GillR2"
+
+	# ── BELLY PLATES — lighter ventral boxes on odd segments ──
+	for i: int in [1, 3, 5, 7, 9, 11]:
+		var seg_pos: Vector3 = segments[i].position
+		var taper: float = 1.0 - float(i) * 0.065
+		var belly_plate: MeshInstance3D = EnemyMeshBuilder.add_box(
+			root, Vector3(0.1 * s * taper, 0.015 * s, 0.07 * s * taper),
+			seg_pos + Vector3(0.0, -head_radius * taper * 0.5, 0.0),
+			mat_belly
+		)
+		belly_plate.name = "BellyPlate%d" % i
+
+	# ── SIDE FIN RIBBING — vein capsules inside side fins ──
+	for i: int in [2, 4, 6]:
+		var seg_pos: Vector3 = segments[i].position
+		var taper: float = 1.0 - float(i) * 0.065
+		var vein_l: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.005 * s, 0.07 * s * taper,
+			seg_pos + Vector3(-head_radius * taper * 0.85 - 0.01 * s, -0.02 * s, 0.0),
+			mat_fin_vein, Vector3(0.0, 0.0, PI * 0.4)
+		)
+		vein_l.name = "FinVein%dL" % i
+		var vein_r: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.005 * s, 0.07 * s * taper,
+			seg_pos + Vector3(head_radius * taper * 0.85 + 0.01 * s, -0.02 * s, 0.0),
+			mat_fin_vein, Vector3(0.0, 0.0, -PI * 0.4)
+		)
+		vein_r.name = "FinVein%dR" % i
+
+	# ── TAIL FIN VEINS — radial capsules inside the tail fin ──
+	var tail_vein_angles: Array[float] = [-0.4, 0.0, 0.4]
+	for i: int in range(tail_vein_angles.size()):
+		var angle: float = tail_vein_angles[i]
+		var vein_offset: Vector3 = Vector3(
+			sin(angle) * 0.04 * s,
+			cos(angle) * 0.04 * s,
+			0.12 * s
+		)
+		var tail_vein: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.005 * s, 0.1 * s,
+			tail_pos + vein_offset,
+			mat_fin_vein, Vector3(PI * 0.5 + angle * 0.3, 0.0, 0.0)
+		)
+		tail_vein.name = "TailVein%d" % i
+
+	# ── BIOLUMINESCENT CHIN PATCHES — emissive spheres under head ──
+	var chin_spots: Array[MeshInstance3D] = []
+	var chin_l: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.018 * s,
+		head_pos + Vector3(-0.04 * s, -0.16 * s, -0.06 * s),
+		mat_glow
+	)
+	chin_l.name = "ChinSpotL"
+	chin_spots.append(chin_l)
+	var chin_r: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.018 * s,
+		head_pos + Vector3(0.04 * s, -0.16 * s, -0.06 * s),
+		mat_glow
+	)
+	chin_r.name = "ChinSpotR"
+	chin_spots.append(chin_r)
+
 	# ── Store animatable parts as metadata ──
 	root.set_meta("segments", segments)
 	root.set_meta("jaw_pivots", [jaw_pivot_l, jaw_pivot_r])
@@ -248,6 +397,8 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("spines", spines)
 	root.set_meta("belly_spots", belly_spots)
 	root.set_meta("tail_fin", tail_fin)
+	root.set_meta("barbels", barbels)
+	root.set_meta("chin_spots", chin_spots)
 	root.set_meta("scale", s)
 	root.set_meta("segment_spacing", segment_spacing)
 	root.set_meta("body_y", body_y)
@@ -356,3 +507,24 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 			var tail_speed: float = 4.5 if is_moving else 2.0
 			var tail_amp: float = 0.4 if is_moving else 0.2
 			tail.rotation.y = lerpf(tail.rotation.y, sin(phase * tail_speed) * tail_amp, delta * 5.0)
+
+	# ── Barbel wave — thin feelers sway gently ──
+	if root.has_meta("barbels"):
+		var barbels: Array = root.get_meta("barbels") as Array
+		for i: int in range(barbels.size()):
+			var barbel: MeshInstance3D = barbels[i] as MeshInstance3D
+			if barbel == null:
+				continue
+			var sway: float = sin(phase * 1.5 + float(i) * 1.2) * 0.2
+			barbel.rotation.x = lerpf(barbel.rotation.x, sway, delta * 4.0)
+
+	# ── Chin spot pulse — bioluminescent glow throbs ──
+	if root.has_meta("chin_spots"):
+		var chin_spots: Array = root.get_meta("chin_spots") as Array
+		for i: int in range(chin_spots.size()):
+			var spot: MeshInstance3D = chin_spots[i] as MeshInstance3D
+			if spot == null:
+				continue
+			var pulse: float = 1.0 + sin(phase * 2.0 + float(i) * 1.5) * 0.2
+			var current_s: float = lerpf(spot.scale.x, pulse, delta * 3.0)
+			spot.scale = Vector3(current_s, current_s, current_s)

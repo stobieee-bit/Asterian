@@ -95,6 +95,14 @@ var settings: Dictionary = {
 # ── Panel layout: { panel_name: { x, y, visible, locked } } ──
 var panel_layout: Dictionary = {}
 
+# ── Tutorial tracking ──
+var tutorial: Dictionary = {
+	"completed": false,
+	"skipped": false,
+	"current_step": 0,
+	"steps_done": [],
+}
+
 # ── Play time tracking ──
 var total_play_time: float = 0.0
 var session_start_time: float = 0.0
@@ -223,6 +231,7 @@ func to_save_data() -> Dictionary:
 		"settings": settings.duplicate(true),
 		"total_play_time": total_play_time,
 		"panel_layout": panel_layout.duplicate(true),
+		"tutorial": tutorial.duplicate(true),
 	}
 
 ## Load state from a save Dictionary
@@ -269,3 +278,4 @@ func from_save_data(data: Dictionary) -> void:
 	settings = data.get("settings", settings)
 	total_play_time = data.get("total_play_time", 0.0)
 	panel_layout = data.get("panel_layout", {})
+	tutorial = data.get("tutorial", tutorial)

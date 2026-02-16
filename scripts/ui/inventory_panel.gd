@@ -105,17 +105,15 @@ func _create_slot(index: int) -> PanelContainer:
 	icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(icon_rect)
 
-	# Icon symbol (centered, larger for icon-only display)
-	var icon_sym: Label = Label.new()
-	icon_sym.name = "IconSymbol"
-	icon_sym.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	icon_sym.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	icon_sym.add_theme_font_size_override("font_size", 24)
-	icon_sym.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
-	icon_sym.position = Vector2(4, 2)
-	icon_sym.size = Vector2(40, 40)
-	icon_sym.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	inner.add_child(icon_sym)
+	# Icon texture (pixel art, centered)
+	var icon_tex: TextureRect = TextureRect.new()
+	icon_tex.name = "IconTexture"
+	icon_tex.position = Vector2(4, 4)
+	icon_tex.size = Vector2(40, 40)
+	icon_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(icon_tex)
 
 	# Hidden item label (kept for data reference, not displayed)
 	var label: Label = Label.new()
@@ -156,7 +154,7 @@ func refresh() -> void:
 		var item_label: Label = inner.get_node("ItemLabel") as Label
 		var qty_label: Label = inner.get_node("QtyLabel") as Label
 		var icon_rect: ColorRect = inner.get_node("IconRect") as ColorRect
-		var icon_sym: Label = inner.get_node("IconSymbol") as Label
+		var icon_tex: TextureRect = inner.get_node("IconTexture") as TextureRect
 		var style: StyleBoxFlat = slot.get_theme_stylebox("panel") as StyleBoxFlat
 
 		if i < GameState.inventory.size():
@@ -174,14 +172,10 @@ func refresh() -> void:
 			icon_rect.color = _type_icon_color(item_type)
 			icon_rect.color.a = 0.85
 
-			# Show icon symbol from item's icon field (or fallback to type)
+			# Show pixel art icon from item's icon field (or fallback to type)
 			var icon_id: String = str(item_data.get("icon", ""))
-			icon_sym.text = _item_icon_symbol(icon_id, item_type)
-			# Pure white text with dark shadow for maximum readability
-			icon_sym.add_theme_color_override("font_color", Color.WHITE)
-			icon_sym.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
-			icon_sym.add_theme_constant_override("shadow_offset_x", 1)
-			icon_sym.add_theme_constant_override("shadow_offset_y", 1)
+			icon_tex.texture = ItemIcons.get_icon_texture(icon_id, item_type)
+			icon_tex.modulate = Color.WHITE
 
 			# Store name for tooltip reference (not displayed)
 			item_label.text = item_name
@@ -196,7 +190,7 @@ func refresh() -> void:
 			item_label.text = ""
 			qty_label.text = ""
 			icon_rect.color = Color(0.15, 0.2, 0.3, 0.0)
-			icon_sym.text = ""
+			icon_tex.texture = null
 			if style:
 				style.border_color = Color(0.2, 0.3, 0.4, 0.6)
 
@@ -302,20 +296,15 @@ func _start_drag() -> void:
 	icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(icon_rect)
 
-	var icon_sym: Label = Label.new()
-	icon_sym.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	icon_sym.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	icon_sym.add_theme_font_size_override("font_size", 24)
-	icon_sym.add_theme_color_override("font_color", Color.WHITE)
-	icon_sym.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
-	icon_sym.add_theme_constant_override("shadow_offset_x", 1)
-	icon_sym.add_theme_constant_override("shadow_offset_y", 1)
+	var icon_tex: TextureRect = TextureRect.new()
+	icon_tex.position = Vector2(4, 4)
+	icon_tex.size = Vector2(40, 40)
+	icon_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var icon_id: String = str(item_data.get("icon", ""))
-	icon_sym.text = _item_icon_symbol(icon_id, item_type)
-	icon_sym.position = Vector2(4, 2)
-	icon_sym.size = Vector2(40, 40)
-	icon_sym.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	inner.add_child(icon_sym)
+	icon_tex.texture = ItemIcons.get_icon_texture(icon_id, item_type)
+	inner.add_child(icon_tex)
 
 	# Add preview as top-level so it draws above everything
 	_drag_preview.top_level = true
@@ -605,6 +594,6 @@ func _type_icon_color(item_type: String) -> Color:
 		"pet":         return Color(0.55, 0.3, 0.5)   # Magenta
 		_:             return Color(0.25, 0.25, 0.3)   # Default gray
 
-## Get emoji icon from item data — delegates to shared ItemIcons utility
-func _item_icon_symbol(icon_name: String, item_type: String) -> String:
-	return ItemIcons.get_icon(icon_name, item_type)
+## Get pixel art texture from item data — delegates to shared ItemIcons utility
+func _item_icon_texture(icon_name: String, item_type: String) -> ImageTexture:
+	return ItemIcons.get_icon_texture(icon_name, item_type)

@@ -49,6 +49,7 @@ var _pet_panel: PanelContainer = null
 var _settings_panel: PanelContainer = null
 var _multiplayer_panel: PanelContainer = null
 var _tooltip_panel: PanelContainer = null
+var _tutorial_panel: PanelContainer = null
 var _context_menu: PanelContainer = null
 var _context_menu_vbox: VBoxContainer = null
 var _context_menu_title: Label = null
@@ -68,6 +69,7 @@ var dungeon_script: GDScript = preload("res://scripts/ui/dungeon_panel.gd")
 var pet_script: GDScript = preload("res://scripts/ui/pet_panel.gd")
 var settings_script: GDScript = preload("res://scripts/ui/settings_panel.gd")
 var tooltip_script: GDScript = preload("res://scripts/ui/tooltip_panel.gd")
+var tutorial_script: GDScript = preload("res://scripts/ui/tutorial_panel.gd")
 # context_menu is built inline in _build_context_menu()
 
 # ── Chat log ──
@@ -133,6 +135,9 @@ func _ready() -> void:
 
 	# Restore saved panel positions/visibility/lock state (deferred so layout pass is done)
 	call_deferred("_restore_panel_layout")
+
+	# Build tutorial panel (auto-shows for new players)
+	_build_tutorial_panel()
 
 	# Build chat log
 	_build_chat_log()
@@ -318,6 +323,10 @@ func _process(delta: float) -> void:
 
 	# ── Minimap camera follow ──
 	_update_minimap()
+
+	# ── Gathering bar: follow 3D node position ──
+	if _gather_progress and _gather_progress.visible:
+		_update_gather_bar_position()
 
 	# ── Distance check: close interaction panels if player walks away ──
 	_check_interaction_distance()
@@ -555,6 +564,37 @@ func _build_panels() -> void:
 	# Context menu (right-click popup — built inline, no external script)
 	_build_context_menu()
 
+
+## Build the tutorial panel — auto-shows on first game
+func _build_tutorial_panel() -> void:
+	var panel_style: StyleBoxFlat = StyleBoxFlat.new()
+	panel_style.bg_color = Color(0.025, 0.035, 0.06, 0.92)
+	panel_style.border_color = Color(0.2, 0.55, 0.75, 0.45)
+	panel_style.set_border_width_all(2)
+	panel_style.set_corner_radius_all(4)
+	panel_style.set_content_margin_all(8)
+
+	var vp_sz: Vector2 = _get_viewport_size()
+	_tutorial_panel = PanelContainer.new()
+	_tutorial_panel.set_script(tutorial_script)
+	_tutorial_panel.add_theme_stylebox_override("panel", panel_style)
+	_tutorial_panel.visible = false
+	_tutorial_panel.position = Vector2(vp_sz.x / 2.0 - 180, 16)
+	add_child(_tutorial_panel)
+
+	# Wire drag-end callback (since _wire_panel_drag_callbacks runs before this)
+	_tutorial_panel.ready.connect(_bind_drag_callback.bind(_tutorial_panel, "tutorial"), CONNECT_ONE_SHOT)
+
+	# Auto-show for new players (deferred so everything is initialized)
+	if not GameState.tutorial.get("completed", false) and not GameState.tutorial.get("skipped", false):
+		call_deferred("_start_tutorial")
+
+
+func _start_tutorial() -> void:
+	if _tutorial_panel and _tutorial_panel.has_method("start_tutorial"):
+		_tutorial_panel.start_tutorial()
+
+
 ## Build the chat log in the bottom-left
 func _build_chat_log() -> void:
 	_chat_bg = PanelContainer.new()
@@ -785,6 +825,24 @@ func _build_action_bar() -> void:
 	set_btn.pressed.connect(func(): _toggle_panel(_settings_panel, "settings"))
 	bar.add_child(set_btn)
 
+	# Help / Tutorial button
+	var help_btn: Button = _make_sci_btn("?", 36, Color(0.3, 0.8, 0.9))
+	help_btn.tooltip_text = "Tutorial / Help"
+	help_btn.pressed.connect(func():
+		if _tutorial_panel:
+			_tutorial_panel.visible = true
+			EventBus.panel_opened.emit("tutorial")
+			if _tutorial_panel.has_method("start_tutorial"):
+				if GameState.tutorial.get("completed", false) or GameState.tutorial.get("skipped", false):
+					# Reset and restart for re-reading
+					GameState.tutorial["completed"] = false
+					GameState.tutorial["skipped"] = false
+					GameState.tutorial["current_step"] = 0
+					GameState.tutorial["steps_done"] = []
+				_tutorial_panel.start_tutorial()
+	)
+	bar.add_child(help_btn)
+
 	# Position centered at bottom
 	_reposition_action_bar()
 
@@ -1012,35 +1070,39 @@ func _check_interaction_distance() -> void:
 
 # ── Gathering progress bar ──
 # Managed by InteractionController but displayed by HUD
+# Floats above the 3D gathering node being harvested
 
 var _gather_progress: ProgressBar = null
+var _gather_target_node: Node3D = null  # The 3D node we're gathering from
 
-## Build the gathering progress bar (shown above the action bar when gathering)
+## Build the gathering progress bar (floats above the resource node)
 func _build_gather_progress() -> void:
 	_gather_progress = ProgressBar.new()
 	_gather_progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_gather_progress.custom_minimum_size = Vector2(140, 12)
+	_gather_progress.custom_minimum_size = Vector2(120, 10)
 	_gather_progress.show_percentage = false
 	_gather_progress.visible = false
-	_gather_progress.position = Vector2(340, _design_size.y - 80)
 
 	var bg_style: StyleBoxFlat = StyleBoxFlat.new()
-	bg_style.bg_color = Color(0.05, 0.06, 0.1, 0.6)
-	bg_style.set_corner_radius_all(2)
+	bg_style.bg_color = Color(0.05, 0.06, 0.1, 0.7)
+	bg_style.set_corner_radius_all(3)
 	_gather_progress.add_theme_stylebox_override("background", bg_style)
 
 	var fill_style: StyleBoxFlat = StyleBoxFlat.new()
-	fill_style.bg_color = Color(0.25, 0.65, 0.85, 0.8)
-	fill_style.set_corner_radius_all(2)
+	fill_style.bg_color = Color(0.25, 0.65, 0.85, 0.9)
+	fill_style.set_corner_radius_all(3)
 	_gather_progress.add_theme_stylebox_override("fill", fill_style)
 
 	add_child(_gather_progress)
 
-## Show/update gathering progress (0.0 to 1.0)
-func show_gather_progress(progress: float) -> void:
+## Show/update gathering progress (0.0 to 1.0), optionally track a 3D node
+func show_gather_progress(progress: float, target_node: Node3D = null) -> void:
+	if target_node and is_instance_valid(target_node):
+		_gather_target_node = target_node
 	if _gather_progress:
 		_gather_progress.value = progress * 100.0
 		_gather_progress.visible = true
+		_update_gather_bar_position()
 
 ## Hide gathering progress bar
 func hide_gather_progress() -> void:
@@ -1048,6 +1110,31 @@ func hide_gather_progress() -> void:
 		_gather_progress.visible = false
 	if _gather_label:
 		_gather_label.visible = false
+	_gather_target_node = null
+
+## Project the gather node's 3D position to screen and position the bar + label above it
+func _update_gather_bar_position() -> void:
+	if _gather_target_node == null or not is_instance_valid(_gather_target_node):
+		return
+	var camera: Camera3D = get_viewport().get_camera_3d()
+	if camera == null:
+		return
+	# Position above the node (offset Y upward in world space)
+	var world_pos: Vector3 = _gather_target_node.global_position + Vector3(0, 1.8, 0)
+	if camera.is_position_behind(world_pos):
+		if _gather_progress:
+			_gather_progress.visible = false
+		if _gather_label:
+			_gather_label.visible = false
+		return
+	var screen_pos: Vector2 = camera.unproject_position(world_pos)
+	# Center the bar on the screen position
+	if _gather_progress:
+		_gather_progress.position = Vector2(screen_pos.x - 60, screen_pos.y)
+		_gather_progress.visible = true
+	if _gather_label and _gather_label.visible:
+		_gather_label.position = Vector2(screen_pos.x - 80, screen_pos.y - 22)
+		_gather_label.size = Vector2(160, 20)
 
 # ── Adrenaline bar ──
 
@@ -2053,15 +2140,14 @@ func _build_gather_label() -> void:
 	_gather_label.name = "GatherLabel"
 	_gather_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_gather_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_gather_label.add_theme_font_size_override("font_size", 15)
+	_gather_label.add_theme_font_size_override("font_size", 13)
 	_gather_label.add_theme_color_override("font_color", Color(0.3, 0.85, 1.0, 0.9))
-	_gather_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.6))
+	_gather_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.7))
 	_gather_label.add_theme_constant_override("shadow_offset_x", 1)
 	_gather_label.add_theme_constant_override("shadow_offset_y", 1)
-	# Position just above the gather progress bar
-	var gp_vp_h: float = _design_size.y
-	_gather_label.position = Vector2(290, gp_vp_h - 108)
-	_gather_label.size = Vector2(260, 24)
+	# Position will be updated dynamically by _update_gather_bar_position()
+	_gather_label.position = Vector2(0, 0)
+	_gather_label.size = Vector2(160, 20)
 	_gather_label.visible = false
 	add_child(_gather_label)
 
@@ -2371,13 +2457,14 @@ func _get_panel_map() -> Dictionary:
 		"dungeon": _dungeon_panel,
 		"pets": _pet_panel,
 		"settings": _settings_panel,
+		"tutorial": _tutorial_panel,
 	}
 
 ## Save one panel's current state to GameState.panel_layout
 func _save_panel_state(panel: PanelContainer, panel_name: String) -> void:
 	if panel == null:
 		return
-	var header: DraggableHeader = panel.get_node_or_null("DragHeader") as DraggableHeader
+	var header: DraggableHeader = panel.find_child("DragHeader", true, false) as DraggableHeader
 	var locked: bool = false
 	if header:
 		locked = header._is_locked
@@ -2425,7 +2512,7 @@ func _restore_panel_layout() -> void:
 
 		# Restore lock state
 		var locked: bool = bool(layout.get("locked", false))
-		var header: DraggableHeader = panel.get_node_or_null("DragHeader") as DraggableHeader
+		var header: DraggableHeader = panel.find_child("DragHeader", true, false) as DraggableHeader
 		if header:
 			header.set_locked(locked)
 
@@ -2441,7 +2528,7 @@ func _wire_panel_drag_callbacks() -> void:
 
 ## Bind the drag-end callback to a panel's header (called after panel._ready)
 func _bind_drag_callback(panel: PanelContainer, panel_name: String) -> void:
-	var header: DraggableHeader = panel.get_node_or_null("DragHeader") as DraggableHeader
+	var header: DraggableHeader = panel.find_child("DragHeader", true, false) as DraggableHeader
 	if header:
 		header._on_drag_end = func(): _save_panel_state(panel, panel_name)
 
@@ -2678,10 +2765,13 @@ func _close_all_panels() -> void:
 		_quest_panel, _bestiary_panel, _prestige_panel,
 		_dungeon_panel, _pet_panel, _settings_panel,
 		_multiplayer_panel, _dialogue_panel, _shop_panel,
-		_crafting_panel, _bank_panel
+		_crafting_panel, _bank_panel, _tutorial_panel
 	]
 	for panel in panels:
 		if panel and panel.visible:
+			var header: DraggableHeader = panel.find_child("DragHeader", true, false) as DraggableHeader
+			if header and header._is_locked:
+				continue
 			panel.visible = false
 
 ## Handle window resize — reposition anchored elements
@@ -2698,6 +2788,8 @@ func _on_window_resized() -> void:
 	_reposition_chat()
 	# Reposition FPS/Pos labels to bottom-right
 	_reposition_bottom_labels()
+	# Reposition tutorial panel to top-center
+	_reposition_tutorial_panel()
 
 ## Reposition the bottom action bar to horizontal center
 func _reposition_action_bar() -> void:
@@ -2717,6 +2809,13 @@ func _reposition_bottom_labels() -> void:
 		fps_label.position = Vector2(vp_size.x - 100, vp_size.y - 26)
 	if pos_label:
 		pos_label.position = Vector2(vp_size.x - 200, vp_size.y - 26)
+
+func _reposition_tutorial_panel() -> void:
+	if _tutorial_panel == null:
+		return
+	var vp_size: Vector2 = _get_viewport_size()
+	_tutorial_panel.position = Vector2(vp_size.x / 2.0 - 180, 16)
+
 
 ## Cycle minimap zoom level (small → medium → large)
 var _minimap_zoom_level: int = 0  # 0=small (160), 1=medium (220), 2=large (300)
@@ -3055,7 +3154,7 @@ func _toggle_full_map() -> void:
 func _save_full_map_state() -> void:
 	if _full_map_panel == null:
 		return
-	var header: DraggableHeader = _full_map_panel.get_node_or_null("DragHeader") as DraggableHeader
+	var header: DraggableHeader = _full_map_panel.find_child("DragHeader", true, false) as DraggableHeader
 	var locked: bool = false
 	if header:
 		locked = header._is_locked

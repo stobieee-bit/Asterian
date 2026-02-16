@@ -269,20 +269,15 @@ func _create_slot(index: int) -> PanelContainer:
 	icon_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(icon_bg)
 
-	# Emoji icon label (centered)
-	var icon_label: Label = Label.new()
-	icon_label.name = "IconLabel"
-	icon_label.position = Vector2(3, 1)
-	icon_label.size = Vector2(SLOT_SIZE - 6, SLOT_SIZE - 6)
-	icon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	icon_label.add_theme_font_size_override("font_size", 20)
-	icon_label.add_theme_color_override("font_color", Color.WHITE)
-	icon_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.5))
-	icon_label.add_theme_constant_override("shadow_offset_x", 1)
-	icon_label.add_theme_constant_override("shadow_offset_y", 1)
-	icon_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	inner.add_child(icon_label)
+	# Pixel art icon texture (centered)
+	var icon_tex: TextureRect = TextureRect.new()
+	icon_tex.name = "IconTexture"
+	icon_tex.position = Vector2(3, 3)
+	icon_tex.size = Vector2(SLOT_SIZE - 6, SLOT_SIZE - 6)
+	icon_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(icon_tex)
 
 	# Hidden item name (for tooltip/data)
 	var item_label: Label = Label.new()
@@ -322,7 +317,7 @@ func refresh() -> void:
 		var slot: PanelContainer = _slots[i]
 		var inner: Control = slot.get_child(0)
 		var icon_bg: ColorRect = inner.get_node("IconBG") as ColorRect
-		var icon_label: Label = inner.get_node("IconLabel") as Label
+		var icon_tex: TextureRect = inner.get_node("IconTexture") as TextureRect
 		var item_label: Label = inner.get_node("ItemLabel") as Label
 		var qty_lbl: Label = inner.get_node("QtyLabel") as Label
 		var style: StyleBoxFlat = slot.get_theme_stylebox("panel") as StyleBoxFlat
@@ -338,8 +333,8 @@ func refresh() -> void:
 			var item_type: String = str(item_data.get("type", ""))
 			var icon_name: String = str(item_data.get("icon", ""))
 
-			# Emoji icon
-			icon_label.text = ItemIcons.get_icon(icon_name, item_type)
+			# Pixel art icon
+			icon_tex.texture = ItemIcons.get_icon_texture(icon_name, item_type)
 
 			# Colored background by type
 			icon_bg.color = _type_bg_color(item_type)
@@ -355,7 +350,7 @@ func refresh() -> void:
 				style.border_color.a = 0.8
 		else:
 			# Empty slot
-			icon_label.text = ""
+			icon_tex.texture = null
 			icon_bg.color = Color(0.15, 0.15, 0.2, 0.0)
 			item_label.text = ""
 			qty_lbl.text = ""

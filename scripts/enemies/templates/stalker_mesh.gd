@@ -2,7 +2,9 @@
 ##
 ## A sleek, low-slung stalking beast with an elongated torso, articulated legs,
 ## spine ridges, wedge-shaped head with fangs, whiskers, pointed ears, and a
-## segmented tail. Animate: prowling walk cycle, tail sway, head bob.
+## segmented tail. Rib cage suggestion, shoulder/haunch muscles, paw pads,
+## throat highlight, scar markings, tail joint spheres, secondary spine ridges,
+## and nostril detail. Animate: prowling walk cycle, tail sway, head bob.
 class_name StalkerMesh
 extends EnemyMeshBuilder
 
@@ -30,6 +32,17 @@ func build_mesh(params: Dictionary) -> Node3D:
 	var mat_claw: StandardMaterial3D = EnemyMeshBuilder.mat_sci(Color(0.2, 0.18, 0.15), 0.6, 0.35)
 	var mat_tail_tuft: StandardMaterial3D = EnemyMeshBuilder.mat_sci(EnemyMeshBuilder.darken(base_color, 0.18), 0.3, 0.5)
 
+	# New detail materials
+	var mat_muscle: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(base_color.r + 0.05, base_color.g - 0.02, base_color.b - 0.02), 0.2, 0.6,
+		Color.BLACK, 0.0, false, 1.0)
+	var mat_scar: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(base_color, 0.05), 0.05, 0.9)
+	var mat_pad: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.12, 0.1, 0.08), 0.0, 0.8)
+	var mat_throat: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(base_color, 0.15), 0.1, 0.65)
+
 	# ── Torso — elongated panther body ──
 	EnemyMeshBuilder.add_sphere(root, 0.45, Vector3(0.0, 0.7, 0.0), mat_body,
 		Vector3(1.8, 0.75, 0.85))
@@ -38,10 +51,50 @@ func build_mesh(params: Dictionary) -> Node3D:
 	EnemyMeshBuilder.add_sphere(root, 0.32, Vector3(0.0, 0.52, 0.0), mat_belly,
 		Vector3(1.5, 0.45, 0.7))
 
+	# ── Throat / chest lighter region ──
+	EnemyMeshBuilder.add_sphere(root, 0.2, Vector3(0.55, 0.55, 0.0), mat_throat,
+		Vector3(1.0, 0.6, 0.8))
+
+	# ── Rib cage suggestion — thin capsules along torso sides ──
+	for side: int in [-1, 1]:
+		for r: int in range(3):
+			var rx: float = -0.15 + r * 0.22
+			EnemyMeshBuilder.add_capsule(root, 0.012, 0.18,
+				Vector3(rx, 0.65, side * 0.28), mat_muscle,
+				Vector3(0.3, 0.0, 0.0))
+
+	# ── Shoulder / haunch muscle groups ──
+	# Front shoulders
+	EnemyMeshBuilder.add_sphere(root, 0.1, Vector3(0.42, 0.58, 0.28), mat_muscle,
+		Vector3(1.0, 0.7, 0.8))
+	EnemyMeshBuilder.add_sphere(root, 0.1, Vector3(0.42, 0.58, -0.28), mat_muscle,
+		Vector3(1.0, 0.7, 0.8))
+	# Rear haunches
+	EnemyMeshBuilder.add_sphere(root, 0.12, Vector3(-0.45, 0.6, 0.28), mat_muscle,
+		Vector3(0.9, 0.75, 0.85))
+	EnemyMeshBuilder.add_sphere(root, 0.12, Vector3(-0.45, 0.6, -0.28), mat_muscle,
+		Vector3(0.9, 0.75, 0.85))
+
+	# ── Scar markings — thin capsules across flanks ──
+	EnemyMeshBuilder.add_capsule(root, 0.005, 0.15,
+		Vector3(0.1, 0.72, 0.32), mat_scar, Vector3(0.2, 0.3, 0.0))
+	EnemyMeshBuilder.add_capsule(root, 0.005, 0.12,
+		Vector3(0.15, 0.68, 0.33), mat_scar, Vector3(-0.1, 0.2, 0.0))
+	EnemyMeshBuilder.add_capsule(root, 0.005, 0.14,
+		Vector3(-0.2, 0.7, -0.31), mat_scar, Vector3(0.15, -0.2, 0.0))
+	EnemyMeshBuilder.add_capsule(root, 0.005, 0.11,
+		Vector3(-0.15, 0.74, -0.30), mat_scar, Vector3(-0.1, -0.15, 0.0))
+
 	# ── Spine ridges (5 small cones along back) ──
 	for i: int in range(5):
 		var xoff: float = -0.5 + i * 0.25
 		EnemyMeshBuilder.add_cone(root, 0.04, 0.14, Vector3(xoff, 1.05, 0.0), mat_ridge,
+			Vector3(0.0, 0.0, 0.0))
+
+	# ── Secondary spine ridges (4 smaller cones between main spines) ──
+	for i: int in range(4):
+		var xoff: float = -0.375 + i * 0.25
+		EnemyMeshBuilder.add_cone(root, 0.025, 0.08, Vector3(xoff, 1.02, 0.0), mat_ridge,
 			Vector3(0.0, 0.0, 0.0))
 
 	# ── Head ──
@@ -88,6 +141,15 @@ func build_mesh(params: Dictionary) -> Node3D:
 				Vector3(0.22 + cos(angle) * 0.05, -0.04, wz), mat_whisker,
 				Vector3(0.0, 0.0, angle + side * 0.4))
 
+	# ── Nostrils — 2 small dark spheres at tip of snout ──
+	EnemyMeshBuilder.add_sphere(head, 0.018, Vector3(0.26, -0.04, 0.04), mat_dark,
+		Vector3(0.8, 0.6, 0.8))
+	EnemyMeshBuilder.add_sphere(head, 0.018, Vector3(0.26, -0.04, -0.04), mat_dark,
+		Vector3(0.8, 0.6, 0.8))
+	# Nose bridge ridge
+	EnemyMeshBuilder.add_capsule(head, 0.015, 0.08,
+		Vector3(0.2, 0.0, 0.0), mat_dark, Vector3(0.0, 0.0, PI * 0.5))
+
 	# ── Pointed ears ──
 	EnemyMeshBuilder.add_cone(head, 0.06, 0.14, Vector3(-0.06, 0.16, 0.12), mat_body,
 		Vector3(-0.3, 0.0, 0.15))
@@ -125,6 +187,10 @@ func build_mesh(params: Dictionary) -> Node3D:
 		EnemyMeshBuilder.add_sphere(lower, 0.06, Vector3(0.03, -0.18, 0.0), mat_dark,
 			Vector3(1.3, 0.6, 1.1))
 
+		# Paw pad — flat dark sphere on underside
+		EnemyMeshBuilder.add_sphere(lower, 0.04, Vector3(0.02, -0.2, 0.0), mat_pad,
+			Vector3(1.2, 0.3, 1.0))
+
 		# 3 claws per paw
 		for c: int in range(3):
 			var cz: float = (c - 1) * 0.035
@@ -151,6 +217,13 @@ func build_mesh(params: Dictionary) -> Node3D:
 			Vector3(0.0, 0.0, 0.0), mat_body,
 			Vector3(0.0, 0.0, PI * 0.5))
 
+	# ── Tail joint spheres between segments ──
+	for i: int in range(4):
+		var jx: float = -(i * 0.18 + 0.09)
+		var jy: float = 0.05 + (i * 0.04 + 0.02)
+		EnemyMeshBuilder.add_sphere(tail_root, 0.025,
+			Vector3(jx, jy, 0.0), mat_dark)
+
 	# Tail tuft
 	EnemyMeshBuilder.add_sphere(tail_root, 0.06,
 		Vector3(-0.92, 0.26, 0.0), mat_tail_tuft,
@@ -163,7 +236,7 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("tail_segments", tail_segments)
 
 	# Built facing +X, rotate to face -Z (Godot forward)
-	root.rotation.y = -PI / 2.0
+	root.rotation.y = PI / 2.0
 	return root
 
 

@@ -3,7 +3,8 @@
 ## A massive hovering eye with blood-vessel-textured sclera, colored iris,
 ## dark pupil, eyelid frames (half-torus), trailing nerve tentacles with
 ## secondary eyes at their tips, and a faint transparent aura glow.
-## ~35-40 mesh nodes. Animates iris look-around, tentacle sway, hover bob.
+## ~78 mesh nodes. Animates iris look-around, tentacle sway, hover bob,
+## nerve-node pulse, and mini-eye scale pulse.
 class_name EldritchEyeMesh
 extends EnemyMeshBuilder
 
@@ -41,6 +42,18 @@ func build_mesh(params: Dictionary) -> Node3D:
 		EnemyMeshBuilder.lighten(base_color, 0.2), 0.0, 1.0,
 		base_color, 0.6,
 		true, 0.08)
+	var mat_iris_detail: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.darken(base_color, 0.05), 0.5, 0.3,
+		EnemyMeshBuilder.darken(base_color, 0.05), 0.8)
+	var mat_nerve_node: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(Color(0.75, 0.55, 0.5), 0.1), 0.15, 0.7,
+		EnemyMeshBuilder.lighten(Color(0.75, 0.55, 0.5), 0.1), 1.0)
+	var mat_tear: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.8, 0.85, 0.9), 0.0, 0.1,
+		Color.BLACK, 0.0,
+		true, 0.2)
+	var mat_lid_inner: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.7, 0.3, 0.25), 0.15, 0.8)
 
 	# ══════════════════════════════════════════════════════════════
 	# CENTRAL EYEBALL
@@ -73,6 +86,26 @@ func build_mesh(params: Dictionary) -> Node3D:
 		var vessel: MeshInstance3D = EnemyMeshBuilder.add_capsule(
 			root, 0.012 * s, v_len, v_pos, mat_vessel, v_rot)
 		vessel.name = "Vessel%d" % vi
+
+	# ── Additional blood vessels — back and sides of sclera ──
+	var vessel_data_extra: Array = [
+		[Vector3(0.2, 0.15, 0.25), Vector3(0.3, -0.5, 0.6), 0.15],
+		[Vector3(-0.25, 0.18, 0.12), Vector3(-0.6, 0.3, 0.5), 0.17],
+		[Vector3(0.15, -0.22, -0.22), Vector3(0.5, 0.4, -0.6), 0.13],
+		[Vector3(-0.1, 0.26, -0.2), Vector3(-0.2, -0.5, 0.4), 0.16],
+		[Vector3(0.22, 0.05, -0.24), Vector3(0.4, 0.6, 0.2), 0.14],
+		[Vector3(-0.18, -0.18, -0.2), Vector3(-0.7, -0.3, -0.5), 0.12],
+		[Vector3(0.05, 0.22, 0.26), Vector3(0.1, 0.4, -0.7), 0.15],
+		[Vector3(-0.08, -0.28, 0.2), Vector3(-0.3, 0.6, 0.3), 0.11],
+	]
+	for vi: int in range(vessel_data_extra.size()):
+		var vd: Array = vessel_data_extra[vi]
+		var v_pos: Vector3 = (vd[0] as Vector3) * s + Vector3(0.0, eye_y, 0.0)
+		var v_rot: Vector3 = vd[1] as Vector3
+		var v_len: float = (vd[2] as float) * s
+		var vessel_extra: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+			root, 0.012 * s, v_len, v_pos, mat_vessel, v_rot)
+		vessel_extra.name = "VesselExtra%d" % vi
 
 	# ══════════════════════════════════════════════════════════════
 	# IRIS + PUPIL (on the front face of the eye, facing -Z)
@@ -115,6 +148,22 @@ func build_mesh(params: Dictionary) -> Node3D:
 		mat_iris_glow, Vector3(1.0, 1.0, 0.2))
 	iris_glow.name = "IrisGlow"
 
+	# ── Iris concentric ring details — 4 torus rings on the iris face ──
+	var iris_detail_radii: Array[float] = [0.05, 0.09, 0.13, 0.16]
+	for ri: int in range(iris_detail_radii.size()):
+		var ring_r: float = iris_detail_radii[ri] * s
+		var iris_detail: MeshInstance3D = EnemyMeshBuilder.add_torus(
+			iris_pivot, 0.008 * s, ring_r,
+			Vector3(0.0, 0.0, -0.29 * s),
+			mat_iris_detail, Vector3(PI * 0.5, 0.0, 0.0))
+		iris_detail.name = "IrisDetail%d" % ri
+
+	# ── Pupil depth — dark sphere behind the pupil for depth illusion ──
+	var pupil_depth: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		iris_pivot, 0.06 * s, Vector3(0.0, 0.0, -0.25 * s),
+		mat_pupil, Vector3(1.0, 1.0, 0.3))
+	pupil_depth.name = "PupilDepth"
+
 	# ══════════════════════════════════════════════════════════════
 	# EYELIDS — half-torus shapes framing top and bottom of the eye
 	# ══════════════════════════════════════════════════════════════
@@ -135,12 +184,39 @@ func build_mesh(params: Dictionary) -> Node3D:
 	eyelid_lower.name = "EyelidLower"
 	eyelid_lower.scale = Vector3(1.0, 0.5, 0.6)
 
+	# ── Eyelid inner linings — capsules along the inner edges ──
+	var lid_inner_upper: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.015 * s, 0.22 * s,
+		Vector3(0.0, eye_y + 0.14 * s, -0.15 * s),
+		mat_lid_inner, Vector3(0.2, 0.0, 0.0))
+	lid_inner_upper.name = "LidInnerUpper"
+
+	var lid_inner_lower: MeshInstance3D = EnemyMeshBuilder.add_capsule(
+		root, 0.015 * s, 0.22 * s,
+		Vector3(0.0, eye_y - 0.14 * s, -0.15 * s),
+		mat_lid_inner, Vector3(-0.2, 0.0, 0.0))
+	lid_inner_lower.name = "LidInnerLower"
+
+	# ── Tear / moisture details — transparent spheres at lower eye ──
+	var tear_left: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.03 * s,
+		Vector3(-0.06 * s, eye_y - 0.22 * s, -0.18 * s),
+		mat_tear)
+	tear_left.name = "TearLeft"
+
+	var tear_right: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+		root, 0.03 * s,
+		Vector3(0.06 * s, eye_y - 0.22 * s, -0.18 * s),
+		mat_tear)
+	tear_right.name = "TearRight"
+
 	# ══════════════════════════════════════════════════════════════
 	# NERVE TENTACLES — 8 capsules trailing from the back/bottom
 	# ══════════════════════════════════════════════════════════════
 
 	var tentacles: Array[MeshInstance3D] = []
 	var mini_eyes: Array[MeshInstance3D] = []
+	var nerve_nodes: Array[MeshInstance3D] = []
 
 	# Each tentacle: [attach_offset, hang_rotation, length, has_mini_eye]
 	var tentacle_data: Array = [
@@ -179,6 +255,28 @@ func build_mesh(params: Dictionary) -> Node3D:
 			mini_eye.name = "MiniEye%d" % ti
 			mini_eyes.append(mini_eye)
 
+		# Additional mini-eyes at nerve tips without existing eyes (indices 1,3,5,7)
+		if not t_has_eye:
+			var tip_dir_extra: Vector3 = Vector3(0.0, -1.0, 0.0).rotated(
+				Vector3.RIGHT, t_rot.x).rotated(
+				Vector3.FORWARD, t_rot.z)
+			var tip_pos_extra: Vector3 = t_offset + tip_dir_extra * t_len * 0.55
+			var mini_eye_extra: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+				root, 0.04 * s, tip_pos_extra, mat_mini_eye)
+			mini_eye_extra.name = "MiniEyeExtra%d" % ti
+			mini_eyes.append(mini_eye_extra)
+
+		# Nerve tentacle nodes — emissive midpoint spheres (indices 0,2,4,6)
+		if ti % 2 == 0:
+			var mid_dir: Vector3 = Vector3(0.0, -1.0, 0.0).rotated(
+				Vector3.RIGHT, t_rot.x).rotated(
+				Vector3.FORWARD, t_rot.z)
+			var mid_pos: Vector3 = t_offset + mid_dir * t_len * 0.25
+			var nerve_node: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+				root, 0.02 * s, mid_pos, mat_nerve_node)
+			nerve_node.name = "NerveNode%d" % ti
+			nerve_nodes.append(nerve_node)
+
 	# ══════════════════════════════════════════════════════════════
 	# AURA GLOW — large transparent sphere around the eyeball
 	# ══════════════════════════════════════════════════════════════
@@ -194,6 +292,7 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("mini_eyes", mini_eyes)
 	root.set_meta("eyelids", [eyelid_upper, eyelid_lower])
 	root.set_meta("aura", aura)
+	root.set_meta("nerve_nodes", nerve_nodes)
 	root.set_meta("eye_y", eye_y)
 	root.set_meta("scale", s)
 
@@ -247,6 +346,16 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 				continue
 			var pulse: float = 1.0 + sin(phase * 3.0 + float(i) * 1.5) * 0.15
 			eye.scale = Vector3(pulse, pulse, pulse)
+
+	# ── Nerve node pulse — scale oscillation on tentacle midpoint nodes ──
+	if root.has_meta("nerve_nodes"):
+		var nerve_nodes: Array = root.get_meta("nerve_nodes") as Array
+		for i: int in range(nerve_nodes.size()):
+			var node_mesh: MeshInstance3D = nerve_nodes[i] as MeshInstance3D
+			if node_mesh == null:
+				continue
+			var n_pulse: float = 1.0 + sin(phase * 2.5 + float(i) * 1.2) * 0.25
+			node_mesh.scale = Vector3(n_pulse, n_pulse, n_pulse)
 
 	# ── Aura pulse — breathing glow effect ──
 	if root.has_meta("aura"):

@@ -3,8 +3,9 @@
 ## A burrowing annelid with 8 tapering body segments, alternating dark/light
 ## banding, bristle setae, a distinct head prostomium with radial mandibles and
 ## mouth glow, a clitellum band, dorsal bumps, lateral bioluminescent spots,
-## and a tail pygidium. Animate: serpentine undulation when moving, gentle sway
-## when idle.
+## ventral grooves, inter-segment connective tissue, lateral veins, head sensory
+## nubs, inner mouth detail, dorsal ridge line, mucus nodes, bristle glow tips,
+## and a tail pygidium. Animate: serpentine undulation, bristle glow pulse.
 class_name WormMesh
 extends EnemyMeshBuilder
 
@@ -38,12 +39,30 @@ func build_mesh(params: Dictionary) -> Node3D:
 	var mat_head: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
 		EnemyMeshBuilder.darken(base_color, 0.05), 0.2, 0.55)
 
+	# New detail materials
+	var mat_vein: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.6, 0.2, 0.15), 0.1, 0.6,
+		Color(0.5, 0.15, 0.1), 0.3, true, 0.5)
+	var mat_sensory_nub: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(base_color, 0.1), 0.05, 0.5,
+		EnemyMeshBuilder.lighten(base_color, 0.15), 0.8)
+	var mat_slime: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		EnemyMeshBuilder.lighten(base_color, 0.25), 0.0, 0.9,
+		Color.BLACK, 0.0, true, 0.3)
+	var mat_bristle_glow: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.4, 0.9, 0.6), 0.0, 0.3,
+		Color(0.4, 0.95, 0.6), 1.0)
+	var mat_inner_mouth: StandardMaterial3D = EnemyMeshBuilder.mat_sci(
+		Color(0.5, 0.12, 0.1), 0.0, 0.7,
+		Color(0.6, 0.15, 0.1), 0.5)
+
 	# ── Segment layout ──
 	# 8 segments along the X axis, tapering from front to rear
 	var segment_count: int = 8
 	var segment_spacing: float = 0.28
 	var start_x: float = (segment_count - 1) * segment_spacing * 0.5
 	var segment_nodes: Array = []
+	var bristle_glow_tips: Array = []
 
 	for i: int in range(segment_count):
 		var seg: Node3D = Node3D.new()
@@ -77,8 +96,36 @@ func build_mesh(params: Dictionary) -> Node3D:
 			EnemyMeshBuilder.add_cone(seg, 0.012, 0.06,
 				Vector3(0.0, by, bz), mat_bristle, bristle_rot)
 
+		# ── Bristle glow tips on select bristles (first 4 segments, top 2 bristles) ──
+		if i < 4:
+			for bi: int in [0, 1]:
+				var angle: float = bristle_angles[bi]
+				var bz: float = cos(angle) * (seg_radius + 0.06)
+				var by: float = sin(angle) * (seg_radius * 0.7 + 0.06) - 0.02
+				var glow_tip: MeshInstance3D = EnemyMeshBuilder.add_sphere(
+					seg, 0.008, Vector3(0.0, by, bz), mat_bristle_glow)
+				bristle_glow_tips.append(glow_tip)
+
 		# ── Dorsal bump on top of each segment ──
 		EnemyMeshBuilder.add_sphere(seg, 0.035, Vector3(0.0, seg_radius * 0.65, 0.0), mat_bump)
+
+		# ── Dorsal ridge capsule above each bump ──
+		EnemyMeshBuilder.add_capsule(seg, 0.012, 0.06,
+			Vector3(0.0, seg_radius * 0.7 + 0.02, 0.0), mat_bump,
+			Vector3(0.0, 0.0, PI * 0.5))
+
+		# ── Ventral groove — capsule along underside ──
+		EnemyMeshBuilder.add_capsule(seg, 0.015, 0.08,
+			Vector3(0.0, -(seg_radius * 0.55), 0.0), mat_dark,
+			Vector3(0.0, 0.0, PI * 0.5))
+
+		# ── Lateral vein lines — thin semi-transparent capsules ──
+		EnemyMeshBuilder.add_capsule(seg, 0.005, 0.10,
+			Vector3(0.0, 0.0, seg_radius * 0.6), mat_vein,
+			Vector3(0.0, 0.0, PI * 0.5))
+		EnemyMeshBuilder.add_capsule(seg, 0.005, 0.10,
+			Vector3(0.0, 0.0, -(seg_radius * 0.6)), mat_vein,
+			Vector3(0.0, 0.0, PI * 0.5))
 
 		# ── Lateral bioluminescent glow spots (one per side, skip head/tail) ──
 		if i > 0 and i < segment_count - 1:
@@ -86,6 +133,19 @@ func build_mesh(params: Dictionary) -> Node3D:
 				Vector3(0.0, 0.0, seg_radius + 0.01), mat_glow)
 			EnemyMeshBuilder.add_sphere(seg, 0.025,
 				Vector3(0.0, 0.0, -(seg_radius + 0.01)), mat_glow)
+
+		# ── Mucus secretion nodes (underside, on even segments) ──
+		if i % 2 == 0 and i > 0:
+			EnemyMeshBuilder.add_sphere(seg, 0.012,
+				Vector3(0.0, -(seg_radius * 0.65), 0.0), mat_slime)
+
+	# ── Inter-segment connective tissue — small spheres at junctions ──
+	for i: int in range(segment_count - 1):
+		var x1: float = start_x - i * segment_spacing
+		var x2: float = start_x - (i + 1) * segment_spacing
+		var mid_x: float = (x1 + x2) * 0.5
+		EnemyMeshBuilder.add_sphere(root, 0.04, Vector3(mid_x, 0.33, 0.0), mat_dark,
+			Vector3(0.8, 0.5, 0.8))
 
 	# ── Head (prostomium) — distinct front segment ──
 	var head: Node3D = Node3D.new()
@@ -96,9 +156,24 @@ func build_mesh(params: Dictionary) -> Node3D:
 	EnemyMeshBuilder.add_sphere(head, 0.15, Vector3.ZERO, mat_head,
 		Vector3(1.2, 0.85, 0.9))
 
+	# ── Head sensory nubs — 6 spheres around prostomium ──
+	for i: int in range(6):
+		var angle: float = (float(i) / 6.0) * TAU
+		var nub_z: float = cos(angle) * 0.12
+		var nub_y: float = sin(angle) * 0.10
+		EnemyMeshBuilder.add_sphere(head, 0.015,
+			Vector3(0.08, nub_y, nub_z), mat_sensory_nub)
+
 	# ── Mouth glow ring ──
 	EnemyMeshBuilder.add_torus(head, 0.03, 0.07, Vector3(0.12, -0.02, 0.0),
 		mat_mouth_glow, Vector3(0.0, 0.0, PI * 0.5))
+
+	# ── Inner mouth detail ──
+	EnemyMeshBuilder.add_sphere(head, 0.04, Vector3(0.10, -0.02, 0.0), mat_inner_mouth)
+	EnemyMeshBuilder.add_cone(head, 0.012, 0.04,
+		Vector3(0.11, 0.02, 0.03), mat_mandible, Vector3(0.0, 0.0, 0.5))
+	EnemyMeshBuilder.add_cone(head, 0.012, 0.04,
+		Vector3(0.11, 0.02, -0.03), mat_mandible, Vector3(0.0, 0.0, -0.5))
 
 	# ── 4 radial mandibles ──
 	var mandible_offsets: Array = [
@@ -130,14 +205,17 @@ func build_mesh(params: Dictionary) -> Node3D:
 	# ── Store animatable references ──
 	root.set_meta("segments", segment_nodes)
 	root.set_meta("head", [head])
+	root.set_meta("bristle_glow_tips", bristle_glow_tips)
 
+	# Built facing +X, rotate to face -Z (Godot forward)
+	root.rotation.y = PI / 2.0
 	return root
 
 
 # ──────────────────────────────────────────────
 # Animate
 # ──────────────────────────────────────────────
-func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
+func animate(root: Node3D, phase: float, is_moving: bool, _delta: float) -> void:
 	var segments: Array = root.get_meta("segments", [])
 	var heads: Array = root.get_meta("head", [])
 	var seg_count: int = segments.size()
@@ -176,3 +254,10 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 			# Idle: slow probing motion
 			head_node.rotation.y = sin(phase * 0.6) * 0.15
 			head_node.rotation.z = sin(phase * 0.4) * 0.05
+
+	# ── Bristle glow tip pulse ──
+	var glow_tips: Array = root.get_meta("bristle_glow_tips", [])
+	for i: int in range(glow_tips.size()):
+		var tip: MeshInstance3D = glow_tips[i] as MeshInstance3D
+		var pulse: float = 0.7 + sin(phase * 1.8 + float(i) * 0.9) * 0.3
+		tip.scale = Vector3(pulse, pulse, pulse)

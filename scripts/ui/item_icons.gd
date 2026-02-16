@@ -119,3 +119,11 @@ static func get_equip_slot_icon(slot_name: String) -> String:
 		"boots":   return "🥾"
 		"gloves":  return "🧤"
 		_:         return "📦"
+
+## Returns procedural pixel art ImageTexture for an item icon
+static func get_icon_texture(icon_name: String, item_type: String = "") -> ImageTexture:
+	return ItemIconGenerator.get_texture(icon_name, item_type)
+
+## Returns procedural pixel art ImageTexture for an empty equipment slot
+static func get_equip_slot_texture(slot_name: String) -> ImageTexture:
+	return ItemIconGenerator.get_slot_texture(slot_name)

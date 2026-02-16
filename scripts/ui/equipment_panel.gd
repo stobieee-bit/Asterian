@@ -97,9 +97,9 @@ func _centered_row() -> HBoxContainer:
 	row.add_theme_constant_override("separation", SLOT_GAP)
 	return row
 
-## Get emoji icon for a slot type (empty state) — delegates to shared ItemIcons
-func _slot_icon(slot_name: String) -> String:
-	return ItemIcons.get_equip_slot_icon(slot_name)
+## Get pixel art texture for a slot type (empty state) — delegates to shared ItemIcons
+func _slot_icon_texture(slot_name: String) -> ImageTexture:
+	return ItemIcons.get_equip_slot_texture(slot_name)
 
 ## Create a single equipment slot
 func _create_slot(slot_name: String, display_name: String) -> PanelContainer:
@@ -120,18 +120,17 @@ func _create_slot(slot_name: String, display_name: String) -> PanelContainer:
 	inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	slot.add_child(inner)
 
-	# Slot icon (large, centered — shows slot type when empty, item icon when equipped)
-	var icon_label: Label = Label.new()
-	icon_label.name = "SlotIcon"
-	icon_label.text = _slot_icon(slot_name)
-	icon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	icon_label.position = Vector2(0, 0)
-	icon_label.size = Vector2(SLOT_SIZE, SLOT_SIZE)
-	icon_label.add_theme_font_size_override("font_size", 28)
-	icon_label.add_theme_color_override("font_color", Color(0.15, 0.22, 0.3, 0.3))
-	icon_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	inner.add_child(icon_label)
+	# Slot icon texture (pixel art — shows slot type when empty, item icon when equipped)
+	var icon_tex: TextureRect = TextureRect.new()
+	icon_tex.name = "SlotIconTex"
+	icon_tex.position = Vector2(3, 3)
+	icon_tex.size = Vector2(SLOT_SIZE - 6, SLOT_SIZE - 6)
+	icon_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_tex.texture = ItemIcons.get_equip_slot_texture(slot_name)
+	icon_tex.modulate = Color(0.15, 0.22, 0.3, 0.3)
+	icon_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(icon_tex)
 
 	# Hidden item label (kept for data reference, not displayed)
 	var item_label: Label = Label.new()
@@ -156,7 +155,7 @@ func refresh() -> void:
 		var slot: PanelContainer = _slot_nodes[slot_name]
 		var inner: Control = slot.get_node("Inner") as Control
 		var item_label: Label = inner.get_node("ItemLabel") as Label
-		var slot_icon: Label = inner.get_node("SlotIcon") as Label
+		var slot_icon_tex: TextureRect = inner.get_node("SlotIconTex") as TextureRect
 		var style: StyleBoxFlat = slot.get_theme_stylebox("panel") as StyleBoxFlat
 
 		var item_id: String = str(GameState.equipment.get(slot_name, ""))
@@ -170,11 +169,14 @@ func refresh() -> void:
 
 			var tc: Color = _tier_color(tier)
 
-			# Show item-specific icon when equipped (icon-only, no text)
-			if slot_icon:
+			# Show item-specific pixel art icon when equipped
+			if slot_icon_tex:
 				var icon_id: String = str(item_data.get("icon", ""))
-				slot_icon.text = _item_icon(icon_id, slot_name)
-				slot_icon.add_theme_color_override("font_color", tc.lightened(0.2))
+				var tex: ImageTexture = ItemIcons.get_icon_texture(icon_id, "")
+				if tex == null:
+					tex = ItemIcons.get_equip_slot_texture(slot_name)
+				slot_icon_tex.texture = tex
+				slot_icon_tex.modulate = tc.lightened(0.2)
 
 			if style:
 				style.border_color = tc.darkened(0.2)
@@ -182,10 +184,10 @@ func refresh() -> void:
 		else:
 			if item_label:
 				item_label.text = ""
-			# Show slot icon prominently when empty
-			if slot_icon:
-				slot_icon.text = _slot_icon(slot_name)
-				slot_icon.add_theme_color_override("font_color", Color(0.2, 0.3, 0.4, 0.4))
+			# Show slot placeholder icon when empty
+			if slot_icon_tex:
+				slot_icon_tex.texture = ItemIcons.get_equip_slot_texture(slot_name)
+				slot_icon_tex.modulate = Color(0.2, 0.3, 0.4, 0.4)
 			if style:
 				style.border_color = Color(0.2, 0.4, 0.5, 0.7)
 
@@ -336,10 +338,9 @@ func _tier_color(tier: int) -> Color:
 		return Color.html(str(tiers[tier_str].get("color", "#888888")))
 	return Color(0.55, 0.55, 0.55)
 
-## Get emoji icon for equipped item — delegates to shared ItemIcons
-func _item_icon(icon_name: String, slot_name: String) -> String:
-	var icon: String = ItemIcons.get_icon(icon_name, "")
-	if icon == "📦":
-		# No match found — use slot placeholder instead
-		return _slot_icon(slot_name)
-	return icon
+## Get pixel art texture for equipped item — delegates to shared ItemIcons
+func _item_icon_texture(icon_name: String, slot_name: String) -> ImageTexture:
+	var tex: ImageTexture = ItemIcons.get_icon_texture(icon_name, "")
+	if tex == null:
+		return _slot_icon_texture(slot_name)
+	return tex
