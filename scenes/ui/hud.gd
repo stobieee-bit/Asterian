@@ -746,8 +746,6 @@ func _build_action_bar() -> void:
 	bg_style.content_margin_left = 8
 	bg_style.content_margin_right = 8
 	bar_bg.add_theme_stylebox_override("panel", bg_style)
-	var vp_init: Vector2 = _get_viewport_size()
-	bar_bg.position = Vector2(vp_init.x / 2.0 - 520, vp_init.y - 52)
 	add_child(bar_bg)
 
 	var bar: HBoxContainer = HBoxContainer.new()
@@ -812,6 +810,9 @@ func _build_action_bar() -> void:
 	set_btn.tooltip_text = "Settings"
 	set_btn.pressed.connect(func(): _toggle_panel(_settings_panel, "settings"))
 	bar.add_child(set_btn)
+
+	# Position centered at bottom
+	_reposition_action_bar()
 
 # ── Signal handlers ──
 
@@ -2840,6 +2841,7 @@ func _reposition_action_bar() -> void:
 	if _action_bar_bg == null:
 		return
 	var vp_size: Vector2 = _get_viewport_size()
+	await get_tree().process_frame
 	var bar_w: float = _action_bar_bg.size.x
 	if bar_w < 10:
 		bar_w = 1040.0
