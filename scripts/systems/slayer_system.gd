@@ -152,7 +152,7 @@ func _build_enemy_pool(combat_level: int) -> Array[Dictionary]:
 
 	for type_id in all_enemies:
 		var data: Dictionary = all_enemies[type_id]
-		var enemy_combat: int = int(data.get("combatLevel", 0))
+		var enemy_combat: int = int(data.get("level", 0))
 
 		# Must be within the player's level window
 		if enemy_combat < level_floor or enemy_combat > level_ceil:
@@ -178,7 +178,7 @@ func _complete_task() -> void:
 
 	var enemy_data: Dictionary = DataManager.get_enemy(enemy_type)
 	var enemy_name: String = str(enemy_data.get("name", enemy_type))
-	var enemy_combat: int = int(enemy_data.get("combatLevel", 1))
+	var enemy_combat: int = int(enemy_data.get("level", 1))
 
 	# ── Calculate rewards ──
 	var total_xp: int = count * enemy_combat * 2

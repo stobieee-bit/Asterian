@@ -51,6 +51,7 @@ func _precompute_zones() -> void:
 			"level_max": int(zone.get("levelMax", 10)),
 			"density": float(zone.get("density", 0.5)),
 			"enemy_types": [] as Array[String],
+			"priority_types": [] as Array[String],  # Quest/slayer objectives guaranteed 2+
 			"spawned_count": 0,
 			"target_count": 0,
 		}
@@ -76,7 +77,72 @@ func _precompute_zones() -> void:
 		if types.size() > 0:
 			_zone_spawn_data.append(zone_data)
 
+	# Ensure quest/slayer objective enemies appear in at least one zone
+	_inject_objective_enemies()
+
 	print("EnemySpawner: %d zones precomputed" % _zone_spawn_data.size())
+
+
+## Collect all quest/board kill-objective enemy types and ensure each is in a zone
+func _inject_objective_enemies() -> void:
+	var objective_types: Dictionary = {}  # enemy_type -> true
+
+	# Scan story quests
+	for quest_id in DataManager.quests:
+		var quest: Dictionary = DataManager.quests[quest_id]
+		var steps: Array = quest.get("steps", [])
+		for step in steps:
+			var stype: String = str(step.get("type", ""))
+			if stype == "kill" or stype == "boss_kill":
+				var target: String = str(step.get("target", ""))
+				if target != "" and DataManager.enemies.has(target):
+					objective_types[target] = true
+
+	# Scan board quests
+	for bq_id in DataManager.board_quests:
+		var bq: Dictionary = DataManager.board_quests[bq_id]
+		var steps: Array = bq.get("steps", [])
+		for step in steps:
+			if str(step.get("type", "")) == "kill":
+				var target: String = str(step.get("target", ""))
+				if target != "" and DataManager.enemies.has(target):
+					objective_types[target] = true
+
+	# For each objective enemy, check if it's in any zone; if not, inject it
+	for enemy_type in objective_types:
+		var edata: Dictionary = DataManager.enemies[enemy_type]
+		var earea: String = str(edata.get("area", ""))
+		var found_in_zone: bool = false
+
+		for zone in _zone_spawn_data:
+			var types: Array = zone["enemy_types"]
+			if types.has(enemy_type):
+				found_in_zone = true
+				# Mark as priority so spawner guarantees at least 2
+				if not zone["priority_types"].has(enemy_type):
+					zone["priority_types"].append(enemy_type)
+				break
+
+		if not found_in_zone:
+			# Find best zone: same area, highest level_max
+			var best_zone: Dictionary = {}
+			var best_level: int = -1
+			for zone in _zone_spawn_data:
+				if zone["area"] == earea and zone["level_max"] > best_level:
+					best_level = zone["level_max"]
+					best_zone = zone
+			if best_zone.is_empty():
+				# Fallback: any zone with highest level
+				for zone in _zone_spawn_data:
+					if zone["level_max"] > best_level:
+						best_level = zone["level_max"]
+						best_zone = zone
+			if not best_zone.is_empty():
+				best_zone["enemy_types"].append(enemy_type)
+				if not best_zone["priority_types"].has(enemy_type):
+					best_zone["priority_types"].append(enemy_type)
+				print("EnemySpawner: Injected '%s' (lv %d) into zone '%s'" % [
+					enemy_type, int(edata.get("level", 0)), best_zone["id"]])
 
 ## Spawn enemies in zones near the player
 func _spawn_nearby_zones() -> void:
@@ -105,17 +171,57 @@ func _spawn_nearby_zones() -> void:
 		# Spawn up to target
 		var to_spawn: int = mini(target - living, max_enemies_total - total_active)
 		if to_spawn <= 0:
+			# Even if zone is at capacity, check priority types have at least 2
+			_ensure_priority_spawns(zone, total_active)
 			continue
 
 		var types: Array = zone["enemy_types"]
 		if types.size() == 0:
 			continue
 
+		# First, guarantee at least 2 of each priority type
+		var priority: Array = zone["priority_types"]
+		for ptype in priority:
+			var pcount: int = _count_type_in_zone(ptype, zone["id"])
+			while pcount < 2 and to_spawn > 0 and total_active < max_enemies_total:
+				var pos: Vector3 = _random_position_in_zone(zone)
+				_spawn_enemy(ptype, pos, zone["id"])
+				total_active += 1
+				to_spawn -= 1
+				pcount += 1
+
+		# Fill remaining with random types
 		for i in range(to_spawn):
 			var type_id: String = types[randi() % types.size()]
 			var pos: Vector3 = _random_position_in_zone(zone)
 			_spawn_enemy(type_id, pos, zone["id"])
 			total_active += 1
+
+## Ensure priority (quest/slayer objective) enemies have at least 2 alive in zone
+func _ensure_priority_spawns(zone: Dictionary, total_active: int) -> void:
+	var priority: Array = zone["priority_types"]
+	for ptype in priority:
+		if total_active >= max_enemies_total:
+			break
+		var pcount: int = _count_type_in_zone(ptype, zone["id"])
+		while pcount < 2 and total_active < max_enemies_total:
+			var pos: Vector3 = _random_position_in_zone(zone)
+			_spawn_enemy(ptype, pos, zone["id"])
+			total_active += 1
+			pcount += 1
+
+
+## Count living enemies of a specific type in a zone
+func _count_type_in_zone(type_id: String, zone_id: String) -> int:
+	var count: int = 0
+	for enemy in _active_enemies:
+		if not is_instance_valid(enemy):
+			continue
+		if enemy.get_meta("zone_id", "") == zone_id and enemy.enemy_id == type_id:
+			if enemy.state != enemy.State.DEAD:
+				count += 1
+	return count
+
 
 ## Spawn a single enemy. Bosses automatically get BossAI child node.
 func _spawn_enemy(type_id: String, pos: Vector3, zone_id: String) -> void:

@@ -2060,6 +2060,52 @@
       "scale": 0.8
     }
   },
+  "night_stalker": {
+    "name": "Night Stalker",
+    "level": 42,
+    "hp": 570,
+    "maxHp": 570,
+    "damage": 42,
+    "defense": 31,
+    "attackSpeed": 3.08,
+    "aggroRange": 7.1,
+    "leashRange": 17.1,
+    "combatStyle": "void",
+    "respawnTime": 33,
+    "area": "alien-wastes",
+    "desc": "Nocturnal predator with darkvision.",
+    "lootTable": [
+      {
+        "itemId": "spore_gland",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 126,
+        "max": 336
+      },
+      {
+        "itemId": "titanex_voidstaff",
+        "chance": 0.02,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "titanex_dark_orb",
+        "chance": 0.015,
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "meshTemplate": "stalker",
+    "meshParams": {
+      "color": 1973790,
+      "scale": 0.85
+    }
+  },
   "dust_worm": {
     "name": "Dust Worm",
     "level": 41,

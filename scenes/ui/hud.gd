@@ -807,6 +807,10 @@ func _on_inventory_full() -> void:
 	_on_chat_message("Inventory is full!", "system")
 
 func _on_chat_message(text: String, channel: String) -> void:
+	# Refresh slayer tracker on any slayer-related chat message (task assigned/completed)
+	if channel == "slayer":
+		_update_slayer_display()
+
 	if _chat_container == null:
 		return
 
@@ -1530,21 +1534,56 @@ func _build_combat_indicator() -> void:
 	add_child(_combat_label)
 
 # ── Slayer task display ──
-var _slayer_label: Label = null
+var _slayer_panel: PanelContainer = null
+var _slayer_title: Label = null
+var _slayer_target: Label = null
+var _slayer_progress: Label = null
+var _slayer_streak: Label = null
 
 func _build_slayer_display() -> void:
-	_slayer_label = Label.new()
-	_slayer_label.name = "SlayerTask"
-	_slayer_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_slayer_label.add_theme_font_size_override("font_size", 14)
-	_slayer_label.add_theme_color_override("font_color", Color(1.0, 0.5, 0.2))
-	_slayer_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.8))
-	_slayer_label.add_theme_constant_override("shadow_offset_x", 1)
-	_slayer_label.add_theme_constant_override("shadow_offset_y", 1)
-	_slayer_label.position = Vector2(14, 148)
-	_slayer_label.size = Vector2(320, 22)
-	_slayer_label.visible = false
-	add_child(_slayer_label)
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = Color(0.08, 0.04, 0.02, 0.75)
+	style.border_color = Color(1.0, 0.5, 0.2, 0.4)
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(4)
+	style.set_content_margin_all(6)
+
+	_slayer_panel = PanelContainer.new()
+	_slayer_panel.name = "SlayerTracker"
+	_slayer_panel.add_theme_stylebox_override("panel", style)
+	_slayer_panel.visible = false
+	_slayer_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_slayer_panel.custom_minimum_size = Vector2(260, 0)
+	add_child(_slayer_panel)
+
+	var vbox: VBoxContainer = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 3)
+	_slayer_panel.add_child(vbox)
+
+	_slayer_title = Label.new()
+	_slayer_title.text = "Slayer Task"
+	_slayer_title.add_theme_font_size_override("font_size", 14)
+	_slayer_title.add_theme_color_override("font_color", Color(1.0, 0.6, 0.2))
+	_slayer_title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.5))
+	_slayer_title.add_theme_constant_override("shadow_offset_x", 1)
+	_slayer_title.add_theme_constant_override("shadow_offset_y", 1)
+	vbox.add_child(_slayer_title)
+
+	_slayer_target = Label.new()
+	_slayer_target.add_theme_font_size_override("font_size", 13)
+	_slayer_target.add_theme_color_override("font_color", Color(0.85, 0.8, 0.7))
+	vbox.add_child(_slayer_target)
+
+	_slayer_progress = Label.new()
+	_slayer_progress.add_theme_font_size_override("font_size", 13)
+	_slayer_progress.add_theme_color_override("font_color", Color(0.9, 0.7, 0.3))
+	vbox.add_child(_slayer_progress)
+
+	_slayer_streak = Label.new()
+	_slayer_streak.add_theme_font_size_override("font_size", 11)
+	_slayer_streak.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7))
+	vbox.add_child(_slayer_streak)
+
 	# Connect to enemy killed to update
 	EventBus.enemy_killed.connect(_on_slayer_enemy_killed)
 	# Show initial state (if save had an active task)
@@ -1554,21 +1593,41 @@ func _on_slayer_enemy_killed(_eid: String, _etype: String) -> void:
 	_update_slayer_display()
 
 func _update_slayer_display() -> void:
-	if _slayer_label == null:
+	if _slayer_panel == null:
 		return
 	var task: Dictionary = GameState.slayer_task
 	if task.is_empty() or not task.has("remaining"):
-		_slayer_label.visible = false
+		_slayer_panel.visible = false
 		return
 	var remaining: int = int(task.get("remaining", 0))
 	if remaining <= 0:
-		_slayer_label.visible = false
+		_slayer_panel.visible = false
 		return
+	var count: int = int(task.get("count", 0))
 	var enemy_type: String = str(task.get("enemy_type", ""))
 	var enemy_data: Dictionary = DataManager.get_enemy(enemy_type)
 	var enemy_name: String = str(enemy_data.get("name", enemy_type))
-	_slayer_label.text = "Slayer: %s (%d left)" % [enemy_name, remaining]
-	_slayer_label.visible = true
+	var area_name: String = str(task.get("area", "")).replace("-", " ").capitalize()
+
+	_slayer_target.text = "Kill %s" % enemy_name
+	_slayer_progress.text = "%d / %d" % [count - remaining, count]
+	_slayer_streak.text = "Streak: %d | %s" % [GameState.slayer_streak, area_name]
+	_slayer_panel.visible = true
+
+	# Position below the quest tracker
+	_reposition_slayer_tracker()
+
+
+func _reposition_slayer_tracker() -> void:
+	if _slayer_panel == null:
+		return
+	var vp_size: Vector2 = _get_viewport_size()
+	# Base Y: below the quest tracker if it's visible, otherwise at 200
+	var base_y: float = 200.0
+	if _quest_tracker_panel != null and _quest_tracker_panel.visible:
+		base_y = _quest_tracker_panel.position.y + _quest_tracker_panel.size.y + 8.0
+	_slayer_panel.position = Vector2(vp_size.x - 280, base_y)
+
 
 func _on_combat_started(_enemy_id: String) -> void:
 	_in_combat_state = true
@@ -2206,6 +2265,9 @@ func _refresh_quest_tracker() -> void:
 	else:
 		_quest_tracker_panel.visible = false
 
+	# Reposition slayer tracker since quest tracker visibility may have changed
+	_reposition_slayer_tracker()
+
 # ══════════════════════════════════════════════════════════════════
 # QoL: AUTO-SAVE INDICATOR — Brief "Game Saved" toast
 # ══════════════════════════════════════════════════════════════════
@@ -2805,6 +2867,8 @@ func _on_window_resized() -> void:
 	_reposition_chat()
 	# Reposition FPS/Pos labels to bottom-right
 	_reposition_bottom_labels()
+	# Reposition slayer tracker below quest tracker
+	_reposition_slayer_tracker()
 
 ## Reposition the bottom action bar to horizontal center
 func _reposition_action_bar() -> void:
@@ -2867,6 +2931,9 @@ func _resize_minimap() -> void:
 	# Move quest tracker below minimap
 	if _quest_tracker_panel:
 		_quest_tracker_panel.position.y = map_size + 12
+
+	# Reposition slayer tracker below quest tracker
+	_reposition_slayer_tracker()
 
 	EventBus.chat_message.emit("Minimap: %s" % ["Small", "Medium", "Large"][_minimap_zoom_level], "system")
 
