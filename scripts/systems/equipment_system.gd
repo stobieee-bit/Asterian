@@ -38,12 +38,25 @@ func equip_item(item_id: String) -> bool:
 		push_warning("EquipmentSystem: Invalid slot '%s'" % slot)
 		return false
 
-	# Check level requirement
+	# Check level requirement — use style's skill level if item has a style
 	var level_req: int = int(item.get("levelReq", 0))
 	if level_req > 0:
-		var combat_lvl: int = GameState.get_combat_level()
-		if combat_lvl < level_req:
-			EventBus.chat_message.emit("Need combat level %d to equip this." % level_req, "system")
+		var item_style: String = str(item.get("style", ""))
+		if item_style == "":
+			item_style = str(item.get("armorStyle", ""))
+
+		var check_level: int = 0
+		var skill_name_display: String = "Combat"
+
+		if item_style != "" and GameState.skills.has(item_style):
+			check_level = int(GameState.skills[item_style]["level"])
+			var skill_data: Dictionary = DataManager.get_skill(item_style)
+			skill_name_display = str(skill_data.get("name", item_style))
+		else:
+			check_level = GameState.get_combat_level()
+
+		if check_level < level_req:
+			EventBus.chat_message.emit("Need %s level %d to equip this." % [skill_name_display, level_req], "system")
 			return false
 
 	# Check skill requirements

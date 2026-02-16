@@ -8,6 +8,7 @@ extends Node3D
 # ── References ──────────────────────────────────────────────────────────
 var _mesh_root: Node3D = null
 var _player: CharacterBody3D = null
+var _weapon_nodes: Array[Node3D] = []  # Currently attached weapon meshes
 
 # ── Animation state ─────────────────────────────────────────────────────
 var _walk_phase: float = 0.0
@@ -41,6 +42,9 @@ func _ready() -> void:
 	var initial_style: String = str(GameState.player.get("combat_style", "nano"))
 	PlayerMeshBuilder.apply_style_theme(_mesh_root, initial_style)
 
+	# Attach initial weapon model
+	_attach_weapon(initial_style)
+
 	# Cache reference to the parent CharacterBody3D (PlayerController)
 	_player = get_parent() as CharacterBody3D
 
@@ -48,9 +52,15 @@ func _ready() -> void:
 	if EventBus.has_signal("player_attacked"):
 		EventBus.player_attacked.connect(_on_player_attacked)
 
-	# Listen for combat style changes to recolor mesh
+	# Listen for combat style changes to recolor mesh and swap weapon
 	if EventBus.has_signal("combat_style_changed"):
 		EventBus.combat_style_changed.connect(_on_style_changed)
+
+	# Listen for equipment changes to show/hide weapon model
+	if EventBus.has_signal("item_equipped"):
+		EventBus.item_equipped.connect(_on_item_equipped)
+	if EventBus.has_signal("item_unequipped"):
+		EventBus.item_unequipped.connect(_on_item_unequipped)
 
 
 func _process(delta: float) -> void:
@@ -111,10 +121,76 @@ func _on_player_attacked() -> void:
 	play_attack()
 
 
-## Signal callback for combat style change — recolor the mesh
+## Signal callback for combat style change — recolor mesh and swap weapon
 func _on_style_changed(new_style: String) -> void:
 	if _mesh_root:
 		PlayerMeshBuilder.apply_style_theme(_mesh_root, new_style)
+		_attach_weapon(new_style)
+
+
+## Signal callback for weapon equip — refresh weapon model
+func _on_item_equipped(slot: String, _item_id: String) -> void:
+	if slot == "weapon":
+		var style: String = str(GameState.player.get("combat_style", "nano"))
+		_attach_weapon(style)
+
+
+## Signal callback for weapon unequip — remove weapon model
+func _on_item_unequipped(slot: String, _item_id: String) -> void:
+	if slot == "weapon":
+		_remove_weapons()
+
+
+## Remove all currently attached weapon meshes
+func _remove_weapons() -> void:
+	for node in _weapon_nodes:
+		if is_instance_valid(node):
+			node.queue_free()
+	_weapon_nodes.clear()
+
+
+## Build and attach weapon mesh(es) for the given combat style
+func _attach_weapon(style: String) -> void:
+	_remove_weapons()
+
+	if _mesh_root == null:
+		return
+
+	# Only show weapon if one is actually equipped
+	var weapon_id: String = str(GameState.equipment.get("weapon", ""))
+	if weapon_id == "":
+		return
+
+	var right_arm_lower: Node3D = _mesh_root.get_meta("right_arm_lower") as Node3D
+	var left_arm_lower: Node3D = _mesh_root.get_meta("left_arm_lower") as Node3D
+
+	match style:
+		"nano":
+			# Dual blades — one per hand
+			if right_arm_lower:
+				var r_blade: Node3D = PlayerMeshBuilder.build_weapon_mesh("nano")
+				right_arm_lower.add_child(r_blade)
+				_weapon_nodes.append(r_blade)
+			if left_arm_lower:
+				var l_blade: Node3D = PlayerMeshBuilder.build_weapon_mesh("nano")
+				left_arm_lower.add_child(l_blade)
+				_weapon_nodes.append(l_blade)
+		"tesla":
+			# Single coilgun in right hand
+			if right_arm_lower:
+				var coilgun: Node3D = PlayerMeshBuilder.build_weapon_mesh("tesla")
+				right_arm_lower.add_child(coilgun)
+				_weapon_nodes.append(coilgun)
+		"void":
+			# Staff in right hand
+			if right_arm_lower:
+				var staff: Node3D = PlayerMeshBuilder.build_weapon_mesh("void")
+				right_arm_lower.add_child(staff)
+				_weapon_nodes.append(staff)
+
+	# Apply style theme so weapon colors match the armor
+	for node in _weapon_nodes:
+		PlayerMeshBuilder.apply_style_theme(node, style)
 
 
 ## Spawn a quick style-specific visual effect at the attack impact point

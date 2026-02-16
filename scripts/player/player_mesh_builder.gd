@@ -1182,6 +1182,255 @@ static func reset_pose(root: Node3D) -> void:
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+#  WEAPON MESH BUILDERS — Procedural 3D weapon models per combat style
+# ═══════════════════════════════════════════════════════════════════════════
+
+## Build a weapon mesh for the given combat style.
+## Nano returns a single blade (attach one to each hand for dual-wield).
+## Tesla/Void return a single weapon (attach to right hand).
+static func build_weapon_mesh(style: String) -> Node3D:
+	match style:
+		"nano":
+			return _build_nanoblade()
+		"tesla":
+			return _build_coilgun()
+		"void":
+			return _build_voidstaff()
+		_:
+			return _build_nanoblade()
+
+
+## Nano — Sleek energy dagger extending forward from the hand
+static func _build_nanoblade() -> Node3D:
+	var root: Node3D = Node3D.new()
+	root.name = "NanobladeRoot"
+	root.position = Vector3(0.0, -0.25, 0.0)
+
+	# Grip
+	var grip: MeshInstance3D = _cylinder("Grip", 0.015, 0.1, COL_PLATE_DARK, true)
+	grip.position = Vector3(0.0, -0.02, -0.02)
+	grip.rotation.x = deg_to_rad(80)
+	root.add_child(grip)
+
+	# Guard crossbar
+	var guard: MeshInstance3D = _box("Guard", Vector3(0.06, 0.015, 0.025), COL_PLATE_HI, true)
+	guard.position = Vector3(0.0, -0.04, -0.06)
+	root.add_child(guard)
+
+	# Blade core
+	var blade: MeshInstance3D = _box("BladeCore", Vector3(0.015, 0.005, 0.22), COL_PLATE, true)
+	blade.position = Vector3(0.0, -0.035, -0.18)
+	root.add_child(blade)
+
+	# Glowing blade edges
+	var edge_l: MeshInstance3D = _box("EdgeL", Vector3(0.003, 0.008, 0.20), COL_ENERGY, false, true, 2.5)
+	edge_l.position = Vector3(-0.01, -0.035, -0.18)
+	root.add_child(edge_l)
+
+	var edge_r: MeshInstance3D = _box("EdgeR", Vector3(0.003, 0.008, 0.20), COL_ENERGY, false, true, 2.5)
+	edge_r.position = Vector3(0.01, -0.035, -0.18)
+	root.add_child(edge_r)
+
+	# Tapered tip
+	var tip: MeshInstance3D = _box("BladeTip", Vector3(0.008, 0.004, 0.04), COL_ENERGY_BRIGHT, false, true, 3.0)
+	tip.position = Vector3(0.0, -0.035, -0.30)
+	root.add_child(tip)
+
+	# Central spine ridge
+	var spine: MeshInstance3D = _box("Spine", Vector3(0.004, 0.012, 0.18), COL_PLATE_HI, true)
+	spine.position = Vector3(0.0, -0.03, -0.16)
+	root.add_child(spine)
+
+	# Nanotech circuit lines
+	var circuit1: MeshInstance3D = _box("Circuit1", Vector3(0.012, 0.003, 0.10), COL_ENERGY, false, true, 1.5)
+	circuit1.position = Vector3(0.0, -0.038, -0.14)
+	root.add_child(circuit1)
+
+	var circuit2: MeshInstance3D = _box("Circuit2", Vector3(0.012, 0.003, 0.08), COL_ENERGY, false, true, 1.5)
+	circuit2.position = Vector3(0.0, -0.038, -0.22)
+	root.add_child(circuit2)
+
+	# Pommel
+	var pommel: MeshInstance3D = _sphere("Pommel", 0.018, COL_PLATE, true)
+	pommel.position = Vector3(0.0, 0.04, 0.02)
+	root.add_child(pommel)
+
+	# Pommel glow
+	var pommel_glow: MeshInstance3D = _sphere("PommelGlow", 0.01, COL_ENERGY_BRIGHT, false, true, 4.0)
+	pommel_glow.position = Vector3(0.0, 0.05, 0.02)
+	root.add_child(pommel_glow)
+
+	return root
+
+
+## Tesla — Chunky coilgun with capacitor rings
+static func _build_coilgun() -> Node3D:
+	var root: Node3D = Node3D.new()
+	root.name = "CoilgunRoot"
+	root.position = Vector3(0.0, -0.25, 0.0)
+
+	# Receiver body
+	var receiver: MeshInstance3D = _box("Receiver", Vector3(0.045, 0.06, 0.20), COL_PLATE, true)
+	receiver.position = Vector3(0.0, -0.01, -0.14)
+	root.add_child(receiver)
+
+	# Barrel
+	var barrel: MeshInstance3D = _cylinder("Barrel", 0.02, 0.22, COL_PLATE_DARK, true)
+	barrel.position = Vector3(0.0, -0.005, -0.30)
+	barrel.rotation.x = deg_to_rad(90)
+	root.add_child(barrel)
+
+	# Muzzle ring
+	var muzzle: MeshInstance3D = _torus("Muzzle", 0.022, 0.008, COL_PLATE_HI, true)
+	muzzle.position = Vector3(0.0, -0.005, -0.41)
+	muzzle.rotation.x = deg_to_rad(90)
+	root.add_child(muzzle)
+
+	# Muzzle glow
+	var muzzle_glow: MeshInstance3D = _sphere("MuzzleGlow", 0.015, COL_ENERGY, false, true, 3.0)
+	muzzle_glow.position = Vector3(0.0, -0.005, -0.42)
+	root.add_child(muzzle_glow)
+
+	# Capacitor coils along barrel
+	for i in range(3):
+		var coil: MeshInstance3D = _torus("Coil%d" % i, 0.03, 0.006, COL_ENERGY, false, true, 2.0)
+		coil.position = Vector3(0.0, -0.005, -0.24 - i * 0.06)
+		coil.rotation.x = deg_to_rad(90)
+		root.add_child(coil)
+
+	# Grip
+	var gun_grip: MeshInstance3D = _cylinder("GunGrip", 0.018, 0.08, COL_PLATE_DARK, true)
+	gun_grip.position = Vector3(0.0, -0.05, -0.08)
+	root.add_child(gun_grip)
+
+	# Trigger guard
+	var trigger: MeshInstance3D = _box("TriggerGuard", Vector3(0.005, 0.03, 0.04), COL_PLATE, true)
+	trigger.position = Vector3(0.0, -0.04, -0.10)
+	root.add_child(trigger)
+
+	# Top rail
+	var rail: MeshInstance3D = _box("TopRail", Vector3(0.02, 0.01, 0.16), COL_PLATE_HI, true)
+	rail.position = Vector3(0.0, 0.025, -0.14)
+	root.add_child(rail)
+
+	# Rear stock
+	var stock: MeshInstance3D = _box("Stock", Vector3(0.035, 0.04, 0.06), COL_PLATE, true)
+	stock.position = Vector3(0.0, 0.0, -0.02)
+	root.add_child(stock)
+
+	# Side panels
+	var side_l: MeshInstance3D = _box("SideL", Vector3(0.005, 0.04, 0.12), COL_SUIT_LIGHT, true)
+	side_l.position = Vector3(-0.025, -0.01, -0.14)
+	root.add_child(side_l)
+
+	var side_r: MeshInstance3D = _box("SideR", Vector3(0.005, 0.04, 0.12), COL_SUIT_LIGHT, true)
+	side_r.position = Vector3(0.025, -0.01, -0.14)
+	root.add_child(side_r)
+
+	# Energy cell in receiver
+	var cell: MeshInstance3D = _box("EnergyCell", Vector3(0.025, 0.03, 0.04), COL_ENERGY_BRIGHT, false, true, 2.5)
+	cell.position = Vector3(0.0, -0.01, -0.06)
+	root.add_child(cell)
+
+	# Barrel vent glow lines
+	var vent_l: MeshInstance3D = _box("VentL", Vector3(0.004, 0.015, 0.08), COL_ENERGY, false, true, 1.5)
+	vent_l.position = Vector3(-0.025, 0.005, -0.28)
+	root.add_child(vent_l)
+
+	var vent_r: MeshInstance3D = _box("VentR", Vector3(0.004, 0.015, 0.08), COL_ENERGY, false, true, 1.5)
+	vent_r.position = Vector3(0.025, 0.005, -0.28)
+	root.add_child(vent_r)
+
+	return root
+
+
+## Void — Tall staff with floating orb at the tip
+static func _build_voidstaff() -> Node3D:
+	var root: Node3D = Node3D.new()
+	root.name = "VoidstaffRoot"
+	root.position = Vector3(0.0, -0.25, 0.0)
+
+	# Lower shaft (extends downward)
+	var shaft_low: MeshInstance3D = _cylinder("ShaftLower", 0.012, 0.45, COL_PLATE_DARK, true)
+	shaft_low.position = Vector3(0.0, -0.25, 0.0)
+	root.add_child(shaft_low)
+
+	# Upper shaft (extends upward)
+	var shaft_up: MeshInstance3D = _cylinder("ShaftUpper", 0.014, 0.55, COL_PLATE_DARK, true)
+	shaft_up.position = Vector3(0.0, 0.30, 0.0)
+	root.add_child(shaft_up)
+
+	# Grip wrap
+	var grip_wrap: MeshInstance3D = _cylinder("GripWrap", 0.02, 0.1, COL_SUIT, true)
+	grip_wrap.position = Vector3(0.0, 0.0, 0.0)
+	root.add_child(grip_wrap)
+
+	# Head cradle ring
+	var cradle: MeshInstance3D = _torus("Cradle", 0.04, 0.008, COL_PLATE, true)
+	cradle.position = Vector3(0.0, 0.60, 0.0)
+	root.add_child(cradle)
+
+	# Three prongs framing the orb
+	var prong_angles: Array[float] = [0.0, 120.0, 240.0]
+	for i in range(3):
+		var prong: MeshInstance3D = _box("Prong%d" % i, Vector3(0.006, 0.08, 0.006), COL_PLATE_HI, true)
+		var angle_rad: float = deg_to_rad(prong_angles[i])
+		prong.position = Vector3(
+			cos(angle_rad) * 0.03,
+			0.62,
+			sin(angle_rad) * 0.03
+		)
+		prong.rotation.z = cos(angle_rad) * deg_to_rad(-15)
+		prong.rotation.x = sin(angle_rad) * deg_to_rad(-15)
+		root.add_child(prong)
+
+	# Floating orb — primary energy sphere
+	var orb: MeshInstance3D = _sphere("VoidOrb", 0.035, COL_ENERGY, false, true, 5.0)
+	orb.position = Vector3(0.0, 0.65, 0.0)
+	root.add_child(orb)
+
+	# Orb outer glow — transparent halo
+	var orb_glow: MeshInstance3D = _sphere("OrbGlow", 0.05, COL_ENERGY_BRIGHT, false, true, 2.0)
+	orb_glow.position = Vector3(0.0, 0.65, 0.0)
+	var glow_mat: StandardMaterial3D = orb_glow.get_surface_override_material(0) as StandardMaterial3D
+	if glow_mat:
+		glow_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		glow_mat.albedo_color.a = 0.3
+	root.add_child(orb_glow)
+
+	# Energy rings on shaft
+	var ring1: MeshInstance3D = _torus("Ring1", 0.02, 0.005, COL_ENERGY, false, true, 2.0)
+	ring1.position = Vector3(0.0, 0.42, 0.0)
+	root.add_child(ring1)
+
+	var ring2: MeshInstance3D = _torus("Ring2", 0.02, 0.005, COL_ENERGY, false, true, 2.0)
+	ring2.position = Vector3(0.0, 0.15, 0.0)
+	root.add_child(ring2)
+
+	# Base cap
+	var base_cap: MeshInstance3D = _sphere("BaseCap", 0.018, COL_PLATE, true)
+	base_cap.position = Vector3(0.0, -0.48, 0.0)
+	root.add_child(base_cap)
+
+	# Base energy dot
+	var base_glow: MeshInstance3D = _sphere("BaseGlow", 0.01, COL_ENERGY, false, true, 3.0)
+	base_glow.position = Vector3(0.0, -0.50, 0.0)
+	root.add_child(base_glow)
+
+	# Mid-shaft accent plate
+	var accent: MeshInstance3D = _box("MidAccent", Vector3(0.025, 0.04, 0.025), COL_PLATE_HI, true)
+	accent.position = Vector3(0.0, 0.35, 0.0)
+	root.add_child(accent)
+
+	# Energy conduit on shaft
+	var conduit: MeshInstance3D = _capsule("Conduit", 0.005, 0.30, COL_ENERGY, false, true, 1.5)
+	conduit.position = Vector3(0.0, 0.35, 0.015)
+	root.add_child(conduit)
+
+	return root
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 #  MESH FACTORY HELPERS
 # ═══════════════════════════════════════════════════════════════════════════
 
