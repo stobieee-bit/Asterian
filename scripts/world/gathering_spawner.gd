@@ -131,6 +131,8 @@ func _define_spawn_zones() -> void:
 
 func _spawn_all_nodes() -> void:
 	var total: int = 0
+	var area_mgr: Node3D = get_tree().get_first_node_in_group("area_manager")
+
 	for zone in _spawn_defs:
 		var cx: float = float(zone["cx"])
 		var cz: float = float(zone["cz"])
@@ -138,18 +140,42 @@ func _spawn_all_nodes() -> void:
 		var skill: String = str(zone["skill"])
 		var nodes: Array = zone["nodes"]
 
+		# Find the level range in this zone for clustering
+		var min_level: int = 999
+		var max_level: int = 0
+		for nd in nodes:
+			var lv: int = int(nd["level"])
+			min_level = mini(min_level, lv)
+			max_level = maxi(max_level, lv)
+		var level_range: int = max_level - min_level
+
+		# Pick a random-but-deterministic cluster direction per zone
+		var zone_rng: RandomNumberGenerator = RandomNumberGenerator.new()
+		zone_rng.seed = hash(str(cx) + str(cz) + skill)
+		var cluster_angle: float = zone_rng.randf() * TAU
+
 		for node_def in nodes:
 			var level: int = int(node_def["level"])
 			var item_id: String = str(node_def["item"])
 			var color: Color = node_def["color"]
 			var count: int = int(node_def["count"])
 
-			var area_mgr: Node3D = get_tree().get_first_node_in_group("area_manager")
+			# Level-based cluster offset: low levels near center, high levels toward edge
+			# along the cluster_angle direction
+			var level_frac: float = 0.0
+			if level_range > 0:
+				level_frac = float(level - min_level) / float(level_range)
+			var cluster_dist: float = level_frac * radius * 0.5
+			var cluster_cx: float = cx + cos(cluster_angle) * cluster_dist
+			var cluster_cz: float = cz + sin(cluster_angle) * cluster_dist
+			# Tighter scatter for each tier — nodes of same level stay together
+			var scatter_r: float = radius * 0.3 if level_range > 0 else radius * 0.85
+
 			for i in range(count):
 				var angle: float = randf() * TAU
-				var dist: float = randf_range(5.0, radius * 0.85)
-				var gx: float = cx + cos(angle) * dist
-				var gz: float = cz + sin(angle) * dist
+				var dist: float = randf_range(3.0, scatter_r)
+				var gx: float = cluster_cx + cos(angle) * dist
+				var gz: float = cluster_cz + sin(angle) * dist
 				var gy: float = 0.1
 				if area_mgr and area_mgr.has_method("get_terrain_height"):
 					gy = area_mgr.get_terrain_height(gx, gz) + 0.1

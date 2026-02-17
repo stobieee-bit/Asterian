@@ -111,17 +111,29 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	add_child(result["mesh_instance"])
 	add_child(result["static_body"])
 
-	# ── Area label ──
+	# ── Area label (terrain-relative, with subtle pole) ──
+	var label_y: float = _terrain_y(center_x, center_z) + 8.0
 	var label: Label3D = Label3D.new()
 	label.name = "Label_%s" % area_id
 	label.text = data.get("name", area_id)
-	label.position = Vector3(center_x, 6.0, center_z)
+	label.position = Vector3(center_x, label_y, center_z)
 	label.font_size = 72
 	label.outline_size = 10
 	label.modulate = Color(0.7, 1.0, 0.9, 0.9)
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.no_depth_test = true
 	add_child(label)
+	# Holographic sign pole
+	var sign_pole: CSGCylinder3D = CSGCylinder3D.new()
+	sign_pole.radius = 0.04
+	sign_pole.height = 8.0
+	sign_pole.sides = 4
+	sign_pole.position = Vector3(center_x, _terrain_y(center_x, center_z) + 4.0, center_z)
+	var pole_mat: StandardMaterial3D = StandardMaterial3D.new()
+	pole_mat.albedo_color = Color(0.3, 0.5, 0.6, 0.4)
+	pole_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	sign_pole.material = pole_mat
+	add_child(sign_pole)
 
 	# y_base kept for compatibility with decoration functions (they'll use _terrain_y internally)
 	var y_base: float = floor_y
@@ -144,6 +156,60 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	_add_ruined_walls(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_area_unique_structures(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_point_lights(area_id, center_x, center_z, radius, base_color, y_base)
+
+	# ── Edge atmosphere — subtle glow ring at terrain boundary ──
+	_add_edge_atmosphere(area_id, center_x, center_z, radius, base_color, floor_y)
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  EDGE ATMOSPHERE — subtle glow ring at terrain boundaries
+# ═══════════════════════════════════════════════════════════════════════════════
+
+## Adds a ring of faint glowing fog at the terrain edge to mask the hard boundary.
+## Uses a CSGTorus3D with a semi-transparent emissive material.
+func _add_edge_atmosphere(area_id: String, cx: float, cz: float, radius: float,
+		base_color: Color, floor_y: float) -> void:
+	# Skip very small areas (like bio-lab) — edges aren't visible
+	if radius < 25.0:
+		return
+
+	var edge_y: float = _terrain_y(cx + radius * 0.85, cz) if radius < 100.0 \
+		else floor_y
+
+	# Outer fog ring — wide, very faint
+	var fog_ring: CSGTorus3D = CSGTorus3D.new()
+	fog_ring.inner_radius = radius * 0.88
+	fog_ring.outer_radius = radius * 1.02
+	fog_ring.ring_sides = 8
+	fog_ring.sides = 48 if radius > 100.0 else 32
+	fog_ring.position = Vector3(cx, floor_y + 0.3, cz)
+
+	var fog_mat: StandardMaterial3D = StandardMaterial3D.new()
+	var fog_color: Color = base_color.lightened(0.2)
+	fog_mat.albedo_color = Color(fog_color.r, fog_color.g, fog_color.b, 0.08)
+	fog_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	fog_mat.emission_enabled = true
+	fog_mat.emission = fog_color
+	fog_mat.emission_energy_multiplier = 0.3
+	fog_mat.no_depth_test = false
+	fog_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	fog_ring.material = fog_mat
+	fog_ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(fog_ring)
+
+	# Scattered edge lights — a few dim lights around the perimeter
+	var light_count: int = 6 if radius > 100.0 else 4
+	for i in range(light_count):
+		var angle: float = float(i) / float(light_count) * TAU
+		var lx: float = cx + cos(angle) * radius * 0.9
+		var lz: float = cz + sin(angle) * radius * 0.9
+		var light: OmniLight3D = OmniLight3D.new()
+		light.position = Vector3(lx, _terrain_y(lx, lz) + 1.5, lz)
+		light.light_color = base_color.lightened(0.3)
+		light.light_energy = 0.15
+		light.omni_range = 8.0
+		light.omni_attenuation = 2.0
+		add_child(light)
+
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  DECORATION COLLISION — add physics bodies so the player can't walk through props
@@ -350,7 +416,7 @@ func _add_tech_panels(area_id: String, cx: float, cz: float, radius: float,
 		var pw: float = rng.randf_range(1.5, 4.0)
 		var pd: float = rng.randf_range(1.0, 3.0)
 		panel.size = Vector3(pw, 0.08, pd)
-		panel.position = Vector3(px, ty + 0.06, pz)
+		panel.position = Vector3(px, ty + 0.04, pz)  # Flush with terrain surface
 		panel.rotation.y = rng.randf() * TAU
 
 		var panel_mat: StandardMaterial3D = StandardMaterial3D.new()
@@ -367,7 +433,7 @@ func _add_tech_panels(area_id: String, cx: float, cz: float, radius: float,
 		# Border frame around panel
 		var frame: CSGBox3D = CSGBox3D.new()
 		frame.size = Vector3(pw + 0.2, 0.12, pd + 0.2)
-		frame.position = Vector3(px, ty + 0.04, pz)
+		frame.position = Vector3(px, ty + 0.02, pz)
 		frame.rotation.y = panel.rotation.y
 		var frame_mat: StandardMaterial3D = StandardMaterial3D.new()
 		frame_mat.albedo_color = base_color.darkened(0.15)
@@ -465,7 +531,7 @@ func _add_crystals(area_id: String, cx: float, cz: float, radius: float,
 		crystal.cone = true
 		crystal.position = Vector3(
 			crx,
-			ty + c_height * 0.4,
+			ty + c_height * 0.5,
 			crz
 		)
 		crystal.rotation = Vector3(
@@ -622,8 +688,13 @@ func _add_floating_debris(area_id: String, cx: float, cz: float, radius: float,
 		var pz: float = cz + sin(angle) * dist
 
 		var debris: CSGBox3D = CSGBox3D.new()
-		var s: float = rng.randf_range(0.2, 1.0)
-		debris.size = Vector3(s, s * 0.6, s * 0.8)
+		var s: float = rng.randf_range(0.2, 0.8)
+		# Varied aspect ratios to look like broken ship/tech fragments
+		var aspect: int = rng.randi_range(0, 2)
+		match aspect:
+			0: debris.size = Vector3(s, s * 0.3, s * 1.2)   # flat plate
+			1: debris.size = Vector3(s * 0.4, s * 0.4, s * 1.5)  # beam fragment
+			2: debris.size = Vector3(s, s * 0.5, s * 0.5)  # chunk
 		var ty: float = _terrain_y(px, pz)
 		debris.position = Vector3(px, ty + hover_h, pz)
 		debris.rotation = Vector3(
@@ -673,32 +744,51 @@ func _add_pipe_structures(area_id: String, cx: float, cz: float, radius: float,
 		var ty: float = _terrain_y(px, pz)
 		var pipe_len: float = rng.randf_range(4.0, 15.0)
 		var pipe_h: float = rng.randf_range(0.3, 2.0)
+		var pipe_r: float = rng.randf_range(0.12, 0.3)
+		var pipe_yaw: float = rng.randf() * TAU
 
 		# Pipe cylinder
 		var pipe: CSGCylinder3D = CSGCylinder3D.new()
-		pipe.radius = rng.randf_range(0.12, 0.3)
+		pipe.radius = pipe_r
 		pipe.height = pipe_len
 		pipe.sides = 8
 		pipe.position = Vector3(px, ty + pipe_h, pz)
-		pipe.rotation = Vector3(0, rng.randf() * TAU, PI / 2.0)
+		pipe.rotation = Vector3(0, pipe_yaw, PI / 2.0)
 		pipe.material = pipe_mat
 		add_child(pipe)
+
+		# Support legs (2 per pipe) so they don't appear to float
+		for leg_idx in range(2):
+			var leg_frac: float = -0.3 + 0.6 * leg_idx  # -0.3 and 0.3 along pipe
+			var leg_x: float = px + cos(pipe_yaw) * pipe_len * leg_frac
+			var leg_z: float = pz + sin(pipe_yaw) * pipe_len * leg_frac
+			var leg_ty: float = _terrain_y(leg_x, leg_z)
+			var leg_h: float = pipe_h + (ty - leg_ty)
+			if leg_h < 0.2:
+				leg_h = 0.2
+			var leg: CSGCylinder3D = CSGCylinder3D.new()
+			leg.radius = pipe_r * 0.4
+			leg.height = leg_h
+			leg.sides = 6
+			leg.position = Vector3(leg_x, leg_ty + leg_h * 0.5, leg_z)
+			leg.material = pipe_mat
+			add_child(leg)
 
 		# Pipe junction rings
 		for j in range(rng.randi_range(1, 3)):
 			var junc: CSGTorus3D = CSGTorus3D.new()
-			junc.inner_radius = pipe.radius
-			junc.outer_radius = pipe.radius + 0.08
+			junc.inner_radius = pipe_r
+			junc.outer_radius = pipe_r + 0.08
 			junc.ring_sides = 6
 			junc.sides = 8
 			var frac: float = rng.randf_range(-0.4, 0.4)
 			junc.position = Vector3(
-				px + cos(pipe.rotation.y) * pipe_len * frac,
+				px + cos(pipe_yaw) * pipe_len * frac,
 				ty + pipe_h,
-				pz + sin(pipe.rotation.y) * pipe_len * frac
+				pz + sin(pipe_yaw) * pipe_len * frac
 			)
 			junc.rotation.z = PI / 2.0
-			junc.rotation.y = pipe.rotation.y
+			junc.rotation.y = pipe_yaw
 			junc.material = pipe_mat
 			add_child(junc)
 
@@ -1706,19 +1796,36 @@ func _build_wastes_stalker_dens(y_base: float) -> void:
 	var tendril_mat: StandardMaterial3D = _make_wastes_mat(
 		Color(0.2, 0.12, 0.25), Color(0.15, 0.08, 0.2), 0.5, 0.2, 0.65)
 
-	# Web canopy sheets — large flat planes stretched between invisible anchor points
+	# Web canopy sheets — stretched between anchor pillars
 	for i in range(5):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(10.0, zr * 0.7)
-		var web_w: float = rng.randf_range(5.0, 15.0)
-		var web_d: float = rng.randf_range(4.0, 10.0)
+		var web_w: float = rng.randf_range(5.0, 12.0)
+		var web_d: float = rng.randf_range(4.0, 8.0)
+		var wx: float = zcx + cos(angle) * dist
+		var wz: float = zcz + sin(angle) * dist
+		var web_ty: float = _terrain_y(wx, wz)
+		var web_h: float = rng.randf_range(4.0, 8.0)
 		var web: CSGBox3D = CSGBox3D.new()
 		web.size = Vector3(web_w, 0.03, web_d)
-		web.position = Vector3(zcx + cos(angle) * dist,
-			y_base + rng.randf_range(4.0, 9.0), zcz + sin(angle) * dist)
+		web.position = Vector3(wx, web_ty + web_h, wz)
 		web.rotation = Vector3(rng.randf_range(-0.15, 0.15), rng.randf() * TAU, rng.randf_range(-0.15, 0.15))
 		web.material = web_mat
 		add_child(web)
+		# Anchor strands from web corners to ground (4 per web)
+		for corner in range(4):
+			var cx_off: float = (web_w * 0.4) * (-1.0 if corner % 2 == 0 else 1.0)
+			var cz_off: float = (web_d * 0.4) * (-1.0 if corner < 2 else 1.0)
+			var strand: CSGCylinder3D = CSGCylinder3D.new()
+			strand.radius = 0.03
+			strand.height = web_h + rng.randf_range(-1.0, 1.0)
+			strand.sides = 4
+			var sx: float = wx + cos(web.rotation.y) * cx_off - sin(web.rotation.y) * cz_off
+			var sz: float = wz + sin(web.rotation.y) * cx_off + cos(web.rotation.y) * cz_off
+			strand.position = Vector3(sx, web_ty + strand.height * 0.5, sz)
+			strand.rotation = Vector3(rng.randf_range(-0.1, 0.1), 0, rng.randf_range(-0.1, 0.1))
+			strand.material = web_mat
+			add_child(strand)
 
 	# Cocoons — elongated egg-like shapes hanging or resting
 	var cocoon_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 8, 4.0)
@@ -1817,14 +1924,16 @@ func _build_wastes_aberration_wastes(y_base: float) -> void:
 			eye.material = eye_mat
 			add_child(eye)
 
-	# Pulsing vein networks on the ground
+	# Pulsing vein networks on the ground (terrain-following)
 	for i in range(8):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(4.0, zr * 0.8)
 		var length: float = rng.randf_range(4.0, 18.0)
+		var vx: float = zcx + cos(angle) * dist
+		var vz: float = zcz + sin(angle) * dist
 		var vein: CSGBox3D = CSGBox3D.new()
 		vein.size = Vector3(rng.randf_range(0.1, 0.3), 0.05, length)
-		vein.position = Vector3(zcx + cos(angle) * dist, y_base + 0.07, zcz + sin(angle) * dist)
+		vein.position = Vector3(vx, _terrain_y(vx, vz) + 0.07, vz)
 		vein.rotation.y = angle + rng.randf_range(-0.4, 0.4)
 		vein.material = vein_mat
 		add_child(vein)
@@ -1913,17 +2022,28 @@ func _build_wastes_eldritch_edge(y_base: float) -> void:
 			"min_scale": 0.8, "max_scale": 1.2
 		})
 
-	# Reality tear rifts — vertical planes of crackling energy
+	# Reality tear rifts — vertical planes of crackling energy (terrain-following)
 	for i in range(5):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(12.0, zr * 0.7)
 		var rift_h: float = rng.randf_range(4.0, 12.0)
+		var rfx: float = zcx + cos(angle) * dist
+		var rfz: float = zcz + sin(angle) * dist
+		var rf_ty: float = _terrain_y(rfx, rfz)
 		var rift: CSGBox3D = CSGBox3D.new()
 		rift.size = Vector3(rng.randf_range(0.3, 1.5), rift_h, 0.04)
-		rift.position = Vector3(zcx + cos(angle) * dist, y_base + rift_h * 0.5, zcz + sin(angle) * dist)
+		rift.position = Vector3(rfx, rf_ty + rift_h * 0.5, rfz)
 		rift.rotation.y = rng.randf() * TAU
 		rift.material = rift_mat
 		add_child(rift)
+		# Glow light at rift center
+		var rift_light: OmniLight3D = OmniLight3D.new()
+		rift_light.position = Vector3(rfx, rf_ty + rift_h * 0.4, rfz)
+		rift_light.light_color = Color(0.6, 0.1, 0.8)
+		rift_light.light_energy = 0.3
+		rift_light.omni_range = 6.0
+		rift_light.omni_attenuation = 2.0
+		add_child(rift_light)
 		_animated_nodes.append({
 			"node": rift, "type": "pulse_scale",
 			"speed": rng.randf_range(1.0, 3.0),
@@ -2007,20 +2127,30 @@ func _build_abyss_structures(cx: float, cz: float, radius: float,
 		add_child(pillar)
 		_add_cylinder_collision(pillar, pillar.radius + 0.2, pillar_h)
 
-	# Reality tear rifts (thin vertical planes of energy)
+	# Reality tear rifts (thin vertical planes of energy — terrain-following)
 	for i in range(6):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(30.0, radius * 0.6)
 		var px: float = cx + cos(angle) * dist
 		var pz: float = cz + sin(angle) * dist
 		var rift_h: float = rng.randf_range(4.0, 12.0)
+		var rift_ty: float = _terrain_y(px, pz)
 
 		var rift: CSGBox3D = CSGBox3D.new()
 		rift.size = Vector3(rng.randf_range(0.5, 2.0), rift_h, 0.05)
-		rift.position = Vector3(px, y_base + rift_h * 0.5, pz)
+		rift.position = Vector3(px, rift_ty + rift_h * 0.5, pz)
 		rift.rotation.y = rng.randf() * TAU
 		rift.material = rift_mat
 		add_child(rift)
+
+		# Glow light at rift center
+		var rift_light: OmniLight3D = OmniLight3D.new()
+		rift_light.position = Vector3(px, rift_ty + rift_h * 0.4, pz)
+		rift_light.light_color = Color(0.6, 0.1, 0.8)
+		rift_light.light_energy = 0.25
+		rift_light.omni_range = 6.0
+		rift_light.omni_attenuation = 2.0
+		add_child(rift_light)
 
 		_animated_nodes.append({
 			"node": rift, "type": "pulse_scale",
