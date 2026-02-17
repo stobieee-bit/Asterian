@@ -390,22 +390,14 @@ func _drop_to_ground() -> void:
 
 ## Show a confirmation context menu before dropping an item
 func _confirm_drop(item_id: String, item_name: String) -> void:
-	var confirm_options: Array = [
-		{"title": "Drop %s?" % item_name, "title_color": Color(1.0, 0.5, 0.3)},
-		{"label": "Confirm", "icon": "!", "color": Color(0.9, 0.3, 0.3),
-		 "callback": func(): _execute_drop(item_id, item_name)},
-	]
+	var confirm_options: Array = []
+	confirm_options.append({"title": "Drop %s?" % item_name, "title_color": Color(1.0, 0.5, 0.3)})
+	confirm_options.append({
+		"label": "Confirm", "icon": "!", "color": Color(0.9, 0.3, 0.3),
+		"callback": func():
+			_execute_drop(item_id, item_name)
+	})
 	EventBus.context_menu_requested.emit(confirm_options, get_global_mouse_position())
-
-
-## Show examine info in chat
-func _examine_item(item_name: String, item_data: Dictionary, item_type: String) -> void:
-	var desc: String = str(item_data.get("desc", ""))
-	if desc == "":
-		desc = "A %s item." % item_type
-	var value: int = int(item_data.get("value", 0))
-	var value_text: String = " (Value: %d cr)" % value if value > 0 else ""
-	EventBus.chat_message.emit("Examine: %s — %s%s" % [item_name, desc, value_text], "system")
 
 
 ## Actually remove the item and spawn it on the ground
@@ -612,7 +604,8 @@ func _show_item_context_menu(item_id: String, item_data: Dictionary, item_type: 
 			"label": "Use",
 			"icon": "U",
 			"color": Color(0.9, 0.8, 0.2),
-			"callback": func(): _use_consumable(item_id)
+			"callback": func():
+				_use_consumable(item_id)
 		})
 
 	# Drop option for all items — shows confirmation before destroying
@@ -620,7 +613,8 @@ func _show_item_context_menu(item_id: String, item_data: Dictionary, item_type: 
 		"label": "Drop",
 		"icon": "D",
 		"color": Color(0.8, 0.4, 0.3),
-		"callback": func(): _confirm_drop(item_id, item_name)
+		"callback": func():
+			_confirm_drop(item_id, item_name)
 	})
 
 	# Examine option for all items
@@ -628,7 +622,16 @@ func _show_item_context_menu(item_id: String, item_data: Dictionary, item_type: 
 		"label": "Examine",
 		"icon": "?",
 		"color": Color(0.6, 0.7, 0.8),
-		"callback": func(): _examine_item(item_name, item_data, item_type)
+		"callback": func():
+			var desc: String = str(item_data.get("desc", ""))
+			if desc == "":
+				desc = "A %s item." % item_type
+			var value: int = int(item_data.get("value", 0))
+			var value_text: String = " (Value: %d cr)" % value if value > 0 else ""
+			EventBus.chat_message.emit(
+				"Examine: %s — %s%s" % [item_name, desc, value_text],
+				"system"
+			)
 	})
 
 	EventBus.context_menu_requested.emit(options, screen_pos)
