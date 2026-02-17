@@ -1909,13 +1909,10 @@ func _make_defense_btn(keybind: String, label_text: String, accent: Color, ab: D
 	if icon_texture != null:
 		var icon_rect: TextureRect = TextureRect.new()
 		icon_rect.texture = icon_texture
-		icon_rect.custom_minimum_size = Vector2(20, 20)
 		icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon_rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		icon_rect.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-		icon_rect.position = Vector2(18, 8)
-		icon_rect.size = Vector2(20, 20)
+		icon_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		btn.add_child(icon_rect)
 	else:
