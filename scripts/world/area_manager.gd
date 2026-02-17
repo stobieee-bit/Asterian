@@ -41,7 +41,8 @@ func _ready() -> void:
 	if _terrain3d:
 		print("AreaManager: Found Terrain3D node")
 	else:
-		push_warning("AreaManager: Terrain3D node not found — height queries will return 0")
+		push_warning("AreaManager: Terrain3D node not found — adding fallback ground plane")
+		_add_fallback_ground()
 	_build_areas()
 	_build_corridors()
 	_build_corridor_gates()
@@ -73,7 +74,41 @@ func _find_terrain3d(node: Node):
 			return found
 	return null
 
+## Add a visible ground plane when Terrain3D is not available (web export fallback).
+## Creates a large flat mesh + collision at y=0 so the world has a visible floor.
+func _add_fallback_ground() -> void:
+	var body := StaticBody3D.new()
+	body.name = "FallbackGround"
+	body.collision_layer = 1
+
+	# Collision
+	var col := CollisionShape3D.new()
+	var shape := BoxShape3D.new()
+	shape.size = Vector3(2000.0, 0.5, 2000.0)
+	col.shape = shape
+	body.add_child(col)
+
+	# Visible mesh — large flat plane with a subtle sci-fi ground color
+	var mesh_inst := MeshInstance3D.new()
+	var plane_mesh := PlaneMesh.new()
+	plane_mesh.size = Vector2(2000.0, 2000.0)
+	plane_mesh.subdivide_width = 0
+	plane_mesh.subdivide_depth = 0
+	mesh_inst.mesh = plane_mesh
+
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.12, 0.14, 0.16, 1.0)  # Dark sci-fi ground
+	mat.roughness = 0.95
+	mat.metallic = 0.05
+	mesh_inst.material_override = mat
+	body.add_child(mesh_inst)
+
+	body.position = Vector3(0, -0.25, 0)  # Mesh surface at y=0
+	add_child(body)
+	print("AreaManager: Fallback ground plane added at y=0")
+
 var _gate_update_timer: float = 0.0
+var _gate_message_cooldown: float = 0.0  # Prevents chat spam when player bumps gated areas
 
 func _process(delta: float) -> void:
 	if _player == null:
@@ -81,6 +116,9 @@ func _process(delta: float) -> void:
 		return
 	_check_area_transition()
 	_animate_world(delta)
+	# Tick down gate message cooldown
+	if _gate_message_cooldown > 0.0:
+		_gate_message_cooldown -= delta
 	# Update gate barrier colors every 2 seconds (not every frame)
 	_gate_update_timer += delta
 	if _gate_update_timer >= 2.0:
@@ -2317,31 +2355,38 @@ func _check_area_gate(area_id: String) -> bool:
 	if reqs.is_empty():
 		return true  # No requirements — always open
 
+	# Only show chat message if cooldown has expired (prevents spam when bumping gates)
+	var can_message: bool = _gate_message_cooldown <= 0.0
+
 	# Check combat level
 	var req_level: int = int(reqs.get("combat_level", 0))
 	if req_level > 0:
 		var player_level: int = GameState.get_combat_level()
 		if player_level < req_level:
-			var area_data: Dictionary = DataManager.get_area(area_id)
-			var area_name: String = str(area_data.get("name", area_id))
-			EventBus.chat_message.emit(
-				"Requires Combat Level %d to enter %s (current: %d)" % [req_level, area_name, player_level],
-				"system"
-			)
+			if can_message:
+				var area_data: Dictionary = DataManager.get_area(area_id)
+				var area_name: String = str(area_data.get("name", area_id))
+				EventBus.chat_message.emit(
+					"Requires Combat Level %d to enter %s (current: %d)" % [req_level, area_name, player_level],
+					"system"
+				)
+				_gate_message_cooldown = 5.0  # 5-second cooldown between gate messages
 			return false
 
 	# Check quest completion
 	var req_quest: String = str(reqs.get("quest", ""))
 	if req_quest != "":
 		if not GameState.completed_quests.has(req_quest):
-			var area_data: Dictionary = DataManager.get_area(area_id)
-			var area_name: String = str(area_data.get("name", area_id))
-			var quest_data: Dictionary = DataManager.get_quest(req_quest)
-			var quest_name: String = str(quest_data.get("name", req_quest))
-			EventBus.chat_message.emit(
-				"Complete \"%s\" to unlock %s" % [quest_name, area_name],
-				"system"
-			)
+			if can_message:
+				var area_data: Dictionary = DataManager.get_area(area_id)
+				var area_name: String = str(area_data.get("name", area_id))
+				var quest_data: Dictionary = DataManager.get_quest(req_quest)
+				var quest_name: String = str(quest_data.get("name", req_quest))
+				EventBus.chat_message.emit(
+					"Complete \"%s\" to unlock %s" % [quest_name, area_name],
+					"system"
+				)
+				_gate_message_cooldown = 5.0  # 5-second cooldown between gate messages
 			return false
 
 	return true
