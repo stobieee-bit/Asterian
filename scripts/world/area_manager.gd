@@ -21,8 +21,7 @@ const GROUND_Y: float = -0.1
 @onready var world_env: WorldEnvironment = $"../WorldEnvironment"
 
 # ── Terrain ──
-var _terrain_gen: TerrainGenerator = null  # Procedural fallback
-var _terrain3d = null                      # Terrain3D plugin node (painted terrain)
+var _terrain3d = null  # Terrain3D plugin node (painted terrain)
 
 # ── Area collision detection ──
 var _area_bodies: Dictionary = {}   # { area_id: { center: Vector3, radius: float } }
@@ -40,11 +39,9 @@ func _ready() -> void:
 	# Find Terrain3D plugin node (user-painted terrain)
 	_terrain3d = _find_terrain3d(get_tree().root)
 	if _terrain3d:
-		print("AreaManager: Found Terrain3D node — using painted terrain")
+		print("AreaManager: Found Terrain3D node")
 	else:
-		push_warning("AreaManager: Terrain3D node not found — using procedural fallback")
-	# Procedural fallback (used until Terrain3D regions are painted)
-	_terrain_gen = TerrainGenerator.new()
+		push_warning("AreaManager: Terrain3D node not found — height queries will return 0")
 	_build_areas()
 	_build_corridors()
 	_add_area_boundaries()
@@ -53,16 +50,12 @@ func _ready() -> void:
 	_player = get_tree().get_first_node_in_group("player")
 
 ## Public API: query terrain height at any world XZ position.
-## Tries Terrain3D (painted) first, falls back to procedural generator.
+## Uses Terrain3D plugin (painted terrain in editor).
 func get_terrain_height(x: float, z: float) -> float:
-	# Terrain3D plugin (painted terrain) — primary source
 	if _terrain3d and _terrain3d.data:
 		var h: float = _terrain3d.data.get_height(Vector3(x, 0.0, z))
 		if not is_nan(h):
 			return h
-	# Procedural fallback (for unpainted regions)
-	if _terrain_gen:
-		return _terrain_gen.get_height(x, z)
 	return 0.0
 
 ## Internal shorthand for prop placement.
@@ -91,29 +84,11 @@ func _process(delta: float) -> void:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 func _build_areas() -> void:
-	# ── Pass 1: Register ALL areas so terrain generator knows full world layout ──
-	for area_id in DataManager.areas:
-		_register_area(area_id, DataManager.areas[area_id])
-	for area_id in DataManager.corrupted_areas:
-		_register_area(area_id, DataManager.corrupted_areas[area_id])
-
-	# ── Pass 2: Generate terrain meshes (now with overlap awareness) ──
 	for area_id in DataManager.areas:
 		_create_area_ground(area_id, DataManager.areas[area_id])
 	for area_id in DataManager.corrupted_areas:
 		_create_area_ground(area_id, DataManager.corrupted_areas[area_id])
 	print("AreaManager: Built %d area grounds" % _area_bodies.size())
-
-
-## Pre-register an area's terrain data without building geometry.
-## Called in Pass 1 so the generator can compute overlaps during Pass 2.
-func _register_area(area_id: String, data: Dictionary) -> void:
-	var center_x: float = float(data.get("center", {}).get("x", 0.0))
-	var center_z: float = float(data.get("center", {}).get("z", 0.0))
-	var radius: float = data.get("radius", 50.0)
-	var floor_y: float = float(data.get("floorY", 0.0))
-	var terrain_params: Dictionary = data.get("terrain", {})
-	_terrain_gen.register_area(area_id, center_x, center_z, radius, floor_y, terrain_params)
 
 func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	var center_x: float = float(data.get("center", {}).get("x", 0.0))
@@ -126,13 +101,6 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	_area_bodies[area_id] = { "center": logical_center, "radius": radius }
 
 	var base_color: Color = _hex_to_color(ground_color_int)
-	var terrain_params: Dictionary = data.get("terrain", {})
-
-	# ── Generate procedural terrain mesh + collision ──
-	var result: Dictionary = _terrain_gen.generate_area_terrain(
-		area_id, center_x, center_z, radius, floor_y, base_color, terrain_params)
-	add_child(result["mesh_instance"])
-	add_child(result["static_body"])
 
 	# ── Area label (terrain-relative, with subtle pole) ──
 	var label_y: float = _terrain_y(center_x, center_z) + 8.0
@@ -2447,9 +2415,6 @@ func _create_corridor(data: Dictionary) -> void:
 
 	var corridor_color: Color = _hex_to_color(ground_color_int)
 
-	# ── Terrain-following ramped ground mesh ──
-	_build_corridor_ramp(center_x, center_z, corridor_w, corridor_d, is_vertical, corridor_color, data.get("id", "unknown"))
-
 	# ── Corridor label ──
 	var label_data = data.get("label", "")
 	if label_data != "" and label_data != null:
@@ -2564,125 +2529,6 @@ func _create_corridor(data: Dictionary) -> void:
 			crossbeam.material = post_mat
 			add_child(crossbeam)
 
-
-## Build a terrain-following corridor ramp mesh with collision.
-## Samples terrain height at each end, then smoothly interpolates along the
-## corridor length so the walkway connects the two areas seamlessly.
-func _build_corridor_ramp(cx: float, cz: float, w: float, d: float,
-		is_vertical: bool, color: Color, corridor_id: String) -> void:
-	var segments: int = 16  # subdivisions along the long axis
-	var cross_segs: int = 4  # subdivisions across the width
-
-	var long_len: float = d if is_vertical else w
-	var cross_len: float = w if is_vertical else d
-
-	# Sample terrain height at both ends of the corridor center line
-	var start_x: float = cx if is_vertical else cx - long_len * 0.5
-	var start_z: float = cz - long_len * 0.5 if is_vertical else cz
-	var end_x: float = cx if is_vertical else cx + long_len * 0.5
-	var end_z: float = cz + long_len * 0.5 if is_vertical else cz
-	var start_y: float = _terrain_y(start_x, start_z)
-	var end_y: float = _terrain_y(end_x, end_z)
-
-	# Build vertex grid
-	var st := SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-
-	var vertices: Array[Vector3] = []
-	var faces := PackedVector3Array()
-
-	# Generate vertices: (segments+1) x (cross_segs+1) grid
-	for li in range(segments + 1):
-		var long_frac: float = float(li) / float(segments)
-		# Smooth interpolation between start and end heights
-		var ramp_y: float = lerpf(start_y, end_y, smoothstep(0.0, 1.0, long_frac))
-		for ci in range(cross_segs + 1):
-			var cross_frac: float = float(ci) / float(cross_segs)
-			var vx: float
-			var vz: float
-			if is_vertical:
-				vx = cx + (cross_frac - 0.5) * cross_len
-				vz = cz + (long_frac - 0.5) * long_len
-			else:
-				vx = cx + (long_frac - 0.5) * long_len
-				vz = cz + (cross_frac - 0.5) * cross_len
-			# Use terrain height if inside an area, otherwise use interpolated ramp
-			var vy: float
-			if _terrain_gen and _terrain_gen.is_inside_area(vx, vz):
-				vy = _terrain_y(vx, vz)
-			else:
-				vy = ramp_y
-			vertices.append(Vector3(vx, vy, vz))
-
-	var cols: int = cross_segs + 1
-
-	# Build triangles from the grid
-	for li in range(segments):
-		for ci in range(cross_segs):
-			var i0: int = li * cols + ci
-			var i1: int = li * cols + ci + 1
-			var i2: int = (li + 1) * cols + ci
-			var i3: int = (li + 1) * cols + ci + 1
-
-			# Tri 1
-			st.set_color(color)
-			st.set_normal(Vector3.UP)
-			st.add_vertex(vertices[i0])
-			st.set_color(color)
-			st.set_normal(Vector3.UP)
-			st.add_vertex(vertices[i2])
-			st.set_color(color)
-			st.set_normal(Vector3.UP)
-			st.add_vertex(vertices[i1])
-
-			# Tri 2
-			st.set_color(color)
-			st.set_normal(Vector3.UP)
-			st.add_vertex(vertices[i1])
-			st.set_color(color)
-			st.set_normal(Vector3.UP)
-			st.add_vertex(vertices[i2])
-			st.set_color(color)
-			st.set_normal(Vector3.UP)
-			st.add_vertex(vertices[i3])
-
-			# Collision faces
-			faces.append(vertices[i0])
-			faces.append(vertices[i2])
-			faces.append(vertices[i1])
-			faces.append(vertices[i1])
-			faces.append(vertices[i2])
-			faces.append(vertices[i3])
-
-	st.generate_normals()
-	var mesh: ArrayMesh = st.commit()
-
-	# Visual
-	var mesh_inst := MeshInstance3D.new()
-	mesh_inst.name = "CorridorMesh_%s" % corridor_id
-	mesh_inst.mesh = mesh
-	mesh_inst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-
-	var mat := StandardMaterial3D.new()
-	mat.vertex_color_use_as_albedo = true
-	mat.roughness = 0.5
-	mat.metallic = 0.35
-	mat.emission_enabled = true
-	mat.emission = color.lightened(0.2)
-	mat.emission_energy_multiplier = 0.15
-	mesh_inst.material_override = mat
-	add_child(mesh_inst)
-
-	# Collision
-	var static_body := StaticBody3D.new()
-	static_body.name = "CorridorCol_%s" % corridor_id
-	static_body.collision_layer = 1
-	var col_shape := CollisionShape3D.new()
-	var shape := ConcavePolygonShape3D.new()
-	shape.set_faces(faces)
-	col_shape.shape = shape
-	static_body.add_child(col_shape)
-	add_child(static_body)
 
 ## Add invisible collision walls around each area edge to prevent walking into the void.
 ## Only adds walls where there is NO corridor connecting — corridors punch through.
