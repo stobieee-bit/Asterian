@@ -18,6 +18,7 @@ var head_color: Color = Color(0.7, 0.7, 0.7)
 var _nameplate: Label3D = null
 var _mesh_root: Node3D = null
 var _idle_phase: float = 0.0
+var _grounded: bool = false
 
 # ── Pending interaction (walk-then-act) ──
 var _pending_action: Callable = Callable()
@@ -36,11 +37,15 @@ func setup(p_npc_id: String) -> void:
 	dialogue = data.get("dialogue", {})
 	shop_data = data.get("shop", {})
 
-	# Position
+	# Position — query terrain height so NPC sits on the surface
 	var pos_data: Dictionary = data.get("position", {})
 	var px: float = float(pos_data.get("x", 0))
 	var pz: float = float(pos_data.get("z", 0))
-	global_position = Vector3(px, 0.0, pz)
+	var py: float = 0.0
+	var area_mgr: Node3D = get_tree().get_first_node_in_group("area_manager")
+	if area_mgr and area_mgr.has_method("get_terrain_height"):
+		py = area_mgr.get_terrain_height(px, pz)
+	global_position = Vector3(px, py, pz)
 
 	# Colors
 	var bc: int = int(data.get("bodyColor", 0x808080))
@@ -73,6 +78,14 @@ func _ready() -> void:
 	add_child(collision)
 
 func _process(delta: float) -> void:
+	# One-time ground snap: ensure NPC sits on terrain surface
+	if not _grounded:
+		_grounded = true
+		var area_mgr: Node3D = get_tree().get_first_node_in_group("area_manager")
+		if area_mgr and area_mgr.has_method("get_terrain_height"):
+			var ty: float = area_mgr.get_terrain_height(global_position.x, global_position.z)
+			global_position.y = ty
+
 	_idle_phase += delta
 	if _mesh_root:
 		_animate_npc_idle(_idle_phase)

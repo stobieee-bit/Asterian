@@ -77,6 +77,12 @@ func _ready() -> void:
 	else:
 		print("Player spawned at Station Hub.")
 
+	# Snap spawn position to terrain surface so player doesn't clip through
+	var area_mgr: Node3D = get_tree().get_first_node_in_group("area_manager")
+	if area_mgr and area_mgr.has_method("get_terrain_height"):
+		var terrain_y: float = area_mgr.get_terrain_height(spawn_pos.x, spawn_pos.z)
+		spawn_pos.y = terrain_y + 1.0
+
 	player.global_position = spawn_pos
 	player.move_target = spawn_pos
 

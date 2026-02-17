@@ -144,14 +144,16 @@ func _spawn_all_nodes() -> void:
 			var color: Color = node_def["color"]
 			var count: int = int(node_def["count"])
 
+			var area_mgr: Node3D = get_tree().get_first_node_in_group("area_manager")
 			for i in range(count):
 				var angle: float = randf() * TAU
 				var dist: float = randf_range(5.0, radius * 0.85)
-				var pos: Vector3 = Vector3(
-					cx + cos(angle) * dist,
-					0.1,
-					cz + sin(angle) * dist
-				)
+				var gx: float = cx + cos(angle) * dist
+				var gz: float = cz + sin(angle) * dist
+				var gy: float = 0.1
+				if area_mgr and area_mgr.has_method("get_terrain_height"):
+					gy = area_mgr.get_terrain_height(gx, gz) + 0.1
+				var pos: Vector3 = Vector3(gx, gy, gz)
 
 				var node_id: String = "%s_%s_%d" % [skill, item_id, i]
 				var gnode: StaticBody3D = StaticBody3D.new()

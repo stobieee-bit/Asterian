@@ -271,8 +271,11 @@ func _count_living_in_zone(zone: Dictionary) -> int:
 func _random_position_in_zone(zone: Dictionary) -> Vector3:
 	var angle: float = randf() * TAU
 	var dist: float = randf_range(2.0, float(zone["radius"]) * 0.8)
-	return Vector3(
-		float(zone["cx"]) + cos(angle) * dist,
-		0.1,  # Just above ground level so gravity settles immediately
-		float(zone["cz"]) + sin(angle) * dist
-	)
+	var px: float = float(zone["cx"]) + cos(angle) * dist
+	var pz: float = float(zone["cz"]) + sin(angle) * dist
+	# Query terrain height so enemies spawn on the surface
+	var py: float = 0.5
+	var area_mgr: Node3D = get_tree().get_first_node_in_group("area_manager")
+	if area_mgr and area_mgr.has_method("get_terrain_height"):
+		py = area_mgr.get_terrain_height(px, pz) + 0.5
+	return Vector3(px, py, pz)

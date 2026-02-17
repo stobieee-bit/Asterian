@@ -19,6 +19,7 @@ var _glow_light: OmniLight3D = null
 # ── Pending interaction (walk-then-act) ──
 var _pending_action: Callable = Callable()
 var _pending_timeout: float = 0.0
+var _grounded: bool = false
 
 ## Initialize from data
 func setup(data: Dictionary) -> void:
@@ -30,7 +31,11 @@ func setup(data: Dictionary) -> void:
 	var pos_data: Dictionary = data.get("position", {})
 	var px: float = float(pos_data.get("x", 0))
 	var pz: float = float(pos_data.get("z", 0))
-	global_position = Vector3(px, 0.5, pz)
+	var py: float = 0.5
+	var area_mgr: Node3D = get_tree().get_first_node_in_group("area_manager")
+	if area_mgr and area_mgr.has_method("get_terrain_height"):
+		py = area_mgr.get_terrain_height(px, pz) + 0.5
+	global_position = Vector3(px, py, pz)
 
 	_apply_visuals()
 
@@ -149,6 +154,14 @@ func _is_player_in_range() -> bool:
 	return player.global_position.distance_to(global_position) <= interact_radius + 1.0
 
 func _process(delta: float) -> void:
+	# One-time ground snap
+	if not _grounded:
+		_grounded = true
+		var area_mgr: Node3D = get_tree().get_first_node_in_group("area_manager")
+		if area_mgr and area_mgr.has_method("get_terrain_height"):
+			var ty: float = area_mgr.get_terrain_height(global_position.x, global_position.z)
+			global_position.y = ty + 0.5
+
 	# ── Walk-then-act: fire pending action when player arrives ──
 	if _pending_action.is_valid():
 		_pending_timeout -= delta

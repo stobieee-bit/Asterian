@@ -20,6 +20,9 @@ const GROUND_Y: float = -0.1
 # ── References ──
 @onready var world_env: WorldEnvironment = $"../WorldEnvironment"
 
+# ── Terrain generator ──
+var _terrain_gen: TerrainGenerator = null
+
 # ── Area collision detection ──
 var _area_bodies: Dictionary = {}   # { area_id: { center: Vector3, radius: float } }
 var _player: CharacterBody3D = null
@@ -33,10 +36,25 @@ var _time: float = 0.0
 
 func _ready() -> void:
 	add_to_group("area_manager")
+	_terrain_gen = TerrainGenerator.new()
 	_build_areas()
 	_build_corridors()
+	_add_area_boundaries()
+	_add_safety_floor()
 	await get_tree().process_frame
 	_player = get_tree().get_first_node_in_group("player")
+
+## Public API: query terrain height at any world XZ position.
+func get_terrain_height(x: float, z: float) -> float:
+	if _terrain_gen:
+		return _terrain_gen.get_height(x, z)
+	return 0.0
+
+## Internal shorthand for prop placement.
+func _terrain_y(x: float, z: float) -> float:
+	if _terrain_gen:
+		return _terrain_gen.get_height(x, z)
+	return 0.0
 
 func _process(delta: float) -> void:
 	if _player == null:
@@ -63,77 +81,19 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	var center_z: float = float(data.get("center", {}).get("z", 0.0))
 	var radius: float = data.get("radius", 50.0)
 	var ground_color_int: int = int(data.get("groundColor", 0x1a2030))
+	var floor_y: float = float(data.get("floorY", 0.0))
 
-	var logical_center: Vector3 = Vector3(center_x, float(data.get("floorY", 0.0)), center_z)
+	var logical_center: Vector3 = Vector3(center_x, floor_y, center_z)
 	_area_bodies[area_id] = { "center": logical_center, "radius": radius }
 
-	# Visual Y offset to prevent z-fighting
-	var visual_y_bump: float = 0.0
-	if radius < 30:
-		visual_y_bump = 0.06
-	elif radius < 80:
-		visual_y_bump = 0.04
-	elif radius < 300:
-		visual_y_bump = 0.02
-
-	# ── Ground disc ──
-	var ground: CSGCylinder3D = CSGCylinder3D.new()
-	ground.name = "Ground_%s" % area_id
-	ground.radius = radius
-	ground.height = 0.2
-	ground.sides = 64 if radius > 100 else 48
-	ground.position = Vector3(center_x, GROUND_Y + visual_y_bump, center_z)
-
 	var base_color: Color = _hex_to_color(ground_color_int)
-	var mat: StandardMaterial3D = StandardMaterial3D.new()
-	mat.albedo_color = base_color.lightened(0.2)
-	mat.roughness = 0.45
-	mat.metallic = 0.4
-	mat.emission_enabled = true
-	mat.emission = base_color.lightened(0.35)
-	mat.emission_energy_multiplier = 0.25
-	mat.uv1_scale = Vector3(radius / 8.0, radius / 8.0, 1.0)
-	if radius < 30:
-		mat.render_priority = 3
-	elif radius < 80:
-		mat.render_priority = 2
-	elif radius < 300:
-		mat.render_priority = 1
-	else:
-		mat.render_priority = 0
-	ground.material = mat
+	var terrain_params: Dictionary = data.get("terrain", {})
 
-	# Collision shape
-	var static_body: StaticBody3D = StaticBody3D.new()
-	static_body.collision_layer = 1
-	var col_shape: CollisionShape3D = CollisionShape3D.new()
-	var shape: CylinderShape3D = CylinderShape3D.new()
-	shape.radius = radius
-	shape.height = 0.4
-	col_shape.shape = shape
-	static_body.add_child(col_shape)
-	ground.add_child(static_body)
-	add_child(ground)
-
-	# ── Edge ring — subtle glowing border ──
-	var edge_ring: CSGTorus3D = CSGTorus3D.new()
-	edge_ring.name = "Edge_%s" % area_id
-	edge_ring.inner_radius = radius - 0.3
-	edge_ring.outer_radius = radius + 0.3
-	edge_ring.ring_sides = 8
-	edge_ring.sides = 64 if radius > 100 else 48
-	edge_ring.position = Vector3(center_x, GROUND_Y + 0.15 + visual_y_bump, center_z)
-	var edge_mat: StandardMaterial3D = StandardMaterial3D.new()
-	edge_mat.albedo_color = base_color.lightened(0.2)
-	edge_mat.albedo_color.a = 0.3
-	edge_mat.emission_enabled = true
-	edge_mat.emission = base_color.lightened(0.3)
-	edge_mat.emission_energy_multiplier = 0.5
-	edge_mat.metallic = 0.3
-	edge_mat.roughness = 0.4
-	edge_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	edge_ring.material = edge_mat
-	add_child(edge_ring)
+	# ── Generate procedural terrain mesh + collision ──
+	var result: Dictionary = _terrain_gen.generate_area_terrain(
+		area_id, center_x, center_z, radius, floor_y, base_color, terrain_params)
+	add_child(result["mesh_instance"])
+	add_child(result["static_body"])
 
 	# ── Area label ──
 	var label: Label3D = Label3D.new()
@@ -147,17 +107,15 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	label.no_depth_test = true
 	add_child(label)
 
-	var y_base: float = GROUND_Y + 0.1 + visual_y_bump
+	# y_base kept for compatibility with decoration functions (they'll use _terrain_y internally)
+	var y_base: float = floor_y
 
 	# ── Build all detail layers ──
 	# Bio-Lab is a small crafting hub — skip heavy clutter, keep it clean
 	var _is_clean_area: bool = area_id == "bio-lab"
 
-	_add_ground_variation(area_id, center_x, center_z, radius, base_color, y_base)
-	if not _is_clean_area:
-		_add_terrain_bumps(area_id, center_x, center_z, radius, base_color, y_base)
-	_add_concentric_rings(area_id, center_x, center_z, radius, base_color, y_base)
-	_add_grid_lines(area_id, center_x, center_z, radius, base_color, y_base)
+	# Ground variation, terrain bumps, concentric rings, grid lines are all replaced
+	# by the procedural terrain mesh (noise height + vertex colors)
 	if not _is_clean_area:
 		_add_rocks_and_boulders(area_id, center_x, center_z, radius, base_color, y_base)
 		_add_energy_pylons(area_id, center_x, center_z, radius, base_color, y_base)
@@ -229,147 +187,6 @@ func _clutter_density(area_id: String) -> float:
 #  DETAIL LAYERS
 # ═══════════════════════════════════════════════════════════════════════════════
 
-## Ground variation — inner and outer color bands for visual depth
-func _add_ground_variation(_area_id: String, cx: float, cz: float, radius: float,
-		base_color: Color, y_base: float) -> void:
-	# Inner ring at 70% radius with lighter color
-	var inner_ring: CSGCylinder3D = CSGCylinder3D.new()
-	inner_ring.radius = radius * 0.7
-	inner_ring.height = 0.05
-	inner_ring.sides = 32 if radius < 80 else 48
-	inner_ring.position = Vector3(cx, y_base + 0.01, cz)
-	var inner_mat: StandardMaterial3D = StandardMaterial3D.new()
-	inner_mat.albedo_color = base_color.lightened(0.08)
-	inner_mat.albedo_color.a = 0.4
-	inner_mat.roughness = 0.55
-	inner_mat.metallic = 0.3
-	inner_mat.emission_enabled = true
-	inner_mat.emission = base_color.lightened(0.1)
-	inner_mat.emission_energy_multiplier = 0.15
-	inner_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	inner_ring.material = inner_mat
-	add_child(inner_ring)
-
-	# Outer band at 85% radius, darker
-	var outer_band: CSGCylinder3D = CSGCylinder3D.new()
-	outer_band.radius = radius * 0.85
-	outer_band.height = 0.04
-	outer_band.sides = 32 if radius < 80 else 48
-	outer_band.position = Vector3(cx, y_base + 0.005, cz)
-	var outer_mat: StandardMaterial3D = StandardMaterial3D.new()
-	outer_mat.albedo_color = base_color.darkened(0.1)
-	outer_mat.albedo_color.a = 0.3
-	outer_mat.roughness = 0.6
-	outer_mat.metallic = 0.2
-	outer_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	outer_band.material = outer_mat
-	add_child(outer_band)
-
-## Terrain bumps and craters — purely visual height variation
-func _add_terrain_bumps(area_id: String, cx: float, cz: float, radius: float,
-		base_color: Color, y_base: float) -> void:
-	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-	rng.seed = area_id.hash()
-
-	# Raised bumps — scaled by area density
-	var density: float = _clutter_density(area_id)
-	var bump_count: int = maxi(int((int(radius / 15.0) + 2) * density), 2)
-	for i in range(bump_count):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(0.2, 0.75) * radius
-		var bx: float = cx + cos(angle) * dist
-		var bz: float = cz + sin(angle) * dist
-		var bump_radius: float = rng.randf_range(2.0, 5.0)
-		var bump_height: float = rng.randf_range(0.2, 0.6)
-
-		var bump: CSGCylinder3D = CSGCylinder3D.new()
-		bump.radius = bump_radius
-		bump.height = bump_height
-		bump.sides = 12
-		bump.position = Vector3(bx, y_base + bump_height * 0.5, bz)
-		var bump_mat: StandardMaterial3D = StandardMaterial3D.new()
-		bump_mat.albedo_color = base_color.lightened(rng.randf_range(-0.05, 0.05))
-		bump_mat.roughness = 0.5
-		bump_mat.metallic = 0.35
-		bump_mat.emission_enabled = true
-		bump_mat.emission = base_color
-		bump_mat.emission_energy_multiplier = 0.1
-		bump.material = bump_mat
-		add_child(bump)
-
-	# Crater depressions — scaled by density
-	var crater_count: int = maxi(int((int(radius / 25.0) + 1) * density), 1)
-	for i in range(crater_count):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(0.3, 0.65) * radius
-		var crx: float = cx + cos(angle) * dist
-		var crz: float = cz + sin(angle) * dist
-
-		var crater: CSGCylinder3D = CSGCylinder3D.new()
-		crater.radius = rng.randf_range(1.5, 4.0)
-		crater.height = 0.06
-		crater.sides = 12
-		crater.position = Vector3(crx, y_base - 0.02, crz)
-		var cr_mat: StandardMaterial3D = StandardMaterial3D.new()
-		cr_mat.albedo_color = base_color.darkened(0.15)
-		cr_mat.roughness = 0.65
-		cr_mat.metallic = 0.2
-		cr_mat.emission_enabled = true
-		cr_mat.emission = base_color.darkened(0.1)
-		cr_mat.emission_energy_multiplier = 0.08
-		crater.material = cr_mat
-		add_child(crater)
-
-## Concentric accent rings — glowing circuit-like rings on the ground
-func _add_concentric_rings(area_id: String, cx: float, cz: float, radius: float,
-		base_color: Color, y_base: float) -> void:
-	var ring_count: int = 4 if radius < 60 else (6 if radius < 300 else 10)
-	for i in range(ring_count):
-		var ring_frac: float = 0.15 + float(i) * (0.75 / float(ring_count))
-		var ring_r: float = radius * ring_frac
-		var ring: CSGTorus3D = CSGTorus3D.new()
-		ring.inner_radius = ring_r - 0.15
-		ring.outer_radius = ring_r + 0.15
-		ring.ring_sides = 6
-		ring.sides = 48
-		ring.position = Vector3(cx, y_base + 0.02, cz)
-		var ring_mat: StandardMaterial3D = StandardMaterial3D.new()
-		ring_mat.albedo_color = base_color.lightened(0.4)
-		ring_mat.emission_enabled = true
-		ring_mat.emission = base_color.lightened(0.55)
-		ring_mat.emission_energy_multiplier = 1.2
-		ring_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		ring_mat.albedo_color.a = 0.5
-		ring.material = ring_mat
-		add_child(ring)
-
-## Grid / radial line patterns on the ground (tech floor look)
-func _add_grid_lines(area_id: String, cx: float, cz: float, radius: float,
-		base_color: Color, y_base: float) -> void:
-	var line_mat: StandardMaterial3D = StandardMaterial3D.new()
-	line_mat.albedo_color = base_color.lightened(0.45)
-	line_mat.emission_enabled = true
-	line_mat.emission = base_color.lightened(0.55)
-	line_mat.emission_energy_multiplier = 0.8
-	line_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	line_mat.albedo_color.a = 0.35
-
-	# Radial lines from center
-	var line_count: int = 8 if radius < 60 else (12 if radius < 300 else 16)
-	for i in range(line_count):
-		var angle: float = float(i) * TAU / float(line_count)
-		var length: float = radius * 0.85
-		var line: CSGBox3D = CSGBox3D.new()
-		line.size = Vector3(0.08, 0.05, length)
-		line.position = Vector3(
-			cx + cos(angle) * length * 0.5,
-			y_base + 0.03,
-			cz + sin(angle) * length * 0.5
-		)
-		line.rotation.y = -angle + PI / 2.0
-		line.material = line_mat
-		add_child(line)
-
 ## Scatter rocks and boulders of various sizes
 func _add_rocks_and_boulders(area_id: String, cx: float, cz: float, radius: float,
 		base_color: Color, y_base: float) -> void:
@@ -390,14 +207,16 @@ func _add_rocks_and_boulders(area_id: String, cx: float, cz: float, radius: floa
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(3.0, radius * 0.88)
 		var rock_r: float = rng.randf_range(0.3, 2.5)
+		var rx: float = cx + cos(angle) * dist
+		var rz: float = cz + sin(angle) * dist
 		var rock: CSGSphere3D = CSGSphere3D.new()
 		rock.radius = rock_r
 		rock.radial_segments = 6
 		rock.rings = 4
 		rock.position = Vector3(
-			cx + cos(angle) * dist,
-			y_base + rock_r * 0.2,
-			cz + sin(angle) * dist
+			rx,
+			_terrain_y(rx, rz) + rock_r * 0.2,
+			rz
 		)
 		rock.scale = Vector3(
 			1.0 + rng.randf() * 0.6,
@@ -424,6 +243,7 @@ func _add_energy_pylons(area_id: String, cx: float, cz: float, radius: float,
 		var dist: float = rng.randf_range(8.0, radius * 0.8)
 		var px: float = cx + cos(angle) * dist
 		var pz: float = cz + sin(angle) * dist
+		var ty: float = _terrain_y(px, pz)
 		var height: float = rng.randf_range(4.0, 12.0)
 
 		# Base pedestal
@@ -431,7 +251,7 @@ func _add_energy_pylons(area_id: String, cx: float, cz: float, radius: float,
 		pedestal.radius = 0.8
 		pedestal.height = 0.6
 		pedestal.sides = 6
-		pedestal.position = Vector3(px, y_base + 0.3, pz)
+		pedestal.position = Vector3(px, ty + 0.3, pz)
 		var ped_mat: StandardMaterial3D = StandardMaterial3D.new()
 		ped_mat.albedo_color = base_color.darkened(0.2)
 		ped_mat.metallic = 0.6
@@ -445,7 +265,7 @@ func _add_energy_pylons(area_id: String, cx: float, cz: float, radius: float,
 		column.radius = 0.25
 		column.height = height
 		column.sides = 8
-		column.position = Vector3(px, y_base + height * 0.5 + 0.6, pz)
+		column.position = Vector3(px, ty + height * 0.5 + 0.6, pz)
 		var col_mat: StandardMaterial3D = StandardMaterial3D.new()
 		col_mat.albedo_color = base_color.darkened(0.1)
 		col_mat.metallic = 0.7
@@ -461,7 +281,7 @@ func _add_energy_pylons(area_id: String, cx: float, cz: float, radius: float,
 		orb.radius = 0.4
 		orb.radial_segments = 12
 		orb.rings = 6
-		orb.position = Vector3(px, y_base + height + 1.0, pz)
+		orb.position = Vector3(px, ty + height + 1.0, pz)
 		var orb_mat: StandardMaterial3D = StandardMaterial3D.new()
 		orb_mat.albedo_color = base_color.lightened(0.5)
 		orb_mat.emission_enabled = true
@@ -476,14 +296,14 @@ func _add_energy_pylons(area_id: String, cx: float, cz: float, radius: float,
 		h_ring.outer_radius = 0.7
 		h_ring.ring_sides = 6
 		h_ring.sides = 16
-		h_ring.position = Vector3(px, y_base + height + 1.0, pz)
+		h_ring.position = Vector3(px, ty + height + 1.0, pz)
 		h_ring.material = orb_mat
 		add_child(h_ring)
 
 		# Register orb for animation (gentle hover + pulse)
 		_animated_nodes.append({
 			"node": orb, "type": "hover",
-			"base_y": y_base + height + 1.0,
+			"base_y": ty + height + 1.0,
 			"speed": rng.randf_range(1.0, 2.0),
 			"phase": rng.randf() * TAU,
 			"amplitude": 0.3
@@ -508,12 +328,13 @@ func _add_tech_panels(area_id: String, cx: float, cz: float, radius: float,
 		var dist: float = rng.randf_range(4.0, radius * 0.85)
 		var px: float = cx + cos(angle) * dist
 		var pz: float = cz + sin(angle) * dist
+		var ty: float = _terrain_y(px, pz)
 
 		var panel: CSGBox3D = CSGBox3D.new()
 		var pw: float = rng.randf_range(1.5, 4.0)
 		var pd: float = rng.randf_range(1.0, 3.0)
 		panel.size = Vector3(pw, 0.08, pd)
-		panel.position = Vector3(px, y_base + 0.06, pz)
+		panel.position = Vector3(px, ty + 0.06, pz)
 		panel.rotation.y = rng.randf() * TAU
 
 		var panel_mat: StandardMaterial3D = StandardMaterial3D.new()
@@ -530,7 +351,7 @@ func _add_tech_panels(area_id: String, cx: float, cz: float, radius: float,
 		# Border frame around panel
 		var frame: CSGBox3D = CSGBox3D.new()
 		frame.size = Vector3(pw + 0.2, 0.12, pd + 0.2)
-		frame.position = Vector3(px, y_base + 0.04, pz)
+		frame.position = Vector3(px, ty + 0.04, pz)
 		frame.rotation.y = panel.rotation.y
 		var frame_mat: StandardMaterial3D = StandardMaterial3D.new()
 		frame_mat.albedo_color = base_color.darkened(0.15)
@@ -553,6 +374,7 @@ func _add_light_columns(area_id: String, cx: float, cz: float, radius: float,
 		var dist: float = rng.randf_range(radius * 0.3, radius * 0.7)
 		var px: float = cx + cos(angle) * dist
 		var pz: float = cz + sin(angle) * dist
+		var ty: float = _terrain_y(px, pz)
 		var beam_h: float = rng.randf_range(15.0, 35.0)
 
 		# Light beam (semi-transparent tall cylinder)
@@ -560,7 +382,7 @@ func _add_light_columns(area_id: String, cx: float, cz: float, radius: float,
 		beam.radius = 0.3
 		beam.height = beam_h
 		beam.sides = 8
-		beam.position = Vector3(px, y_base + beam_h * 0.5, pz)
+		beam.position = Vector3(px, ty + beam_h * 0.5, pz)
 		var beam_mat: StandardMaterial3D = StandardMaterial3D.new()
 		var beam_color: Color = base_color.lightened(0.5)
 		beam_mat.albedo_color = Color(beam_color.r, beam_color.g, beam_color.b, 0.15)
@@ -577,7 +399,7 @@ func _add_light_columns(area_id: String, cx: float, cz: float, radius: float,
 		base_disc.radius = 1.2
 		base_disc.height = 0.15
 		base_disc.sides = 12
-		base_disc.position = Vector3(px, y_base + 0.08, pz)
+		base_disc.position = Vector3(px, ty + 0.08, pz)
 		var disc_mat: StandardMaterial3D = StandardMaterial3D.new()
 		disc_mat.albedo_color = beam_color
 		disc_mat.emission_enabled = true
@@ -616,6 +438,9 @@ func _add_crystals(area_id: String, cx: float, cz: float, radius: float,
 		var dist: float = rng.randf_range(5.0, radius * 0.8)
 		var c_height: float = rng.randf_range(1.5, 8.0)
 		var c_radius: float = rng.randf_range(0.15, 0.8)
+		var crx: float = cx + cos(angle) * dist
+		var crz: float = cz + sin(angle) * dist
+		var ty: float = _terrain_y(crx, crz)
 
 		var crystal: CSGCylinder3D = CSGCylinder3D.new()
 		crystal.radius = c_radius
@@ -623,9 +448,9 @@ func _add_crystals(area_id: String, cx: float, cz: float, radius: float,
 		crystal.sides = 5
 		crystal.cone = true
 		crystal.position = Vector3(
-			cx + cos(angle) * dist,
-			y_base + c_height * 0.4,
-			cz + sin(angle) * dist
+			crx,
+			ty + c_height * 0.4,
+			crz
 		)
 		crystal.rotation = Vector3(
 			rng.randf_range(-0.35, 0.35),
@@ -686,13 +511,14 @@ func _add_alien_flora(area_id: String, cx: float, cz: float, radius: float,
 		var stem_h: float = rng.randf_range(1.0, 6.0)
 		var px: float = cx + cos(angle) * dist
 		var pz: float = cz + sin(angle) * dist
+		var ty: float = _terrain_y(px, pz)
 
 		# Stem
 		var stem: CSGCylinder3D = CSGCylinder3D.new()
 		stem.radius = 0.08 + rng.randf() * 0.06
 		stem.height = stem_h
 		stem.sides = 6
-		stem.position = Vector3(px, y_base + stem_h * 0.5, pz)
+		stem.position = Vector3(px, ty + stem_h * 0.5, pz)
 		stem.rotation.z = rng.randf_range(-0.2, 0.2)
 		stem.rotation.x = rng.randf_range(-0.1, 0.1)
 		var stem_mat: StandardMaterial3D = StandardMaterial3D.new()
@@ -710,7 +536,7 @@ func _add_alien_flora(area_id: String, cx: float, cz: float, radius: float,
 		bulb.radius = bulb_r
 		bulb.radial_segments = 10
 		bulb.rings = 6
-		bulb.position = Vector3(px, y_base + stem_h + bulb_r * 0.3, pz)
+		bulb.position = Vector3(px, ty + stem_h + bulb_r * 0.3, pz)
 		var bulb_color: Color = Color(
 			rng.randf_range(0.1, 0.4),
 			rng.randf_range(0.6, 1.0),
@@ -731,7 +557,7 @@ func _add_alien_flora(area_id: String, cx: float, cz: float, radius: float,
 				tendril.radius = 0.03
 				tendril.height = stem_h * rng.randf_range(0.3, 0.6)
 				tendril.sides = 4
-				var t_y: float = y_base + stem_h * rng.randf_range(0.3, 0.7)
+				var t_y: float = ty + stem_h * rng.randf_range(0.3, 0.7)
 				tendril.position = Vector3(px, t_y, pz)
 				tendril.rotation = Vector3(
 					rng.randf_range(-0.8, 0.8),
@@ -782,7 +608,8 @@ func _add_floating_debris(area_id: String, cx: float, cz: float, radius: float,
 		var debris: CSGBox3D = CSGBox3D.new()
 		var s: float = rng.randf_range(0.2, 1.0)
 		debris.size = Vector3(s, s * 0.6, s * 0.8)
-		debris.position = Vector3(px, y_base + hover_h, pz)
+		var ty: float = _terrain_y(px, pz)
+		debris.position = Vector3(px, ty + hover_h, pz)
 		debris.rotation = Vector3(
 			rng.randf() * TAU,
 			rng.randf() * TAU,
@@ -794,7 +621,7 @@ func _add_floating_debris(area_id: String, cx: float, cz: float, radius: float,
 		# Register for slow hovering animation
 		_animated_nodes.append({
 			"node": debris, "type": "hover",
-			"base_y": y_base + hover_h,
+			"base_y": ty + hover_h,
 			"speed": rng.randf_range(0.3, 0.8),
 			"phase": rng.randf() * TAU,
 			"amplitude": rng.randf_range(0.3, 1.0)
@@ -827,6 +654,7 @@ func _add_pipe_structures(area_id: String, cx: float, cz: float, radius: float,
 		var dist: float = rng.randf_range(5.0, radius * 0.7)
 		var px: float = cx + cos(angle) * dist
 		var pz: float = cz + sin(angle) * dist
+		var ty: float = _terrain_y(px, pz)
 		var pipe_len: float = rng.randf_range(4.0, 15.0)
 		var pipe_h: float = rng.randf_range(0.3, 2.0)
 
@@ -835,7 +663,7 @@ func _add_pipe_structures(area_id: String, cx: float, cz: float, radius: float,
 		pipe.radius = rng.randf_range(0.12, 0.3)
 		pipe.height = pipe_len
 		pipe.sides = 8
-		pipe.position = Vector3(px, y_base + pipe_h, pz)
+		pipe.position = Vector3(px, ty + pipe_h, pz)
 		pipe.rotation = Vector3(0, rng.randf() * TAU, PI / 2.0)
 		pipe.material = pipe_mat
 		add_child(pipe)
@@ -850,7 +678,7 @@ func _add_pipe_structures(area_id: String, cx: float, cz: float, radius: float,
 			var frac: float = rng.randf_range(-0.4, 0.4)
 			junc.position = Vector3(
 				px + cos(pipe.rotation.y) * pipe_len * frac,
-				y_base + pipe_h,
+				ty + pipe_h,
 				pz + sin(pipe.rotation.y) * pipe_len * frac
 			)
 			junc.rotation.z = PI / 2.0
@@ -884,13 +712,14 @@ func _add_ruined_walls(area_id: String, cx: float, cz: float, radius: float,
 		var dist: float = rng.randf_range(10.0, radius * 0.75)
 		var px: float = cx + cos(angle) * dist
 		var pz: float = cz + sin(angle) * dist
+		var ty: float = _terrain_y(px, pz)
 		var wall_h: float = rng.randf_range(2.0, 7.0)
 		var wall_w: float = rng.randf_range(3.0, 10.0)
 
 		# Wall section
 		var wall: CSGBox3D = CSGBox3D.new()
 		wall.size = Vector3(wall_w, wall_h, 0.4)
-		wall.position = Vector3(px, y_base + wall_h * 0.5, pz)
+		wall.position = Vector3(px, ty + wall_h * 0.5, pz)
 		wall.rotation.y = rng.randf() * TAU
 		wall.material = wall_mat
 		add_child(wall)
@@ -904,7 +733,7 @@ func _add_ruined_walls(area_id: String, cx: float, cz: float, radius: float,
 			chunk.size = Vector3(cw, ch, 0.4)
 			chunk.position = Vector3(
 				px + (rng.randf() - 0.5) * wall_w * 0.5,
-				y_base + wall_h + ch * 0.3,
+				ty + wall_h + ch * 0.3,
 				pz
 			)
 			chunk.rotation.y = wall.rotation.y
@@ -932,6 +761,7 @@ func _add_area_unique_structures(area_id: String, cx: float, cz: float,
 ## Station Hub — central marketplace, control tower, landing pads, supply depot
 func _build_hub_structures(cx: float, cz: float, radius: float,
 		base_color: Color, y_base: float) -> void:
+	y_base = _terrain_y(cx, cz)
 	# ── Shared materials ──
 	var glow_mat: StandardMaterial3D = StandardMaterial3D.new()
 	glow_mat.albedo_color = Color(0.2, 0.8, 1.0)
@@ -1363,6 +1193,7 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 ## Gathering Grounds — mushroom groves, spore vents, resource nodes highlighted
 func _build_gathering_structures(cx: float, cz: float, radius: float,
 		base_color: Color, y_base: float) -> void:
+	y_base = _terrain_y(cx, cz)
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = hash("gathering_unique")
 
@@ -1447,7 +1278,6 @@ func _build_wastes_structures(cx: float, cz: float, radius: float,
 	_build_wastes_stalker_dens(y_base)
 	_build_wastes_aberration_wastes(y_base)
 	_build_wastes_eldritch_edge(y_base)
-	_build_wastes_zone_borders(y_base)
 
 ## Helper: create a material with emission
 func _make_wastes_mat(color: Color, emission_color: Color, emission_str: float = 1.0,
@@ -1480,23 +1310,6 @@ func _scatter_positions(rng: RandomNumberGenerator, zcx: float, zcz: float,
 	return positions
 
 ## Helper: place a sub-zone ground tint disc
-func _add_zone_ground_tint(zcx: float, zcz: float, zr: float, color: Color,
-		alpha: float, y_base: float) -> void:
-	var disc: CSGCylinder3D = CSGCylinder3D.new()
-	disc.radius = zr
-	disc.height = 0.06
-	disc.sides = 48
-	disc.position = Vector3(zcx, y_base + 0.08, zcz)
-	var mat: StandardMaterial3D = StandardMaterial3D.new()
-	mat.albedo_color = Color(color.r, color.g, color.b, alpha)
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.emission_enabled = true
-	mat.emission = color
-	mat.emission_energy_multiplier = 0.3
-	mat.render_priority = 4
-	disc.material = mat
-	add_child(disc)
-
 ## Helper: place a sub-zone label
 func _add_zone_label(text: String, zcx: float, zcz: float, y_base: float,
 		color: Color = Color(0.7, 0.9, 0.8, 0.8)) -> void:
@@ -1513,10 +1326,10 @@ func _add_zone_label(text: String, zcx: float, zcz: float, y_base: float,
 # ── SPORE FIELDS — Bioluminescent entry zone, soft green/teal glow ──
 func _build_wastes_spore_fields(y_base: float) -> void:
 	var zcx: float = 40.0; var zcz: float = -180.0; var zr: float = 60.0
+	y_base = _terrain_y(zcx, zcz)
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = hash("wastes_spore_fields")
 
-	_add_zone_ground_tint(zcx, zcz, zr, Color(0.05, 0.2, 0.15), 0.35, y_base)
 	_add_zone_label("Spore Fields", zcx, zcz, y_base, Color(0.3, 0.9, 0.6, 0.85))
 
 	var spore_glow: StandardMaterial3D = _make_wastes_mat(
@@ -1589,10 +1402,10 @@ func _build_wastes_spore_fields(y_base: float) -> void:
 # ── HIVE PERIMETER — Chitin walls, organic tunnels, hive arches ──
 func _build_wastes_hive_perimeter(y_base: float) -> void:
 	var zcx: float = -45.0; var zcz: float = -290.0; var zr: float = 70.0
+	y_base = _terrain_y(zcx, zcz)
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = hash("wastes_hive_perimeter")
 
-	_add_zone_ground_tint(zcx, zcz, zr, Color(0.15, 0.08, 0.03), 0.35, y_base)
 	_add_zone_label("Hive Perimeter", zcx, zcz, y_base, Color(0.8, 0.6, 0.2, 0.85))
 
 	var chitin_mat: StandardMaterial3D = _make_wastes_mat(
@@ -1689,10 +1502,10 @@ func _build_wastes_hive_perimeter(y_base: float) -> void:
 # ── FUNGAL DEPTHS — Giant mushrooms, mycelium networks, purple haze ──
 func _build_wastes_fungal_depths(y_base: float) -> void:
 	var zcx: float = 50.0; var zcz: float = -420.0; var zr: float = 75.0
+	y_base = _terrain_y(zcx, zcz)
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = hash("wastes_fungal_depths")
 
-	_add_zone_ground_tint(zcx, zcz, zr, Color(0.12, 0.05, 0.18), 0.35, y_base)
 	_add_zone_label("Fungal Depths", zcx, zcz, y_base, Color(0.7, 0.3, 0.9, 0.85))
 
 	var cap_mat: StandardMaterial3D = _make_wastes_mat(
@@ -1783,10 +1596,10 @@ func _build_wastes_fungal_depths(y_base: float) -> void:
 # ── TOXIC HEART — Acid pools, toxic geysers, corroded bone structures ──
 func _build_wastes_toxic_heart(y_base: float) -> void:
 	var zcx: float = -40.0; var zcz: float = -550.0; var zr: float = 70.0
+	y_base = _terrain_y(zcx, zcz)
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = hash("wastes_toxic_heart")
 
-	_add_zone_ground_tint(zcx, zcz, zr, Color(0.15, 0.2, 0.02), 0.4, y_base)
 	_add_zone_label("Toxic Heart", zcx, zcz, y_base, Color(0.6, 0.9, 0.1, 0.85))
 
 	var acid_mat: StandardMaterial3D = _make_wastes_alpha_mat(
@@ -1864,10 +1677,10 @@ func _build_wastes_toxic_heart(y_base: float) -> void:
 # ── STALKER DENS — Web canopies, cocoons, trap tendrils ──
 func _build_wastes_stalker_dens(y_base: float) -> void:
 	var zcx: float = 45.0; var zcz: float = -670.0; var zr: float = 70.0
+	y_base = _terrain_y(zcx, zcz)
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = hash("wastes_stalker_dens")
 
-	_add_zone_ground_tint(zcx, zcz, zr, Color(0.08, 0.06, 0.1), 0.4, y_base)
 	_add_zone_label("Stalker Dens", zcx, zcz, y_base, Color(0.6, 0.5, 0.7, 0.85))
 
 	var web_mat: StandardMaterial3D = _make_wastes_alpha_mat(
@@ -1947,10 +1760,10 @@ func _build_wastes_stalker_dens(y_base: float) -> void:
 # ── ABERRATION WASTES — Mutated terrain, fleshy growths, pulsing veins ──
 func _build_wastes_aberration_wastes(y_base: float) -> void:
 	var zcx: float = -50.0; var zcz: float = -790.0; var zr: float = 70.0
+	y_base = _terrain_y(zcx, zcz)
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = hash("wastes_aberration")
 
-	_add_zone_ground_tint(zcx, zcz, zr, Color(0.2, 0.05, 0.08), 0.4, y_base)
 	_add_zone_label("Aberration Wastes", zcx, zcz, y_base, Color(0.9, 0.3, 0.4, 0.85))
 
 	var flesh_mat: StandardMaterial3D = _make_wastes_mat(
@@ -2029,10 +1842,10 @@ func _build_wastes_aberration_wastes(y_base: float) -> void:
 # ── ELDRITCH EDGE — Void cracks, reality distortions, the queen's domain ──
 func _build_wastes_eldritch_edge(y_base: float) -> void:
 	var zcx: float = 40.0; var zcz: float = -880.0; var zr: float = 75.0
+	y_base = _terrain_y(zcx, zcz)
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = hash("wastes_eldritch_edge")
 
-	_add_zone_ground_tint(zcx, zcz, zr, Color(0.05, 0.02, 0.1), 0.45, y_base)
 	_add_zone_label("Eldritch Edge", zcx, zcz, y_base, Color(0.9, 0.4, 0.8, 0.85))
 
 	var void_mat: StandardMaterial3D = _make_wastes_mat(
@@ -2136,36 +1949,10 @@ func _build_wastes_eldritch_edge(y_base: float) -> void:
 	add_child(throne_light)
 
 # ── Zone border rings — glowing boundary markers between sub-zones ──
-func _build_wastes_zone_borders(y_base: float) -> void:
-	var zones: Array[Dictionary] = [
-		{ "cx": 40.0, "cz": -180.0, "r": 60.0, "color": Color(0.15, 0.8, 0.5) },
-		{ "cx": -45.0, "cz": -290.0, "r": 70.0, "color": Color(0.8, 0.5, 0.15) },
-		{ "cx": 50.0, "cz": -420.0, "r": 75.0, "color": Color(0.5, 0.15, 0.8) },
-		{ "cx": -40.0, "cz": -550.0, "r": 70.0, "color": Color(0.4, 0.9, 0.1) },
-		{ "cx": 45.0, "cz": -670.0, "r": 70.0, "color": Color(0.4, 0.35, 0.6) },
-		{ "cx": -50.0, "cz": -790.0, "r": 70.0, "color": Color(0.8, 0.15, 0.2) },
-		{ "cx": 40.0, "cz": -880.0, "r": 75.0, "color": Color(0.6, 0.1, 0.8) },
-	]
-	for z in zones:
-		var ring: CSGTorus3D = CSGTorus3D.new()
-		ring.inner_radius = float(z["r"]) - 0.3
-		ring.outer_radius = float(z["r"]) + 0.3
-		ring.ring_sides = 6
-		ring.sides = 32
-		ring.position = Vector3(float(z["cx"]), y_base + 0.12, float(z["cz"]))
-		var ring_mat: StandardMaterial3D = StandardMaterial3D.new()
-		var col: Color = z["color"] as Color
-		ring_mat.albedo_color = Color(col.r, col.g, col.b, 0.3)
-		ring_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		ring_mat.emission_enabled = true
-		ring_mat.emission = col
-		ring_mat.emission_energy_multiplier = 1.5
-		ring.material = ring_mat
-		add_child(ring)
-
 ## The Abyss — void pillars, floating platforms, reality tears, eye clusters
 func _build_abyss_structures(cx: float, cz: float, radius: float,
 		base_color: Color, y_base: float) -> void:
+	y_base = _terrain_y(cx, cz)
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = hash("abyss_unique")
 
@@ -2229,6 +2016,7 @@ func _build_abyss_structures(cx: float, cz: float, radius: float,
 ## Asteroid Mines — mining rigs, conveyor frames, ore carts, drill towers
 func _build_mines_structures(cx: float, cz: float, radius: float,
 		base_color: Color, y_base: float) -> void:
+	y_base = _terrain_y(cx, cz)
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = hash("mines_unique")
 
@@ -2327,6 +2115,7 @@ func _build_mines_structures(cx: float, cz: float, radius: float,
 ## Bio-Lab — containment pods, lab benches, data terminals, tubes
 func _build_biolab_structures(cx: float, cz: float, radius: float,
 		base_color: Color, y_base: float) -> void:
+	y_base = _terrain_y(cx, cz)
 	## Bio-Lab is a small area (radius 18) — keep it clean and open.
 	## Just a central reactor, 2 containment pods, and ambient lighting.
 	## Processing stations are spawned separately by StationSpawner.
@@ -2446,12 +2235,14 @@ func _add_point_lights(area_id: String, cx: float, cz: float, radius: float,
 	for i in range(light_count):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(5.0, radius * 0.7)
+		var lx: float = cx + cos(angle) * dist
+		var lz: float = cz + sin(angle) * dist
 
 		var light: OmniLight3D = OmniLight3D.new()
 		light.position = Vector3(
-			cx + cos(angle) * dist,
-			y_base + rng.randf_range(3.0, 8.0),
-			cz + sin(angle) * dist
+			lx,
+			_terrain_y(lx, lz) + rng.randf_range(3.0, 8.0),
+			lz
 		)
 		light.light_color = base_color.lightened(0.5)
 		light.light_energy = rng.randf_range(0.3, 0.8)
@@ -2482,33 +2273,13 @@ func _create_corridor(data: Dictionary) -> void:
 	var center_z: float = (min_z + max_z) / 2.0
 	var corridor_w: float = maxf(width, 12.0)
 	var corridor_d: float = maxf(depth, 12.0)
-
-	# ── Ground box ──
-	var box: CSGBox3D = CSGBox3D.new()
-	box.name = "Corridor_%s" % data.get("id", "unknown")
-	box.size = Vector3(corridor_w, 0.2, corridor_d)
-	box.position = Vector3(center_x, GROUND_Y - 0.02, center_z)
+	var is_vertical: bool = corridor_d > corridor_w
+	var corridor_length: float = maxf(corridor_w, corridor_d)
 
 	var corridor_color: Color = _hex_to_color(ground_color_int)
-	var mat: StandardMaterial3D = StandardMaterial3D.new()
-	mat.albedo_color = corridor_color.lightened(0.15)
-	mat.roughness = 0.5
-	mat.metallic = 0.35
-	mat.emission_enabled = true
-	mat.emission = corridor_color.lightened(0.25)
-	mat.emission_energy_multiplier = 0.15
-	mat.render_priority = -1
-	box.material = mat
 
-	var static_body: StaticBody3D = StaticBody3D.new()
-	static_body.collision_layer = 1
-	var col_shape: CollisionShape3D = CollisionShape3D.new()
-	var shape: BoxShape3D = BoxShape3D.new()
-	shape.size = Vector3(corridor_w, 0.4, corridor_d)
-	col_shape.shape = shape
-	static_body.add_child(col_shape)
-	box.add_child(static_body)
-	add_child(box)
+	# ── Terrain-following ramped ground mesh ──
+	_build_corridor_ramp(center_x, center_z, corridor_w, corridor_d, is_vertical, corridor_color, data.get("id", "unknown"))
 
 	# ── Corridor label ──
 	var label_data = data.get("label", "")
@@ -2528,44 +2299,7 @@ func _create_corridor(data: Dictionary) -> void:
 		label.no_depth_test = true
 		add_child(label)
 
-	# ── Edge guide lines ──
-	var edge_mat: StandardMaterial3D = StandardMaterial3D.new()
-	edge_mat.albedo_color = corridor_color.lightened(0.5)
-	edge_mat.emission_enabled = true
-	edge_mat.emission = corridor_color.lightened(0.6)
-	edge_mat.emission_energy_multiplier = 1.0
-	edge_mat.metallic = 0.5
-
-	var is_vertical: bool = corridor_d > corridor_w
-	if is_vertical:
-		# Left edge
-		var left_edge: CSGBox3D = CSGBox3D.new()
-		left_edge.size = Vector3(0.3, 0.15, corridor_d)
-		left_edge.position = Vector3(center_x - corridor_w * 0.5, GROUND_Y + 0.15, center_z)
-		left_edge.material = edge_mat
-		add_child(left_edge)
-		# Right edge
-		var right_edge: CSGBox3D = CSGBox3D.new()
-		right_edge.size = Vector3(0.3, 0.15, corridor_d)
-		right_edge.position = Vector3(center_x + corridor_w * 0.5, GROUND_Y + 0.15, center_z)
-		right_edge.material = edge_mat
-		add_child(right_edge)
-	else:
-		# Front edge
-		var front_edge: CSGBox3D = CSGBox3D.new()
-		front_edge.size = Vector3(corridor_w, 0.15, 0.3)
-		front_edge.position = Vector3(center_x, GROUND_Y + 0.15, center_z - corridor_d * 0.5)
-		front_edge.material = edge_mat
-		add_child(front_edge)
-		# Back edge
-		var back_edge: CSGBox3D = CSGBox3D.new()
-		back_edge.size = Vector3(corridor_w, 0.15, 0.3)
-		back_edge.position = Vector3(center_x, GROUND_Y + 0.15, center_z + corridor_d * 0.5)
-		back_edge.material = edge_mat
-		add_child(back_edge)
-
 	# ── Guide light posts along the corridor ──
-	var corridor_length: float = maxf(corridor_w, corridor_d)
 	var post_spacing: float = 8.0
 	var post_count: int = int(corridor_length / post_spacing)
 
@@ -2585,17 +2319,13 @@ func _create_corridor(data: Dictionary) -> void:
 		for side in [-1.0, 1.0]:
 			var post_pos: Vector3
 			if is_vertical:
-				post_pos = Vector3(
-					center_x + side * (corridor_w * 0.5 - 0.5),
-					GROUND_Y,
-					center_z + (frac - 0.5) * corridor_d
-				)
+				var pz: float = center_z + (frac - 0.5) * corridor_d
+				var px: float = center_x + side * (corridor_w * 0.5 - 0.5)
+				post_pos = Vector3(px, _terrain_y(px, pz), pz)
 			else:
-				post_pos = Vector3(
-					center_x + (frac - 0.5) * corridor_w,
-					GROUND_Y,
-					center_z + side * (corridor_d * 0.5 - 0.5)
-				)
+				var px: float = center_x + (frac - 0.5) * corridor_w
+				var pz: float = center_z + side * (corridor_d * 0.5 - 0.5)
+				post_pos = Vector3(px, _terrain_y(px, pz), pz)
 
 			# Post
 			var post: CSGCylinder3D = CSGCylinder3D.new()
@@ -2622,9 +2352,11 @@ func _create_corridor(data: Dictionary) -> void:
 			var frac: float = (float(i) + 0.5) / float(arch_count)
 			var arch_pos: Vector3
 			if is_vertical:
-				arch_pos = Vector3(center_x, GROUND_Y, center_z + (frac - 0.5) * corridor_d)
+				var apz: float = center_z + (frac - 0.5) * corridor_d
+				arch_pos = Vector3(center_x, _terrain_y(center_x, apz), apz)
 			else:
-				arch_pos = Vector3(center_x + (frac - 0.5) * corridor_w, GROUND_Y, center_z)
+				var apx: float = center_x + (frac - 0.5) * corridor_w
+				arch_pos = Vector3(apx, _terrain_y(apx, center_z), center_z)
 
 			var arch_h: float = 6.0
 			var arch_span: float = corridor_w if is_vertical else corridor_d
@@ -2662,6 +2394,190 @@ func _create_corridor(data: Dictionary) -> void:
 			crossbeam.position = arch_pos + Vector3(0, arch_h, 0)
 			crossbeam.material = post_mat
 			add_child(crossbeam)
+
+
+## Build a terrain-following corridor ramp mesh with collision.
+## Samples terrain height at each end, then smoothly interpolates along the
+## corridor length so the walkway connects the two areas seamlessly.
+func _build_corridor_ramp(cx: float, cz: float, w: float, d: float,
+		is_vertical: bool, color: Color, corridor_id: String) -> void:
+	var segments: int = 16  # subdivisions along the long axis
+	var cross_segs: int = 4  # subdivisions across the width
+
+	var long_len: float = d if is_vertical else w
+	var cross_len: float = w if is_vertical else d
+
+	# Sample terrain height at both ends of the corridor center line
+	var start_x: float = cx if is_vertical else cx - long_len * 0.5
+	var start_z: float = cz - long_len * 0.5 if is_vertical else cz
+	var end_x: float = cx if is_vertical else cx + long_len * 0.5
+	var end_z: float = cz + long_len * 0.5 if is_vertical else cz
+	var start_y: float = _terrain_y(start_x, start_z)
+	var end_y: float = _terrain_y(end_x, end_z)
+
+	# Build vertex grid
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+
+	var vertices: Array[Vector3] = []
+	var faces := PackedVector3Array()
+
+	# Generate vertices: (segments+1) x (cross_segs+1) grid
+	for li in range(segments + 1):
+		var long_frac: float = float(li) / float(segments)
+		# Smooth interpolation between start and end heights
+		var ramp_y: float = lerpf(start_y, end_y, smoothstep(0.0, 1.0, long_frac))
+		for ci in range(cross_segs + 1):
+			var cross_frac: float = float(ci) / float(cross_segs)
+			var vx: float
+			var vz: float
+			if is_vertical:
+				vx = cx + (cross_frac - 0.5) * cross_len
+				vz = cz + (long_frac - 0.5) * long_len
+			else:
+				vx = cx + (long_frac - 0.5) * long_len
+				vz = cz + (cross_frac - 0.5) * cross_len
+			# Use terrain height if inside an area, otherwise use interpolated ramp
+			var vy: float
+			if _terrain_gen and _terrain_gen.is_inside_area(vx, vz):
+				vy = _terrain_y(vx, vz)
+			else:
+				vy = ramp_y
+			vertices.append(Vector3(vx, vy, vz))
+
+	var cols: int = cross_segs + 1
+
+	# Build triangles from the grid
+	for li in range(segments):
+		for ci in range(cross_segs):
+			var i0: int = li * cols + ci
+			var i1: int = li * cols + ci + 1
+			var i2: int = (li + 1) * cols + ci
+			var i3: int = (li + 1) * cols + ci + 1
+
+			# Tri 1
+			st.set_color(color)
+			st.set_normal(Vector3.UP)
+			st.add_vertex(vertices[i0])
+			st.set_color(color)
+			st.set_normal(Vector3.UP)
+			st.add_vertex(vertices[i2])
+			st.set_color(color)
+			st.set_normal(Vector3.UP)
+			st.add_vertex(vertices[i1])
+
+			# Tri 2
+			st.set_color(color)
+			st.set_normal(Vector3.UP)
+			st.add_vertex(vertices[i1])
+			st.set_color(color)
+			st.set_normal(Vector3.UP)
+			st.add_vertex(vertices[i2])
+			st.set_color(color)
+			st.set_normal(Vector3.UP)
+			st.add_vertex(vertices[i3])
+
+			# Collision faces
+			faces.append(vertices[i0])
+			faces.append(vertices[i2])
+			faces.append(vertices[i1])
+			faces.append(vertices[i1])
+			faces.append(vertices[i2])
+			faces.append(vertices[i3])
+
+	st.generate_normals()
+	var mesh: ArrayMesh = st.commit()
+
+	# Visual
+	var mesh_inst := MeshInstance3D.new()
+	mesh_inst.name = "CorridorMesh_%s" % corridor_id
+	mesh_inst.mesh = mesh
+	mesh_inst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+	var mat := StandardMaterial3D.new()
+	mat.vertex_color_use_as_albedo = true
+	mat.roughness = 0.5
+	mat.metallic = 0.35
+	mat.emission_enabled = true
+	mat.emission = color.lightened(0.2)
+	mat.emission_energy_multiplier = 0.15
+	mesh_inst.material_override = mat
+	add_child(mesh_inst)
+
+	# Collision
+	var static_body := StaticBody3D.new()
+	static_body.name = "CorridorCol_%s" % corridor_id
+	static_body.collision_layer = 1
+	var col_shape := CollisionShape3D.new()
+	var shape := ConcavePolygonShape3D.new()
+	shape.set_faces(faces)
+	col_shape.shape = shape
+	static_body.add_child(col_shape)
+	add_child(static_body)
+
+## Add invisible collision walls around each area edge to prevent walking into the void.
+## Only adds walls where there is NO corridor connecting — corridors punch through.
+func _add_area_boundaries() -> void:
+	# Collect corridor rectangles for gap-detection
+	var corridor_rects: Array[Dictionary] = []
+	for corridor_data in DataManager.corridors:
+		corridor_rects.append({
+			"min_x": float(corridor_data.get("minX", 0.0)) - 2.0,
+			"max_x": float(corridor_data.get("maxX", 0.0)) + 2.0,
+			"min_z": float(corridor_data.get("minZ", 0.0)) - 2.0,
+			"max_z": float(corridor_data.get("maxZ", 0.0)) + 2.0,
+		})
+
+	for area_id in _area_bodies:
+		var info: Dictionary = _area_bodies[area_id]
+		var center: Vector3 = info["center"]
+		var radius: float = float(info["radius"])
+
+		# Build wall segments around the perimeter, skipping corridor openings
+		# Scale segment count by circumference so wall pieces stay ~6 units long
+		var wall_segments: int = clampi(int(radius * TAU / 6.0), 16, 128)
+		for seg in range(wall_segments):
+			var angle: float = float(seg) / float(wall_segments) * TAU
+			var next_angle: float = float(seg + 1) / float(wall_segments) * TAU
+			var mid_angle: float = (angle + next_angle) * 0.5
+			var wx: float = center.x + cos(mid_angle) * radius
+			var wz: float = center.z + sin(mid_angle) * radius
+
+			# Skip this segment if it overlaps a corridor
+			var in_corridor: bool = false
+			for cr in corridor_rects:
+				if wx >= cr["min_x"] and wx <= cr["max_x"] and wz >= cr["min_z"] and wz <= cr["max_z"]:
+					in_corridor = true
+					break
+			if in_corridor:
+				continue
+
+			# Place an invisible wall segment
+			var wall := StaticBody3D.new()
+			wall.collision_layer = 1
+			var col := CollisionShape3D.new()
+			var shape := BoxShape3D.new()
+			var seg_length: float = radius * TAU / float(wall_segments)
+			shape.size = Vector3(seg_length, 6.0, 1.0)
+			col.shape = shape
+			wall.add_child(col)
+			var wy: float = _terrain_y(wx, wz)
+			wall.position = Vector3(wx, wy + 3.0, wz)
+			wall.rotation.y = mid_angle
+			add_child(wall)
+
+## Invisible collision floor far below the world — catches anything that falls through terrain.
+func _add_safety_floor() -> void:
+	var body := StaticBody3D.new()
+	body.name = "SafetyFloor"
+	body.collision_layer = 1
+	var col := CollisionShape3D.new()
+	var shape := BoxShape3D.new()
+	shape.size = Vector3(4000.0, 1.0, 4000.0)
+	col.shape = shape
+	body.add_child(col)
+	body.position = Vector3(0, -20.0, 0)
+	add_child(body)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  ANIMATION

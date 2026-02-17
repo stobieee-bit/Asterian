@@ -130,6 +130,9 @@ func _ready() -> void:
 	# Listen for enemy attacks on player
 	EventBus.hit_landed.connect(_on_hit_landed)
 
+	# Listen for /unstick command
+	EventBus.player_unstick_requested.connect(_on_unstick_requested)
+
 	# Load abilities for current combat style
 	refresh_abilities()
 
@@ -1434,7 +1437,7 @@ func _player_death() -> void:
 			dungeon_sys.exit_dungeon()
 	else:
 		EventBus.chat_message.emit("You have been defeated! Respawning at Station Hub...", "combat")
-		_player.teleport_to(Vector3(0, 1, 0))
+		_player.teleport_to(_hub_spawn_pos())
 
 	# Respawn with full HP/energy
 	GameState.player["hp"] = GameState.player["max_hp"]
@@ -1443,6 +1446,35 @@ func _player_death() -> void:
 	GameState.active_buffs.clear()
 	EventBus.player_respawned.emit()
 	EventBus.float_text_requested.emit("Respawned!", _player.global_position + Vector3(0, 3.0, 0), Color(0.3, 1.0, 0.5))
+
+## Handle /unstick command — acts as a death (penalties + respawn at hub)
+func _on_unstick_requested() -> void:
+	_clear_target()
+	GameState.player["adrenaline"] = 0.0
+	EventBus.player_died.emit()
+
+	var death_pos: Vector3 = _player.global_position
+	_apply_death_penalty(death_pos)
+
+	if GameState.dungeon_active:
+		var dungeon_sys: Node = get_tree().get_first_node_in_group("dungeon_system")
+		if dungeon_sys and dungeon_sys.has_method("exit_dungeon"):
+			dungeon_sys.exit_dungeon()
+
+	_player.teleport_to(_hub_spawn_pos())
+
+	GameState.player["hp"] = GameState.player["max_hp"]
+	GameState.player["energy"] = GameState.player["max_energy"]
+	GameState.active_buffs.clear()
+	EventBus.player_respawned.emit()
+	EventBus.float_text_requested.emit("Unstuck!", _player.global_position + Vector3(0, 3.0, 0), Color(1.0, 0.85, 0.3))
+
+## Get Station Hub spawn position snapped to terrain height.
+func _hub_spawn_pos() -> Vector3:
+	var area_mgr: Node3D = get_tree().get_first_node_in_group("area_manager")
+	if area_mgr and area_mgr.has_method("get_terrain_height"):
+		return Vector3(0, area_mgr.get_terrain_height(0, 0) + 1.0, 0)
+	return Vector3(0, 1, 0)
 
 ## Apply death penalties: lose 10% credits and drop up to 3 random items at death location.
 ## Items that are equipped or quest-related are never dropped.
