@@ -398,6 +398,16 @@ func _confirm_drop(item_id: String, item_name: String) -> void:
 	EventBus.context_menu_requested.emit(confirm_options, get_global_mouse_position())
 
 
+## Show examine info in chat
+func _examine_item(item_name: String, item_data: Dictionary, item_type: String) -> void:
+	var desc: String = str(item_data.get("desc", ""))
+	if desc == "":
+		desc = "A %s item." % item_type
+	var value: int = int(item_data.get("value", 0))
+	var value_text: String = " (Value: %d cr)" % value if value > 0 else ""
+	EventBus.chat_message.emit("Examine: %s — %s%s" % [item_name, desc, value_text], "system")
+
+
 ## Actually remove the item and spawn it on the ground
 func _execute_drop(item_id: String, item_name: String) -> void:
 	GameState.remove_item(item_id, 1)
@@ -602,8 +612,7 @@ func _show_item_context_menu(item_id: String, item_data: Dictionary, item_type: 
 			"label": "Use",
 			"icon": "U",
 			"color": Color(0.9, 0.8, 0.2),
-			"callback": func():
-				_use_consumable(item_id)
+			"callback": func(): _use_consumable(item_id)
 		})
 
 	# Drop option for all items — shows confirmation before destroying
@@ -619,16 +628,7 @@ func _show_item_context_menu(item_id: String, item_data: Dictionary, item_type: 
 		"label": "Examine",
 		"icon": "?",
 		"color": Color(0.6, 0.7, 0.8),
-		"callback": func():
-			var desc: String = str(item_data.get("desc", ""))
-			if desc == "":
-				desc = "A %s item." % item_type
-			var value: int = int(item_data.get("value", 0))
-			var value_text: String = " (Value: %d cr)" % value if value > 0 else ""
-			EventBus.chat_message.emit(
-				"Examine: %s — %s%s" % [item_name, desc, value_text],
-				"system"
-			)
+		"callback": func(): _examine_item(item_name, item_data, item_type)
 	})
 
 	EventBus.context_menu_requested.emit(options, screen_pos)
