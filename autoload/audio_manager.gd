@@ -268,6 +268,11 @@ func _generate_all_sfx() -> void:
 	_sfx_streams["button_click"] = _generate_button_click()
 	_sfx_streams["achievement"] = _generate_achievement()
 	_sfx_streams["error"] = _generate_error()
+	_sfx_streams["telegraph_charge"] = _generate_telegraph_charge()
+	_sfx_streams["telegraph_impact"] = _generate_telegraph_impact()
+	_sfx_streams["boss_enrage"] = _generate_boss_enrage()
+	_sfx_streams["boss_phase"] = _generate_boss_phase()
+	_sfx_streams["footstep"] = _generate_footstep()
 
 
 ## attack_hit — Short sharp noise burst (50ms)
@@ -539,6 +544,102 @@ func _generate_error() -> AudioStreamWAV:
 		var value: int = clampi(int(sample * 32767.0), -32768, 32767)
 		data.encode_s16(i * 2, value)
 
+	return _make_wav(data)
+
+
+## telegraph_charge — Rising tone (200Hz→600Hz) with noise overlay (300ms)
+func _generate_telegraph_charge() -> AudioStreamWAV:
+	var duration: float = 0.3
+	var sample_count: int = int(MIX_RATE * duration)
+	var data: PackedByteArray = PackedByteArray()
+	data.resize(sample_count * 2)
+	for i: int in range(sample_count):
+		var t: float = float(i) / float(MIX_RATE)
+		var progress: float = float(i) / float(sample_count)
+		var freq: float = lerpf(200.0, 600.0, progress)
+		var envelope: float = minf(progress * 4.0, 1.0)  # Quick fade-in
+		var tone: float = sin(TAU_CONST * freq * t)
+		var noise: float = randf_range(-1.0, 1.0) * 0.2
+		var sample: float = (tone * 0.7 + noise) * envelope * 0.5
+		var value: int = clampi(int(sample * 32767.0), -32768, 32767)
+		data.encode_s16(i * 2, value)
+	return _make_wav(data)
+
+
+## telegraph_impact — Low boom (80Hz) + noise burst (150ms)
+func _generate_telegraph_impact() -> AudioStreamWAV:
+	var duration: float = 0.15
+	var sample_count: int = int(MIX_RATE * duration)
+	var data: PackedByteArray = PackedByteArray()
+	data.resize(sample_count * 2)
+	for i: int in range(sample_count):
+		var t: float = float(i) / float(MIX_RATE)
+		var progress: float = float(i) / float(sample_count)
+		var envelope: float = (1.0 - progress) * (1.0 - progress)  # Fast decay
+		var tone: float = sin(TAU_CONST * 80.0 * t)
+		var noise: float = randf_range(-1.0, 1.0)
+		var sample: float = (tone * 0.6 + noise * 0.4) * envelope * 0.7
+		var value: int = clampi(int(sample * 32767.0), -32768, 32767)
+		data.encode_s16(i * 2, value)
+	return _make_wav(data)
+
+
+## boss_enrage — Aggressive sawtooth-like buzz + noise (400ms)
+func _generate_boss_enrage() -> AudioStreamWAV:
+	var duration: float = 0.4
+	var sample_count: int = int(MIX_RATE * duration)
+	var data: PackedByteArray = PackedByteArray()
+	data.resize(sample_count * 2)
+	for i: int in range(sample_count):
+		var t: float = float(i) / float(MIX_RATE)
+		var progress: float = float(i) / float(sample_count)
+		var envelope: float = 1.0 - progress * 0.7  # Slow decay
+		var tone: float = sin(TAU_CONST * 100.0 * t)
+		tone = clampf(tone * 2.5, -1.0, 1.0)  # Clip for harsh buzz
+		var noise: float = randf_range(-1.0, 1.0) * 0.3
+		var sample: float = (tone * 0.6 + noise) * envelope * 0.5
+		var value: int = clampi(int(sample * 32767.0), -32768, 32767)
+		data.encode_s16(i * 2, value)
+	return _make_wav(data)
+
+
+## boss_phase — Two-tone descending chord E4→C4 (300ms)
+func _generate_boss_phase() -> AudioStreamWAV:
+	var duration: float = 0.3
+	var sample_count: int = int(MIX_RATE * duration)
+	var data: PackedByteArray = PackedByteArray()
+	data.resize(sample_count * 2)
+	for i: int in range(sample_count):
+		var t: float = float(i) / float(MIX_RATE)
+		var progress: float = float(i) / float(sample_count)
+		var envelope: float = 1.0 - progress
+		# E4 (329.6 Hz) fading to C4 (261.6 Hz)
+		var freq: float = lerpf(329.6, 261.6, progress)
+		var tone1: float = sin(TAU_CONST * freq * t)
+		# Add fifth harmonic for richness
+		var tone2: float = sin(TAU_CONST * freq * 1.5 * t) * 0.3
+		var sample: float = (tone1 + tone2) * envelope * 0.45
+		var value: int = clampi(int(sample * 32767.0), -32768, 32767)
+		data.encode_s16(i * 2, value)
+	return _make_wav(data)
+
+
+## footstep — Soft filtered noise thud (40ms)
+func _generate_footstep() -> AudioStreamWAV:
+	var duration: float = 0.04
+	var sample_count: int = int(MIX_RATE * duration)
+	var data: PackedByteArray = PackedByteArray()
+	data.resize(sample_count * 2)
+	for i: int in range(sample_count):
+		var t: float = float(i) / float(MIX_RATE)
+		var progress: float = float(i) / float(sample_count)
+		var envelope: float = (1.0 - progress) * (1.0 - progress)  # Fast decay
+		# Low-frequency filtered noise (mix of low tone + soft noise)
+		var tone: float = sin(TAU_CONST * 150.0 * t)
+		var noise: float = randf_range(-1.0, 1.0) * 0.4
+		var sample: float = (tone * 0.5 + noise) * envelope * 0.3
+		var value: int = clampi(int(sample * 32767.0), -32768, 32767)
+		data.encode_s16(i * 2, value)
 	return _make_wav(data)
 
 

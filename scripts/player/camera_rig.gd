@@ -97,5 +97,21 @@ func _update_camera_transform() -> void:
 	offset.z = cos(_orbit_angle) * cos(_pitch) * _distance
 	offset.y = -sin(_pitch) * _distance  # Negative pitch = above
 
+	# Anti-clip: raycast from player toward camera, pull in if obstructed
+	var space_state: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
+	if space_state:
+		var ray_start: Vector3 = global_position + Vector3(0, 1.0, 0)
+		var ray_end: Vector3 = global_position + offset
+		var query := PhysicsRayQueryParameters3D.create(ray_start, ray_end, 1)
+		query.collide_with_areas = false
+		var result: Dictionary = space_state.intersect_ray(query)
+		if not result.is_empty():
+			var hit_dist: float = ray_start.distance_to(result.position)
+			var safe_dist: float = maxf(hit_dist - 0.5, min_distance * 0.5)
+			var clamped_offset: Vector3 = offset.normalized() * safe_dist
+			camera.position = clamped_offset
+			camera.look_at(global_position, Vector3.UP)
+			return
+
 	camera.position = offset
 	camera.look_at(global_position, Vector3.UP)  # Look at rig pivot (player position)

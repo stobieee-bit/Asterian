@@ -25,6 +25,11 @@ var _deposit_all_btn: Button = null
 var _deposit_equip_btn: Button = null
 var _grid: GridContainer = null
 var _slots: Array[PanelContainer] = []
+var _slot_inner: Array[Control] = []
+var _slot_icon_bg: Array[ColorRect] = []
+var _slot_icon_tex: Array[TextureRect] = []
+var _slot_item_label: Array[Label] = []
+var _slot_qty_label: Array[Label] = []
 
 # Quantity selector
 var _qty_buttons: Array[Button] = []
@@ -300,6 +305,13 @@ func _create_slot(index: int) -> PanelContainer:
 	qty_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(qty_lbl)
 
+	# Cache child refs for fast refresh lookups
+	_slot_inner.append(inner)
+	_slot_icon_bg.append(icon_bg)
+	_slot_icon_tex.append(icon_tex)
+	_slot_item_label.append(item_label)
+	_slot_qty_label.append(qty_lbl)
+
 	# Input / hover signals
 	slot.gui_input.connect(_on_slot_input.bind(index))
 	slot.mouse_entered.connect(_on_slot_hover.bind(index))
@@ -315,11 +327,10 @@ func refresh() -> void:
 
 	for i in range(_slots.size()):
 		var slot: PanelContainer = _slots[i]
-		var inner: Control = slot.get_child(0)
-		var icon_bg: ColorRect = inner.get_node("IconBG") as ColorRect
-		var icon_tex: TextureRect = inner.get_node("IconTexture") as TextureRect
-		var item_label: Label = inner.get_node("ItemLabel") as Label
-		var qty_lbl: Label = inner.get_node("QtyLabel") as Label
+		var icon_bg: ColorRect = _slot_icon_bg[i]
+		var icon_tex: TextureRect = _slot_icon_tex[i]
+		var item_label: Label = _slot_item_label[i]
+		var qty_lbl: Label = _slot_qty_label[i]
 		var style: StyleBoxFlat = slot.get_theme_stylebox("panel") as StyleBoxFlat
 
 		if i < source.size():

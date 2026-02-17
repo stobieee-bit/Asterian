@@ -19,6 +19,7 @@ var is_moving: bool = false
 var is_running: bool = false
 var current_speed: float = 0.0
 var current_area: String = "station-hub"
+var _footstep_timer: float = 0.0
 
 # ── References ──
 @onready var mesh: Node3D = $PlayerMesh
@@ -69,6 +70,14 @@ func _physics_process(delta: float) -> void:
 		_snap_to_terrain()
 		# Clamp position inside world bounds
 		_clamp_position()
+	# Footstep sounds
+	if is_moving and current_speed > 1.0:
+		_footstep_timer -= delta
+		if _footstep_timer <= 0.0:
+			AudioManager.play_sfx("footstep")
+			_footstep_timer = 0.35 / maxf(current_speed / move_speed, 0.5)
+	else:
+		_footstep_timer = 0.0
 	# Update move marker
 	_update_move_marker(delta)
 

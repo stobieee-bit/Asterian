@@ -249,8 +249,15 @@ func _on_close() -> void:
 	EventBus.panel_closed.emit("prestige")
 
 
-## Attempt to prestige via the prestige system, then rebuild the panel.
+## Attempt to prestige — show confirmation first since this resets progress.
 func _on_prestige() -> void:
+	EventBus.context_menu_requested.emit([
+		{"title": "Prestige Reset?", "title_color": Color(1.0, 0.85, 0.2)},
+		{"label": "Confirm Reset", "icon": "!", "color": Color(0.9, 0.3, 0.3),
+		 "callback": func(): _do_prestige()},
+	], _prestige_btn.global_position + Vector2(0, -40))
+
+func _do_prestige() -> void:
 	var prestige_sys: Node = get_tree().get_first_node_in_group("prestige_system")
 	if prestige_sys == null:
 		push_warning("PrestigePanel: No prestige_system node found in scene tree.")

@@ -337,6 +337,7 @@ func _transition_to_phase(new_index: int) -> void:
 		_parent.global_position + Vector3.UP * 2.5,
 		Color(1.0, 0.8, 0.2)
 	)
+	AudioManager.play_sfx("boss_phase")
 
 	# Spawn adds if the phase calls for it.
 	var should_spawn: bool = bool(phase.get("spawn_adds", false))
@@ -389,6 +390,7 @@ func _tick_enrage(delta: float) -> void:
 			_parent.global_position + Vector3.UP * 3.0,
 			Color(1.0, 0.1, 0.1)
 		)
+		AudioManager.play_sfx("boss_enrage")
 
 	# Tint the boss redder as enrage grows (cap visual at 3x).
 	var tint_factor: float = clampf((elapsed_enrage * dmg_per_sec) / 2.0, 0.0, 1.0)
@@ -475,6 +477,7 @@ func _begin_telegraph(attack_name: String) -> void:
 	_telegraph_timer = float(_telegraph_data.get("delay", 2.0))
 	_pulse_time = 0.0
 	channeling = true
+	AudioManager.play_sfx("telegraph_charge")
 
 	# Freeze parent movement.
 	_parent.velocity = Vector3.ZERO
@@ -539,6 +542,7 @@ func _update_telegraph_pulse() -> void:
 
 ## Resolve the telegraph: check hit, apply damage, spawn adds, cleanup.
 func _resolve_telegraph() -> void:
+	AudioManager.play_sfx("telegraph_impact")
 	var telegraph_type: String = str(_telegraph_data.get("type", "circle"))
 	var dmg_pct: float = float(_telegraph_data.get("dmg_pct", 0.3))
 	var cooldown: float = float(_telegraph_data.get("cooldown", 10.0))
