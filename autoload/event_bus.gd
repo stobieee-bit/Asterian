@@ -68,7 +68,6 @@ signal chat_message(text: String, channel: String)
 # ── World signals ──
 signal area_entered(area_id: String)
 signal area_exited(area_id: String)
-signal portal_activated(from_area: String, to_area: String)
 
 # ── System signals ──
 signal game_saved

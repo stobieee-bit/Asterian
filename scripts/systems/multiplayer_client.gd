@@ -93,16 +93,6 @@ var _player_node: CharacterBody3D = null
 func _ready() -> void:
 	add_to_group("multiplayer_client")
 
-	# Connect to EventBus signals for automatic broadcasting
-	EventBus.item_equipped.connect(_on_equipment_changed)
-	EventBus.item_unequipped.connect(_on_equipment_changed)
-	EventBus.player_level_up.connect(_on_stats_changed)
-	EventBus.player_damaged.connect(_on_player_damaged)
-	EventBus.player_healed.connect(_on_player_healed)
-	EventBus.player_moved_to_area.connect(_on_area_changed)
-	EventBus.dungeon_started.connect(_on_dungeon_visibility_changed)
-	EventBus.dungeon_exited.connect(_on_dungeon_visibility_changed_no_args)
-
 	# Auto-connect on startup — use saved name or generate one
 	var mp_name: String = str(GameState.settings.get("mp_name", ""))
 	if mp_name == "":
@@ -784,49 +774,3 @@ func _update_remote_visibility() -> void:
 		if node != null and is_instance_valid(node):
 			node.visible = not in_dungeon
 
-# ──────────────────────────────────────────────
-#  EventBus signal handlers
-# ──────────────────────────────────────────────
-
-## Triggered when equipment changes — schedule an equipment sync.
-func _on_equipment_changed(_slot: String, _item_id: String) -> void:
-	# Change detection in _check_equipment_changed will pick this up next frame
-	pass
-
-
-## Triggered when player levels up — schedule a stats sync.
-func _on_stats_changed(_skill: String, _new_level: int) -> void:
-	# Change detection in _check_stats_changed will pick this up next frame
-	pass
-
-
-## Triggered when player takes damage — stats sync needed.
-## Signature matches EventBus.player_damaged(amount: int, source: String)
-func _on_player_damaged(_amount: int, _source: String) -> void:
-	# Change detection in _check_stats_changed will pick this up next frame
-	pass
-
-
-## Triggered when player heals — stats sync needed.
-## Signature matches EventBus.player_healed(amount: int)
-func _on_player_healed(_amount: int) -> void:
-	# Change detection in _check_stats_changed will pick this up next frame
-	pass
-
-
-## Triggered when player moves to a new area — stats sync needed.
-func _on_area_changed(_area_id: String) -> void:
-	# Change detection in _check_stats_changed will pick this up next frame
-	pass
-
-
-## Triggered when a dungeon starts — hide remote players.
-func _on_dungeon_visibility_changed(_floor_data: Dictionary) -> void:
-	# Visibility updated in _update_remote_visibility each frame
-	pass
-
-
-## Triggered when a dungeon exits — show remote players.
-func _on_dungeon_visibility_changed_no_args() -> void:
-	# Visibility updated in _update_remote_visibility each frame
-	pass

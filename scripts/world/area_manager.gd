@@ -2672,6 +2672,10 @@ func _check_area_transition() -> void:
 		EventBus.area_entered.emit(new_area)
 		EventBus.area_exited.emit(old_area)
 		_update_atmosphere(new_area)
+		# Notify player of area entry
+		var area_data: Dictionary = DataManager.get_area(new_area)
+		var area_name: String = str(area_data.get("name", new_area))
+		EventBus.chat_message.emit("Entered: %s" % area_name, "system")
 
 func _get_area_at_position(pos: Vector2) -> String:
 	for corridor_data in DataManager.corridors:
@@ -2687,7 +2691,7 @@ func _get_area_at_position(pos: Vector2) -> String:
 				var to_c: Vector3 = _area_bodies[to_id]["center"]
 				var from_center: Vector2 = Vector2(from_c.x, from_c.z)
 				var to_center: Vector2 = Vector2(to_c.x, to_c.z)
-				if pos.distance_to(from_center) < pos.distance_to(to_center):
+				if pos.distance_squared_to(from_center) < pos.distance_squared_to(to_center):
 					return from_id
 				else:
 					return to_id
@@ -2699,7 +2703,7 @@ func _get_area_at_position(pos: Vector2) -> String:
 		var c: Vector3 = area_data["center"]
 		var center: Vector2 = Vector2(c.x, c.z)
 		var r: float = area_data["radius"]
-		if pos.distance_to(center) <= r:
+		if pos.distance_squared_to(center) <= r * r:
 			if r < best_radius:
 				best_radius = r
 				best_area = area_id
@@ -2788,7 +2792,7 @@ func _is_point_in_world(p: Vector2) -> bool:
 		var c: Vector3 = area_data["center"]
 		var center: Vector2 = Vector2(c.x, c.z)
 		var r: float = area_data["radius"]
-		if p.distance_to(center) <= r:
+		if p.distance_squared_to(center) <= r * r:
 			return true
 
 	return false

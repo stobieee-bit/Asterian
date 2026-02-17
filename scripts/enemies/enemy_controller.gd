@@ -293,14 +293,13 @@ func _process_chase(delta: float) -> void:
 		return
 
 	# Check leash
-	var dist_to_spawn: float = global_position.distance_to(spawn_position)
-	if dist_to_spawn > leash_range:
+	if global_position.distance_squared_to(spawn_position) > leash_range * leash_range:
 		_enter_state(State.RETURNING)
 		return
 
 	# Check if player left aggro range (with hysteresis)
-	var dist_to_player: float = global_position.distance_to(_player.global_position)
-	if dist_to_player > aggro_range * 1.5:
+	var deaggro: float = aggro_range * 1.5
+	if global_position.distance_squared_to(_player.global_position) > deaggro * deaggro:
 		_enter_state(State.RETURNING)
 		return
 
@@ -359,7 +358,7 @@ func _process_attacking(delta: float) -> void:
 		return
 
 	# Check leash
-	if global_position.distance_to(spawn_position) > leash_range:
+	if global_position.distance_squared_to(spawn_position) > leash_range * leash_range:
 		_enter_state(State.RETURNING)
 		return
 
@@ -555,7 +554,7 @@ func _snap_to_terrain() -> void:
 func _can_aggro() -> bool:
 	if _player == null:
 		return false
-	return global_position.distance_to(_player.global_position) <= aggro_range
+	return global_position.distance_squared_to(_player.global_position) <= aggro_range * aggro_range
 
 func _pick_wander_target() -> void:
 	var angle: float = randf() * TAU

@@ -43,29 +43,20 @@ func save_game() -> bool:
 	return true
 
 ## Load game state from disk. Returns true if successful.
+## If the primary save is corrupt, automatically tries the backup.
 func load_game() -> bool:
 	if not FileAccess.file_exists(SAVE_PATH):
 		print("SaveManager: No save file found.")
 		return false
 
-	var file: FileAccess = FileAccess.open(SAVE_PATH, FileAccess.READ)
-	if file == null:
-		push_error("SaveManager: Could not open save file for reading.")
-		return false
-
-	var text: String = file.get_as_text()
-	file.close()
-
-	var json: JSON = JSON.new()
-	var err: Error = json.parse(text)
-	if err != OK:
-		push_error("SaveManager: JSON parse error: %s" % json.get_error_message())
-		return false
-
-	var data: Dictionary = json.data
-	if not data is Dictionary:
-		push_error("SaveManager: Save data is not a Dictionary.")
-		return false
+	var data: Dictionary = _try_load_file(SAVE_PATH)
+	if data.is_empty():
+		push_warning("SaveManager: Primary save corrupt — trying backup...")
+		data = _try_load_file(BACKUP_PATH)
+		if data.is_empty():
+			push_error("SaveManager: Backup also corrupt or missing. Cannot load.")
+			return false
+		print("SaveManager: Restored from backup successfully.")
 
 	GameState.from_save_data(data)
 
@@ -77,6 +68,24 @@ func load_game() -> bool:
 	print("SaveManager: Game loaded successfully (save version %d)." % data.get("save_version", 0))
 	EventBus.game_loaded.emit()
 	return true
+
+## Attempt to parse a save file. Returns empty Dictionary on failure.
+func _try_load_file(path: String) -> Dictionary:
+	if not FileAccess.file_exists(path):
+		return {}
+	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		return {}
+	var text: String = file.get_as_text()
+	file.close()
+	var json: JSON = JSON.new()
+	if json.parse(text) != OK:
+		push_error("SaveManager: JSON parse error in %s: %s" % [path, json.get_error_message()])
+		return {}
+	if not json.data is Dictionary:
+		push_error("SaveManager: Data in %s is not a Dictionary." % path)
+		return {}
+	return json.data
 
 ## Check if a save file exists
 func has_save() -> bool:

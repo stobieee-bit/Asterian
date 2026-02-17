@@ -31,9 +31,8 @@ var attack_range: float:
 		var s: String = str(GameState.player.get("combat_style", "nano"))
 		var base: float = STYLE_ATTACK_RANGE.get(s, 2.5)
 		# Add set bonus range (e.g., void set gives +range)
-		var equip_sys: Node = get_node_or_null("../EquipmentSystem")
-		if equip_sys and equip_sys.has_method("get_set_bonus_range"):
-			base += equip_sys.get_set_bonus_range()
+		if _equipment_system and _equipment_system.has_method("get_set_bonus_range"):
+			base += _equipment_system.get_set_bonus_range()
 		return base
 
 ## Dynamic attack speed based on current combat style + set bonus
@@ -42,9 +41,8 @@ var base_attack_speed: float:
 		var s: String = str(GameState.player.get("combat_style", "nano"))
 		var base: float = STYLE_ATTACK_SPEED.get(s, 2.4)
 		# Apply set bonus speed multiplier (e.g., nano set gives faster attacks)
-		var equip_sys: Node = get_node_or_null("../EquipmentSystem")
-		if equip_sys and equip_sys.has_method("get_set_bonus_attack_speed_mult"):
-			base *= equip_sys.get_set_bonus_attack_speed_mult()
+		if _equipment_system and _equipment_system.has_method("get_set_bonus_attack_speed_mult"):
+			base *= _equipment_system.get_set_bonus_attack_speed_mult()
 		return base
 
 # ── Global cooldown (GCD) for abilities ──
@@ -121,8 +119,12 @@ const COMBAT_EXIT_DELAY: float = 15.0 ## Seconds without combat to start regen/a
 # ── Target highlight ──
 var _target_indicator: MeshInstance3D = null
 
+# ── Cached node refs ──
+var _equipment_system: Node = null
+
 func _ready() -> void:
 	_player = get_parent()
+	_equipment_system = get_node_or_null("../EquipmentSystem")
 
 	# Listen for enemy death so we can clear target
 	EventBus.enemy_killed.connect(_on_enemy_killed)
@@ -404,9 +406,8 @@ func _do_attack() -> void:
 		total_damage += int(food_dmg_buff)
 
 	# Apply set bonus damage
-	var equip_sys: Node = _player.get_node_or_null("EquipmentSystem")
-	if equip_sys and equip_sys.has_method("get_set_bonus_damage"):
-		total_damage += equip_sys.get_set_bonus_damage()
+	if _equipment_system and _equipment_system.has_method("get_set_bonus_damage"):
+		total_damage += _equipment_system.get_set_bonus_damage()
 
 	# Dungeon: Berserker — player deals +20% damage
 	if _has_dungeon_modifier("berserker"):
@@ -1266,9 +1267,8 @@ func _spawn_ground_aoe_visual(pos: Vector3, radius: float, duration: float, colo
 
 ## Get damage from equipped weapon
 func _get_weapon_damage() -> int:
-	var equip_sys: Node = _player.get_node_or_null("EquipmentSystem")
-	if equip_sys and equip_sys.has_method("get_weapon_damage"):
-		return equip_sys.get_weapon_damage()
+	if _equipment_system and _equipment_system.has_method("get_weapon_damage"):
+		return _equipment_system.get_weapon_damage()
 	# Fallback: read directly
 	var weapon_id: String = str(GameState.equipment.get("weapon", ""))
 	if weapon_id == "":
@@ -1287,20 +1287,18 @@ func _get_target_collision_radius(enemy: Node) -> float:
 
 ## Get total armor from equipped gear (includes set bonus)
 func _get_total_armor() -> int:
-	var equip_sys: Node = _player.get_node_or_null("EquipmentSystem")
 	var total: int = 0
-	if equip_sys:
-		if equip_sys.has_method("get_total_armor"):
-			total += equip_sys.get_total_armor()
-		if equip_sys.has_method("get_set_bonus_armor"):
-			total += equip_sys.get_set_bonus_armor()
+	if _equipment_system:
+		if _equipment_system.has_method("get_total_armor"):
+			total += _equipment_system.get_total_armor()
+		if _equipment_system.has_method("get_set_bonus_armor"):
+			total += _equipment_system.get_set_bonus_armor()
 	return total
 
 ## Get the offhand item data dictionary (empty if nothing equipped).
 func _get_offhand_data() -> Dictionary:
-	var equip_sys: Node = _player.get_node_or_null("EquipmentSystem")
-	if equip_sys and equip_sys.has_method("get_offhand_stats"):
-		return equip_sys.get_offhand_stats()
+	if _equipment_system and _equipment_system.has_method("get_offhand_stats"):
+		return _equipment_system.get_offhand_stats()
 	return {}
 
 ## Determine offhand category from the item name/id.

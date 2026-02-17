@@ -57,21 +57,17 @@ func _ready() -> void:
 	_build_move_marker()
 
 func _physics_process(delta: float) -> void:
-	_apply_gravity(delta)
+	# Vertical movement: dungeon uses physics gravity, overworld snaps to terrain
+	if GameState.dungeon_active:
+		_apply_gravity(delta)
+	else:
+		velocity.y = 0.0  # No gravity — terrain snap handles Y
 	_process_movement(delta)
 	move_and_slide()
-	# Safety nets are disabled inside dungeons (dungeon has its own floor/walls)
 	if not GameState.dungeon_active:
-		# Safety net: snap back to terrain surface if fallen below it
-		if _area_manager and _area_manager.has_method("get_terrain_height") and not is_on_floor():
-			var terrain_y: float = _area_manager.get_terrain_height(global_position.x, global_position.z)
-			if global_position.y < terrain_y - 3.0:
-				global_position.y = terrain_y + 0.5
-				velocity.y = 0.0
-		elif global_position.y < -15.0:
-			global_position.y = 1.0
-			velocity.y = 0.0
-		# Safety net: after physics, clamp position back inside world bounds
+		# Overworld: pin to Terrain3D surface every frame
+		_snap_to_terrain()
+		# Clamp position inside world bounds
 		_clamp_position()
 	# Update move marker
 	_update_move_marker(delta)
@@ -198,6 +194,14 @@ func teleport_to(pos: Vector3) -> void:
 # ── Boundary clamping ──
 
 ## After move_and_slide(), push the player back inside the world if they slipped out.
+## Snap player Y to the Terrain3D surface every frame (overworld only).
+## Terrain3D has no physics collider, so gravity/is_on_floor() can't work.
+func _snap_to_terrain() -> void:
+	if _area_manager and _area_manager.has_method("get_terrain_height"):
+		var terrain_y: float = _area_manager.get_terrain_height(global_position.x, global_position.z)
+		global_position.y = terrain_y + 0.1
+		velocity.y = 0.0
+
 func _clamp_position() -> void:
 	if _area_manager == null or not _area_manager.has_method("is_position_in_world"):
 		return
