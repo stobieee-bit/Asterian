@@ -2210,7 +2210,7 @@ func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost:
 	if icon_texture != null:
 		var icon_rect: TextureRect = TextureRect.new()
 		icon_rect.texture = icon_texture
-		icon_rect.position = Vector2(38, 2)
+		icon_rect.position = Vector2(48, 6)
 		icon_rect.size = Vector2(24, 24)
 		icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
