@@ -309,8 +309,7 @@ func _add_rocks_and_boulders(area_id: String, cx: float, cz: float, radius: floa
 		rock.rotation.y = rng.randf() * TAU
 		rock.material = rock_mat
 		add_child(rock)
-		if rock_r >= 1.0:
-			_add_cylinder_collision(rock, rock_r * 0.8, rock_r * 0.6)
+		# No collision — scatter rocks are decorative; collision traps the player
 
 ## Energy pylons — tall glowing pillars scattered through the area
 func _add_energy_pylons(area_id: String, cx: float, cz: float, radius: float,
@@ -341,7 +340,7 @@ func _add_energy_pylons(area_id: String, cx: float, cz: float, radius: float,
 		ped_mat.roughness = 0.3
 		pedestal.material = ped_mat
 		add_child(pedestal)
-		_add_cylinder_collision(pedestal, 0.8, height + 0.6)
+		# No collision — thin pylons are walk-through scenery to avoid trapping player
 
 		# Main column
 		var column: CSGCylinder3D = CSGCylinder3D.new()
@@ -549,8 +548,7 @@ func _add_crystals(area_id: String, cx: float, cz: float, radius: float,
 		cryst_mat.emission_energy_multiplier = 1.8
 		crystal.material = cryst_mat
 		add_child(crystal)
-		if c_height >= 3.0:
-			_add_cylinder_collision(crystal, c_radius + 0.2, c_height * 0.8)
+		# No collision — scatter crystals are decorative scenery
 
 		# Add cluster mates (2-3 smaller crystals near each large one)
 		if rng.randf() > 0.4:
@@ -830,7 +828,7 @@ func _add_ruined_walls(area_id: String, cx: float, cz: float, radius: float,
 		wall.rotation.y = rng.randf() * TAU
 		wall.material = wall_mat
 		add_child(wall)
-		_add_box_collision(wall, Vector3(wall_w, wall_h, 0.6))
+		# No collision — ruined walls are walk-through scenery to avoid trapping player
 
 		# Broken top — irregular jagged silhouette (smaller boxes on top)
 		for j in range(rng.randi_range(2, 5)):
@@ -1335,7 +1333,7 @@ func _build_gathering_structures(cx: float, cz: float, radius: float,
 		stem_mat.roughness = 0.7
 		stem.material = stem_mat
 		add_child(stem)
-		_add_cylinder_collision(stem, 0.6, stem_h)
+		# No collision — mushroom stems are walk-through scenery
 
 		# Large cap
 		var cap: CSGCylinder3D = CSGCylinder3D.new()
@@ -1657,7 +1655,7 @@ func _build_abyss_structures(cx: float, cz: float, radius: float,
 		)
 		pillar.material = void_mat
 		add_child(pillar)
-		_add_cylinder_collision(pillar, pillar.radius + 0.2, pillar_h)
+		# No collision — scatter pillars are walk-through scenery
 
 	# Reality tear rifts (thin vertical planes of energy — terrain-following)
 	for i in range(6):
