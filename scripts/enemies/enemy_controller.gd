@@ -179,10 +179,13 @@ func _physics_process(delta: float) -> void:
 	if _stun_timer > 0:
 		_stun_timer -= delta
 		velocity = Vector3.ZERO
-		# Apply gravity even when stunned
-		if not is_on_floor():
-			velocity.y -= 20.0 * delta
+		if GameState.dungeon_active:
+			# Dungeon has real floor colliders — use physics gravity
+			if not is_on_floor():
+				velocity.y -= 20.0 * delta
 		move_and_slide()
+		if not GameState.dungeon_active:
+			_snap_to_terrain()
 		_update_hp_bar()
 		# Process DoTs even while stunned
 		_process_dots(delta)
@@ -219,23 +222,20 @@ func _physics_process(delta: float) -> void:
 		State.DEAD:
 			_process_dead(delta)
 
-	# Apply gravity
-	if not is_on_floor():
-		velocity.y -= 20.0 * delta
+	# Vertical movement: dungeon uses physics gravity, overworld snaps to terrain
+	if GameState.dungeon_active:
+		if not is_on_floor():
+			velocity.y -= 20.0 * delta
+		else:
+			velocity.y = -0.5  # Downward nudge keeps floor_snap_length engaged
 	else:
-		velocity.y = -0.5  # Small downward nudge keeps floor_snap_length engaged
+		velocity.y = 0.0  # No gravity — terrain snap handles Y
 
 	move_and_slide()
 
-	# Safety net: snap to terrain if not on floor
+	# Overworld: pin to Terrain3D surface every frame
 	if state != State.DEAD and not GameState.dungeon_active:
-		if _area_mgr == null:
-			_area_mgr = get_tree().get_first_node_in_group("area_manager")
-		if _area_mgr and not is_on_floor():
-			var terrain_y: float = _area_mgr.get_terrain_height(global_position.x, global_position.z)
-			if global_position.y < terrain_y - 0.5:
-				global_position.y = terrain_y + 0.5
-				velocity.y = 0.0
+		_snap_to_terrain()
 
 	# Update HP bar
 	_update_hp_bar()
@@ -540,6 +540,17 @@ func _get_melee_reach() -> float:
 	if collision_shape and collision_shape.shape is CapsuleShape3D:
 		return (collision_shape.shape as CapsuleShape3D).radius + 1.0
 	return 2.0
+
+## Snap this enemy's Y position to the Terrain3D surface.
+## Called every physics frame in the overworld (Terrain3D has no physics collider,
+## so gravity/is_on_floor() cannot work — we query height directly instead).
+func _snap_to_terrain() -> void:
+	if _area_mgr == null:
+		_area_mgr = get_tree().get_first_node_in_group("area_manager")
+	if _area_mgr:
+		var terrain_y: float = _area_mgr.get_terrain_height(global_position.x, global_position.z)
+		global_position.y = terrain_y + 0.1
+		velocity.y = 0.0
 
 func _can_aggro() -> bool:
 	if _player == null:
