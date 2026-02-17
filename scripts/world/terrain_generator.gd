@@ -159,15 +159,15 @@ func get_height_in_area(area_id: String, world_x: float, world_z: float) -> floa
 #  OVERLAP SUPPRESSION
 # ═══════════════════════════════════════════════════════════════════════════════
 
-## For a vertex at (wx, wz) belonging to area_id, returns how much to keep:
-## - 0.0 = deep inside a smaller (higher-priority) area → suppress vertex
-## - 0.0–1.0 = in the blend margin (outer 10% of the smaller area's radius)
+## For a vertex at (wx, wz) belonging to area_id, returns:
+## - 0.0 = inside a smaller (higher-priority) area → suppress vertex entirely
 ## - 1.0 = outside all smaller areas → keep vertex as-is
+## Binary suppression: no partial blending. The smaller area's own edge falloff
+## handles smooth visual transitions naturally.
 ## Uses "smaller radius wins" rule (same as get_height). Ties broken by area_id.
 func _get_overlap_factor(area_id: String, wx: float, wz: float) -> float:
 	var my_data: Dictionary = _area_data[area_id]
 	var my_radius: float = my_data["radius"]
-	var factor: float = 1.0
 
 	for other_id in _area_data:
 		if other_id == area_id:
@@ -187,22 +187,11 @@ func _get_overlap_factor(area_id: String, wx: float, wz: float) -> float:
 		var dz: float = wz - other["cz"]
 		var dist: float = sqrt(dx * dx + dz * dz)
 
-		# Outside the other area entirely — no suppression from this area
-		if dist > other_radius:
-			continue
-
-		# Inside the other area — compute blend factor
-		# Blend margin = outer 10% of the other area's radius
-		var blend_start: float = other_radius * 0.9
-		if dist <= blend_start:
-			# Deep inside — fully suppress
+		# Inside the other area — fully suppress (binary: no blend margin)
+		if dist <= other_radius:
 			return 0.0
-		else:
-			# In the blend margin — partial suppression (0 at blend_start, 1 at edge)
-			var blend_factor: float = (dist - blend_start) / (other_radius - blend_start)
-			factor = minf(factor, blend_factor)
 
-	return factor
+	return 1.0
 
 
 ## Get the terrain height of the highest-priority (smallest) area at (wx, wz),
@@ -247,14 +236,14 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 	var center_h: float = _sample_height(cx, cz, noise, amplitude, cx, cz, radius, falloff_start)
 	var center_overlap: float = _get_overlap_factor(area_id, cx, cz)
 	overlaps.append(center_overlap)
-	if center_overlap <= 0.0:
-		# Snap to priority area's height so the vertex is flush (not a cliff)
+	if center_overlap < 1.0:
+		# Inside a priority area — snap to its height (vertex won't be rendered)
 		var priority_y: float = _get_priority_height(area_id, cx, cz)
 		vertices.append(Vector3(cx, priority_y, cz))
 		colors.append(Color(base_color, 0.0))
 	else:
-		vertices.append(Vector3(cx, floor_y + center_h * center_overlap, cz))
-		colors.append(_height_color(base_color, center_h * center_overlap, amplitude))
+		vertices.append(Vector3(cx, floor_y + center_h, cz))
+		colors.append(_height_color(base_color, center_h, amplitude))
 
 	# Ring vertices (ring 1 .. ring_count) — with overlap suppression
 	for ring in range(1, ring_count + 1):
@@ -267,15 +256,15 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 			var h: float = _sample_height(vx, vz, noise, amplitude, cx, cz, radius, falloff_start)
 			var overlap: float = _get_overlap_factor(area_id, vx, vz)
 			overlaps.append(overlap)
-			if overlap <= 0.0:
-				# Snap to priority area's height so it's flush, not a cliff
+			if overlap < 1.0:
+				# Inside a priority area — snap to its height (vertex won't be rendered)
 				var priority_y: float = _get_priority_height(area_id, vx, vz)
 				vertices.append(Vector3(vx, priority_y, vz))
 				colors.append(Color(base_color, 0.0))
 			else:
-				# Partial or no overlap — scale height by overlap factor
-				vertices.append(Vector3(vx, floor_y + h * overlap, vz))
-				colors.append(_height_color(base_color, h * overlap, amplitude))
+				# Outside all priority areas — full height
+				vertices.append(Vector3(vx, floor_y + h, vz))
+				colors.append(_height_color(base_color, h, amplitude))
 
 	# ── Build triangles using SurfaceTool (skip fully-suppressed triangles) ──
 	var st := SurfaceTool.new()
@@ -288,8 +277,8 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 		var i1: int = 1 + seg        # ring 1, current segment
 		var i2: int = 1 + next_seg   # ring 1, next segment
 
-		# Skip triangle if ANY vertex is fully suppressed (inside priority area)
-		if overlaps[i0] <= 0.0 or overlaps[i1] <= 0.0 or overlaps[i2] <= 0.0:
+		# Skip triangle if ANY vertex is suppressed (inside a priority area)
+		if overlaps[i0] < 1.0 or overlaps[i1] < 1.0 or overlaps[i2] < 1.0:
 			continue
 
 		st.set_color(colors[i0])
@@ -315,8 +304,8 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 			var i2: int = next_base + seg
 			var i3: int = next_base + next_seg
 
-			# Triangle 1 — skip if any vertex is suppressed
-			if overlaps[i0] > 0.0 and overlaps[i2] > 0.0 and overlaps[i1] > 0.0:
+			# Triangle 1 — skip if any vertex is inside a priority area
+			if overlaps[i0] >= 1.0 and overlaps[i2] >= 1.0 and overlaps[i1] >= 1.0:
 				st.set_color(colors[i0])
 				st.set_normal(Vector3.UP)
 				st.add_vertex(vertices[i0])
@@ -329,8 +318,8 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 				st.set_normal(Vector3.UP)
 				st.add_vertex(vertices[i1])
 
-			# Triangle 2 — skip if any vertex is suppressed
-			if overlaps[i1] > 0.0 and overlaps[i2] > 0.0 and overlaps[i3] > 0.0:
+			# Triangle 2 — skip if any vertex is inside a priority area
+			if overlaps[i1] >= 1.0 and overlaps[i2] >= 1.0 and overlaps[i3] >= 1.0:
 				st.set_color(colors[i1])
 				st.set_normal(Vector3.UP)
 				st.add_vertex(vertices[i1])
@@ -348,9 +337,8 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 	var mesh: ArrayMesh = st.commit()
 
 	# ── Build collision face array, SKIPPING suppressed triangles ──
-	# Triangles with any fully-suppressed vertex (overlap <= 0) are omitted from
-	# collision so they don't create invisible walls at floor_y - 50.
-	# The smaller (priority) area's collision mesh fills those gaps instead.
+	# Triangles with any suppressed vertex (overlap < 1.0) are omitted from
+	# collision. The smaller (priority) area's collision mesh covers that zone.
 	var faces := PackedVector3Array()
 
 	# Center fan faces — skip if any vertex is suppressed
@@ -359,7 +347,7 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 		var i0: int = 0
 		var i1: int = 1 + seg
 		var i2: int = 1 + next_seg
-		if overlaps[i0] <= 0.0 or overlaps[i1] <= 0.0 or overlaps[i2] <= 0.0:
+		if overlaps[i0] < 1.0 or overlaps[i1] < 1.0 or overlaps[i2] < 1.0:
 			continue
 		faces.append(vertices[i0])
 		faces.append(vertices[i1])
@@ -375,13 +363,13 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 			var i1: int = base_idx + next_seg
 			var i2: int = next_base + seg
 			var i3: int = next_base + next_seg
-			# Tri 1 — only if all vertices are unsuppressed
-			if overlaps[i0] > 0.0 and overlaps[i2] > 0.0 and overlaps[i1] > 0.0:
+			# Tri 1 — only if all vertices are outside priority areas
+			if overlaps[i0] >= 1.0 and overlaps[i2] >= 1.0 and overlaps[i1] >= 1.0:
 				faces.append(vertices[i0])
 				faces.append(vertices[i2])
 				faces.append(vertices[i1])
-			# Tri 2 — only if all vertices are unsuppressed
-			if overlaps[i1] > 0.0 and overlaps[i2] > 0.0 and overlaps[i3] > 0.0:
+			# Tri 2 — only if all vertices are outside priority areas
+			if overlaps[i1] >= 1.0 and overlaps[i2] >= 1.0 and overlaps[i3] >= 1.0:
 				faces.append(vertices[i1])
 				faces.append(vertices[i2])
 				faces.append(vertices[i3])
