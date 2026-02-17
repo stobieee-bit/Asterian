@@ -428,8 +428,8 @@ func _do_attack() -> void:
 		miss_chance = maxf(0.0, miss_chance - float(oh_acc) * 0.01)
 
 	# Set bonus accuracy: reduce miss chance by 0.5% per accuracy point
-	if equip_sys and equip_sys.has_method("get_set_bonus_accuracy"):
-		var set_acc: int = equip_sys.get_set_bonus_accuracy()
+	if _equipment_system and _equipment_system.has_method("get_set_bonus_accuracy"):
+		var set_acc: int = _equipment_system.get_set_bonus_accuracy()
 		if set_acc > 0:
 			miss_chance = maxf(0.0, miss_chance - float(set_acc) * 0.005)
 
