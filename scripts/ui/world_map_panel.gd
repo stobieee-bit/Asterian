@@ -89,12 +89,30 @@ func _ready() -> void:
 
 ## Convert world coordinates to map pixel coordinates
 func _world_to_map(world_x: float, world_z: float) -> Vector2:
-	# World bounds (from areas.json layout)
-	# X range: roughly -200 to 200, Z range: roughly 50 to -850
-	var min_x: float = -230.0
-	var max_x: float = 250.0
-	var min_z: float = -900.0
-	var max_z: float = 100.0
+	# Calculate world bounds dynamically from DataManager.areas so the map
+	# always scales correctly when new areas are added or positions change.
+	var min_x: float = INF
+	var max_x: float = -INF
+	var min_z: float = INF
+	var max_z: float = -INF
+
+	for area_id in DataManager.areas:
+		var center: Dictionary = DataManager.areas[area_id].get("center", {})
+		var ax: float = float(center.get("x", 0))
+		var az: float = float(center.get("z", 0))
+		var ar: float = float(DataManager.areas[area_id].get("radius", 60))
+		min_x = minf(min_x, ax - ar)
+		max_x = maxf(max_x, ax + ar)
+		min_z = minf(min_z, az - ar)
+		max_z = maxf(max_z, az + ar)
+
+	# Expand by 10% margin so edge nodes don't hit the panel border
+	var range_x: float = max_x - min_x
+	var range_z: float = max_z - min_z
+	min_x -= range_x * 0.05
+	max_x += range_x * 0.05
+	min_z -= range_z * 0.05
+	max_z += range_z * 0.05
 
 	var norm_x: float = (world_x - min_x) / (max_x - min_x)
 	var norm_z: float = (world_z - min_z) / (max_z - min_z)

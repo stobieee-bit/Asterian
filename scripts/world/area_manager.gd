@@ -256,6 +256,8 @@ func _clutter_density(area_id: String) -> float:
 	match area_id:
 		"asteroid-mines":    return 0.3   # ores are the stars
 		"gathering-grounds": return 0.4   # gathering nodes need visibility
+		"mycelium-hollows":  return 0.55  # fungal zone — moderate clutter, nodes must be visible
+		"solarith-wastes":   return 0.5   # desert outpost — wide-open feel, moderate props
 		"station-hub":       return 0.5   # town hub, keep some bustle but not overwhelming
 		"the-abyss":         return 0.35  # supposed to feel empty and ominous
 		"corrupted-wastes":  return 0.5   # small area, moderate clutter
