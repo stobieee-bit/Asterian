@@ -18,11 +18,13 @@ var _area_data: Dictionary = {}    # area_id -> { cx, cz, radius, amplitude, flo
 #  PUBLIC API
 # ═══════════════════════════════════════════════════════════════════════════════
 
-## Generate terrain mesh + collision for one area.
-## Returns { "mesh_instance": MeshInstance3D, "static_body": StaticBody3D }
-func generate_area_terrain(area_id: String, cx: float, cz: float, radius: float,
-		floor_y: float, base_color: Color, terrain_params: Dictionary) -> Dictionary:
-
+## Pre-register an area's noise and geometry data without building a mesh.
+## Must be called for ALL areas before generate_area_terrain() so the generator
+## knows the full world layout and can suppress overlapping vertices.
+func register_area(area_id: String, cx: float, cz: float, radius: float,
+		floor_y: float, terrain_params: Dictionary) -> void:
+	if _area_data.has(area_id):
+		return  # Already registered
 	var amplitude: float = float(terrain_params.get("amplitude", 1.0))
 	var frequency: float = float(terrain_params.get("frequency", 0.02))
 	var seed_val: int = int(terrain_params.get("seed", hash(area_id) % 99999))
@@ -31,7 +33,6 @@ func generate_area_terrain(area_id: String, cx: float, cz: float, radius: float,
 	var gain: float = float(terrain_params.get("gain", 0.5))
 	var falloff_start: float = float(terrain_params.get("edgeFalloffStart", 0.7))
 
-	# Create and cache noise instance
 	var noise := FastNoiseLite.new()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
 	noise.seed = seed_val
@@ -42,12 +43,25 @@ func generate_area_terrain(area_id: String, cx: float, cz: float, radius: float,
 	noise.fractal_gain = gain
 	_noise_map[area_id] = noise
 
-	# Cache area data for height queries
 	_area_data[area_id] = {
 		"cx": cx, "cz": cz, "radius": radius,
 		"amplitude": amplitude, "floor_y": floor_y,
 		"falloff_start": falloff_start
 	}
+
+
+## Generate terrain mesh + collision for one area.
+## Returns { "mesh_instance": MeshInstance3D, "static_body": StaticBody3D }
+## All areas must be registered via register_area() first for overlap awareness.
+func generate_area_terrain(area_id: String, cx: float, cz: float, radius: float,
+		floor_y: float, base_color: Color, terrain_params: Dictionary) -> Dictionary:
+
+	# Register if not already done (backward compatibility)
+	register_area(area_id, cx, cz, radius, floor_y, terrain_params)
+
+	var amplitude: float = _area_data[area_id]["amplitude"]
+	var falloff_start: float = _area_data[area_id]["falloff_start"]
+	var noise: FastNoiseLite = _noise_map[area_id]
 
 	# Determine mesh resolution based on area size
 	var ring_count: int
@@ -142,6 +156,56 @@ func get_height_in_area(area_id: String, world_x: float, world_z: float) -> floa
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+#  OVERLAP SUPPRESSION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+## For a vertex at (wx, wz) belonging to area_id, returns how much to keep:
+## - 0.0 = deep inside a smaller (higher-priority) area → suppress vertex
+## - 0.0–1.0 = in the blend margin (outer 10% of the smaller area's radius)
+## - 1.0 = outside all smaller areas → keep vertex as-is
+## Uses "smaller radius wins" rule (same as get_height). Ties broken by area_id.
+func _get_overlap_factor(area_id: String, wx: float, wz: float) -> float:
+	var my_data: Dictionary = _area_data[area_id]
+	var my_radius: float = my_data["radius"]
+	var factor: float = 1.0
+
+	for other_id in _area_data:
+		if other_id == area_id:
+			continue
+		var other: Dictionary = _area_data[other_id]
+		var other_radius: float = other["radius"]
+
+		# Only suppress if the OTHER area is smaller (higher priority)
+		# Tie-break: smaller area_id string wins priority
+		if other_radius > my_radius:
+			continue
+		if other_radius == my_radius and other_id >= area_id:
+			continue
+
+		# Distance from this vertex to the other area's center
+		var dx: float = wx - other["cx"]
+		var dz: float = wz - other["cz"]
+		var dist: float = sqrt(dx * dx + dz * dz)
+
+		# Outside the other area entirely — no suppression from this area
+		if dist > other_radius:
+			continue
+
+		# Inside the other area — compute blend factor
+		# Blend margin = outer 10% of the other area's radius
+		var blend_start: float = other_radius * 0.9
+		if dist <= blend_start:
+			# Deep inside — fully suppress
+			return 0.0
+		else:
+			# In the blend margin — partial suppression (0 at blend_start, 1 at edge)
+			var blend_factor: float = (dist - blend_start) / (other_radius - blend_start)
+			factor = minf(factor, blend_factor)
+
+	return factor
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 #  MESH GENERATION
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -154,12 +218,17 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 	var vertices: Array[Vector3] = []
 	var colors: Array[Color] = []
 
-	# Center vertex
+	# Center vertex — apply overlap suppression
 	var center_h: float = _sample_height(cx, cz, noise, amplitude, cx, cz, radius, falloff_start)
-	vertices.append(Vector3(cx, floor_y + center_h, cz))
-	colors.append(_height_color(base_color, center_h, amplitude))
+	var center_overlap: float = _get_overlap_factor(area_id, cx, cz)
+	if center_overlap <= 0.0:
+		vertices.append(Vector3(cx, floor_y - 50.0, cz))
+		colors.append(Color(base_color, 0.0))
+	else:
+		vertices.append(Vector3(cx, floor_y + center_h * center_overlap, cz))
+		colors.append(_height_color(base_color, center_h * center_overlap, amplitude))
 
-	# Ring vertices (ring 1 .. ring_count)
+	# Ring vertices (ring 1 .. ring_count) — with overlap suppression
 	for ring in range(1, ring_count + 1):
 		var ring_frac: float = float(ring) / float(ring_count)
 		var ring_radius: float = radius * ring_frac
@@ -168,8 +237,15 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 			var vx: float = cx + cos(angle) * ring_radius
 			var vz: float = cz + sin(angle) * ring_radius
 			var h: float = _sample_height(vx, vz, noise, amplitude, cx, cz, radius, falloff_start)
-			vertices.append(Vector3(vx, floor_y + h, vz))
-			colors.append(_height_color(base_color, h, amplitude))
+			var overlap: float = _get_overlap_factor(area_id, vx, vz)
+			if overlap <= 0.0:
+				# Fully inside a smaller area — sink vertex far below
+				vertices.append(Vector3(vx, floor_y - 50.0, vz))
+				colors.append(Color(base_color, 0.0))
+			else:
+				# Partial or no overlap — scale height by overlap factor
+				vertices.append(Vector3(vx, floor_y + h * overlap, vz))
+				colors.append(_height_color(base_color, h * overlap, amplitude))
 
 	# ── Build triangles using SurfaceTool ──
 	var st := SurfaceTool.new()
