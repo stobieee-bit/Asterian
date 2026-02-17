@@ -44,6 +44,7 @@ var wander_interval: float = 4.0
 # ── State machine ──
 var state: State = State.IDLE
 var _player: CharacterBody3D = null
+var _area_mgr: Node3D = null
 var _attack_timer: float = 0.0
 var _dead_timer: float = 0.0
 var _return_speed_mult: float = 2.0  # Move faster when returning
@@ -222,6 +223,16 @@ func _physics_process(delta: float) -> void:
 		velocity.y = 0.0
 
 	move_and_slide()
+
+	# Safety net: snap to terrain if fallen below surface
+	if state != State.DEAD and not GameState.dungeon_active and not is_on_floor():
+		if _area_mgr == null:
+			_area_mgr = get_tree().get_first_node_in_group("area_manager")
+		if _area_mgr:
+			var terrain_y: float = _area_mgr.get_terrain_height(global_position.x, global_position.z)
+			if global_position.y < terrain_y - 2.0:
+				global_position.y = terrain_y + 0.5
+				velocity.y = 0.0
 
 	# Update HP bar
 	_update_hp_bar()
@@ -535,7 +546,13 @@ func _can_aggro() -> bool:
 func _pick_wander_target() -> void:
 	var angle: float = randf() * TAU
 	var dist: float = randf_range(2.0, 6.0)
-	wander_target = spawn_position + Vector3(cos(angle) * dist, 0, sin(angle) * dist)
+	var wx: float = spawn_position.x + cos(angle) * dist
+	var wz: float = spawn_position.z + sin(angle) * dist
+	var wy: float = spawn_position.y
+	var area_mgr: Node3D = get_tree().get_first_node_in_group("area_manager")
+	if area_mgr and area_mgr.has_method("get_terrain_height"):
+		wy = area_mgr.get_terrain_height(wx, wz)
+	wander_target = Vector3(wx, wy, wz)
 
 func _enter_state(new_state: State) -> void:
 	state = new_state

@@ -11,6 +11,7 @@ extends Node
 # ── Player signals ──
 signal player_died
 signal player_respawned
+signal player_unstick_requested
 signal player_healed(amount: int)
 signal player_damaged(amount: int, source: String)
 signal player_level_up(skill: String, new_level: int)

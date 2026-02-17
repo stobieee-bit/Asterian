@@ -17,6 +17,7 @@ var respawn_time: float = 15.0     # Seconds to respawn
 # ── State ──
 var _is_depleted: bool = false
 var _respawn_timer: float = 0.0
+var _grounded: bool = false
 var _mesh_parts: Array[Node3D] = []   # All CSG parts for deplete/respawn animation
 var _label: Label3D = null
 var _node_color: Color = Color(0.6, 0.5, 0.3)
@@ -1212,6 +1213,14 @@ func _add_glow_ring(inner_r: float, outer_r: float) -> void:
 	_mesh_parts.append(glow_ring)
 
 func _process(delta: float) -> void:
+	# One-time ground snap
+	if not _grounded:
+		_grounded = true
+		var area_mgr: Node3D = get_tree().get_first_node_in_group("area_manager")
+		if area_mgr and area_mgr.has_method("get_terrain_height"):
+			var ty: float = area_mgr.get_terrain_height(global_position.x, global_position.z)
+			global_position.y = ty + 0.1
+
 	if _is_depleted:
 		_respawn_timer -= delta
 		if _respawn_timer <= 0:

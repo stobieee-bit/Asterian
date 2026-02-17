@@ -1107,17 +1107,30 @@ func _apply_chat_filters() -> void:
 func _on_chat_input_submitted(text: String) -> void:
 	var trimmed: String = text.strip_edges()
 	if trimmed.length() > 0:
-		# Send via multiplayer
-		var client: Node = get_tree().get_first_node_in_group("multiplayer_client")
-		if client and client.has_method("send_chat") and client.is_mp_connected():
-			client.send_chat(trimmed)
-			# Don't emit locally — server echoes our message back via _handle_chat()
+		# ── Slash commands (local only) ──
+		if trimmed.begins_with("/"):
+			_handle_slash_command(trimmed)
 		else:
-			# Not connected — show locally as system message
-			EventBus.chat_message.emit(trimmed, "system")
+			# Send via multiplayer
+			var client: Node = get_tree().get_first_node_in_group("multiplayer_client")
+			if client and client.has_method("send_chat") and client.is_mp_connected():
+				client.send_chat(trimmed)
+			else:
+				EventBus.chat_message.emit(trimmed, "system")
 	# Clear input and release focus
 	_chat_input.text = ""
 	_chat_input.release_focus()
+
+
+func _handle_slash_command(cmd: String) -> void:
+	var parts: PackedStringArray = cmd.split(" ", false)
+	var command: String = parts[0].to_lower()
+	match command:
+		"/unstick":
+			EventBus.chat_message.emit("Unsticking... You will respawn at Station Hub with death penalties.", "system")
+			EventBus.player_unstick_requested.emit()
+		_:
+			EventBus.chat_message.emit("Unknown command: %s" % command, "system")
 
 ## Called when the chat input gains focus
 func _on_chat_focus_entered() -> void:

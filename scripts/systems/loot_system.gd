@@ -149,8 +149,13 @@ func _spawn_ground_item(item_id: String, quantity: int, pos: Vector3) -> void:
 
 	# Scatter slightly from kill position
 	var offset: Vector3 = Vector3(randf_range(-1.0, 1.0), 0.0, randf_range(-1.0, 1.0))
-	gitem.global_position = pos + offset
-	gitem.global_position.y = pos.y + 0.3
+	var drop_pos: Vector3 = pos + offset
+	var area_mgr: Node3D = get_tree().get_first_node_in_group("area_manager")
+	if area_mgr and area_mgr.has_method("get_terrain_height"):
+		drop_pos.y = area_mgr.get_terrain_height(drop_pos.x, drop_pos.z) + 0.3
+	else:
+		drop_pos.y = pos.y + 0.3
+	gitem.global_position = drop_pos
 
 	# Store item data on the node
 	gitem.set_meta("item_id", item_id)

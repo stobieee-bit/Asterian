@@ -62,9 +62,14 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	# Safety nets are disabled inside dungeons (dungeon has its own floor/walls)
 	if not GameState.dungeon_active:
-		# Safety net: prevent sinking below ground plane
-		if global_position.y < -0.5:
-			global_position.y = 0.0
+		# Safety net: snap back to terrain surface if fallen below it
+		if _area_manager and _area_manager.has_method("get_terrain_height") and not is_on_floor():
+			var terrain_y: float = _area_manager.get_terrain_height(global_position.x, global_position.z)
+			if global_position.y < terrain_y - 3.0:
+				global_position.y = terrain_y + 0.5
+				velocity.y = 0.0
+		elif global_position.y < -15.0:
+			global_position.y = 1.0
 			velocity.y = 0.0
 		# Safety net: after physics, clamp position back inside world bounds
 		_clamp_position()
@@ -157,17 +162,17 @@ func _handle_move_click(event: InputEvent) -> void:
 	if result:
 		move_target = result.position
 		if not GameState.dungeon_active:
-			move_target.y = 0.0  # Keep on ground plane
 			move_target = _clamp_move_target(move_target)
 		is_moving = true
 		_show_move_marker(move_target)
 	else:
-		# Fallback: intersect with flat ground plane at y=0
+		# Fallback: intersect with flat ground plane then query terrain height
 		var hit = _ground_plane.intersects_ray(from, dir)
 		if hit:
 			move_target = hit
 			if not GameState.dungeon_active:
-				move_target.y = 0.0
+				if _area_manager and _area_manager.has_method("get_terrain_height"):
+					move_target.y = _area_manager.get_terrain_height(move_target.x, move_target.z)
 				move_target = _clamp_move_target(move_target)
 			is_moving = true
 			_show_move_marker(move_target)
@@ -238,7 +243,10 @@ func _build_move_marker() -> void:
 func _show_move_marker(pos: Vector3) -> void:
 	if _move_marker == null:
 		return
-	_move_marker.global_position = Vector3(pos.x, 0.05, pos.z)
+	var marker_y: float = 0.05
+	if _area_manager and _area_manager.has_method("get_terrain_height"):
+		marker_y = _area_manager.get_terrain_height(pos.x, pos.z) + 0.05
+	_move_marker.global_position = Vector3(pos.x, marker_y, pos.z)
 	_move_marker.visible = true
 	_move_marker_active = true
 	_move_marker_time = 0.0

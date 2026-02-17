@@ -8,7 +8,8 @@
       },
       "radius": 55,
       "groundColor": 1712176,
-      "floorY": 0
+      "floorY": 0,
+      "terrain": { "seed": 100, "frequency": 0.03, "amplitude": 2.0, "octaves": 3 }
     },
     "asteroid-mines": {
       "name": "Asteroid Mines",
@@ -18,7 +19,8 @@
       },
       "radius": 80,
       "groundColor": 2759184,
-      "floorY": -2
+      "floorY": -2,
+      "terrain": { "seed": 200, "frequency": 0.015, "amplitude": 6.0, "octaves": 4 }
     },
     "gathering-grounds": {
       "name": "Gathering Grounds",
@@ -28,7 +30,8 @@
       },
       "radius": 60,
       "groundColor": 663576,
-      "floorY": -0.5
+      "floorY": -0.5,
+      "terrain": { "seed": 300, "frequency": 0.02, "amplitude": 3.5, "octaves": 3 }
     },
     "alien-wastes": {
       "name": "Alien Wastes",
@@ -38,7 +41,8 @@
       },
       "radius": 450,
       "groundColor": 662032,
-      "floorY": -1
+      "floorY": -1,
+      "terrain": { "seed": 400, "frequency": 0.01, "amplitude": 5.0, "octaves": 4 }
     },
     "bio-lab": {
       "name": "Bio-Lab",
@@ -48,7 +52,8 @@
       },
       "radius": 18,
       "groundColor": 663584,
-      "floorY": 0
+      "floorY": 0,
+      "terrain": { "seed": 500, "frequency": 0.05, "amplitude": 0.8, "octaves": 2 }
     },
     "the-abyss": {
       "name": "The Abyss",
@@ -58,28 +63,32 @@
       },
       "radius": 350,
       "groundColor": 328976,
-      "floorY": -3
+      "floorY": -3,
+      "terrain": { "seed": 600, "frequency": 0.008, "amplitude": 8.0, "octaves": 5 }
     },
     "mycelium-hollows": {
       "name": "Mycelium Hollows",
       "center": { "x": 180, "z": -150 },
       "radius": 140,
       "groundColor": 667434,
-      "floorY": -1.5
+      "floorY": -1.5,
+      "terrain": { "seed": 700, "frequency": 0.02, "amplitude": 4.5, "octaves": 4 }
     },
     "solarith-wastes": {
       "name": "Solarith Wastes",
       "center": { "x": -200, "z": -500 },
       "radius": 180,
       "groundColor": 9136404,
-      "floorY": -0.5
+      "floorY": -0.5,
+      "terrain": { "seed": 800, "frequency": 0.012, "amplitude": 5.5, "octaves": 4 }
     },
     "void-citadel": {
       "name": "Void Citadel",
       "center": { "x": 0, "z": -1000 },
       "radius": 160,
       "groundColor": 657434,
-      "floorY": -2
+      "floorY": -2,
+      "terrain": { "seed": 900, "frequency": 0.015, "amplitude": 6.5, "octaves": 4 }
     }
   },
   "corrupted_areas": {
@@ -93,7 +102,8 @@
       "radius": 60,
       "groundColor": 1705992,
       "floorY": -1,
-      "fogColor": 3342336
+      "fogColor": 3342336,
+      "terrain": { "seed": 1000, "frequency": 0.025, "amplitude": 4.5, "octaves": 4 }
     }
   },
   "atmosphere": {
