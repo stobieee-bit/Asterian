@@ -6397,5 +6397,761 @@
     "value": 8000,
     "tier": 12,
     "desc": "The rarest alloy in the galaxy. Forged from corrupted ingots and harmony cores."
+  },
+  "spore_sac": {
+    "id": "spore_sac",
+    "name": "Spore Sac",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 8,
+    "tier": 1,
+    "desc": "Burst sac from sporeling crawlers."
+  },
+  "glowcap_membrane": {
+    "id": "glowcap_membrane",
+    "name": "Glowcap Membrane",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 12,
+    "tier": 1,
+    "desc": "Translucent membrane from glowcap drifters."
+  },
+  "tendril_fiber": {
+    "id": "tendril_fiber",
+    "name": "Tendril Fiber",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 15,
+    "tier": 1,
+    "desc": "Tough fiber from mycelium tendrils."
+  },
+  "stalker_claw": {
+    "id": "stalker_claw",
+    "name": "Stalker Claw",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 22,
+    "tier": 2,
+    "desc": "Razor-sharp fungal stalker claw."
+  },
+  "rootweb_silk": {
+    "id": "rootweb_silk",
+    "name": "Rootweb Silk",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 28,
+    "tier": 2,
+    "desc": "Sticky silk from rootweb weavers."
+  },
+  "shaman_spore": {
+    "id": "shaman_spore",
+    "name": "Shaman Spore",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 35,
+    "tier": 2,
+    "desc": "Enchanted spore from spore shamans."
+  },
+  "hulk_core": {
+    "id": "hulk_core",
+    "name": "Hulk Core",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 45,
+    "tier": 2,
+    "desc": "Dense fungal core from mycelium hulks."
+  },
+  "queen_spore_heart": {
+    "id": "queen_spore_heart",
+    "name": "Queen Spore Heart",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 500,
+    "tier": 3,
+    "desc": "Pulsating heart of the Hollow Queen."
+  },
+  "spore_antidote": {
+    "id": "spore_antidote",
+    "name": "Spore Antidote",
+    "type": "consumable",
+    "icon": "icon_serum",
+    "stackable": false,
+    "value": 25,
+    "tier": 1,
+    "buff": {
+      "type": "defense",
+      "value": 4,
+      "duration": 120
+    },
+    "desc": "Neutralizes fungal toxins. +4 defense for 2 min."
+  },
+  "glowcap_tea": {
+    "id": "glowcap_tea",
+    "name": "Glowcap Tea",
+    "type": "consumable",
+    "icon": "icon_potion",
+    "stackable": false,
+    "value": 30,
+    "tier": 1,
+    "buff": {
+      "type": "healOverTime",
+      "value": 3,
+      "duration": 30
+    },
+    "desc": "Soothing bioluminescent tea. Heals 3 HP/sec for 30s."
+  },
+  "mycelium_wrap": {
+    "id": "mycelium_wrap",
+    "name": "Mycelium Wrap",
+    "type": "food",
+    "icon": "icon_food",
+    "stackable": false,
+    "value": 20,
+    "tier": 1,
+    "heals": 80,
+    "desc": "Edible fungal wrap. Heals 80 HP."
+  },
+  "fungal_tonic": {
+    "id": "fungal_tonic",
+    "name": "Fungal Tonic",
+    "type": "consumable",
+    "icon": "icon_potion",
+    "stackable": false,
+    "value": 35,
+    "tier": 1,
+    "buff": {
+      "type": "damage",
+      "value": 3,
+      "duration": 120
+    },
+    "desc": "Fungal brew. +3 damage for 2 min."
+  },
+  "luminescent_salve": {
+    "id": "luminescent_salve",
+    "name": "Luminescent Salve",
+    "type": "consumable",
+    "icon": "icon_serum",
+    "stackable": false,
+    "value": 30,
+    "tier": 1,
+    "buff": {
+      "type": "accuracy",
+      "value": 3,
+      "duration": 120
+    },
+    "desc": "Glowing healing salve. +3 accuracy for 2 min."
+  },
+  "rootsap_elixir": {
+    "id": "rootsap_elixir",
+    "name": "Rootsap Elixir",
+    "type": "consumable",
+    "icon": "icon_potion",
+    "stackable": false,
+    "value": 45,
+    "tier": 2,
+    "buff": {
+      "type": "speed",
+      "value": 0.1,
+      "duration": 90
+    },
+    "desc": "Concentrated root sap. +10% speed for 90s."
+  },
+  "spore_harvester": {
+    "id": "spore_harvester",
+    "name": "Spore Harvester",
+    "type": "tool",
+    "icon": "icon_tool",
+    "stackable": false,
+    "value": 50,
+    "tier": 1,
+    "desc": "Specialized tool for gathering fungal resources."
+  },
+  "mycelium_probe": {
+    "id": "mycelium_probe",
+    "name": "Mycelium Probe",
+    "type": "tool",
+    "icon": "icon_tool",
+    "stackable": false,
+    "value": 80,
+    "tier": 2,
+    "desc": "Probe for detecting underground fungal deposits."
+  },
+  "glowcap_fungus": {
+    "id": "glowcap_fungus",
+    "name": "Glowcap Fungus",
+    "type": "resource",
+    "icon": "icon_plant",
+    "stackable": false,
+    "value": 12,
+    "tier": 1,
+    "skillReq": {
+      "xenobotany": 5
+    },
+    "desc": "Bioluminescent mushroom cap."
+  },
+  "mycelium_strand": {
+    "id": "mycelium_strand",
+    "name": "Mycelium Strand",
+    "type": "resource",
+    "icon": "icon_plant",
+    "stackable": false,
+    "value": 18,
+    "tier": 1,
+    "skillReq": {
+      "xenobotany": 10
+    },
+    "desc": "Living fungal filament."
+  },
+  "deeproot_bulb": {
+    "id": "deeproot_bulb",
+    "name": "Deeproot Bulb",
+    "type": "resource",
+    "icon": "icon_plant",
+    "stackable": false,
+    "value": 25,
+    "tier": 2,
+    "skillReq": {
+      "xenobotany": 15
+    },
+    "desc": "Deep-growing fungal bulb."
+  },
+  "fungite_ore": {
+    "id": "fungite_ore",
+    "name": "Fungite Ore",
+    "type": "resource",
+    "icon": "icon_ore",
+    "stackable": false,
+    "value": 12,
+    "tier": 1,
+    "skillReq": {
+      "astromining": 5
+    },
+    "desc": "Mineral-infused fungal rock."
+  },
+  "sporite_crystal": {
+    "id": "sporite_crystal",
+    "name": "Sporite Crystal",
+    "type": "resource",
+    "icon": "icon_crystal",
+    "stackable": false,
+    "value": 18,
+    "tier": 1,
+    "skillReq": {
+      "astromining": 10
+    },
+    "desc": "Crystallized spore formation."
+  },
+  "hollow_geode": {
+    "id": "hollow_geode",
+    "name": "Hollow Geode",
+    "type": "resource",
+    "icon": "icon_ore",
+    "stackable": false,
+    "value": 28,
+    "tier": 2,
+    "skillReq": {
+      "astromining": 15
+    },
+    "desc": "Geode from deep in the hollows."
+  },
+  "scarab_carapace": {
+    "id": "scarab_carapace",
+    "name": "Scarab Carapace",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 55,
+    "tier": 4,
+    "desc": "Hardened shell from sand scarabs."
+  },
+  "solar_dust": {
+    "id": "solar_dust",
+    "name": "Solar Dust",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 65,
+    "tier": 4,
+    "desc": "Shimmering dust from solar automatons."
+  },
+  "automaton_circuit": {
+    "id": "automaton_circuit",
+    "name": "Automaton Circuit",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 80,
+    "tier": 4,
+    "desc": "Intact circuit from solar automatons."
+  },
+  "mirage_fang": {
+    "id": "mirage_fang",
+    "name": "Mirage Fang",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 95,
+    "tier": 5,
+    "desc": "Venomous fang from mirage vipers."
+  },
+  "viper_venom_sac": {
+    "id": "viper_venom_sac",
+    "name": "Viper Venom Sac",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 110,
+    "tier": 5,
+    "desc": "Potent venom sac from mirage vipers."
+  },
+  "reaver_hide": {
+    "id": "reaver_hide",
+    "name": "Reaver Hide",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 130,
+    "tier": 5,
+    "desc": "Thick hide from dune reavers."
+  },
+  "solar_core": {
+    "id": "solar_core",
+    "name": "Solar Core",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 160,
+    "tier": 5,
+    "desc": "Blazing core from sunfire elementals."
+  },
+  "obsidian_shard": {
+    "id": "obsidian_shard",
+    "name": "Obsidian Shard",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 140,
+    "tier": 5,
+    "desc": "Razor-sharp volcanic glass."
+  },
+  "wyrm_scale": {
+    "id": "wyrm_scale",
+    "name": "Wyrm Scale",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 200,
+    "tier": 6,
+    "desc": "Iridescent scale from canyon wyrms."
+  },
+  "drake_wing_shard": {
+    "id": "drake_wing_shard",
+    "name": "Drake Wing Shard",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 250,
+    "tier": 6,
+    "desc": "Fragment of a sun drake's wing."
+  },
+  "solaris_core": {
+    "id": "solaris_core",
+    "name": "Solaris Core",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 2500,
+    "tier": 7,
+    "desc": "The blazing heart of Solaris Prime."
+  },
+  "solar_ration": {
+    "id": "solar_ration",
+    "name": "Solar Ration",
+    "type": "food",
+    "icon": "icon_food",
+    "stackable": false,
+    "value": 150,
+    "tier": 4,
+    "heals": 400,
+    "desc": "Sun-dried desert ration. Heals 400 HP."
+  },
+  "heat_shield_flask": {
+    "id": "heat_shield_flask",
+    "name": "Heat Shield Flask",
+    "type": "consumable",
+    "icon": "icon_serum",
+    "stackable": false,
+    "value": 200,
+    "tier": 5,
+    "buff": {
+      "type": "defense",
+      "value": 15,
+      "duration": 180
+    },
+    "desc": "Protects against extreme heat. +15 defense for 3 min."
+  },
+  "solar_ingot": {
+    "id": "solar_ingot",
+    "name": "Solar Ingot",
+    "type": "material",
+    "icon": "icon_bar",
+    "stackable": false,
+    "value": 200,
+    "tier": 5,
+    "desc": "Smelted from solarite ore. Radiates warmth."
+  },
+  "heat_core": {
+    "id": "heat_core",
+    "name": "Heat Core",
+    "type": "material",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 280,
+    "tier": 5,
+    "desc": "Concentrated thermal energy."
+  },
+  "solar_plating": {
+    "id": "solar_plating",
+    "name": "Solar Plating",
+    "type": "material",
+    "icon": "icon_alloy",
+    "stackable": false,
+    "value": 350,
+    "tier": 6,
+    "desc": "Heat-resistant armor plating."
+  },
+  "solarite_ore": {
+    "id": "solarite_ore",
+    "name": "Solarite Ore",
+    "type": "resource",
+    "icon": "icon_ore",
+    "stackable": false,
+    "value": 90,
+    "tier": 4,
+    "skillReq": {
+      "astromining": 35
+    },
+    "desc": "Sun-forged ore glowing with inner heat."
+  },
+  "amber_crystal": {
+    "id": "amber_crystal",
+    "name": "Amber Crystal",
+    "type": "resource",
+    "icon": "icon_crystal",
+    "stackable": false,
+    "value": 110,
+    "tier": 4,
+    "skillReq": {
+      "astromining": 40
+    },
+    "desc": "Fossilized desert crystal."
+  },
+  "obsidian_ore": {
+    "id": "obsidian_ore",
+    "name": "Obsidian Ore",
+    "type": "resource",
+    "icon": "icon_ore",
+    "stackable": false,
+    "value": 150,
+    "tier": 5,
+    "skillReq": {
+      "astromining": 50
+    },
+    "desc": "Volcanic glass ore from canyon depths."
+  },
+  "sun_cactus": {
+    "id": "sun_cactus",
+    "name": "Sun Cactus",
+    "type": "resource",
+    "icon": "icon_plant",
+    "stackable": false,
+    "value": 85,
+    "tier": 4,
+    "skillReq": {
+      "xenobotany": 35
+    },
+    "desc": "Desert plant storing solar energy."
+  },
+  "desert_thornvine": {
+    "id": "desert_thornvine",
+    "name": "Desert Thornvine",
+    "type": "resource",
+    "icon": "icon_plant",
+    "stackable": false,
+    "value": 120,
+    "tier": 5,
+    "skillReq": {
+      "xenobotany": 45
+    },
+    "desc": "Hardy thorned vine surviving extreme heat."
+  },
+  "mirage_bloom": {
+    "id": "mirage_bloom",
+    "name": "Mirage Bloom",
+    "type": "resource",
+    "icon": "icon_plant",
+    "stackable": false,
+    "value": 180,
+    "tier": 5,
+    "skillReq": {
+      "xenobotany": 55
+    },
+    "desc": "Iridescent desert flower visible only at dusk."
+  },
+  "sentinel_core": {
+    "id": "sentinel_core",
+    "name": "Sentinel Core",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 300,
+    "tier": 7,
+    "desc": "Power core from void sentinels."
+  },
+  "void_shard": {
+    "id": "void_shard",
+    "name": "Void Shard",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 350,
+    "tier": 7,
+    "desc": "Fragment of concentrated void energy."
+  },
+  "phase_membrane": {
+    "id": "phase_membrane",
+    "name": "Phase Membrane",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 380,
+    "tier": 7,
+    "desc": "Membrane that shifts between dimensions."
+  },
+  "rift_thread": {
+    "id": "rift_thread",
+    "name": "Rift Thread",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 420,
+    "tier": 8,
+    "desc": "Thread woven from dimensional rifts."
+  },
+  "architect_alloy": {
+    "id": "architect_alloy",
+    "name": "Architect Alloy",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 500,
+    "tier": 8,
+    "desc": "Ancient alien construction material."
+  },
+  "gravity_essence": {
+    "id": "gravity_essence",
+    "name": "Gravity Essence",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 480,
+    "tier": 8,
+    "desc": "Liquid gravity from gravity wraiths."
+  },
+  "dimensional_fang": {
+    "id": "dimensional_fang",
+    "name": "Dimensional Fang",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 550,
+    "tier": 8,
+    "desc": "Fang from a dimensional predator."
+  },
+  "warden_fragment": {
+    "id": "warden_fragment",
+    "name": "Warden Fragment",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 650,
+    "tier": 9,
+    "desc": "Fragment of a singularity warden."
+  },
+  "reality_shard": {
+    "id": "reality_shard",
+    "name": "Reality Shard",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 750,
+    "tier": 9,
+    "desc": "Crystallized piece of reality."
+  },
+  "sovereign_crown_shard": {
+    "id": "sovereign_crown_shard",
+    "name": "Sovereign Crown Shard",
+    "type": "resource",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 5000,
+    "tier": 10,
+    "desc": "Fragment of the Void Sovereign's crown."
+  },
+  "void_elixir": {
+    "id": "void_elixir",
+    "name": "Void Elixir",
+    "type": "consumable",
+    "icon": "icon_potion",
+    "stackable": false,
+    "value": 500,
+    "tier": 7,
+    "buff": {
+      "type": "all",
+      "value": 10,
+      "duration": 120
+    },
+    "desc": "Elixir infused with void energy. +10 all stats for 2 min."
+  },
+  "singularity_shard_item": {
+    "id": "singularity_shard_item",
+    "name": "Singularity Shard",
+    "type": "consumable",
+    "icon": "icon_serum",
+    "stackable": false,
+    "value": 800,
+    "tier": 8,
+    "buff": {
+      "type": "damage",
+      "value": 20,
+      "duration": 90
+    },
+    "desc": "Consumable shard granting immense power. +20 damage for 90s."
+  },
+  "void_alloy": {
+    "id": "void_alloy",
+    "name": "Void Alloy",
+    "type": "material",
+    "icon": "icon_alloy",
+    "stackable": false,
+    "value": 600,
+    "tier": 8,
+    "desc": "Alloy forged in the void between dimensions."
+  },
+  "phase_crystal": {
+    "id": "phase_crystal",
+    "name": "Phase Crystal",
+    "type": "material",
+    "icon": "icon_crystal",
+    "stackable": false,
+    "value": 700,
+    "tier": 8,
+    "desc": "Crystal existing in multiple phases simultaneously."
+  },
+  "singularity_fragment": {
+    "id": "singularity_fragment",
+    "name": "Singularity Fragment",
+    "type": "material",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 900,
+    "tier": 9,
+    "desc": "Fragment of a collapsed singularity."
+  },
+  "architect_blueprint": {
+    "id": "architect_blueprint",
+    "name": "Architect Blueprint",
+    "type": "material",
+    "icon": "icon_component",
+    "stackable": false,
+    "value": 1200,
+    "tier": 9,
+    "desc": "Ancient alien construction schematic."
+  },
+  "void_crystal": {
+    "id": "void_crystal",
+    "name": "Void Crystal",
+    "type": "resource",
+    "icon": "icon_crystal",
+    "stackable": false,
+    "value": 350,
+    "tier": 7,
+    "skillReq": {
+      "astromining": 65
+    },
+    "desc": "Crystal formed in dimensional voids."
+  },
+  "phase_ore": {
+    "id": "phase_ore",
+    "name": "Phase Ore",
+    "type": "resource",
+    "icon": "icon_ore",
+    "stackable": false,
+    "value": 450,
+    "tier": 8,
+    "skillReq": {
+      "astromining": 75
+    },
+    "desc": "Ore that phases in and out of reality."
+  },
+  "singularity_shard_ore": {
+    "id": "singularity_shard_ore",
+    "name": "Singularity Shard Ore",
+    "type": "resource",
+    "icon": "icon_ore",
+    "stackable": false,
+    "value": 580,
+    "tier": 9,
+    "skillReq": {
+      "astromining": 85
+    },
+    "desc": "Ore from the edge of a singularity."
+  },
+  "dimensional_moss": {
+    "id": "dimensional_moss",
+    "name": "Dimensional Moss",
+    "type": "resource",
+    "icon": "icon_plant",
+    "stackable": false,
+    "value": 320,
+    "tier": 7,
+    "skillReq": {
+      "xenobotany": 65
+    },
+    "desc": "Moss growing between dimensions."
+  },
+  "void_bloom": {
+    "id": "void_bloom",
+    "name": "Void Bloom",
+    "type": "resource",
+    "icon": "icon_plant",
+    "stackable": false,
+    "value": 400,
+    "tier": 8,
+    "skillReq": {
+      "xenobotany": 75
+    },
+    "desc": "Flower that blooms in the void."
+  },
+  "architect_root": {
+    "id": "architect_root",
+    "name": "Architect Root",
+    "type": "resource",
+    "icon": "icon_plant",
+    "stackable": false,
+    "value": 550,
+    "tier": 9,
+    "skillReq": {
+      "xenobotany": 85
+    },
+    "desc": "Ancient root structure from the citadel's bio-systems."
   }
 }

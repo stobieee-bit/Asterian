@@ -59,6 +59,27 @@
       "radius": 350,
       "groundColor": 328976,
       "floorY": -3
+    },
+    "mycelium-hollows": {
+      "name": "Mycelium Hollows",
+      "center": { "x": 180, "z": -150 },
+      "radius": 140,
+      "groundColor": 667434,
+      "floorY": -1.5
+    },
+    "solarith-wastes": {
+      "name": "Solarith Wastes",
+      "center": { "x": -200, "z": -500 },
+      "radius": 180,
+      "groundColor": 9136404,
+      "floorY": -0.5
+    },
+    "void-citadel": {
+      "name": "Void Citadel",
+      "center": { "x": 0, "z": -1000 },
+      "radius": 160,
+      "groundColor": 657434,
+      "floorY": -2
     }
   },
   "corrupted_areas": {
@@ -180,6 +201,51 @@
       "cgBright": 0.85,
       "cgTint": 6697932,
       "cgTintStr": 0.1
+    },
+    "mycelium-hollows": {
+      "ambientColor": 670512,
+      "ambientInt": 0.55,
+      "dirColor": 3394696,
+      "dirInt": 0.5,
+      "fogColor": 665624,
+      "fogDensity": 0.006,
+      "skyTop": 4104,
+      "skyBottom": 665624,
+      "cgSat": 1.2,
+      "cgContrast": 1.02,
+      "cgBright": 0.9,
+      "cgTint": 3394696,
+      "cgTintStr": 0.06
+    },
+    "solarith-wastes": {
+      "ambientColor": 9136944,
+      "ambientInt": 0.75,
+      "dirColor": 16768392,
+      "dirInt": 1.0,
+      "fogColor": 7030032,
+      "fogDensity": 0.003,
+      "skyTop": 13403168,
+      "skyBottom": 7030032,
+      "cgSat": 1.15,
+      "cgContrast": 1.08,
+      "cgBright": 1.05,
+      "cgTint": 16763972,
+      "cgTintStr": 0.08
+    },
+    "void-citadel": {
+      "ambientColor": 1706538,
+      "ambientInt": 0.35,
+      "dirColor": 8930508,
+      "dirInt": 0.45,
+      "fogColor": 657432,
+      "fogDensity": 0.005,
+      "skyTop": 131080,
+      "skyBottom": 657432,
+      "cgSat": 0.9,
+      "cgContrast": 1.1,
+      "cgBright": 0.8,
+      "cgTint": 8930508,
+      "cgTintStr": 0.12
     }
   },
   "corridors": [
@@ -246,6 +312,45 @@
         "x": 0,
         "z": -980
       }
+    },
+    {
+      "id": "hub-to-hollows",
+      "from": "station-hub",
+      "to": "mycelium-hollows",
+      "minX": 40,
+      "maxX": 80,
+      "minZ": -10,
+      "maxZ": 10,
+      "floorY": -0.5,
+      "groundColor": 665378,
+      "label": "Mycelium Hollows -->",
+      "labelPos": { "x": 60, "z": 0 }
+    },
+    {
+      "id": "wastes-to-solarith",
+      "from": "alien-wastes",
+      "to": "solarith-wastes",
+      "minX": -80,
+      "maxX": -40,
+      "minZ": -380,
+      "maxZ": -350,
+      "floorY": -0.5,
+      "groundColor": 7025936,
+      "label": "<-- Solarith Wastes",
+      "labelPos": { "x": -60, "z": -365 }
+    },
+    {
+      "id": "wastes-to-citadel",
+      "from": "alien-wastes",
+      "to": "void-citadel",
+      "minX": -6,
+      "maxX": 6,
+      "minZ": -960,
+      "maxZ": -935,
+      "floorY": -1.5,
+      "groundColor": 657432,
+      "label": "Void Citadel",
+      "labelPos": { "x": 0, "z": -948 }
     }
   ],
   "level_ranges": {
@@ -283,6 +388,21 @@
       "min": 80,
       "max": 99,
       "label": "Lv 80-99 Prestige"
+    },
+    "mycelium-hollows": {
+      "min": 5,
+      "max": 20,
+      "label": "Lv 5-20 Combat & Gathering"
+    },
+    "solarith-wastes": {
+      "min": 35,
+      "max": 60,
+      "label": "Lv 35-60 Combat"
+    },
+    "void-citadel": {
+      "min": 65,
+      "max": 90,
+      "label": "Lv 65-90 Combat"
     }
   },
   "sub_zones": [
@@ -417,6 +537,78 @@
       "levelMax": 200,
       "density": 0.85,
       "desc": "The absolute bottom — domain of cosmic titans."
+    },
+    {
+      "id": "sporeveil-thicket",
+      "name": "Sporeveil Thicket",
+      "area": "mycelium-hollows",
+      "cx": 160,
+      "cz": -120,
+      "radius": 65,
+      "levelMin": 5,
+      "levelMax": 12,
+      "density": 0.85,
+      "desc": "A dense grove of towering fungal stalks where glowing spores drift lazily. Weak fungal creatures scuttle among the roots."
+    },
+    {
+      "id": "rootweb-depths",
+      "name": "Rootweb Depths",
+      "area": "mycelium-hollows",
+      "cx": 200,
+      "cz": -200,
+      "radius": 70,
+      "levelMin": 12,
+      "levelMax": 20,
+      "density": 0.9,
+      "desc": "Deep tangled tunnels of interwoven mycelium roots. Predatory fungi lurk in ambush along winding paths."
+    },
+    {
+      "id": "dune-approach",
+      "name": "Dune Approach",
+      "area": "solarith-wastes",
+      "cx": -170,
+      "cz": -430,
+      "radius": 80,
+      "levelMin": 35,
+      "levelMax": 47,
+      "density": 0.9,
+      "desc": "Endless amber dunes beneath a merciless artificial sun. Ancient solar collector pylons jut from the sand like skeletal fingers."
+    },
+    {
+      "id": "obsidian-canyon",
+      "name": "Obsidian Canyon",
+      "area": "solarith-wastes",
+      "cx": -230,
+      "cz": -570,
+      "radius": 85,
+      "levelMin": 47,
+      "levelMax": 60,
+      "density": 0.95,
+      "desc": "A jagged rift of black volcanic glass cuts through the desert floor. Apex predators nest in the shade of the overhangs."
+    },
+    {
+      "id": "fractured-halls",
+      "name": "Fractured Halls",
+      "area": "void-citadel",
+      "cx": 20,
+      "cz": -940,
+      "radius": 75,
+      "levelMin": 65,
+      "levelMax": 77,
+      "density": 0.9,
+      "desc": "Shattered entrance halls of the ancient citadel. Metal corridors twist at impossible angles and void energy seeps through cracks in reality."
+    },
+    {
+      "id": "singularity-core",
+      "name": "Singularity Core",
+      "area": "void-citadel",
+      "cx": -20,
+      "cz": -1060,
+      "radius": 80,
+      "levelMin": 77,
+      "levelMax": 90,
+      "density": 0.95,
+      "desc": "The heart of the citadel where a contained singularity once powered the fortress. Space-time distortions warp the terrain."
     }
   ],
   "processing_stations": [
@@ -507,6 +699,70 @@
       },
       "interactRadius": 3,
       "icon": "⏳"
+    },
+    {
+      "id": "hollows_xenocook",
+      "name": "Spore Processor",
+      "skill": "xenocook",
+      "position": { "x": 155, "z": -115 },
+      "interactRadius": 3,
+      "icon": "🍳"
+    },
+    {
+      "id": "hollows_bioforge",
+      "name": "Fungal Press",
+      "skill": "bioforge",
+      "position": { "x": 162, "z": -115 },
+      "interactRadius": 3,
+      "icon": "🧬"
+    },
+    {
+      "id": "solarith_circuitry",
+      "name": "Solar Anvil",
+      "skill": "circuitry",
+      "position": { "x": -158, "z": -400 },
+      "interactRadius": 3,
+      "icon": "🔧"
+    },
+    {
+      "id": "solarith_bioforge",
+      "name": "Desert Kiln",
+      "skill": "bioforge",
+      "position": { "x": -163, "z": -400 },
+      "interactRadius": 3,
+      "icon": "🧬"
+    },
+    {
+      "id": "solarith_xenocook",
+      "name": "Sand Oven",
+      "skill": "xenocook",
+      "position": { "x": -168, "z": -400 },
+      "interactRadius": 3,
+      "icon": "🍳"
+    },
+    {
+      "id": "citadel_circuitry",
+      "name": "Void Forge",
+      "skill": "circuitry",
+      "position": { "x": 28, "z": -910 },
+      "interactRadius": 3,
+      "icon": "🔧"
+    },
+    {
+      "id": "citadel_bioforge",
+      "name": "Phase Synthesizer",
+      "skill": "bioforge",
+      "position": { "x": 33, "z": -910 },
+      "interactRadius": 3,
+      "icon": "🧬"
+    },
+    {
+      "id": "citadel_xenocook",
+      "name": "Dimensional Cooker",
+      "skill": "xenocook",
+      "position": { "x": 38, "z": -910 },
+      "interactRadius": 3,
+      "icon": "🍳"
     }
   ]
 }

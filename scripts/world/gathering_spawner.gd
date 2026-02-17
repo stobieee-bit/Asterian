@@ -57,6 +57,78 @@ func _define_spawn_zones() -> void:
 		]
 	})
 
+	# Mycelium Hollows — Fungal gathering (xenobotany)
+	_spawn_defs.append({
+		"area": "mycelium-hollows",
+		"cx": 180.0, "cz": -150.0, "radius": 120.0,
+		"skill": "xenobotany",
+		"nodes": [
+			{"level": 5, "item": "glowcap_fungus", "color": Color(0.2, 0.9, 0.4), "count": 10},
+			{"level": 10, "item": "mycelium_strand", "color": Color(0.8, 0.8, 0.9), "count": 8},
+			{"level": 15, "item": "deeproot_bulb", "color": Color(0.6, 0.4, 0.2), "count": 6},
+		]
+	})
+
+	# Mycelium Hollows — Mineral deposits (astromining)
+	_spawn_defs.append({
+		"area": "mycelium-hollows",
+		"cx": 180.0, "cz": -150.0, "radius": 120.0,
+		"skill": "astromining",
+		"nodes": [
+			{"level": 5, "item": "fungite_ore", "color": Color(0.5, 0.6, 0.3), "count": 10},
+			{"level": 10, "item": "sporite_crystal", "color": Color(0.6, 0.9, 0.5), "count": 8},
+			{"level": 15, "item": "hollow_geode", "color": Color(0.4, 0.3, 0.5), "count": 6},
+		]
+	})
+
+	# Solarith Wastes — Desert flora (xenobotany)
+	_spawn_defs.append({
+		"area": "solarith-wastes",
+		"cx": -200.0, "cz": -500.0, "radius": 160.0,
+		"skill": "xenobotany",
+		"nodes": [
+			{"level": 35, "item": "sun_cactus", "color": Color(0.9, 0.7, 0.1), "count": 8},
+			{"level": 45, "item": "desert_thornvine", "color": Color(0.6, 0.5, 0.2), "count": 6},
+			{"level": 55, "item": "mirage_bloom", "color": Color(0.9, 0.4, 0.8), "count": 4},
+		]
+	})
+
+	# Solarith Wastes — Desert ores (astromining)
+	_spawn_defs.append({
+		"area": "solarith-wastes",
+		"cx": -200.0, "cz": -500.0, "radius": 160.0,
+		"skill": "astromining",
+		"nodes": [
+			{"level": 35, "item": "solarite_ore", "color": Color(1.0, 0.6, 0.1), "count": 8},
+			{"level": 40, "item": "amber_crystal", "color": Color(0.9, 0.7, 0.2), "count": 6},
+			{"level": 50, "item": "obsidian_ore", "color": Color(0.15, 0.1, 0.15), "count": 4},
+		]
+	})
+
+	# Void Citadel — Dimensional flora (xenobotany)
+	_spawn_defs.append({
+		"area": "void-citadel",
+		"cx": 0.0, "cz": -1000.0, "radius": 140.0,
+		"skill": "xenobotany",
+		"nodes": [
+			{"level": 65, "item": "dimensional_moss", "color": Color(0.3, 0.1, 0.6), "count": 6},
+			{"level": 75, "item": "void_bloom", "color": Color(0.5, 0.0, 0.8), "count": 4},
+			{"level": 85, "item": "architect_root", "color": Color(0.2, 0.3, 0.5), "count": 3},
+		]
+	})
+
+	# Void Citadel — Void minerals (astromining)
+	_spawn_defs.append({
+		"area": "void-citadel",
+		"cx": 0.0, "cz": -1000.0, "radius": 140.0,
+		"skill": "astromining",
+		"nodes": [
+			{"level": 65, "item": "void_crystal", "color": Color(0.4, 0.0, 0.7), "count": 6},
+			{"level": 75, "item": "phase_ore", "color": Color(0.3, 0.5, 0.9), "count": 4},
+			{"level": 85, "item": "singularity_shard_ore", "color": Color(0.1, 0.0, 0.3), "count": 3},
+		]
+	})
+
 func _spawn_all_nodes() -> void:
 	var total: int = 0
 	for zone in _spawn_defs:

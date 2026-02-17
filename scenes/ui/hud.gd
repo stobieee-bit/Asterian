@@ -566,12 +566,12 @@ func _build_panels() -> void:
 	_shop_panel.position = Vector2(500, 100)
 	add_child(_shop_panel)
 
-	# Crafting panel (center)
+	# Crafting panel (center — wider for split-panel layout)
 	_crafting_panel = PanelContainer.new()
 	_crafting_panel.set_script(crafting_script)
 	_crafting_panel.add_theme_stylebox_override("panel", panel_style.duplicate())
 	_crafting_panel.visible = false
-	_crafting_panel.position = Vector2(350, 100)
+	_crafting_panel.position = Vector2(vp_sz.x / 2.0 - 320, 80)
 	add_child(_crafting_panel)
 
 	# Quest panel (left-center)
@@ -999,6 +999,8 @@ func _on_chat_message(text: String, channel: String) -> void:
 	var label: Label = Label.new()
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.add_theme_font_size_override("font_size", 14)
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 	# Color by channel — slightly muted for a cleaner look
 	var color: Color
@@ -4175,8 +4177,10 @@ func _update_minimap_dots() -> void:
 	var tex_size: Vector2 = _minimap_tex_rect.size
 	var player_pos: Vector3 = _player.global_position
 	var cam_rot_y: float = _minimap_camera.global_rotation.y
-	var cos_r: float = cos(-cam_rot_y)
-	var sin_r: float = sin(-cam_rot_y)
+	# Forward rotation (world → screen): use +cam_rot_y
+	# (inverse -cam_rot_y is for screen → world, e.g. click-to-walk)
+	var cos_r: float = cos(cam_rot_y)
+	var sin_r: float = sin(cam_rot_y)
 
 	# Hide all dots first
 	for dot in _minimap_enemy_dots:

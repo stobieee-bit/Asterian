@@ -674,5 +674,362 @@
         ]
       }
     }
+  },
+  "mycologist_thren": {
+    "name": "Mycologist Thren",
+    "position": { "x": 150, "z": -100 },
+    "bodyColor": 2780490,
+    "headColor": 8961194,
+    "desc": "A cautious researcher studying the hollows' unique fungal ecosystem.",
+    "dialogue": {
+      "greeting": {
+        "text": "__QUEST_DYNAMIC__",
+        "options": []
+      },
+      "lore": {
+        "text": "The Mycelium Hollows formed when alien spores took root in the station's waste systems. Now it's a thriving ecosystem — beautiful and deadly.",
+        "options": [{ "label": "Interesting.", "next": null }]
+      }
+    }
+  },
+  "sporekeeper_ixil": {
+    "name": "Sporekeeper Ixil",
+    "position": { "x": 170, "z": -110 },
+    "bodyColor": 3833690,
+    "headColor": 11206075,
+    "desc": "A cheerful trader who harvests fungal products for sale.",
+    "shop": {
+      "name": "Ixil's Spore Market",
+      "specialty": "consumables",
+      "items": [
+        { "itemId": "spore_antidote", "price": 30, "stock": 40 },
+        { "itemId": "glowcap_tea", "price": 45, "stock": 30 },
+        { "itemId": "mycelium_wrap", "price": 65, "stock": 25 },
+        { "itemId": "fungal_tonic", "price": 90, "stock": 20 },
+        { "itemId": "luminescent_salve", "price": 110, "stock": 15 },
+        { "itemId": "rootsap_elixir", "price": 140, "stock": 10 }
+      ]
+    },
+    "dialogue": {
+      "greeting": {
+        "text": "Fresh spore products! Nothing beats my extracts for surviving the hollows.",
+        "options": [
+          { "label": "Show me your wares.", "action": "openShop" },
+          { "label": "No thanks.", "next": null }
+        ]
+      }
+    }
+  },
+  "tendril_hermit": {
+    "name": "Tendril the Hermit",
+    "position": { "x": 145, "z": -135 },
+    "bodyColor": 1727290,
+    "headColor": 7847833,
+    "desc": "An old gatherer who knows every node in the hollows.",
+    "shop": {
+      "name": "Tendril's Tool Shed",
+      "specialty": "gathering",
+      "items": [
+        { "itemId": "spore_harvester", "price": 55, "stock": 5 },
+        { "itemId": "mycelium_probe", "price": 55, "stock": 5 }
+      ]
+    },
+    "dialogue": {
+      "greeting": {
+        "text": "Down here, the fungus grows thick and the veins of ore run deep. Need tools for the job?",
+        "options": [
+          { "label": "Let me see your tools.", "action": "openShop" },
+          { "label": "Not right now.", "next": null }
+        ]
+      }
+    }
+  },
+  "captain_solara": {
+    "name": "Guard Captain Solara",
+    "position": { "x": 155, "z": -95 },
+    "bodyColor": 4876122,
+    "headColor": 13421772,
+    "desc": "Station guard posted at the hollows entrance. Assigns bounties on dangerous fungal creatures.",
+    "dialogue": {
+      "greeting": {
+        "text": "__SLAYER_DYNAMIC__",
+        "options": []
+      }
+    }
+  },
+  "forager_nim": {
+    "name": "Forager Nim",
+    "position": { "x": 210, "z": -190 },
+    "bodyColor": 2776906,
+    "headColor": 10076330,
+    "desc": "A brave forager who ventured too deep and set up camp in the Rootweb Depths.",
+    "dialogue": {
+      "greeting": {
+        "text": "__QUEST_DYNAMIC__",
+        "options": []
+      },
+      "deep_info": {
+        "text": "The Rootweb is where the real ecosystem begins. The fungi here are predatory — they sense vibrations. The Hulks are the apex — slow but devastatingly strong.",
+        "options": [{ "label": "Good to know.", "next": null }]
+      }
+    }
+  },
+  "banker_sprout": {
+    "name": "Banker Sprout",
+    "position": { "x": 165, "z": -105 },
+    "bodyColor": 3837786,
+    "headColor": 12316364,
+    "desc": "A mobile vault operator stationed at the hollows entrance.",
+    "dialogue": {
+      "greeting": {
+        "text": "Even underground, your valuables deserve proper storage. Shall I open the vault?",
+        "options": [
+          { "label": "Access my bank.", "action": "openBank" },
+          { "label": "Goodbye.", "next": null }
+        ]
+      }
+    }
+  },
+  "sandwalker_ren": {
+    "name": "Sandwalker Ren",
+    "position": { "x": -155, "z": -400 },
+    "bodyColor": 9141050,
+    "headColor": 14535816,
+    "desc": "A desert nomad who has mapped every dune and ruin in the Solarith Wastes.",
+    "dialogue": {
+      "greeting": {
+        "text": "__QUEST_DYNAMIC__",
+        "options": []
+      },
+      "lore": {
+        "text": "Solarith was a solar energy research station. When the containment fields failed, the concentrated solar energy fused the sand into glass and scorched everything. The automatons still follow their last orders.",
+        "options": [{ "label": "Fascinating.", "next": null }]
+      }
+    }
+  },
+  "dune_merchant_azara": {
+    "name": "Dune Merchant Azara",
+    "position": { "x": -160, "z": -405 },
+    "bodyColor": 10193226,
+    "headColor": 15654297,
+    "desc": "A resourceful trader who hauls goods across the desert.",
+    "shop": {
+      "name": "Azara's Desert Outpost",
+      "specialty": "equipment",
+      "items": [
+        { "itemId": "duranium_nanoblade", "price": 800, "stock": 2 },
+        { "itemId": "duranium_coilgun", "price": 800, "stock": 2 },
+        { "itemId": "duranium_voidstaff", "price": 800, "stock": 2 },
+        { "itemId": "duranium_helmet", "price": 500, "stock": 3 },
+        { "itemId": "duranium_vest", "price": 700, "stock": 2 },
+        { "itemId": "duranium_legs", "price": 600, "stock": 3 },
+        { "itemId": "duranium_boots", "price": 400, "stock": 3 },
+        { "itemId": "duranium_gloves", "price": 400, "stock": 3 },
+        { "itemId": "solar_ration", "price": 120, "stock": 30 },
+        { "itemId": "heat_shield_flask", "price": 180, "stock": 20 }
+      ]
+    },
+    "dialogue": {
+      "greeting": {
+        "text": "Desert survival essentials and fine equipment! What'll it be?",
+        "options": [
+          { "label": "Show me your stock.", "action": "openShop" },
+          { "label": "Not today.", "next": null }
+        ]
+      }
+    }
+  },
+  "dr_solenne": {
+    "name": "Dr. Solenne",
+    "position": { "x": -220, "z": -555 },
+    "bodyColor": 8088378,
+    "headColor": 13421943,
+    "desc": "A driven archaeologist excavating the ancient solar research facility buried in Obsidian Canyon.",
+    "dialogue": {
+      "greeting": {
+        "text": "__QUEST_DYNAMIC__",
+        "options": []
+      },
+      "discovery_info": {
+        "text": "The automatons weren't guards — they were researchers. Synthetic intelligences tasked with perfecting solar energy. When the containment failed, their programming corrupted.",
+        "options": [{ "label": "Remarkable.", "next": null }]
+      }
+    }
+  },
+  "forge_smith_korvus": {
+    "name": "Forge-Smith Korvus",
+    "position": { "x": -165, "z": -410 },
+    "bodyColor": 7035178,
+    "headColor": 12303206,
+    "desc": "A massive smith who maintains a portable forge in the desert.",
+    "shop": {
+      "name": "Korvus's Solar Forge",
+      "specialty": "crafting",
+      "items": [
+        { "itemId": "solar_ingot", "price": 200, "stock": 15 },
+        { "itemId": "obsidian_shard", "price": 300, "stock": 10 },
+        { "itemId": "heat_core", "price": 450, "stock": 5 },
+        { "itemId": "solar_plating", "price": 550, "stock": 3 }
+      ]
+    },
+    "dialogue": {
+      "greeting": {
+        "text": "The desert sun fuels my forge. Need materials or repairs?",
+        "options": [
+          { "label": "Show me your materials.", "action": "openShop" },
+          { "label": "Maybe later.", "next": null }
+        ]
+      }
+    }
+  },
+  "scout_veyla": {
+    "name": "Scout Veyla",
+    "position": { "x": -150, "z": -395 },
+    "bodyColor": 8092490,
+    "headColor": 13421960,
+    "desc": "A veteran desert scout who tracks the most dangerous creatures in the Solarith Wastes.",
+    "dialogue": {
+      "greeting": {
+        "text": "__SLAYER_DYNAMIC__",
+        "options": []
+      }
+    }
+  },
+  "oasis_keeper_maren": {
+    "name": "Oasis Keeper Maren",
+    "position": { "x": -170, "z": -415 },
+    "bodyColor": 4885610,
+    "headColor": 8961194,
+    "desc": "Maintains a secure vault at the desert oasis trading post.",
+    "dialogue": {
+      "greeting": {
+        "text": "The desert may shift, but your vault stays put. Need to stash or grab something?",
+        "options": [
+          { "label": "Access my bank.", "action": "openBank" },
+          { "label": "Goodbye.", "next": null }
+        ]
+      }
+    }
+  },
+  "warden_eidolon": {
+    "name": "Warden Eidolon",
+    "position": { "x": 25, "z": -910 },
+    "bodyColor": 4860523,
+    "headColor": 11175884,
+    "desc": "The last functioning guardian AI of the citadel, manifested as a translucent humanoid figure.",
+    "dialogue": {
+      "greeting": {
+        "text": "__QUEST_DYNAMIC__",
+        "options": []
+      },
+      "lore": {
+        "text": "This citadel was constructed by the Architects — a civilization that mastered void energy manipulation. They created the singularity to power interdimensional travel. When it destabilized, reality fractured.",
+        "options": [{ "label": "Understood.", "next": null }]
+      }
+    }
+  },
+  "phantom_vendor_zyra": {
+    "name": "Phantom Vendor Zyra",
+    "position": { "x": 30, "z": -915 },
+    "bodyColor": 3807579,
+    "headColor": 10058683,
+    "desc": "A spectral merchant who trades in void-forged equipment.",
+    "shop": {
+      "name": "Zyra's Void Emporium",
+      "specialty": "equipment",
+      "items": [
+        { "itemId": "titanex_nanoblade", "price": 2500, "stock": 1 },
+        { "itemId": "titanex_coilgun", "price": 2500, "stock": 1 },
+        { "itemId": "titanex_voidstaff", "price": 2500, "stock": 1 },
+        { "itemId": "titanex_helmet", "price": 1500, "stock": 2 },
+        { "itemId": "titanex_vest", "price": 2000, "stock": 1 },
+        { "itemId": "titanex_legs", "price": 1800, "stock": 2 },
+        { "itemId": "titanex_boots", "price": 1200, "stock": 2 },
+        { "itemId": "titanex_gloves", "price": 1200, "stock": 2 },
+        { "itemId": "void_elixir", "price": 350, "stock": 15 },
+        { "itemId": "singularity_shard_item", "price": 500, "stock": 8 }
+      ]
+    },
+    "dialogue": {
+      "greeting": {
+        "text": "The void provides for those who dare to trade in its currency. Interested in my wares?",
+        "options": [
+          { "label": "Show me what you have.", "action": "openShop" },
+          { "label": "Not right now.", "next": null }
+        ]
+      }
+    }
+  },
+  "echo_sage_vael": {
+    "name": "Echo-Sage Vael",
+    "position": { "x": -15, "z": -1045 },
+    "bodyColor": 2755659,
+    "headColor": 8939178,
+    "desc": "A being caught between dimensions — partially phased out of reality.",
+    "dialogue": {
+      "greeting": {
+        "text": "__QUEST_DYNAMIC__",
+        "options": []
+      },
+      "origin_info": {
+        "text": "I was Chief Resonance Engineer when the singularity first destabilized. I attempted emergency phase-shift to survive. Now I exist between dimensions — not alive, not dead.",
+        "options": [{ "label": "I see.", "next": null }]
+      }
+    }
+  },
+  "arms_master_kethis": {
+    "name": "Arms-Master Kethis",
+    "position": { "x": 20, "z": -905 },
+    "bodyColor": 5905275,
+    "headColor": 12298461,
+    "desc": "A battle-hardened warrior fighting the citadel's corrupted denizens. Assigns the most dangerous hunting contracts.",
+    "dialogue": {
+      "greeting": {
+        "text": "__SLAYER_DYNAMIC__",
+        "options": []
+      }
+    }
+  },
+  "void_smith_orin": {
+    "name": "Void-Smith Orin",
+    "position": { "x": 35, "z": -920 },
+    "bodyColor": 3810907,
+    "headColor": 11175884,
+    "desc": "A master craftsman who has learned to work void-infused materials.",
+    "shop": {
+      "name": "Orin's Void Forge",
+      "specialty": "crafting",
+      "items": [
+        { "itemId": "void_alloy", "price": 400, "stock": 10 },
+        { "itemId": "phase_crystal", "price": 600, "stock": 6 },
+        { "itemId": "singularity_fragment", "price": 900, "stock": 3 },
+        { "itemId": "architect_blueprint", "price": 1500, "stock": 2 }
+      ]
+    },
+    "dialogue": {
+      "greeting": {
+        "text": "Void-forged materials require a steady hand and an understanding of dimensional stress. Need supplies?",
+        "options": [
+          { "label": "Show me your materials.", "action": "openShop" },
+          { "label": "Not now.", "next": null }
+        ]
+      }
+    }
+  },
+  "dimensional_banker": {
+    "name": "Dimensional Banker",
+    "position": { "x": 15, "z": -905 },
+    "bodyColor": 4868715,
+    "headColor": 11184812,
+    "desc": "A banking terminal that operates across dimensional boundaries.",
+    "dialogue": {
+      "greeting": {
+        "text": "Dimensional vault link established. Your assets are secure across all phase states.",
+        "options": [
+          { "label": "Access my bank.", "action": "openBank" },
+          { "label": "Goodbye.", "next": null }
+        ]
+      }
+    }
   }
 }
