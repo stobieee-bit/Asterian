@@ -149,31 +149,36 @@ func _spawn_all_nodes() -> void:
 			max_level = maxi(max_level, lv)
 		var level_range: int = max_level - min_level
 
-		# Pick a random-but-deterministic cluster direction per zone
+		# Pick a random-but-deterministic base cluster direction per zone
 		var zone_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 		zone_rng.seed = hash(str(cx) + str(cz) + skill)
 		var cluster_angle: float = zone_rng.randf() * TAU
+		var num_tiers: int = nodes.size()
 
-		for node_def in nodes:
+		for tier_idx in range(num_tiers):
+			var node_def: Dictionary = nodes[tier_idx]
 			var level: int = int(node_def["level"])
 			var item_id: String = str(node_def["item"])
 			var color: Color = node_def["color"]
 			var count: int = int(node_def["count"])
 
-			# Level-based cluster offset: low levels near center, high levels toward edge
-			# along the cluster_angle direction
+			# Each tier gets its own angular direction (starburst pattern)
+			var tier_angle: float = cluster_angle + float(tier_idx) / float(num_tiers) * TAU
+
+			# Level-based radial offset: always at least 15% from center
 			var level_frac: float = 0.0
 			if level_range > 0:
 				level_frac = float(level - min_level) / float(level_range)
-			var cluster_dist: float = level_frac * radius * 0.5
-			var cluster_cx: float = cx + cos(cluster_angle) * cluster_dist
-			var cluster_cz: float = cz + sin(cluster_angle) * cluster_dist
-			# Tighter scatter for each tier — nodes of same level stay together
-			var scatter_r: float = radius * 0.3 if level_range > 0 else radius * 0.85
+			var cluster_dist: float = (radius * 0.15) + level_frac * radius * 0.45
+			var cluster_cx: float = cx + cos(tier_angle) * cluster_dist
+			var cluster_cz: float = cz + sin(tier_angle) * cluster_dist
+			# Tighter scatter per tier — keeps tiers distinct without overlapping
+			var scatter_r: float = radius * 0.2 if level_range > 0 else radius * 0.85
+			var min_scatter: float = maxf(5.0, scatter_r * 0.15)
 
 			for i in range(count):
 				var angle: float = randf() * TAU
-				var dist: float = randf_range(3.0, scatter_r)
+				var dist: float = randf_range(min_scatter, scatter_r)
 				var gx: float = cluster_cx + cos(angle) * dist
 				var gz: float = cluster_cz + sin(angle) * dist
 				var gy: float = 0.1

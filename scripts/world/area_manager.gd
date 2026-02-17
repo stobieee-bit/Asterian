@@ -2698,6 +2698,22 @@ func _add_area_boundaries() -> void:
 			if in_corridor:
 				continue
 
+			# Skip this segment if it falls inside another area (overlap zone)
+			var in_other_area: bool = false
+			for other_id in _area_bodies:
+				if other_id == area_id:
+					continue
+				var other_info: Dictionary = _area_bodies[other_id]
+				var oc: Vector3 = other_info["center"]
+				var or_radius: float = float(other_info["radius"])
+				var odx: float = wx - oc.x
+				var odz: float = wz - oc.z
+				if sqrt(odx * odx + odz * odz) < or_radius:
+					in_other_area = true
+					break
+			if in_other_area:
+				continue
+
 			# Place an invisible wall segment
 			var wall := StaticBody3D.new()
 			wall.collision_layer = 1
