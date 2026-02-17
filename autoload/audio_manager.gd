@@ -651,13 +651,17 @@ func _generate_footstep() -> AudioStreamWAV:
 func _generate_all_ambient() -> void:
 	_ambient_streams["station-hub"] = _generate_ambient_station_hub()
 	_ambient_streams["gathering-grounds"] = _generate_ambient_gathering_grounds()
-	_ambient_streams["alien-wastes"] = _generate_ambient_alien_wastes()
+	var wastes_ambient: AudioStreamWAV = _generate_ambient_alien_wastes()
+	_ambient_streams["spore-marshes"] = wastes_ambient
+	_ambient_streams["hive-tunnels"] = wastes_ambient
+	_ambient_streams["fungal-wastes"] = wastes_ambient
+	_ambient_streams["stalker-reaches"] = wastes_ambient
 	_ambient_streams["the-abyss"] = _generate_ambient_the_abyss()
 	_ambient_streams["asteroid-mines"] = _generate_ambient_asteroid_mines()
 	_ambient_streams["bio-research-lab"] = _generate_ambient_bio_research_lab()
 	## Corrupted variants (glitchy distorted versions)
 	_ambient_streams["corrupted-gathering-grounds"] = _generate_ambient_corrupted("gathering-grounds")
-	_ambient_streams["corrupted-alien-wastes"] = _generate_ambient_corrupted("alien-wastes")
+	_ambient_streams["corrupted-wastes"] = _generate_ambient_corrupted("spore-marshes")
 	_ambient_streams["corrupted-the-abyss"] = _generate_ambient_corrupted("the-abyss")
 
 
@@ -816,7 +820,7 @@ func _generate_ambient_corrupted(base_area: String) -> AudioStreamWAV:
 	match base_area:
 		"gathering-grounds":
 			base_freq = 220.0
-		"alien-wastes":
+		"spore-marshes", "hive-tunnels", "fungal-wastes", "stalker-reaches":
 			base_freq = 50.0
 		"the-abyss":
 			base_freq = 45.0

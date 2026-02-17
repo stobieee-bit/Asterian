@@ -15,7 +15,7 @@ var recipes: Dictionary = {}
 var enemies: Dictionary = {}
 var enemy_defs: Array = []
 var areas: Dictionary = {}
-var corrupted_areas: Dictionary = {}
+var area_requirements: Dictionary = {}  # area_id -> { combat_level, quest }
 var area_atmosphere: Dictionary = {}
 var corridors: Array = []
 var area_level_ranges: Dictionary = {}
@@ -72,7 +72,11 @@ func _load_all_data() -> void:
 	# Areas (compound file)
 	var area_data: Dictionary = _load_json("res://data/areas.json")
 	areas = area_data.get("areas", {})
-	corrupted_areas = area_data.get("corrupted_areas", {})
+	# Build requirements lookup from area data
+	for area_id in areas:
+		var reqs: Dictionary = areas[area_id].get("requirements", {})
+		if reqs.size() > 0:
+			area_requirements[area_id] = reqs
 	area_atmosphere = area_data.get("atmosphere", {})
 	corridors = area_data.get("corridors", [])
 	area_level_ranges = area_data.get("level_ranges", {})
@@ -143,7 +147,7 @@ func _load_all_data() -> void:
 	print("  Items: %d" % items.size())
 	print("  Recipes: %d" % recipes.size())
 	print("  Enemies: %d" % enemies.size())
-	print("  Areas: %d + %d corrupted" % [areas.size(), corrupted_areas.size()])
+	print("  Areas: %d (%d gated)" % [areas.size(), area_requirements.size()])
 	print("  Skills: %d" % skill_defs.size())
 	print("  Quests: %d + %d board" % [quests.size(), board_quests.size()])
 	print("  NPCs: %d" % npcs.size())
@@ -194,9 +198,11 @@ func get_enemy(enemy_id: String) -> Dictionary:
 func get_area(area_id: String) -> Dictionary:
 	if areas.has(area_id):
 		return areas[area_id]
-	if corrupted_areas.has(area_id):
-		return corrupted_areas[area_id]
 	return {}
+
+## Get area requirements. Returns empty dict if area has no requirements (always open).
+func get_area_requirements(area_id: String) -> Dictionary:
+	return area_requirements.get(area_id, {})
 
 ## Get atmosphere settings for an area. Returns empty dict if not found.
 func get_atmosphere(area_id: String) -> Dictionary:
@@ -239,12 +245,10 @@ func level_for_xp(xp: int) -> int:
 			return i + 1
 	return 1
 
-## Get all area IDs (including corrupted)
+## Get all area IDs
 func get_all_area_ids() -> Array[String]:
 	var ids: Array[String] = []
 	for key in areas.keys():
-		ids.append(key)
-	for key in corrupted_areas.keys():
 		ids.append(key)
 	return ids
 

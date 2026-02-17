@@ -104,12 +104,17 @@
   "area_theme_map": {
     "station-hub": "industrial",
     "asteroid-mines": "industrial",
-    "alien-wastes": "organic",
+    "spore-marshes": "organic",
+    "hive-tunnels": "organic",
+    "fungal-wastes": "organic",
+    "stalker-reaches": "crystalline",
     "gathering-grounds": "organic",
     "the-abyss": "crystalline",
     "bio-lab": "lab",
-    "corrupted-wastes": "corrupted",
-    "corrupted-abyss": "corrupted"
+    "mycelium-hollows": "organic",
+    "solarith-wastes": "industrial",
+    "void-citadel": "crystalline",
+    "corrupted-wastes": "corrupted"
   },
   "modifiers": {
     "vampiric": {

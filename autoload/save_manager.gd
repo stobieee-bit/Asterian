@@ -10,7 +10,7 @@ const BACKUP_PATH := "user://save_data_backup.json"
 ## Save current game state to disk
 func save_game() -> bool:
 	var data: Dictionary = GameState.to_save_data()
-	data["save_version"] = 1
+	data["save_version"] = 2
 	data["save_timestamp"] = Time.get_unix_time_from_system()
 
 	# Save achievement system internal counters
@@ -58,6 +58,11 @@ func load_game() -> bool:
 			return false
 		print("SaveManager: Restored from backup successfully.")
 
+	# ── Save migration ──
+	var version: int = int(data.get("save_version", 0))
+	if version < 2:
+		data = _migrate_v1_to_v2(data)
+
 	GameState.from_save_data(data)
 
 	# Restore achievement system internal counters
@@ -98,3 +103,30 @@ func delete_save() -> void:
 		print("SaveManager: Save file deleted.")
 	if FileAccess.file_exists(BACKUP_PATH):
 		DirAccess.remove_absolute(BACKUP_PATH)
+
+# ── Save migration helpers ──
+
+## Migrate v1 (alien-wastes single area) to v2 (4 separate areas)
+func _migrate_v1_to_v2(data: Dictionary) -> Dictionary:
+	print("SaveManager: Migrating save v1 -> v2 (alien-wastes split)")
+
+	# If player was in the removed alien-wastes, relocate to spore-marshes
+	var area: String = data.get("current_area", "station-hub")
+	if area == "alien-wastes":
+		data["current_area"] = "spore-marshes"
+		# Reset position to station hub for safety
+		data["position"] = { "x": 0, "y": 0, "z": 0 }
+		print("  Relocated player from alien-wastes -> spore-marshes (Station Hub)")
+
+	# Migrate visited_areas — replace alien-wastes with all 4 replacement areas
+	var visited: Array = data.get("visited_areas", [])
+	if "alien-wastes" in visited:
+		visited.erase("alien-wastes")
+		for new_area in ["spore-marshes", "hive-tunnels", "fungal-wastes", "stalker-reaches"]:
+			if new_area not in visited:
+				visited.append(new_area)
+		data["visited_areas"] = visited
+		print("  Migrated visited_areas: alien-wastes -> 4 new areas")
+
+	data["save_version"] = 2
+	return data

@@ -2728,6 +2728,19 @@ static func _generate_misc(icon_id: String) -> Image:
 		"location_pin": _draw_misc_location_pin(i)
 		"food": _draw_drumstick(i)
 		"special_attack": _draw_misc_special_attack(i)
+		# ── UI Action Bar Icons ──
+		"ui_bag": _draw_ui_bag(i)
+		"ui_equip": _draw_ui_equip(i)
+		"ui_skills": _draw_ui_skills(i)
+		"ui_quests": _draw_ui_quests(i)
+		"ui_bestiary": _draw_ui_bestiary(i)
+		"ui_prestige": _draw_ui_prestige(i)
+		"ui_dungeon": _draw_ui_dungeon(i)
+		"ui_pets": _draw_ui_pets(i)
+		"ui_achieve": _draw_ui_achieve(i)
+		"ui_settings": _draw_ui_settings(i)
+		"ui_help": _draw_ui_help(i)
+		"ui_map": _draw_ui_map(i)
 		_: return null
 	return i
 
@@ -2799,3 +2812,186 @@ static func _draw_misc_special_attack(i: Image) -> void:
 	_px(i, 8, 7, C_WHITE)
 	_px(i, 7, 8, C_WHITE)
 	_px(i, 8, 8, C_WHITE)
+
+# ═══════════════════════════════════════════
+#  UI ACTION BAR ICONS (16x16 pixel art)
+# ═══════════════════════════════════════════
+
+static func _draw_ui_bag(i: Image) -> void:
+	# Cyan backpack / satchel
+	_rect(i, 4, 5, 8, 9, C_TEAL)          # Body
+	_rect(i, 5, 6, 6, 7, C_CYAN)          # Front panel
+	_hline(i, 6, 3, 4, C_TEAL)            # Top strap
+	_px(i, 5, 4, C_TEAL)
+	_px(i, 10, 4, C_TEAL)
+	_hline(i, 6, 8, 4, C_NCYAN)           # Buckle/clasp
+	_px(i, 7, 7, C_WHITE)                 # Highlight
+
+static func _draw_ui_equip(i: Image) -> void:
+	# Cyan shield outline
+	_hline(i, 5, 2, 6, C_CYAN)            # Top edge
+	_vline(i, 4, 3, 6, C_TEAL)            # Left
+	_vline(i, 11, 3, 6, C_TEAL)           # Right
+	_rect(i, 5, 3, 6, 6, C_NAVY)          # Inner
+	_px(i, 5, 9, C_TEAL)
+	_px(i, 10, 9, C_TEAL)
+	_hline(i, 6, 10, 4, C_TEAL)           # Bottom taper
+	_hline(i, 7, 11, 2, C_TEAL)
+	_px(i, 7, 12, C_CYAN)                 # Point
+	# Cross on shield
+	_vline(i, 7, 4, 4, C_CYAN)
+	_hline(i, 6, 6, 4, C_CYAN)
+
+static func _draw_ui_skills(i: Image) -> void:
+	# Green upward arrow / growth
+	_vline(i, 7, 2, 11, C_GREEN)          # Shaft
+	_vline(i, 8, 2, 11, C_GREEN)
+	# Arrowhead
+	_px(i, 5, 5, C_GREEN)
+	_px(i, 6, 4, C_GREEN)
+	_px(i, 7, 3, C_NGREEN)
+	_px(i, 8, 3, C_NGREEN)
+	_px(i, 9, 4, C_GREEN)
+	_px(i, 10, 5, C_GREEN)
+	# Base marks
+	_hline(i, 5, 12, 6, C_DGREEN)
+
+static func _draw_ui_quests(i: Image) -> void:
+	# Purple scroll / parchment
+	_rect(i, 4, 3, 8, 10, C_DPURPLE)      # Scroll body
+	_rect(i, 5, 4, 6, 8, C_PURPLE)        # Inner
+	# Text lines
+	_hline(i, 6, 5, 4, C_WHITE)
+	_hline(i, 6, 7, 3, C_LGRAY)
+	_hline(i, 6, 9, 4, C_LGRAY)
+	# Scroll caps
+	_hline(i, 3, 3, 2, C_PURPLE)
+	_hline(i, 11, 3, 2, C_PURPLE)
+	_hline(i, 3, 12, 2, C_PURPLE)
+	_hline(i, 11, 12, 2, C_PURPLE)
+
+static func _draw_ui_bestiary(i: Image) -> void:
+	# Red skull / creature head
+	_rect(i, 5, 3, 6, 6, C_RED)           # Head
+	_rect(i, 6, 4, 4, 4, C_CRIMSON)       # Face
+	# Eyes
+	_px(i, 6, 5, C_WHITE)
+	_px(i, 9, 5, C_WHITE)
+	# Jaw
+	_hline(i, 6, 9, 4, C_RED)
+	_px(i, 6, 10, C_CRIMSON)
+	_px(i, 9, 10, C_CRIMSON)
+	# Horns
+	_px(i, 4, 3, C_CRIMSON)
+	_px(i, 4, 2, C_RED)
+	_px(i, 11, 3, C_CRIMSON)
+	_px(i, 11, 2, C_RED)
+
+static func _draw_ui_prestige(i: Image) -> void:
+	# Gold star / crown
+	_px(i, 7, 2, C_WHITE)                 # Top point
+	_px(i, 7, 3, C_GOLD)
+	_px(i, 8, 2, C_WHITE)
+	_px(i, 8, 3, C_GOLD)
+	_hline(i, 5, 4, 6, C_GOLD)
+	_hline(i, 4, 5, 8, C_AMBER)
+	_hline(i, 3, 6, 10, C_GOLD)
+	_hline(i, 4, 7, 8, C_AMBER)
+	_hline(i, 5, 8, 6, C_GOLD)
+	_hline(i, 6, 9, 4, C_DGOLD)
+	# Sparkle accents
+	_px(i, 6, 5, C_WHITE)
+	_px(i, 9, 5, C_WHITE)
+	_px(i, 7, 7, C_WHITE)
+
+static func _draw_ui_dungeon(i: Image) -> void:
+	# Orange doorway / entrance
+	_rect(i, 4, 3, 8, 10, C_DGRAY)        # Door frame
+	_rect(i, 5, 4, 6, 9, C_BLACK)         # Dark interior
+	# Arch
+	_hline(i, 5, 3, 6, C_ORANGE)
+	_px(i, 4, 4, C_ORANGE)
+	_px(i, 11, 4, C_ORANGE)
+	_vline(i, 4, 5, 8, C_AMBER)           # Left pillar
+	_vline(i, 11, 5, 8, C_AMBER)          # Right pillar
+	# Key hole
+	_px(i, 7, 8, C_ORANGE)
+	_px(i, 8, 8, C_ORANGE)
+	_vline(i, 7, 9, 2, C_AMBER)
+
+static func _draw_ui_pets(i: Image) -> void:
+	# Purple creature companion
+	_rect(i, 5, 4, 6, 5, C_PURPLE)        # Body
+	_rect(i, 6, 3, 4, 2, C_PURPLE)        # Head
+	# Eyes
+	_px(i, 6, 3, C_WHITE)
+	_px(i, 9, 3, C_WHITE)
+	# Ears
+	_px(i, 5, 2, C_DPURPLE)
+	_px(i, 10, 2, C_DPURPLE)
+	# Legs
+	_vline(i, 5, 9, 3, C_DPURPLE)
+	_vline(i, 10, 9, 3, C_DPURPLE)
+	# Tail
+	_px(i, 11, 6, C_DPURPLE)
+	_px(i, 12, 5, C_PURPLE)
+
+static func _draw_ui_achieve(i: Image) -> void:
+	# Gold trophy / medal
+	_rect(i, 5, 3, 6, 5, C_GOLD)          # Cup body
+	_rect(i, 6, 4, 4, 3, C_AMBER)         # Cup inner
+	_px(i, 7, 5, C_WHITE)                 # Shine
+	# Handles
+	_px(i, 4, 4, C_DGOLD)
+	_px(i, 4, 5, C_DGOLD)
+	_px(i, 11, 4, C_DGOLD)
+	_px(i, 11, 5, C_DGOLD)
+	# Base
+	_hline(i, 6, 8, 4, C_DGOLD)
+	_hline(i, 5, 9, 6, C_GOLD)
+	# Star on cup
+	_px(i, 7, 4, C_WHITE)
+	_px(i, 8, 4, C_WHITE)
+
+static func _draw_ui_settings(i: Image) -> void:
+	# Gray gear / cog
+	_circle(i, 7, 7, 3, C_GRAY)
+	_circle(i, 7, 7, 1, C_DGRAY)
+	# Teeth
+	_px(i, 7, 2, C_LGRAY); _px(i, 8, 2, C_LGRAY)
+	_px(i, 7, 12, C_LGRAY); _px(i, 8, 12, C_LGRAY)
+	_px(i, 2, 7, C_LGRAY); _px(i, 2, 8, C_LGRAY)
+	_px(i, 12, 7, C_LGRAY); _px(i, 12, 8, C_LGRAY)
+	_px(i, 4, 4, C_LGRAY); _px(i, 11, 4, C_LGRAY)
+	_px(i, 4, 11, C_LGRAY); _px(i, 11, 11, C_LGRAY)
+	# Center dot
+	_px(i, 7, 7, C_WHITE)
+
+static func _draw_ui_help(i: Image) -> void:
+	# Cyan question mark
+	_hline(i, 5, 3, 5, C_CYAN)
+	_px(i, 10, 4, C_CYAN)
+	_px(i, 10, 5, C_CYAN)
+	_px(i, 9, 6, C_CYAN)
+	_px(i, 8, 7, C_NCYAN)
+	_px(i, 7, 7, C_NCYAN)
+	_px(i, 7, 8, C_CYAN)
+	# Dot
+	_px(i, 7, 10, C_WHITE)
+	_px(i, 8, 10, C_WHITE)
+
+static func _draw_ui_map(i: Image) -> void:
+	# Blue/cyan world map
+	_rect(i, 3, 3, 10, 9, C_NAVY)         # Background
+	_rect(i, 4, 4, 8, 7, C_BLUE)          # Map area
+	# Grid lines
+	_hline(i, 4, 6, 8, C_NAVY)
+	_hline(i, 4, 8, 8, C_NAVY)
+	_vline(i, 6, 4, 7, C_NAVY)
+	_vline(i, 9, 4, 7, C_NAVY)
+	# Location markers
+	_px(i, 5, 5, C_NCYAN)
+	_px(i, 8, 7, C_NGREEN)
+	_px(i, 10, 5, C_GOLD)
+	# Player dot
+	_px(i, 7, 7, C_WHITE)

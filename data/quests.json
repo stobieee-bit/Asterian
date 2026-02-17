@@ -2,7 +2,7 @@
   "quests": {
     "first_blood": {
       "name": "First Blood",
-      "desc": "Commander Vex wants you to prove yourself. Defeat 5 Chithari in the Alien Wastes.",
+      "desc": "Commander Vex wants you to prove yourself. Defeat 5 Chithari in the Spore Marshes.",
       "giver": "commander_vex",
       "steps": [
         {
@@ -117,7 +117,7 @@
     },
     "into_the_wastes": {
       "name": "Into the Wastes",
-      "desc": "The Alien Wastes are overrun. Destroy the Voidjelly and take down a Sporeclaw.",
+      "desc": "The deeper wastes are overrun. Destroy the Voidjelly and take down a Sporeclaw.",
       "giver": "commander_vex",
       "steps": [
         {
@@ -679,7 +679,7 @@
   "board_quests": {
     "board_pest_control": {
       "name": "Pest Control",
-      "desc": "Clear out Chithari pests from the Alien Wastes.",
+      "desc": "Clear out Chithari pests from the Spore Marshes.",
       "steps": [
         {
           "type": "kill",

@@ -1,6 +1,6 @@
 ## AreaManager — Builds a richly detailed 3D sci-fi world from JSON area data
 ##
-## Reads AREAS, CORRUPTED_AREAS, and CORRIDORS from DataManager and generates:
+## Reads AREAS and CORRIDORS from DataManager and generates:
 ## - Ground discs for each area (CSGCylinder3D) with layered detail
 ## - Corridor ground boxes with guide lights and wall structures
 ## - Environmental props: energy pylons, tech panels, alien flora, crystals,
@@ -44,6 +44,7 @@ func _ready() -> void:
 		push_warning("AreaManager: Terrain3D node not found — height queries will return 0")
 	_build_areas()
 	_build_corridors()
+	_build_corridor_gates()
 	_add_area_boundaries()
 	_add_safety_floor()
 	await get_tree().process_frame
@@ -72,12 +73,19 @@ func _find_terrain3d(node: Node):
 			return found
 	return null
 
+var _gate_update_timer: float = 0.0
+
 func _process(delta: float) -> void:
 	if _player == null:
 		_player = get_tree().get_first_node_in_group("player")
 		return
 	_check_area_transition()
 	_animate_world(delta)
+	# Update gate barrier colors every 2 seconds (not every frame)
+	_gate_update_timer += delta
+	if _gate_update_timer >= 2.0:
+		_gate_update_timer = 0.0
+		_update_gate_barriers()
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  WORLD BUILDING
@@ -86,8 +94,6 @@ func _process(delta: float) -> void:
 func _build_areas() -> void:
 	for area_id in DataManager.areas:
 		_create_area_ground(area_id, DataManager.areas[area_id])
-	for area_id in DataManager.corrupted_areas:
-		_create_area_ground(area_id, DataManager.corrupted_areas[area_id])
 	print("AreaManager: Built %d area grounds" % _area_bodies.size())
 
 func _create_area_ground(area_id: String, data: Dictionary) -> void:
@@ -130,8 +136,9 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	var y_base: float = floor_y
 
 	# ── Build all detail layers ──
-	# Bio-Lab is a small crafting hub — skip heavy clutter, keep it clean
-	var _is_clean_area: bool = area_id == "bio-lab"
+	# Bio-Lab and Station Hub are structured hubs — skip random clutter to avoid
+	# clipping with hand-placed structures (shops, landing pad, control tower, etc.)
+	var _is_clean_area: bool = area_id == "bio-lab" or area_id == "station-hub"
 
 	# Ground variation, terrain bumps, concentric rings, grid lines are all replaced
 	# by the procedural terrain mesh (noise height + vertex colors)
@@ -252,7 +259,10 @@ func _clutter_density(area_id: String) -> float:
 		"station-hub":       return 0.5   # town hub, keep some bustle but not overwhelming
 		"the-abyss":         return 0.35  # supposed to feel empty and ominous
 		"corrupted-wastes":  return 0.5   # small area, moderate clutter
-		"alien-wastes":      return 0.5   # huge area with sub-zones providing detail
+		"spore-marshes":     return 0.6
+		"hive-tunnels":      return 0.5
+		"fungal-wastes":     return 0.5
+		"stalker-reaches":   return 0.4
 		"bio-lab":           return 0.0   # already handled by _is_clean_area
 		_:                   return 1.0
 
@@ -494,8 +504,8 @@ func _add_light_columns(area_id: String, cx: float, cz: float, radius: float,
 func _add_crystals(area_id: String, cx: float, cz: float, radius: float,
 		base_color: Color, y_base: float) -> void:
 	var crystal_areas: Array[String] = [
-		"alien-wastes", "the-abyss", "asteroid-mines",
-		"corrupted-wastes", "corrupted-abyss"
+		"spore-marshes", "hive-tunnels", "fungal-wastes", "stalker-reaches",
+		"the-abyss", "asteroid-mines", "corrupted-wastes"
 	]
 	if area_id not in crystal_areas:
 		return
@@ -563,11 +573,11 @@ func _add_crystals(area_id: String, cx: float, cz: float, radius: float,
 				sub.material = cryst_mat
 				add_child(sub)
 
-## Alien flora — bioluminescent plants for safe/gathering areas and alien wastes
+## Alien flora — bioluminescent plants for safe/gathering areas and marsh/fungal zones
 func _add_alien_flora(area_id: String, cx: float, cz: float, radius: float,
 		base_color: Color, y_base: float) -> void:
 	var flora_areas: Array[String] = [
-		"gathering-grounds", "alien-wastes", "station-hub", "bio-lab"
+		"gathering-grounds", "spore-marshes", "fungal-wastes"
 	]
 	if area_id not in flora_areas:
 		return
@@ -787,8 +797,8 @@ func _add_pipe_structures(area_id: String, cx: float, cz: float, radius: float,
 func _add_ruined_walls(area_id: String, cx: float, cz: float, radius: float,
 		base_color: Color, y_base: float) -> void:
 	var ruin_areas: Array[String] = [
-		"alien-wastes", "the-abyss", "corrupted-wastes", "corrupted-abyss",
-		"asteroid-mines"
+		"spore-marshes", "hive-tunnels", "fungal-wastes", "stalker-reaches",
+		"the-abyss", "corrupted-wastes", "asteroid-mines"
 	]
 	if area_id not in ruin_areas:
 		return
@@ -846,8 +856,14 @@ func _add_area_unique_structures(area_id: String, cx: float, cz: float,
 			_build_hub_structures(cx, cz, radius, base_color, y_base)
 		"gathering-grounds":
 			_build_gathering_structures(cx, cz, radius, base_color, y_base)
-		"alien-wastes":
-			_build_wastes_structures(cx, cz, radius, base_color, y_base)
+		"spore-marshes":
+			_build_spore_marshes_structures(cx, cz, radius, base_color, y_base)
+		"hive-tunnels":
+			_build_hive_tunnels_structures(cx, cz, radius, base_color, y_base)
+		"fungal-wastes":
+			_build_fungal_structures(cx, cz, radius, base_color, y_base)
+		"stalker-reaches":
+			_build_stalker_structures(cx, cz, radius, base_color, y_base)
 		"the-abyss":
 			_build_abyss_structures(cx, cz, radius, base_color, y_base)
 		"asteroid-mines":
@@ -1352,730 +1368,255 @@ func _build_gathering_structures(cx: float, cz: float, radius: float,
 		vent.material = vent_mat
 		add_child(vent)
 
-## Alien Wastes — hive arches, bone pillars, organic mounds
-func _build_wastes_structures(cx: float, cz: float, radius: float,
+## Spore Marshes — bioluminescent pods and spore clouds
+func _build_spore_marshes_structures(cx: float, cz: float, radius: float,
 		base_color: Color, y_base: float) -> void:
-	# The Alien Wastes is a massive area with 7 distinct sub-zones stretching
-	# along the Z axis. Each zone gets its own visual identity, color palette,
-	# and thematic props to make exploration feel purposeful and varied.
-	#
-	# Sub-zone layout (all at cx≈0, stretching south from z=-180 to z=-880):
-	#   Spore Fields    (40, -180)  r=60   Lv 1-10   — bioluminescent spore pods, soft green/teal glow
-	#   Hive Perimeter  (-45, -290) r=70   Lv 8-20   — chitin walls, hive tunnels, organic arches
-	#   Fungal Depths   (50, -420)  r=75   Lv 18-35  — giant mushrooms, mycelium networks, purple haze
-	#   Toxic Heart     (-40, -550) r=70   Lv 30-50  — acid pools, toxic geysers, corroded bone
-	#   Stalker Dens    (45, -670)  r=70   Lv 40-50  — web canopies, cocoons, trap tendrils
-	#   Aberration Wastes (-50,-790) r=70  Lv 40-50  — mutated terrain, fleshy growths, pulsing veins
-	#   Eldritch Edge   (40, -880)  r=75   Lv 45-50  — void cracks, reality distortions, the queen's throne
-
-	_build_wastes_spore_fields(y_base)
-	_build_wastes_hive_perimeter(y_base)
-	_build_wastes_fungal_depths(y_base)
-	_build_wastes_toxic_heart(y_base)
-	_build_wastes_stalker_dens(y_base)
-	_build_wastes_aberration_wastes(y_base)
-	_build_wastes_eldritch_edge(y_base)
-
-## Helper: create a material with emission
-func _make_wastes_mat(color: Color, emission_color: Color, emission_str: float = 1.0,
-		metal: float = 0.2, rough: float = 0.6) -> StandardMaterial3D:
-	var mat: StandardMaterial3D = StandardMaterial3D.new()
-	mat.albedo_color = color
-	mat.metallic = metal
-	mat.roughness = rough
-	mat.emission_enabled = true
-	mat.emission = emission_color
-	mat.emission_energy_multiplier = emission_str
-	return mat
-
-## Helper: create a transparent material
-func _make_wastes_alpha_mat(color: Color, alpha: float, emission_color: Color,
-		emission_str: float = 1.0) -> StandardMaterial3D:
-	var mat: StandardMaterial3D = _make_wastes_mat(color, emission_color, emission_str)
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.albedo_color.a = alpha
-	return mat
-
-## Helper: scatter items in a circle
-func _scatter_positions(rng: RandomNumberGenerator, zcx: float, zcz: float,
-		zr: float, count: int, min_dist: float = 3.0) -> Array[Vector3]:
-	var positions: Array[Vector3] = []
-	for i in range(count):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(min_dist, zr * 0.85)
-		positions.append(Vector3(zcx + cos(angle) * dist, 0.0, zcz + sin(angle) * dist))
-	return positions
-
-## Helper: place a sub-zone ground tint disc
-## Helper: place a sub-zone label
-func _add_zone_label(text: String, zcx: float, zcz: float, y_base: float,
-		color: Color = Color(0.7, 0.9, 0.8, 0.8)) -> void:
-	var label: Label3D = Label3D.new()
-	label.text = text
-	label.position = Vector3(zcx, y_base + 4.0, zcz)
-	label.font_size = 48
-	label.outline_size = 6
-	label.modulate = color
-	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	label.no_depth_test = true
-	add_child(label)
-
-# ── SPORE FIELDS — Bioluminescent entry zone, soft green/teal glow ──
-func _build_wastes_spore_fields(y_base: float) -> void:
-	var zcx: float = 40.0; var zcz: float = -180.0; var zr: float = 60.0
-	y_base = _terrain_y(zcx, zcz)
+	var zones: Array = DataManager.get_sub_zones_for_area("spore-marshes")
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-	rng.seed = hash("wastes_spore_fields")
+	rng.seed = "spore_marshes".hash()
 
-	_add_zone_label("Spore Fields", zcx, zcz, y_base, Color(0.3, 0.9, 0.6, 0.85))
+	# Spore pods scattered around the marsh
+	var pod_mat: StandardMaterial3D = StandardMaterial3D.new()
+	pod_mat.albedo_color = Color(0.3, 0.8, 0.4, 0.8)
+	pod_mat.emission_enabled = true
+	pod_mat.emission = Color(0.2, 0.6, 0.3)
+	pod_mat.emission_energy_multiplier = 1.2
+	pod_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 
-	var spore_glow: StandardMaterial3D = _make_wastes_mat(
-		Color(0.1, 0.6, 0.4), Color(0.15, 0.9, 0.5), 3.0, 0.1, 0.4)
-	var pod_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.08, 0.3, 0.18), Color(0.06, 0.2, 0.12), 0.5, 0.15, 0.65)
-	var tendril_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.04, 0.15, 0.1), Color(0.03, 0.1, 0.06), 0.3, 0.1, 0.7)
+	for i in range(15):
+		var angle: float = rng.randf() * TAU
+		var dist: float = rng.randf_range(8.0, radius * 0.8)
+		var px: float = cx + cos(angle) * dist
+		var pz: float = cz + sin(angle) * dist
+		var py: float = _terrain_y(px, pz)
 
-	# Large spore pods — bulbous organic sacs that glow softly
-	var positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 10)
-	for pos in positions:
-		var pod_r: float = rng.randf_range(0.8, 2.5)
 		var pod: CSGSphere3D = CSGSphere3D.new()
-		pod.radius = pod_r
-		pod.radial_segments = 10
-		pod.rings = 6
-		pod.position = Vector3(pos.x, y_base + pod_r * 0.5, pos.z)
-		pod.scale = Vector3(1.0, rng.randf_range(0.6, 1.2), 1.0)
+		pod.radius = rng.randf_range(0.8, 2.5)
+		pod.rings = 8
+		pod.radial_segments = 8
+		pod.position = Vector3(px, py + pod.radius * 0.5, pz)
 		pod.material = pod_mat
 		add_child(pod)
-		if pod_r >= 1.5:
-			_add_cylinder_collision(pod, pod_r * 0.8, pod_r)
 
-		# Glowing tip on top
-		var tip: CSGSphere3D = CSGSphere3D.new()
-		tip.radius = pod_r * 0.3
-		tip.radial_segments = 8
-		tip.rings = 4
-		tip.position = Vector3(pos.x, y_base + pod_r * 0.9, pos.z)
-		tip.material = spore_glow
-		add_child(tip)
+	# Tall marsh reeds
+	var reed_mat: StandardMaterial3D = StandardMaterial3D.new()
+	reed_mat.albedo_color = Color(0.25, 0.5, 0.2)
 
-		# Register tip for pulsing
-		_animated_nodes.append({
-			"node": tip, "type": "pulse_scale",
-			"speed": rng.randf_range(0.8, 1.5),
-			"phase": rng.randf() * TAU,
-			"min_scale": 0.85, "max_scale": 1.15
-		})
-
-	# Tendril clusters — thin organic stalks reaching upward
-	var tendril_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 12)
-	for pos in tendril_positions:
-		var t_height: float = rng.randf_range(2.0, 5.0)
-		var tendril: CSGCylinder3D = CSGCylinder3D.new()
-		tendril.radius = 0.05 + rng.randf() * 0.05
-		tendril.height = t_height
-		tendril.sides = 5
-		tendril.cone = true
-		tendril.position = Vector3(pos.x, y_base + t_height * 0.5, pos.z)
-		tendril.rotation = Vector3(rng.randf_range(-0.3, 0.3), 0, rng.randf_range(-0.3, 0.3))
-		tendril.material = tendril_mat
-		add_child(tendril)
-
-	# Floating spore particles removed — will revisit with proper particle system later
-
-	# Omni lights for ambient glow
-	for i in range(4):
+	for i in range(20):
 		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(10.0, zr * 0.6)
-		var light: OmniLight3D = OmniLight3D.new()
-		light.position = Vector3(zcx + cos(angle) * dist, y_base + 3.0, zcz + sin(angle) * dist)
-		light.light_color = Color(0.15, 0.8, 0.5)
-		light.light_energy = 0.6
-		light.omni_range = 15.0
-		light.omni_attenuation = 1.5
-		add_child(light)
+		var dist: float = rng.randf_range(5.0, radius * 0.85)
+		var px: float = cx + cos(angle) * dist
+		var pz: float = cz + sin(angle) * dist
+		var py: float = _terrain_y(px, pz)
 
-# ── HIVE PERIMETER — Chitin walls, organic tunnels, hive arches ──
-func _build_wastes_hive_perimeter(y_base: float) -> void:
-	var zcx: float = -45.0; var zcz: float = -290.0; var zr: float = 70.0
-	y_base = _terrain_y(zcx, zcz)
+		var reed: CSGCylinder3D = CSGCylinder3D.new()
+		reed.radius = rng.randf_range(0.05, 0.15)
+		reed.height = rng.randf_range(2.0, 5.0)
+		reed.sides = 6
+		reed.position = Vector3(px, py + reed.height * 0.5, pz)
+		reed.material = reed_mat
+		add_child(reed)
+
+## Hive Tunnels — chitin walls and hive arches
+func _build_hive_tunnels_structures(cx: float, cz: float, radius: float,
+		base_color: Color, y_base: float) -> void:
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-	rng.seed = hash("wastes_hive_perimeter")
+	rng.seed = "hive_tunnels".hash()
 
-	_add_zone_label("Hive Perimeter", zcx, zcz, y_base, Color(0.8, 0.6, 0.2, 0.85))
+	# Chitin wall segments
+	var chitin_mat: StandardMaterial3D = StandardMaterial3D.new()
+	chitin_mat.albedo_color = Color(0.35, 0.25, 0.15)
+	chitin_mat.metallic = 0.3
+	chitin_mat.roughness = 0.6
 
-	var chitin_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.25, 0.15, 0.08), Color(0.2, 0.1, 0.0), 0.3, 0.3, 0.75)
-	var hive_glow: StandardMaterial3D = _make_wastes_mat(
-		Color(0.6, 0.35, 0.1), Color(0.8, 0.4, 0.1), 2.0, 0.2, 0.5)
-	var membrane_mat: StandardMaterial3D = _make_wastes_alpha_mat(
-		Color(0.5, 0.3, 0.1), 0.4, Color(0.6, 0.3, 0.05), 1.5)
-
-	# Chitin wall segments — curved organic barriers
-	for i in range(5):
+	for i in range(12):
 		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(15.0, zr * 0.75)
-		var px: float = zcx + cos(angle) * dist
-		var pz: float = zcz + sin(angle) * dist
-		var wall_h: float = rng.randf_range(3.0, 8.0)
-		var wall_w: float = rng.randf_range(4.0, 12.0)
+		var dist: float = rng.randf_range(10.0, radius * 0.75)
+		var px: float = cx + cos(angle) * dist
+		var pz: float = cz + sin(angle) * dist
+		var py: float = _terrain_y(px, pz)
 
 		var wall: CSGBox3D = CSGBox3D.new()
-		wall.size = Vector3(wall_w, wall_h, rng.randf_range(0.6, 1.2))
-		wall.position = Vector3(px, y_base + wall_h * 0.5, pz)
-		wall.rotation.y = angle + PI * 0.5
+		wall.size = Vector3(rng.randf_range(3.0, 6.0), rng.randf_range(2.0, 4.5), rng.randf_range(0.5, 1.2))
+		wall.position = Vector3(px, py + wall.size.y * 0.5, pz)
+		wall.rotation.y = rng.randf() * TAU
 		wall.material = chitin_mat
 		add_child(wall)
-		_add_box_collision(wall, Vector3(wall_w, wall_h, 1.2))
 
-	# Hive arch structures — paired pillars with organic arches
-	for i in range(3):
-		var angle: float = float(i) * TAU / 6.0 + rng.randf_range(-0.3, 0.3)
-		var dist: float = rng.randf_range(20.0, zr * 0.6)
-		var px: float = zcx + cos(angle) * dist
-		var pz: float = zcz + sin(angle) * dist
-		var arch_h: float = rng.randf_range(6.0, 14.0)
-		var arch_w: float = rng.randf_range(4.0, 8.0)
+	# Hive arch structures (pairs of pillars with crossbar)
+	var amber_mat: StandardMaterial3D = StandardMaterial3D.new()
+	amber_mat.albedo_color = Color(0.6, 0.4, 0.1)
+	amber_mat.emission_enabled = true
+	amber_mat.emission = Color(0.5, 0.3, 0.05)
+	amber_mat.emission_energy_multiplier = 0.8
 
-		# Pillars
-		for side in [-1.0, 1.0]:
-			var pillar: CSGCylinder3D = CSGCylinder3D.new()
-			pillar.radius = rng.randf_range(0.4, 0.8)
-			pillar.height = arch_h
-			pillar.sides = 6
-			pillar.position = Vector3(px + side * arch_w * 0.5, y_base + arch_h * 0.5, pz)
-			pillar.rotation = Vector3(rng.randf_range(-0.08, 0.08), 0, rng.randf_range(-0.08, 0.08))
-			pillar.material = chitin_mat
-			add_child(pillar)
-
-		# Arch crossbar
-		var arch: CSGCylinder3D = CSGCylinder3D.new()
-		arch.radius = 0.5
-		arch.height = arch_w + 1.0
-		arch.sides = 6
-		arch.position = Vector3(px, y_base + arch_h, pz)
-		arch.rotation.z = PI / 2.0
-		arch.material = chitin_mat
-		add_child(arch)
-
-	# Hive mounds — large organic domes
-	var mound_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 6, 8.0)
-	for pos in mound_positions:
-		var mound_r: float = rng.randf_range(3.0, 7.0)
-		var mound: CSGSphere3D = CSGSphere3D.new()
-		mound.radius = mound_r
-		mound.radial_segments = 10
-		mound.rings = 6
-		mound.position = Vector3(pos.x, y_base + mound_r * 0.25, pos.z)
-		mound.scale = Vector3(1.2, 0.35, 1.0)
-		mound.material = chitin_mat
-		add_child(mound)
-		_add_cylinder_collision(mound, mound_r * 1.0, mound_r * 0.5)
-
-		# Glowing openings on some mounds
-		if rng.randf() > 0.4:
-			var opening: CSGSphere3D = CSGSphere3D.new()
-			opening.radius = mound_r * 0.3
-			opening.radial_segments = 8
-			opening.rings = 4
-			opening.position = Vector3(pos.x + rng.randf_range(-1.0, 1.0),
-				y_base + mound_r * 0.2, pos.z + rng.randf_range(-1.0, 1.0))
-			opening.material = hive_glow
-			add_child(opening)
-
-	# Ambient lights — warm amber
-	for i in range(3):
+	for i in range(5):
 		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(10.0, zr * 0.5)
-		var light: OmniLight3D = OmniLight3D.new()
-		light.position = Vector3(zcx + cos(angle) * dist, y_base + 4.0, zcz + sin(angle) * dist)
-		light.light_color = Color(0.8, 0.5, 0.15)
-		light.light_energy = 0.5
-		light.omni_range = 18.0
-		light.omni_attenuation = 1.5
-		add_child(light)
+		var dist: float = rng.randf_range(15.0, radius * 0.6)
+		var px: float = cx + cos(angle) * dist
+		var pz: float = cz + sin(angle) * dist
+		var py: float = _terrain_y(px, pz)
+		var arch_h: float = rng.randf_range(4.0, 7.0)
+		var gap: float = rng.randf_range(2.0, 4.0)
+		var yaw: float = rng.randf() * TAU
 
-# ── FUNGAL DEPTHS — Giant mushrooms, mycelium networks, purple haze ──
-func _build_wastes_fungal_depths(y_base: float) -> void:
-	var zcx: float = 50.0; var zcz: float = -420.0; var zr: float = 75.0
-	y_base = _terrain_y(zcx, zcz)
+		# Left pillar
+		var lp: CSGCylinder3D = CSGCylinder3D.new()
+		lp.radius = 0.4
+		lp.height = arch_h
+		lp.sides = 8
+		lp.position = Vector3(px - cos(yaw) * gap, py + arch_h * 0.5, pz - sin(yaw) * gap)
+		lp.material = amber_mat
+		add_child(lp)
+
+		# Right pillar
+		var rp: CSGCylinder3D = CSGCylinder3D.new()
+		rp.radius = 0.4
+		rp.height = arch_h
+		rp.sides = 8
+		rp.position = Vector3(px + cos(yaw) * gap, py + arch_h * 0.5, pz + sin(yaw) * gap)
+		rp.material = amber_mat
+		add_child(rp)
+
+		# Crossbar
+		var bar: CSGBox3D = CSGBox3D.new()
+		bar.size = Vector3(gap * 2.0 + 0.8, 0.6, 0.6)
+		bar.position = Vector3(px, py + arch_h, pz)
+		bar.rotation.y = yaw
+		bar.material = amber_mat
+		add_child(bar)
+
+## Fungal Wastes — giant mushrooms and mycelium networks
+func _build_fungal_structures(cx: float, cz: float, radius: float,
+		base_color: Color, y_base: float) -> void:
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-	rng.seed = hash("wastes_fungal_depths")
+	rng.seed = "fungal_wastes".hash()
 
-	_add_zone_label("Fungal Depths", zcx, zcz, y_base, Color(0.7, 0.3, 0.9, 0.85))
+	# Giant mushroom caps
+	var cap_mat: StandardMaterial3D = StandardMaterial3D.new()
+	cap_mat.albedo_color = Color(0.6, 0.2, 0.7)
+	cap_mat.emission_enabled = true
+	cap_mat.emission = Color(0.4, 0.1, 0.5)
+	cap_mat.emission_energy_multiplier = 0.6
 
-	var cap_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.35, 0.12, 0.5), Color(0.5, 0.15, 0.7), 2.0, 0.15, 0.5)
-	var stem_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.2, 0.15, 0.25), Color(0.12, 0.08, 0.15), 0.3, 0.1, 0.7)
-	var mycelium_mat: StandardMaterial3D = _make_wastes_alpha_mat(
-		Color(0.4, 0.2, 0.6), 0.3, Color(0.5, 0.2, 0.8), 1.5)
-	var spore_cloud_mat: StandardMaterial3D = _make_wastes_alpha_mat(
-		Color(0.5, 0.15, 0.7), 0.12, Color(0.6, 0.2, 0.8), 2.0)
+	var stem_mat: StandardMaterial3D = StandardMaterial3D.new()
+	stem_mat.albedo_color = Color(0.7, 0.65, 0.5)
 
-	# Giant mushrooms — towering fungi with wide caps
-	var mushroom_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 8, 5.0)
-	for pos in mushroom_positions:
-		var stem_h: float = rng.randf_range(4.0, 14.0)
-		var cap_r: float = rng.randf_range(2.0, 6.0)
-		var stem_r: float = rng.randf_range(0.3, 0.8)
+	for i in range(10):
+		var angle: float = rng.randf() * TAU
+		var dist: float = rng.randf_range(8.0, radius * 0.8)
+		var px: float = cx + cos(angle) * dist
+		var pz: float = cz + sin(angle) * dist
+		var py: float = _terrain_y(px, pz)
+		var stem_h: float = rng.randf_range(3.0, 8.0)
+		var cap_r: float = rng.randf_range(1.5, 4.0)
 
 		# Stem
 		var stem: CSGCylinder3D = CSGCylinder3D.new()
-		stem.radius = stem_r
+		stem.radius = rng.randf_range(0.3, 0.7)
 		stem.height = stem_h
 		stem.sides = 8
-		stem.position = Vector3(pos.x, y_base + stem_h * 0.5, pos.z)
-		stem.rotation = Vector3(rng.randf_range(-0.1, 0.1), 0, rng.randf_range(-0.1, 0.1))
+		stem.position = Vector3(px, py + stem_h * 0.5, pz)
 		stem.material = stem_mat
 		add_child(stem)
-		_add_cylinder_collision(stem, stem_r + 0.3, stem_h)
 
-		# Cap (flattened sphere on top)
+		# Cap (flattened sphere)
 		var cap: CSGSphere3D = CSGSphere3D.new()
 		cap.radius = cap_r
+		cap.rings = 8
 		cap.radial_segments = 12
-		cap.rings = 6
-		cap.position = Vector3(pos.x, y_base + stem_h + cap_r * 0.15, pos.z)
-		cap.scale = Vector3(1.0, 0.3, 1.0)
+		cap.position = Vector3(px, py + stem_h + cap_r * 0.3, pz)
+		cap.scale = Vector3(1.0, 0.35, 1.0)
 		cap.material = cap_mat
 		add_child(cap)
 
-		# Glow spots under cap
-		if rng.randf() > 0.3:
-			var glow_ring: CSGTorus3D = CSGTorus3D.new()
-			glow_ring.inner_radius = cap_r * 0.4
-			glow_ring.outer_radius = cap_r * 0.6
-			glow_ring.ring_sides = 6
-			glow_ring.sides = 12
-			glow_ring.position = Vector3(pos.x, y_base + stem_h - 0.3, pos.z)
-			glow_ring.material = _make_wastes_mat(
-				Color(0.6, 0.2, 0.9), Color(0.7, 0.3, 1.0), 3.5, 0.1, 0.3)
-			add_child(glow_ring)
+	# Mycelium ground tendrils
+	var myc_mat: StandardMaterial3D = StandardMaterial3D.new()
+	myc_mat.albedo_color = Color(0.8, 0.75, 0.9, 0.7)
+	myc_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 
-	# Mycelium ground networks — flat glowing veins on the ground
-	for i in range(5):
+	for i in range(18):
 		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(5.0, zr * 0.75)
-		var length: float = rng.randf_range(5.0, 20.0)
-		var vein: CSGBox3D = CSGBox3D.new()
-		vein.size = Vector3(rng.randf_range(0.15, 0.4), 0.04, length)
-		vein.position = Vector3(zcx + cos(angle) * dist, y_base + 0.08, zcz + sin(angle) * dist)
-		vein.rotation.y = angle + rng.randf_range(-0.5, 0.5)
-		vein.material = mycelium_mat
-		add_child(vein)
+		var dist: float = rng.randf_range(5.0, radius * 0.85)
+		var px: float = cx + cos(angle) * dist
+		var pz: float = cz + sin(angle) * dist
+		var py: float = _terrain_y(px, pz)
 
-	# Spore clouds — large translucent spheres of haze
-	for i in range(3):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(10.0, zr * 0.6)
-		var cloud: CSGSphere3D = CSGSphere3D.new()
-		cloud.radius = rng.randf_range(3.0, 8.0)
-		cloud.radial_segments = 10
-		cloud.rings = 6
-		cloud.position = Vector3(zcx + cos(angle) * dist, y_base + rng.randf_range(2.0, 6.0), zcz + sin(angle) * dist)
-		cloud.material = spore_cloud_mat
-		add_child(cloud)
+		var tendril: CSGBox3D = CSGBox3D.new()
+		tendril.size = Vector3(rng.randf_range(2.0, 6.0), 0.15, rng.randf_range(0.3, 0.8))
+		tendril.position = Vector3(px, py + 0.1, pz)
+		tendril.rotation.y = rng.randf() * TAU
+		tendril.material = myc_mat
+		add_child(tendril)
 
-	# Purple ambient lights
-	for i in range(5):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(8.0, zr * 0.6)
-		var light: OmniLight3D = OmniLight3D.new()
-		light.position = Vector3(zcx + cos(angle) * dist, y_base + 5.0, zcz + sin(angle) * dist)
-		light.light_color = Color(0.5, 0.15, 0.8)
-		light.light_energy = 0.7
-		light.omni_range = 20.0
-		light.omni_attenuation = 1.5
-		add_child(light)
-
-# ── TOXIC HEART — Acid pools, toxic geysers, corroded bone structures ──
-func _build_wastes_toxic_heart(y_base: float) -> void:
-	var zcx: float = -40.0; var zcz: float = -550.0; var zr: float = 70.0
-	y_base = _terrain_y(zcx, zcz)
+## Stalker Reaches — web canopies and cocoons
+func _build_stalker_structures(cx: float, cz: float, radius: float,
+		base_color: Color, y_base: float) -> void:
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-	rng.seed = hash("wastes_toxic_heart")
+	rng.seed = "stalker_reaches".hash()
 
-	_add_zone_label("Toxic Heart", zcx, zcz, y_base, Color(0.6, 0.9, 0.1, 0.85))
+	# Web support pillars
+	var pillar_mat: StandardMaterial3D = StandardMaterial3D.new()
+	pillar_mat.albedo_color = Color(0.2, 0.15, 0.25)
+	pillar_mat.metallic = 0.2
 
-	var acid_mat: StandardMaterial3D = _make_wastes_alpha_mat(
-		Color(0.3, 0.7, 0.05), 0.6, Color(0.4, 0.9, 0.1), 3.0)
-	var bone_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.5, 0.45, 0.3), Color(0.3, 0.25, 0.15), 0.2, 0.1, 0.8)
-	var corroded_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.35, 0.4, 0.15), Color(0.25, 0.35, 0.1), 0.5, 0.3, 0.6)
-	var geyser_mat: StandardMaterial3D = _make_wastes_alpha_mat(
-		Color(0.4, 0.8, 0.1), 0.3, Color(0.5, 1.0, 0.15), 4.0)
-
-	# Acid pools — flat glowing discs on the ground
-	for i in range(5):
+	for i in range(10):
 		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(8.0, zr * 0.7)
-		var pool_r: float = rng.randf_range(2.0, 6.0)
-		var pool: CSGCylinder3D = CSGCylinder3D.new()
-		pool.radius = pool_r
-		pool.height = 0.08
-		pool.sides = 16
-		pool.position = Vector3(zcx + cos(angle) * dist, y_base + 0.06, zcz + sin(angle) * dist)
-		pool.material = acid_mat
-		add_child(pool)
+		var dist: float = rng.randf_range(8.0, radius * 0.8)
+		var px: float = cx + cos(angle) * dist
+		var pz: float = cz + sin(angle) * dist
+		var py: float = _terrain_y(px, pz)
+		var h: float = rng.randf_range(4.0, 9.0)
 
-	# Toxic geysers — tall translucent columns that pulse
-	for i in range(3):
+		var pillar: CSGCylinder3D = CSGCylinder3D.new()
+		pillar.radius = rng.randf_range(0.3, 0.7)
+		pillar.height = h
+		pillar.sides = 6
+		pillar.position = Vector3(px, py + h * 0.5, pz)
+		pillar.material = pillar_mat
+		add_child(pillar)
+
+	# Cocoon pods
+	var cocoon_mat: StandardMaterial3D = StandardMaterial3D.new()
+	cocoon_mat.albedo_color = Color(0.6, 0.55, 0.45, 0.85)
+	cocoon_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+
+	for i in range(8):
 		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(10.0, zr * 0.6)
-		var geyser_h: float = rng.randf_range(6.0, 15.0)
-		var geyser: CSGCylinder3D = CSGCylinder3D.new()
-		geyser.radius = rng.randf_range(0.3, 0.8)
-		geyser.height = geyser_h
-		geyser.sides = 8
-		var gx: float = zcx + cos(angle) * dist
-		var gz: float = zcz + sin(angle) * dist
-		geyser.position = Vector3(gx, y_base + geyser_h * 0.5, gz)
-		geyser.material = geyser_mat
-		add_child(geyser)
-		_animated_nodes.append({
-			"node": geyser, "type": "pulse_scale",
-			"speed": rng.randf_range(1.5, 3.0),
-			"phase": rng.randf() * TAU,
-			"min_scale": 0.7, "max_scale": 1.3
-		})
+		var dist: float = rng.randf_range(10.0, radius * 0.7)
+		var px: float = cx + cos(angle) * dist
+		var pz: float = cz + sin(angle) * dist
+		var py: float = _terrain_y(px, pz)
 
-	# Corroded bone pillars — weathered skeletal remains
-	var bone_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 7, 6.0)
-	for pos in bone_positions:
-		var bone_h: float = rng.randf_range(3.0, 10.0)
-		var bone_r: float = rng.randf_range(0.2, 0.6)
-		var bone: CSGCylinder3D = CSGCylinder3D.new()
-		bone.radius = bone_r
-		bone.height = bone_h
-		bone.sides = 5
-		bone.cone = rng.randf() > 0.5
-		bone.position = Vector3(pos.x, y_base + bone_h * 0.5, pos.z)
-		bone.rotation = Vector3(rng.randf_range(-0.25, 0.25), rng.randf() * TAU, rng.randf_range(-0.25, 0.25))
-		bone.material = bone_mat if rng.randf() > 0.4 else corroded_mat
-		add_child(bone)
-		if bone_h >= 3.0:
-			_add_cylinder_collision(bone, bone_r + 0.2, bone_h)
-
-	# Toxic green lights
-	for i in range(4):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(10.0, zr * 0.5)
-		var light: OmniLight3D = OmniLight3D.new()
-		light.position = Vector3(zcx + cos(angle) * dist, y_base + 3.0, zcz + sin(angle) * dist)
-		light.light_color = Color(0.4, 0.9, 0.1)
-		light.light_energy = 0.7
-		light.omni_range = 15.0
-		light.omni_attenuation = 1.5
-		add_child(light)
-
-# ── STALKER DENS — Web canopies, cocoons, trap tendrils ──
-func _build_wastes_stalker_dens(y_base: float) -> void:
-	var zcx: float = 45.0; var zcz: float = -670.0; var zr: float = 70.0
-	y_base = _terrain_y(zcx, zcz)
-	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-	rng.seed = hash("wastes_stalker_dens")
-
-	_add_zone_label("Stalker Dens", zcx, zcz, y_base, Color(0.6, 0.5, 0.7, 0.85))
-
-	var web_mat: StandardMaterial3D = _make_wastes_alpha_mat(
-		Color(0.7, 0.7, 0.65), 0.2, Color(0.5, 0.5, 0.45), 0.8)
-	var cocoon_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.35, 0.3, 0.25), Color(0.2, 0.15, 0.1), 0.3, 0.15, 0.75)
-	var tendril_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.2, 0.12, 0.25), Color(0.15, 0.08, 0.2), 0.5, 0.2, 0.65)
-
-	# Web canopy sheets — stretched between anchor pillars
-	for i in range(5):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(10.0, zr * 0.7)
-		var web_w: float = rng.randf_range(5.0, 12.0)
-		var web_d: float = rng.randf_range(4.0, 8.0)
-		var wx: float = zcx + cos(angle) * dist
-		var wz: float = zcz + sin(angle) * dist
-		var web_ty: float = _terrain_y(wx, wz)
-		var web_h: float = rng.randf_range(4.0, 8.0)
-		var web: CSGBox3D = CSGBox3D.new()
-		web.size = Vector3(web_w, 0.03, web_d)
-		web.position = Vector3(wx, web_ty + web_h, wz)
-		web.rotation = Vector3(rng.randf_range(-0.15, 0.15), rng.randf() * TAU, rng.randf_range(-0.15, 0.15))
-		web.material = web_mat
-		add_child(web)
-		# Anchor strands from web corners to ground (4 per web)
-		for corner in range(4):
-			var cx_off: float = (web_w * 0.4) * (-1.0 if corner % 2 == 0 else 1.0)
-			var cz_off: float = (web_d * 0.4) * (-1.0 if corner < 2 else 1.0)
-			var strand: CSGCylinder3D = CSGCylinder3D.new()
-			strand.radius = 0.03
-			strand.height = web_h + rng.randf_range(-1.0, 1.0)
-			strand.sides = 4
-			var sx: float = wx + cos(web.rotation.y) * cx_off - sin(web.rotation.y) * cz_off
-			var sz: float = wz + sin(web.rotation.y) * cx_off + cos(web.rotation.y) * cz_off
-			strand.position = Vector3(sx, web_ty + strand.height * 0.5, sz)
-			strand.rotation = Vector3(rng.randf_range(-0.1, 0.1), 0, rng.randf_range(-0.1, 0.1))
-			strand.material = web_mat
-			add_child(strand)
-
-	# Cocoons — elongated egg-like shapes hanging or resting
-	var cocoon_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 8, 4.0)
-	for pos in cocoon_positions:
-		var c_r: float = rng.randf_range(0.4, 1.2)
 		var cocoon: CSGSphere3D = CSGSphere3D.new()
-		cocoon.radius = c_r
+		cocoon.radius = rng.randf_range(0.5, 1.5)
+		cocoon.rings = 6
 		cocoon.radial_segments = 8
-		cocoon.rings = 5
-		var hanging: bool = rng.randf() > 0.5
-		cocoon.position = Vector3(pos.x,
-			y_base + (rng.randf_range(3.0, 7.0) if hanging else c_r * 0.6), pos.z)
-		cocoon.scale = Vector3(0.6, 1.4, 0.6)
+		cocoon.position = Vector3(px, py + rng.randf_range(1.0, 3.0), pz)
+		cocoon.scale = Vector3(0.7, 1.3, 0.7)
 		cocoon.material = cocoon_mat
 		add_child(cocoon)
 
-		# Web strand connecting hanging cocoons to canopy
-		if hanging:
-			var strand: CSGCylinder3D = CSGCylinder3D.new()
-			strand.radius = 0.02
-			strand.height = rng.randf_range(1.0, 3.0)
-			strand.sides = 4
-			strand.position = Vector3(pos.x, cocoon.position.y + c_r * 1.2, pos.z)
-			strand.material = web_mat
-			add_child(strand)
+	# Golem remains (shattered stone blocks)
+	var stone_mat: StandardMaterial3D = StandardMaterial3D.new()
+	stone_mat.albedo_color = Color(0.3, 0.28, 0.35)
+	stone_mat.roughness = 0.9
 
-	# Trap tendrils — menacing stalks that sway
-	for i in range(6):
+	for i in range(12):
 		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(5.0, zr * 0.8)
-		var t_h: float = rng.randf_range(2.0, 6.0)
-		var tendril: CSGCylinder3D = CSGCylinder3D.new()
-		tendril.radius = 0.06 + rng.randf() * 0.06
-		tendril.height = t_h
-		tendril.sides = 5
-		var tx: float = zcx + cos(angle) * dist
-		var tz: float = zcz + sin(angle) * dist
-		tendril.position = Vector3(tx, y_base + t_h * 0.5, tz)
-		tendril.rotation = Vector3(rng.randf_range(-0.2, 0.2), 0, rng.randf_range(-0.2, 0.2))
-		tendril.material = tendril_mat
-		add_child(tendril)
+		var dist: float = rng.randf_range(5.0, radius * 0.85)
+		var px: float = cx + cos(angle) * dist
+		var pz: float = cz + sin(angle) * dist
+		var py: float = _terrain_y(px, pz)
 
-	# Dim purple lights
-	for i in range(3):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(10.0, zr * 0.5)
-		var light: OmniLight3D = OmniLight3D.new()
-		light.position = Vector3(zcx + cos(angle) * dist, y_base + 3.5, zcz + sin(angle) * dist)
-		light.light_color = Color(0.4, 0.3, 0.6)
-		light.light_energy = 0.4
-		light.omni_range = 16.0
-		light.omni_attenuation = 1.5
-		add_child(light)
+		var block: CSGBox3D = CSGBox3D.new()
+		var s: float = rng.randf_range(0.5, 2.0)
+		block.size = Vector3(s * rng.randf_range(0.8, 1.5), s, s * rng.randf_range(0.8, 1.5))
+		block.position = Vector3(px, py + block.size.y * 0.5, pz)
+		block.rotation = Vector3(rng.randf_range(-0.3, 0.3), rng.randf() * TAU, rng.randf_range(-0.3, 0.3))
+		block.material = stone_mat
+		add_child(block)
 
-# ── ABERRATION WASTES — Mutated terrain, fleshy growths, pulsing veins ──
-func _build_wastes_aberration_wastes(y_base: float) -> void:
-	var zcx: float = -50.0; var zcz: float = -790.0; var zr: float = 70.0
-	y_base = _terrain_y(zcx, zcz)
-	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-	rng.seed = hash("wastes_aberration")
-
-	_add_zone_label("Aberration Wastes", zcx, zcz, y_base, Color(0.9, 0.3, 0.4, 0.85))
-
-	var flesh_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.4, 0.12, 0.15), Color(0.5, 0.1, 0.12), 1.0, 0.15, 0.55)
-	var vein_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.6, 0.08, 0.12), Color(0.8, 0.1, 0.15), 2.5, 0.2, 0.4)
-	var eye_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.9, 0.8, 0.2), Color(1.0, 0.9, 0.3), 3.0, 0.3, 0.2)
-	var growth_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.3, 0.08, 0.12), Color(0.25, 0.06, 0.1), 0.5, 0.1, 0.7)
-
-	# Fleshy mounds — disturbing organic humps
-	var mound_positions: Array[Vector3] = _scatter_positions(rng, zcx, zcz, zr, 7, 6.0)
-	for pos in mound_positions:
-		var m_r: float = rng.randf_range(1.5, 5.0)
-		var mound: CSGSphere3D = CSGSphere3D.new()
-		mound.radius = m_r
-		mound.radial_segments = 10
-		mound.rings = 6
-		mound.position = Vector3(pos.x, y_base + m_r * 0.2, pos.z)
-		mound.scale = Vector3(rng.randf_range(0.8, 1.4), rng.randf_range(0.2, 0.5),
-			rng.randf_range(0.8, 1.3))
-		mound.material = flesh_mat
-		add_child(mound)
-		if m_r >= 2.5:
-			_add_cylinder_collision(mound, m_r * 0.8, m_r * 0.5)
-
-		# Random eye on some mounds
-		if rng.randf() > 0.6:
-			var eye: CSGSphere3D = CSGSphere3D.new()
-			eye.radius = m_r * 0.2
-			eye.radial_segments = 8
-			eye.rings = 4
-			eye.position = Vector3(pos.x, y_base + m_r * 0.35, pos.z)
-			eye.material = eye_mat
-			add_child(eye)
-
-	# Pulsing vein networks on the ground (terrain-following)
-	for i in range(8):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(4.0, zr * 0.8)
-		var length: float = rng.randf_range(4.0, 18.0)
-		var vx: float = zcx + cos(angle) * dist
-		var vz: float = zcz + sin(angle) * dist
-		var vein: CSGBox3D = CSGBox3D.new()
-		vein.size = Vector3(rng.randf_range(0.1, 0.3), 0.05, length)
-		vein.position = Vector3(vx, _terrain_y(vx, vz) + 0.07, vz)
-		vein.rotation.y = angle + rng.randf_range(-0.4, 0.4)
-		vein.material = vein_mat
-		add_child(vein)
-
-	# Twisted growth pillars — organic columns warped by mutation
-	for i in range(5):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(10.0, zr * 0.7)
-		var g_h: float = rng.randf_range(3.0, 10.0)
-		var growth: CSGCylinder3D = CSGCylinder3D.new()
-		growth.radius = rng.randf_range(0.3, 1.0)
-		growth.height = g_h
-		growth.sides = 6
-		growth.position = Vector3(zcx + cos(angle) * dist, y_base + g_h * 0.5, zcz + sin(angle) * dist)
-		growth.rotation = Vector3(rng.randf_range(-0.3, 0.3), 0, rng.randf_range(-0.3, 0.3))
-		growth.material = growth_mat
-		add_child(growth)
-
-	# Sickly red lights
-	for i in range(4):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(10.0, zr * 0.5)
-		var light: OmniLight3D = OmniLight3D.new()
-		light.position = Vector3(zcx + cos(angle) * dist, y_base + 3.0, zcz + sin(angle) * dist)
-		light.light_color = Color(0.8, 0.15, 0.2)
-		light.light_energy = 0.6
-		light.omni_range = 16.0
-		light.omni_attenuation = 1.5
-		add_child(light)
-
-# ── ELDRITCH EDGE — Void cracks, reality distortions, the queen's domain ──
-func _build_wastes_eldritch_edge(y_base: float) -> void:
-	var zcx: float = 40.0; var zcz: float = -880.0; var zr: float = 75.0
-	y_base = _terrain_y(zcx, zcz)
-	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-	rng.seed = hash("wastes_eldritch_edge")
-
-	_add_zone_label("Eldritch Edge", zcx, zcz, y_base, Color(0.9, 0.4, 0.8, 0.85))
-
-	var void_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.06, 0.02, 0.12), Color(0.12, 0.04, 0.2), 1.5, 0.4, 0.3)
-	var rift_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.6, 0.1, 0.8), Color(0.8, 0.15, 1.0), 5.0, 0.3, 0.15)
-	var throne_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.15, 0.05, 0.2), Color(0.25, 0.08, 0.35), 1.0, 0.5, 0.35)
-	var crystal_mat: StandardMaterial3D = _make_wastes_mat(
-		Color(0.5, 0.15, 0.7), Color(0.7, 0.2, 1.0), 4.0, 0.8, 0.1)
-
-	# Queen's Throne — massive elevated platform at the center
-	var throne_base: CSGCylinder3D = CSGCylinder3D.new()
-	throne_base.radius = 8.0
-	throne_base.height = 1.5
-	throne_base.sides = 12
-	throne_base.position = Vector3(zcx, y_base + 0.75, zcz)
-	throne_base.material = throne_mat
-	add_child(throne_base)
-	_add_cylinder_collision(throne_base, 8.0, 1.5)
-
-	# Throne spires — tall spikes around the platform
-	for i in range(4):
-		var angle: float = float(i) * TAU / 4.0
-		var spire: CSGCylinder3D = CSGCylinder3D.new()
-		spire.radius = 0.5
-		spire.height = rng.randf_range(10.0, 18.0)
-		spire.sides = 5
-		spire.cone = true
-		var sx: float = zcx + cos(angle) * 7.0
-		var sz: float = zcz + sin(angle) * 7.0
-		spire.position = Vector3(sx, y_base + spire.height * 0.5 + 1.5, sz)
-		spire.material = void_mat
-		add_child(spire)
-		_add_cylinder_collision(spire, 0.6, spire.height)
-
-		# Crystal tip on each spire
-		var tip: CSGSphere3D = CSGSphere3D.new()
-		tip.radius = 0.6
-		tip.radial_segments = 8
-		tip.rings = 4
-		tip.position = Vector3(sx, y_base + spire.height + 2.0, sz)
-		tip.material = crystal_mat
-		add_child(tip)
-		_animated_nodes.append({
-			"node": tip, "type": "pulse_scale",
-			"speed": rng.randf_range(1.0, 2.0),
-			"phase": rng.randf() * TAU,
-			"min_scale": 0.8, "max_scale": 1.2
-		})
-
-	# Reality tear rifts — vertical planes of crackling energy (terrain-following)
-	for i in range(5):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(12.0, zr * 0.7)
-		var rift_h: float = rng.randf_range(4.0, 12.0)
-		var rfx: float = zcx + cos(angle) * dist
-		var rfz: float = zcz + sin(angle) * dist
-		var rf_ty: float = _terrain_y(rfx, rfz)
-		var rift: CSGBox3D = CSGBox3D.new()
-		rift.size = Vector3(rng.randf_range(0.3, 1.5), rift_h, 0.04)
-		rift.position = Vector3(rfx, rf_ty + rift_h * 0.5, rfz)
-		rift.rotation.y = rng.randf() * TAU
-		rift.material = rift_mat
-		add_child(rift)
-		# Glow light at rift center
-		var rift_light: OmniLight3D = OmniLight3D.new()
-		rift_light.position = Vector3(rfx, rf_ty + rift_h * 0.4, rfz)
-		rift_light.light_color = Color(0.6, 0.1, 0.8)
-		rift_light.light_energy = 0.3
-		rift_light.omni_range = 6.0
-		rift_light.omni_attenuation = 2.0
-		add_child(rift_light)
-		_animated_nodes.append({
-			"node": rift, "type": "pulse_scale",
-			"speed": rng.randf_range(1.0, 3.0),
-			"phase": rng.randf() * TAU,
-			"min_scale": 0.85, "max_scale": 1.15
-		})
-
-	# Void cracks in the ground — dark lines with faint glow
-	for i in range(6):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(8.0, zr * 0.8)
-		var crack_len: float = rng.randf_range(3.0, 15.0)
-		var crack: CSGBox3D = CSGBox3D.new()
-		crack.size = Vector3(rng.randf_range(0.05, 0.2), 0.06, crack_len)
-		crack.position = Vector3(zcx + cos(angle) * dist, y_base + 0.09, zcz + sin(angle) * dist)
-		crack.rotation.y = angle + rng.randf_range(-0.5, 0.5)
-		crack.material = rift_mat
-		add_child(crack)
-
-	# Intense purple/void lights
-	for i in range(5):
-		var angle: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(5.0, zr * 0.6)
-		var light: OmniLight3D = OmniLight3D.new()
-		light.position = Vector3(zcx + cos(angle) * dist, y_base + 4.0, zcz + sin(angle) * dist)
-		light.light_color = Color(0.6, 0.1, 0.8)
-		light.light_energy = 0.8
-		light.omni_range = 18.0
-		light.omni_attenuation = 1.5
-		add_child(light)
-
-	# Central throne light — bright beacon
-	var throne_light: OmniLight3D = OmniLight3D.new()
-	throne_light.position = Vector3(zcx, y_base + 6.0, zcz)
-	throne_light.light_color = Color(0.7, 0.2, 0.9)
-	throne_light.light_energy = 1.2
-	throne_light.omni_range = 25.0
-	throne_light.omni_attenuation = 1.2
-	add_child(throne_light)
-
-# ── Zone border rings — glowing boundary markers between sub-zones ──
 ## The Abyss — void pillars, floating platforms, reality tears, eye clusters
 func _build_abyss_structures(cx: float, cz: float, radius: float,
 		base_color: Color, y_base: float) -> void:
@@ -2392,10 +1933,99 @@ func _add_point_lights(area_id: String, cx: float, cz: float, radius: float,
 #  CORRIDORS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+## Gate barrier meshes — keyed by area_id, updated each frame for color
+var _gate_barriers: Dictionary = {}  # { area_id: Array[CSGBox3D] }
+
 func _build_corridors() -> void:
 	for corridor_data in DataManager.corridors:
 		_create_corridor(corridor_data)
 	print("AreaManager: Built %d corridors" % DataManager.corridors.size())
+
+## Build semi-transparent energy barriers at corridor mouths for gated areas
+func _build_corridor_gates() -> void:
+	var gate_count: int = 0
+	for corridor_data in DataManager.corridors:
+		var from_id: String = str(corridor_data.get("from", ""))
+		var to_id: String = str(corridor_data.get("to", ""))
+
+		# Check if either end has requirements
+		for area_id in [from_id, to_id]:
+			var reqs: Dictionary = DataManager.get_area_requirements(area_id)
+			if reqs.is_empty():
+				continue
+
+			# Place barrier at the mouth of the gated area (on the corridor side near that area)
+			var area_data: Dictionary = DataManager.get_area(area_id)
+			var area_center: Dictionary = area_data.get("center", {})
+			var area_cx: float = float(area_center.get("x", 0))
+			var area_cz: float = float(area_center.get("z", 0))
+			var area_radius: float = float(area_data.get("radius", 60))
+
+			var min_x: float = float(corridor_data.get("minX", 0.0))
+			var max_x: float = float(corridor_data.get("maxX", 0.0))
+			var min_z: float = float(corridor_data.get("minZ", 0.0))
+			var max_z: float = float(corridor_data.get("maxZ", 0.0))
+			var corr_cx: float = (min_x + max_x) / 2.0
+			var corr_cz: float = (min_z + max_z) / 2.0
+			var corr_w: float = max_x - min_x
+			var corr_d: float = max_z - min_z
+			var is_vertical: bool = corr_d > corr_w
+
+			# Position the barrier near the gated area edge
+			var dir: Vector2 = Vector2(area_cx - corr_cx, area_cz - corr_cz).normalized()
+			var gate_pos: Vector3 = Vector3(
+				area_cx - dir.x * (area_radius * 0.85),
+				0.0,
+				area_cz - dir.y * (area_radius * 0.85)
+			)
+
+			# Build the energy barrier — a thin translucent wall
+			var barrier: CSGBox3D = CSGBox3D.new()
+			barrier.name = "GateBarrier_%s" % area_id
+			if is_vertical:
+				barrier.size = Vector3(maxf(corr_w, 10.0), 5.0, 0.6)
+			else:
+				barrier.size = Vector3(0.6, 5.0, maxf(corr_d, 10.0))
+			barrier.position = gate_pos
+			barrier.position.y = 2.5  # Center vertically
+
+			var mat: StandardMaterial3D = StandardMaterial3D.new()
+			mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			mat.albedo_color = Color(0.8, 0.15, 0.1, 0.25)  # Red = locked
+			mat.emission_enabled = true
+			mat.emission = Color(0.8, 0.15, 0.1)
+			mat.emission_energy_multiplier = 0.8
+			mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+			barrier.material = mat
+
+			add_child(barrier)
+			if not _gate_barriers.has(area_id):
+				_gate_barriers[area_id] = []
+			_gate_barriers[area_id].append(barrier)
+			gate_count += 1
+
+	print("AreaManager: Built %d gate barriers" % gate_count)
+
+## Update gate barrier colors based on current player eligibility
+func _update_gate_barriers() -> void:
+	for area_id in _gate_barriers:
+		var accessible: bool = _check_area_gate(area_id)
+		for barrier in _gate_barriers[area_id]:
+			if barrier == null or not is_instance_valid(barrier):
+				continue
+			var mat: StandardMaterial3D = barrier.material as StandardMaterial3D
+			if mat == null:
+				continue
+			if accessible:
+				# Green = accessible
+				mat.albedo_color = Color(0.1, 0.7, 0.3, 0.12)
+				mat.emission = Color(0.1, 0.7, 0.3)
+				mat.emission_energy_multiplier = 0.4
+			else:
+				# Red = locked
+				mat.albedo_color = Color(0.8, 0.15, 0.1, 0.25)
+				mat.emission = Color(0.8, 0.15, 0.1)
+				mat.emission_energy_multiplier = 0.8
 
 func _create_corridor(data: Dictionary) -> void:
 	var min_x: float = data.get("minX", 0.0)
@@ -2666,6 +2296,10 @@ func _check_area_transition() -> void:
 	var new_area: String = _get_area_at_position(player_pos)
 
 	if new_area != "" and new_area != GameState.current_area:
+		# ── Area gate check ──
+		if not _check_area_gate(new_area):
+			_push_player_back()
+			return
 		var old_area: String = GameState.current_area
 		GameState.current_area = new_area
 		GameState.previous_area = old_area
@@ -2676,6 +2310,55 @@ func _check_area_transition() -> void:
 		var area_data: Dictionary = DataManager.get_area(new_area)
 		var area_name: String = str(area_data.get("name", new_area))
 		EventBus.chat_message.emit("Entered: %s" % area_name, "system")
+
+## Check if the player meets requirements to enter an area
+func _check_area_gate(area_id: String) -> bool:
+	var reqs: Dictionary = DataManager.get_area_requirements(area_id)
+	if reqs.is_empty():
+		return true  # No requirements — always open
+
+	# Check combat level
+	var req_level: int = int(reqs.get("combat_level", 0))
+	if req_level > 0:
+		var player_level: int = GameState.get_combat_level()
+		if player_level < req_level:
+			var area_data: Dictionary = DataManager.get_area(area_id)
+			var area_name: String = str(area_data.get("name", area_id))
+			EventBus.chat_message.emit(
+				"Requires Combat Level %d to enter %s (current: %d)" % [req_level, area_name, player_level],
+				"system"
+			)
+			return false
+
+	# Check quest completion
+	var req_quest: String = str(reqs.get("quest", ""))
+	if req_quest != "":
+		if not GameState.completed_quests.has(req_quest):
+			var area_data: Dictionary = DataManager.get_area(area_id)
+			var area_name: String = str(area_data.get("name", area_id))
+			var quest_data: Dictionary = DataManager.get_quest(req_quest)
+			var quest_name: String = str(quest_data.get("name", req_quest))
+			EventBus.chat_message.emit(
+				"Complete \"%s\" to unlock %s" % [quest_name, area_name],
+				"system"
+			)
+			return false
+
+	return true
+
+## Push the player back toward their current area center when gate check fails
+func _push_player_back() -> void:
+	if _player == null:
+		return
+	# Get current area center and push player toward it
+	var current: Dictionary = _area_bodies.get(GameState.current_area, {})
+	if current.is_empty():
+		return
+	var center: Vector3 = current.get("center", Vector3.ZERO)
+	var dir: Vector3 = (center - _player.global_position).normalized()
+	# Push player 3 units back toward current area
+	_player.global_position += dir * 3.0
+	_player.global_position.y = get_terrain_height(_player.global_position.x, _player.global_position.z)
 
 func _get_area_at_position(pos: Vector2) -> String:
 	for corridor_data in DataManager.corridors:

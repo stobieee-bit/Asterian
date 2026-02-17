@@ -14,11 +14,24 @@ func _ready() -> void:
 	_define_spawn_zones()
 	_spawn_all_nodes()
 
+## Helper: read area center from DataManager, fallback to provided defaults
+func _area_center(area_id: String) -> Dictionary:
+	var area_data: Dictionary = DataManager.areas.get(area_id, {})
+	var center: Dictionary = area_data.get("center", {})
+	return {
+		"cx": float(center.get("x", 0)),
+		"cz": float(center.get("z", 0)),
+		"radius": float(area_data.get("radius", 60))
+	}
+
 func _define_spawn_zones() -> void:
-	# Asteroid Mines — Ore nodes
+	var c: Dictionary
+
+	# ── Asteroid Mines — Ore nodes ──
+	c = _area_center("asteroid-mines")
 	_spawn_defs.append({
 		"area": "asteroid-mines",
-		"cx": 120.0, "cz": 0.0, "radius": 70.0,
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.85,
 		"skill": "astromining",
 		"nodes": [
 			{"level": 1, "item": "stellarite_ore", "color": Color(0.85, 0.75, 0.5), "count": 12},
@@ -34,10 +47,11 @@ func _define_spawn_zones() -> void:
 		]
 	})
 
-	# Gathering Grounds — Bio resources (spores, lichen, etc.)
+	# ── Gathering Grounds — Bio resources ──
+	c = _area_center("gathering-grounds")
 	_spawn_defs.append({
 		"area": "gathering-grounds",
-		"cx": 0.0, "cz": -100.0, "radius": 65.0,
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.9,
 		"skill": "xenobotany",
 		"nodes": [
 			{"level": 1, "item": "space_lichen", "color": Color(0.3, 0.5, 0.25), "count": 10},
@@ -49,18 +63,14 @@ func _define_spawn_zones() -> void:
 			{"level": 30, "item": "spore_cap", "color": Color(0.5, 0.6, 0.3), "count": 5},
 			{"level": 35, "item": "plasma_pepper", "color": Color(1.0, 0.3, 0.1), "count": 4},
 			{"level": 40, "item": "void_moss", "color": Color(0.25, 0.5, 0.3), "count": 3},
-			{"level": 45, "item": "crystal_honey", "color": Color(0.9, 0.8, 0.3), "count": 3},
-			{"level": 50, "item": "neural_bloom", "color": Color(0.6, 0.3, 0.8), "count": 3},
-			{"level": 55, "item": "void_truffle", "color": Color(0.3, 0.1, 0.4), "count": 2},
-			{"level": 60, "item": "quantum_vine", "color": Color(0.2, 0.8, 0.8), "count": 2},
-			{"level": 65, "item": "gravity_residue", "color": Color(0.4, 0.2, 0.6), "count": 2},
 		]
 	})
 
-	# Mycelium Hollows — Fungal gathering (xenobotany)
+	# ── Mycelium Hollows — Fungal gathering (xenobotany) ──
+	c = _area_center("mycelium-hollows")
 	_spawn_defs.append({
 		"area": "mycelium-hollows",
-		"cx": 180.0, "cz": -150.0, "radius": 120.0,
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.85,
 		"skill": "xenobotany",
 		"nodes": [
 			{"level": 5, "item": "glowcap_fungus", "color": Color(0.2, 0.9, 0.4), "count": 10},
@@ -69,10 +79,10 @@ func _define_spawn_zones() -> void:
 		]
 	})
 
-	# Mycelium Hollows — Mineral deposits (astromining)
+	# ── Mycelium Hollows — Mineral deposits (astromining) ──
 	_spawn_defs.append({
 		"area": "mycelium-hollows",
-		"cx": 180.0, "cz": -150.0, "radius": 120.0,
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.85,
 		"skill": "astromining",
 		"nodes": [
 			{"level": 5, "item": "fungite_ore", "color": Color(0.5, 0.6, 0.3), "count": 10},
@@ -81,10 +91,39 @@ func _define_spawn_zones() -> void:
 		]
 	})
 
-	# Solarith Wastes — Desert flora (xenobotany)
+	# ── Spore Marshes — Marsh flora (xenobotany) ──
+	c = _area_center("spore-marshes")
+	_spawn_defs.append({
+		"area": "spore-marshes",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.85,
+		"skill": "xenobotany",
+		"nodes": [
+			{"level": 1, "item": "space_lichen", "color": Color(0.3, 0.5, 0.25), "count": 4},
+			{"level": 5, "item": "cryo_kelp", "color": Color(0.2, 0.5, 0.6), "count": 3},
+			{"level": 10, "item": "nebula_fruit", "color": Color(0.6, 0.3, 0.7), "count": 3},
+			{"level": 15, "item": "solar_grain", "color": Color(0.8, 0.7, 0.2), "count": 2},
+		]
+	})
+
+	# ── Hive Tunnels — Hive resources (xenobotany) ──
+	c = _area_center("hive-tunnels")
+	_spawn_defs.append({
+		"area": "hive-tunnels",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.8,
+		"skill": "xenobotany",
+		"nodes": [
+			{"level": 18, "item": "chitin_shard", "color": Color(0.5, 0.4, 0.2), "count": 3},
+			{"level": 25, "item": "alien_steak", "color": Color(0.7, 0.3, 0.3), "count": 3},
+			{"level": 30, "item": "spore_cap", "color": Color(0.5, 0.6, 0.3), "count": 2},
+			{"level": 35, "item": "plasma_pepper", "color": Color(1.0, 0.3, 0.1), "count": 2},
+		]
+	})
+
+	# ── Solarith Wastes — Desert flora (xenobotany) ──
+	c = _area_center("solarith-wastes")
 	_spawn_defs.append({
 		"area": "solarith-wastes",
-		"cx": -200.0, "cz": -500.0, "radius": 160.0,
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.85,
 		"skill": "xenobotany",
 		"nodes": [
 			{"level": 35, "item": "sun_cactus", "color": Color(0.9, 0.7, 0.1), "count": 8},
@@ -93,10 +132,10 @@ func _define_spawn_zones() -> void:
 		]
 	})
 
-	# Solarith Wastes — Desert ores (astromining)
+	# ── Solarith Wastes — Desert ores (astromining) ──
 	_spawn_defs.append({
 		"area": "solarith-wastes",
-		"cx": -200.0, "cz": -500.0, "radius": 160.0,
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.85,
 		"skill": "astromining",
 		"nodes": [
 			{"level": 35, "item": "solarite_ore", "color": Color(1.0, 0.6, 0.1), "count": 8},
@@ -105,10 +144,81 @@ func _define_spawn_zones() -> void:
 		]
 	})
 
-	# Void Citadel — Dimensional flora (xenobotany)
+	# ── Fungal Wastes — Fungal flora (xenobotany) ──
+	c = _area_center("fungal-wastes")
+	_spawn_defs.append({
+		"area": "fungal-wastes",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.8,
+		"skill": "xenobotany",
+		"nodes": [
+			{"level": 40, "item": "void_moss", "color": Color(0.25, 0.5, 0.3), "count": 3},
+			{"level": 50, "item": "neural_bloom", "color": Color(0.6, 0.3, 0.8), "count": 3},
+			{"level": 60, "item": "quantum_vine", "color": Color(0.2, 0.8, 0.8), "count": 2},
+		]
+	})
+
+	# ── Fungal Wastes — Fungal ores (astromining) ──
+	_spawn_defs.append({
+		"area": "fungal-wastes",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.8,
+		"skill": "astromining",
+		"nodes": [
+			{"level": 40, "item": "titanex_ore", "color": Color(0.9, 0.95, 0.1), "count": 2},
+			{"level": 50, "item": "plasmite_ore", "color": Color(0.8, 0.15, 1.0), "count": 2},
+		]
+	})
+
+	# ── Stalker Reaches — Shadow flora (xenobotany) ──
+	c = _area_center("stalker-reaches")
+	_spawn_defs.append({
+		"area": "stalker-reaches",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.8,
+		"skill": "xenobotany",
+		"nodes": [
+			{"level": 55, "item": "void_truffle", "color": Color(0.3, 0.1, 0.4), "count": 2},
+			{"level": 65, "item": "gravity_residue", "color": Color(0.4, 0.2, 0.6), "count": 2},
+			{"level": 70, "item": "crystal_honey", "color": Color(0.9, 0.8, 0.3), "count": 2},
+		]
+	})
+
+	# ── Stalker Reaches — Deep ores (astromining) ──
+	_spawn_defs.append({
+		"area": "stalker-reaches",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.8,
+		"skill": "astromining",
+		"nodes": [
+			{"level": 60, "item": "quantite_ore", "color": Color(1.0, 0.5, 0.0), "count": 2},
+			{"level": 70, "item": "neutronium_ore", "color": Color(1.0, 0.1, 0.3), "count": 2},
+		]
+	})
+
+	# ── Corrupted Wastes — Corrupted resources (xenobotany) ──
+	c = _area_center("corrupted-wastes")
+	_spawn_defs.append({
+		"area": "corrupted-wastes",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.8,
+		"skill": "xenobotany",
+		"nodes": [
+			{"level": 80, "item": "neural_bloom", "color": Color(0.8, 0.2, 0.9), "count": 2},
+			{"level": 90, "item": "void_truffle", "color": Color(0.4, 0.0, 0.5), "count": 2},
+		]
+	})
+
+	# ── Corrupted Wastes — Dark ores (astromining) ──
+	_spawn_defs.append({
+		"area": "corrupted-wastes",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.8,
+		"skill": "astromining",
+		"nodes": [
+			{"level": 80, "item": "darkmatter_shard", "color": Color(0.15, 0.0, 0.35), "count": 2},
+		]
+	})
+
+	# ── Void Citadel — Dimensional flora (xenobotany) ──
+	c = _area_center("void-citadel")
 	_spawn_defs.append({
 		"area": "void-citadel",
-		"cx": 0.0, "cz": -1000.0, "radius": 140.0,
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.85,
 		"skill": "xenobotany",
 		"nodes": [
 			{"level": 65, "item": "dimensional_moss", "color": Color(0.3, 0.1, 0.6), "count": 6},
@@ -117,15 +227,37 @@ func _define_spawn_zones() -> void:
 		]
 	})
 
-	# Void Citadel — Void minerals (astromining)
+	# ── Void Citadel — Void minerals (astromining) ──
 	_spawn_defs.append({
 		"area": "void-citadel",
-		"cx": 0.0, "cz": -1000.0, "radius": 140.0,
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.85,
 		"skill": "astromining",
 		"nodes": [
 			{"level": 65, "item": "void_crystal", "color": Color(0.4, 0.0, 0.7), "count": 6},
 			{"level": 75, "item": "phase_ore", "color": Color(0.3, 0.5, 0.9), "count": 4},
 			{"level": 85, "item": "singularity_shard_ore", "color": Color(0.1, 0.0, 0.3), "count": 3},
+		]
+	})
+
+	# ── The Abyss — Abyssal flora (xenobotany) ──
+	c = _area_center("the-abyss")
+	_spawn_defs.append({
+		"area": "the-abyss",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.8,
+		"skill": "xenobotany",
+		"nodes": [
+			{"level": 100, "item": "architect_root", "color": Color(0.15, 0.2, 0.5), "count": 3},
+			{"level": 140, "item": "void_bloom", "color": Color(0.6, 0.0, 0.9), "count": 2},
+		]
+	})
+
+	# ── The Abyss — Abyssal ores (astromining) ──
+	_spawn_defs.append({
+		"area": "the-abyss",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.8,
+		"skill": "astromining",
+		"nodes": [
+			{"level": 90, "item": "voidsteel_ore", "color": Color(0.1, 0.0, 0.2), "count": 3},
 		]
 	})
 

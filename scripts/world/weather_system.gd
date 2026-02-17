@@ -118,33 +118,68 @@ const WEATHER_CONFIGS: Dictionary = {
 		},
 	},
 
-	# ── Alien Wastes: horizontal sand/dust storm, orange-tinted ──
-	"alien-wastes": {
+	# ── Spore Marshes: drifting green spores ──
+	"spore-marshes": {
 		"primary": {
-			"amount": 150,
-			"lifetime": 3.5,
-			"direction": Vector3(1.0, 0.1, 0.3),
-			"velocity_min": 2.0,
-			"velocity_max": 5.0,
-			"gravity": Vector3(0.0, -0.3, 0.0),
-			"scale_min": 0.04,
-			"scale_max": 0.2,
-			"color_start": Color(0.9, 0.6, 0.2, 0.5),
-			"color_end": Color(0.8, 0.5, 0.15, 0.0),
-			"box_extents": Vector3(30.0, 12.0, 30.0),
+			"amount": 100,
+			"lifetime": 5.0,
+			"direction": Vector3(0.3, 0.5, 0.2),
+			"velocity_min": 0.3,
+			"velocity_max": 1.0,
+			"gravity": Vector3(0.0, -0.1, 0.0),
+			"scale_min": 0.02,
+			"scale_max": 0.12,
+			"color_start": Color(0.4, 0.9, 0.3, 0.4),
+			"color_end": Color(0.3, 0.7, 0.2, 0.0),
+			"box_extents": Vector3(25.0, 10.0, 25.0),
 		},
-		"secondary": {
-			"amount": 60,
-			"lifetime": 2.5,
-			"direction": Vector3(1.2, 0.3, 0.5),
-			"velocity_min": 3.0,
-			"velocity_max": 6.0,
-			"gravity": Vector3(0.0, -0.5, 0.0),
+	},
+	# ── Hive Tunnels: amber dust particles ──
+	"hive-tunnels": {
+		"primary": {
+			"amount": 80,
+			"lifetime": 3.0,
+			"direction": Vector3(0.5, -0.2, 0.3),
+			"velocity_min": 0.5,
+			"velocity_max": 2.0,
+			"gravity": Vector3(0.0, -0.2, 0.0),
+			"scale_min": 0.02,
+			"scale_max": 0.08,
+			"color_start": Color(0.8, 0.6, 0.2, 0.35),
+			"color_end": Color(0.6, 0.4, 0.1, 0.0),
+			"box_extents": Vector3(20.0, 8.0, 20.0),
+		},
+	},
+	# ── Fungal Wastes: purple spore clouds ──
+	"fungal-wastes": {
+		"primary": {
+			"amount": 120,
+			"lifetime": 4.5,
+			"direction": Vector3(0.2, 0.8, 0.1),
+			"velocity_min": 0.2,
+			"velocity_max": 0.8,
+			"gravity": Vector3(0.0, -0.05, 0.0),
 			"scale_min": 0.03,
-			"scale_max": 0.1,
-			"color_start": Color(1.0, 0.75, 0.35, 0.35),
-			"color_end": Color(0.9, 0.6, 0.25, 0.0),
-			"box_extents": Vector3(30.0, 10.0, 30.0),
+			"scale_max": 0.15,
+			"color_start": Color(0.6, 0.2, 0.8, 0.3),
+			"color_end": Color(0.4, 0.1, 0.6, 0.0),
+			"box_extents": Vector3(25.0, 12.0, 25.0),
+		},
+	},
+	# ── Stalker Reaches: dark mist wisps ──
+	"stalker-reaches": {
+		"primary": {
+			"amount": 60,
+			"lifetime": 6.0,
+			"direction": Vector3(0.1, -0.3, 0.2),
+			"velocity_min": 0.1,
+			"velocity_max": 0.5,
+			"gravity": Vector3(0.0, -0.05, 0.0),
+			"scale_min": 0.05,
+			"scale_max": 0.2,
+			"color_start": Color(0.3, 0.2, 0.4, 0.25),
+			"color_end": Color(0.2, 0.1, 0.3, 0.0),
+			"box_extents": Vector3(25.0, 10.0, 25.0),
 		},
 	},
 

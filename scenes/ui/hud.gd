@@ -51,6 +51,7 @@ var _achievement_panel: PanelContainer = null
 var _multiplayer_panel: PanelContainer = null
 var _tooltip_panel: PanelContainer = null
 var _tutorial_panel: PanelContainer = null
+var _world_map_panel: PanelContainer = null
 var _context_menu: PanelContainer = null
 var _context_menu_vbox: VBoxContainer = null
 var _context_menu_title: Label = null
@@ -72,6 +73,7 @@ var settings_script: GDScript = preload("res://scripts/ui/settings_panel.gd")
 var achievement_script: GDScript = preload("res://scripts/ui/achievement_panel.gd")
 var tooltip_script: GDScript = preload("res://scripts/ui/tooltip_panel.gd")
 var tutorial_script: GDScript = preload("res://scripts/ui/tutorial_panel.gd")
+var world_map_script: GDScript = preload("res://scripts/ui/world_map_panel.gd")
 # context_menu is built inline in _build_context_menu()
 
 # ── Chat log ──
@@ -497,9 +499,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_J:
 				_toggle_panel(_achievement_panel, "achievements")
 				get_viewport().set_input_as_handled()
-			# Minimap zoom toggle (M)
+			# World Map (M)
 			KEY_M:
-				_cycle_minimap_zoom()
+				_toggle_world_map_panel()
 				get_viewport().set_input_as_handled()
 
 ## Toggle a panel's visibility
@@ -870,7 +872,51 @@ func _make_sci_btn(text: String, width: float = 70, accent: Color = Color(0.2, 0
 ## Action bar background reference (for repositioning on window resize)
 var _action_bar_bg: PanelContainer = null
 
-## Build action button bar at the bottom
+## Create a compact icon button for the action bar (36x36 with 16x16 pixel art icon)
+func _make_icon_btn(icon_id: String, tooltip: String, accent: Color = Color(0.2, 0.6, 0.8)) -> Button:
+	var btn: Button = Button.new()
+	btn.custom_minimum_size = Vector2(36, 36)
+	btn.tooltip_text = tooltip
+	btn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	# Set pixel art icon
+	var tex: ImageTexture = ItemIconGenerator.get_misc_texture(icon_id)
+	if tex:
+		btn.icon = tex
+		btn.expand_icon = true
+
+	# Normal — near-invisible background, subtle bottom accent
+	var normal: StyleBoxFlat = StyleBoxFlat.new()
+	normal.bg_color = Color(0.03, 0.04, 0.08, 0.6)
+	normal.border_color = accent.darkened(0.4)
+	normal.border_color.a = 0.35
+	normal.set_border_width_all(0)
+	normal.border_width_bottom = 2
+	normal.set_corner_radius_all(4)
+	normal.set_content_margin_all(4)
+	btn.add_theme_stylebox_override("normal", normal)
+
+	# Hover — slight lift effect
+	var hover: StyleBoxFlat = normal.duplicate()
+	hover.bg_color = Color(0.05, 0.07, 0.14, 0.75)
+	hover.border_color = accent.darkened(0.15)
+	hover.border_color.a = 0.6
+	hover.border_width_bottom = 3
+	btn.add_theme_stylebox_override("hover", hover)
+
+	# Pressed — inset feel
+	var pressed: StyleBoxFlat = normal.duplicate()
+	pressed.bg_color = accent.darkened(0.65)
+	pressed.bg_color.a = 0.7
+	pressed.border_width_bottom = 0
+	pressed.border_width_top = 2
+	pressed.border_color = accent.darkened(0.2)
+	pressed.border_color.a = 0.5
+	btn.add_theme_stylebox_override("pressed", pressed)
+
+	return btn
+
+## Build compact 2x6 icon grid action bar at the bottom
 func _build_action_bar() -> void:
 	_action_bar_bg = PanelContainer.new()
 	var bar_bg: PanelContainer = _action_bar_bg
@@ -880,98 +926,86 @@ func _build_action_bar() -> void:
 	bg_style.border_color = Color(0.08, 0.15, 0.25, 0.3)
 	bg_style.border_width_top = 1
 	bg_style.set_corner_radius_all(6)
-	bg_style.set_content_margin_all(4)
-	bg_style.content_margin_left = 8
-	bg_style.content_margin_right = 8
+	bg_style.set_content_margin_all(3)
+	bg_style.content_margin_left = 5
+	bg_style.content_margin_right = 5
 	bar_bg.add_theme_stylebox_override("panel", bg_style)
 	add_child(bar_bg)
 
-	var bar: HBoxContainer = HBoxContainer.new()
-	bar.add_theme_constant_override("separation", 4)
-	bar_bg.add_child(bar)
+	# 2-row grid layout
+	var grid: GridContainer = GridContainer.new()
+	grid.columns = 6
+	grid.add_theme_constant_override("h_separation", 3)
+	grid.add_theme_constant_override("v_separation", 3)
+	bar_bg.add_child(grid)
 
 	var cyan: Color = Color(0.2, 0.7, 0.9)
 	var gold: Color = Color(0.9, 0.75, 0.3)
 	var green: Color = Color(0.3, 0.8, 0.4)
 	var purple: Color = Color(0.7, 0.4, 0.9)
+	var orange: Color = Color(0.9, 0.5, 0.2)
+	var red: Color = Color(0.8, 0.4, 0.3)
 
-	# Inventory button
-	var inv_btn: Button = _make_sci_btn("Bag [I]", 65, cyan)
-	inv_btn.tooltip_text = "Inventory (I)"
+	# ── Row 1: Bag, Equip, Skills, Quests, Bestiary, Prestige ──
+	var inv_btn: Button = _make_icon_btn("ui_bag", "Inventory (I)", cyan)
 	inv_btn.pressed.connect(func(): _toggle_panel(_inventory_panel, "inventory"))
-	bar.add_child(inv_btn)
+	grid.add_child(inv_btn)
 
-	# Equipment button
-	var eq_btn: Button = _make_sci_btn("Equip [E]", 72, cyan)
-	eq_btn.tooltip_text = "Equipment (E)"
+	var eq_btn: Button = _make_icon_btn("ui_equip", "Equipment (E)", cyan)
 	eq_btn.pressed.connect(func(): _toggle_panel(_equipment_panel, "equipment"))
-	bar.add_child(eq_btn)
+	grid.add_child(eq_btn)
 
-	# Skills button
-	var sk_btn: Button = _make_sci_btn("Skills [K]", 72, green)
-	sk_btn.tooltip_text = "Skills (K)"
+	var sk_btn: Button = _make_icon_btn("ui_skills", "Skills (K)", green)
 	sk_btn.pressed.connect(func(): _toggle_panel(_skills_panel, "skills"))
-	bar.add_child(sk_btn)
+	grid.add_child(sk_btn)
 
-	# Quests button
-	var quest_btn: Button = _make_sci_btn("Quests [Q]", 78, purple)
-	quest_btn.tooltip_text = "Quests (Q)"
+	var quest_btn: Button = _make_icon_btn("ui_quests", "Quests (Q)", purple)
 	quest_btn.pressed.connect(func(): _toggle_panel(_quest_panel, "quests"))
-	bar.add_child(quest_btn)
+	grid.add_child(quest_btn)
 
-	# Bestiary button
-	var best_btn: Button = _make_sci_btn("Bestiary [L]", 82, Color(0.8, 0.4, 0.3))
-	best_btn.tooltip_text = "Bestiary (L)"
+	var best_btn: Button = _make_icon_btn("ui_bestiary", "Bestiary (L)", red)
 	best_btn.pressed.connect(func(): _toggle_panel(_bestiary_panel, "bestiary"))
-	bar.add_child(best_btn)
+	grid.add_child(best_btn)
 
-	# Prestige button
-	var pres_btn: Button = _make_sci_btn("Prestige", 72, gold)
-	pres_btn.tooltip_text = "Prestige System"
+	var pres_btn: Button = _make_icon_btn("ui_prestige", "Prestige", gold)
 	pres_btn.pressed.connect(func(): _toggle_panel(_prestige_panel, "prestige"))
-	bar.add_child(pres_btn)
+	grid.add_child(pres_btn)
 
-	# Dungeon button
-	var dung_btn: Button = _make_sci_btn("Dungeon", 72, Color(0.9, 0.5, 0.2))
-	dung_btn.tooltip_text = "Dungeon Explorer"
+	# ── Row 2: Dungeon, Pets, Achieve, Settings, Help, Map ──
+	var dung_btn: Button = _make_icon_btn("ui_dungeon", "Dungeon (N)", orange)
 	dung_btn.pressed.connect(func(): _toggle_panel(_dungeon_panel, "dungeon"))
-	bar.add_child(dung_btn)
+	grid.add_child(dung_btn)
 
-	# Pets button
-	var pet_btn: Button = _make_sci_btn("Pets", 52, Color(0.8, 0.4, 0.9))
-	pet_btn.tooltip_text = "Pet Companions"
+	var pet_btn: Button = _make_icon_btn("ui_pets", "Pets", Color(0.8, 0.4, 0.9))
 	pet_btn.pressed.connect(func(): _toggle_panel(_pet_panel, "pets"))
-	bar.add_child(pet_btn)
+	grid.add_child(pet_btn)
 
-	# Achievements button
-	var ach_btn: Button = _make_sci_btn("Achieve [J]", 82, gold)
-	ach_btn.tooltip_text = "Achievements (J)"
+	var ach_btn: Button = _make_icon_btn("ui_achieve", "Achievements (J)", gold)
 	ach_btn.pressed.connect(func(): _toggle_panel(_achievement_panel, "achievements"))
-	bar.add_child(ach_btn)
+	grid.add_child(ach_btn)
 
-	# Settings button
-	var set_btn: Button = _make_sci_btn("Settings", 68, Color(0.5, 0.5, 0.6))
-	set_btn.tooltip_text = "Settings"
+	var set_btn: Button = _make_icon_btn("ui_settings", "Settings", Color(0.5, 0.5, 0.6))
 	set_btn.pressed.connect(func(): _toggle_panel(_settings_panel, "settings"))
-	bar.add_child(set_btn)
+	grid.add_child(set_btn)
 
-	# Help / Tutorial button
-	var help_btn: Button = _make_sci_btn("?", 36, Color(0.3, 0.8, 0.9))
-	help_btn.tooltip_text = "Tutorial / Help"
+	var help_btn: Button = _make_icon_btn("ui_help", "Tutorial / Help", cyan)
 	help_btn.pressed.connect(func():
 		if _tutorial_panel:
 			_tutorial_panel.visible = true
 			EventBus.panel_opened.emit("tutorial")
 			if _tutorial_panel.has_method("start_tutorial"):
 				if GameState.tutorial.get("completed", false) or GameState.tutorial.get("skipped", false):
-					# Reset and restart for re-reading
 					GameState.tutorial["completed"] = false
 					GameState.tutorial["skipped"] = false
 					GameState.tutorial["current_step"] = 0
 					GameState.tutorial["steps_done"] = []
 				_tutorial_panel.start_tutorial()
 	)
-	bar.add_child(help_btn)
+	grid.add_child(help_btn)
+
+	var map_btn: Button = _make_icon_btn("ui_map", "World Map (M)", Color(0.3, 0.5, 0.85))
+	map_btn.pressed.connect(func(): _toggle_world_map_panel())
+	grid.add_child(map_btn)
 
 	# Position centered at bottom
 	_reposition_action_bar()
@@ -1468,13 +1502,15 @@ func _reposition_buff_display() -> void:
 	if _buff_container == null:
 		return
 	var vp_size: Vector2 = _get_viewport_size()
-	# Position centered above stat bars (stat bars at vp.y - 178, buff display above that)
+	# Position centered above stat bars
 	var container_width: float = _buff_container.size.x
 	if container_width < 10:
 		container_width = 200.0
+	# Stat bars top is ~vp.y - 88 - 97 - 67 = ~vp.y - 252
+	var stat_top: float = vp_size.y - 252.0
 	_buff_container.position = Vector2(
 		vp_size.x / 2.0 - container_width / 2.0,
-		vp_size.y - 200
+		stat_top - 22
 	)
 
 func _update_buff_display() -> void:
@@ -1966,7 +2002,7 @@ func _use_defensive_ability(slot: int) -> void:
 		if combat and combat.has_method("use_defensive_ability"):
 			combat.use_defensive_ability(slot)
 
-## Position the ability bar centered above the action bar
+## Position the ability bar centered above the compact action bar
 func _reposition_ability_bar() -> void:
 	if _ability_bar_bg == null:
 		return
@@ -1975,9 +2011,13 @@ func _reposition_ability_bar() -> void:
 	await get_tree().process_frame
 	var bar_width: float = _ability_bar_bg.size.x
 	if bar_width < 10:
-		bar_width = 830.0  # Estimate for 6 buttons × 120px + gaps + margins
-	# Two-row bar is ~50px taller (defense row 36 + gap 3 + main row 44 + padding)
-	_ability_bar_bg.position = Vector2(vp_size.x / 2.0 - bar_width / 2.0, vp_size.y - 150)
+		bar_width = 830.0  # Estimate for 6 buttons * 120px + gaps + margins
+	# Position above compact action bar (~88px from bottom)
+	var action_top: float = vp_size.y - 88.0
+	var ability_h: float = _ability_bar_bg.size.y
+	if ability_h < 10:
+		ability_h = 95.0  # Two-row ability bar estimate
+	_ability_bar_bg.position = Vector2(vp_size.x / 2.0 - bar_width / 2.0, action_top - ability_h - 2)
 	# Also reposition stat bars above ability bar
 	_reposition_stat_bars()
 
@@ -1985,11 +2025,15 @@ func _reposition_stat_bars() -> void:
 	if _stat_bars_container == null:
 		return
 	var vp_size: Vector2 = _get_viewport_size()
-	# Stat bars sit centered above the ability bar (which is now taller with defense row)
+	# Stat bars sit centered above the ability bar
 	var container_width: float = 280.0  # Width of widest bar (HP)
+	var ability_top: float = vp_size.y - 88.0 - 97.0  # action bar top - ability bar height
+	var stat_h: float = _stat_bars_container.size.y
+	if stat_h < 10:
+		stat_h = 65.0  # HP + EN + ADR + style + spacing
 	_stat_bars_container.position = Vector2(
 		vp_size.x / 2.0 - container_width / 2.0,
-		vp_size.y - 228
+		ability_top - stat_h - 2
 	)
 
 ## Highlight the queued ability button with a pulsing glow border
@@ -2533,8 +2577,12 @@ func _show_area_toast(area_id: String) -> void:
 		_area_toast_label.add_theme_color_override("font_color", Color(1.0, 0.2, 0.2, 1.0))
 	elif area_id == "the-abyss":
 		_area_toast_label.add_theme_color_override("font_color", Color(0.6, 0.2, 0.9, 1.0))
-	elif area_id == "alien-wastes":
+	elif area_id in ["spore-marshes", "hive-tunnels"]:
+		_area_toast_label.add_theme_color_override("font_color", Color(0.5, 0.9, 0.3, 1.0))
+	elif area_id in ["fungal-wastes", "stalker-reaches"]:
 		_area_toast_label.add_theme_color_override("font_color", Color(0.9, 0.6, 0.2, 1.0))
+	elif area_id == "void-citadel":
+		_area_toast_label.add_theme_color_override("font_color", Color(0.5, 0.3, 0.9, 1.0))
 	else:
 		_area_toast_label.add_theme_color_override("font_color", Color(0.3, 0.9, 0.8, 1.0))
 
@@ -2610,6 +2658,9 @@ func _show_levelup_flash(skill_id: String, new_level: int) -> void:
 
 var _combat_indicator: HBoxContainer = null
 var _in_combat_state: bool = false
+## Panels hidden by combat mode (to restore when combat ends)
+var _combat_hidden_panels: Array[String] = []
+var _pre_combat_chat_alpha: float = 1.0
 
 func _build_combat_indicator() -> void:
 	_combat_indicator = HBoxContainer.new()
@@ -2645,9 +2696,55 @@ func _build_combat_indicator() -> void:
 
 func _on_combat_started(_enemy_id: String) -> void:
 	_in_combat_state = true
+	# ── Combat mode: auto-hide non-essential panels ──
+	_combat_hidden_panels.clear()
+	var hide_map: Dictionary = {
+		"skills": _skills_panel,
+		"quests": _quest_panel,
+		"bestiary": _bestiary_panel,
+		"prestige": _prestige_panel,
+		"dungeon": _dungeon_panel,
+		"pet": _pet_panel,
+		"achievement": _achievement_panel,
+		"settings": _settings_panel,
+	}
+	for panel_name in hide_map:
+		var panel: PanelContainer = hide_map[panel_name]
+		if panel and panel.visible:
+			panel.visible = false
+			_combat_hidden_panels.append(panel_name)
+	# Reduce chat opacity
+	if _chat_bg:
+		_pre_combat_chat_alpha = _chat_bg.modulate.a
+		var tween: Tween = create_tween()
+		tween.tween_property(_chat_bg, "modulate:a", 0.3, 0.3)
 
 func _on_combat_ended() -> void:
 	_in_combat_state = false
+	# ── Combat mode: restore panels after 2s delay ──
+	await get_tree().create_timer(2.0).timeout
+	if _in_combat_state:
+		return  # Re-entered combat, don't restore
+	var restore_map: Dictionary = {
+		"skills": _skills_panel,
+		"quests": _quest_panel,
+		"bestiary": _bestiary_panel,
+		"prestige": _prestige_panel,
+		"dungeon": _dungeon_panel,
+		"pet": _pet_panel,
+		"achievement": _achievement_panel,
+		"settings": _settings_panel,
+	}
+	for panel_name in _combat_hidden_panels:
+		if restore_map.has(panel_name):
+			var panel: PanelContainer = restore_map[panel_name]
+			if panel:
+				panel.visible = true
+	_combat_hidden_panels.clear()
+	# Restore chat opacity
+	if _chat_bg:
+		var tween: Tween = create_tween()
+		tween.tween_property(_chat_bg, "modulate:a", _pre_combat_chat_alpha, 0.5)
 
 func _update_combat_indicator() -> void:
 	if _combat_indicator == null:
@@ -2970,10 +3067,10 @@ func _build_target_info_panel() -> void:
 	_target_panel.add_theme_stylebox_override("panel", style)
 	_target_panel.visible = false
 	_target_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var vp_w: float = _design_size.x
-	_target_panel.position = Vector2(vp_w / 2.0 - 150, 8)
 	_target_panel.custom_minimum_size = Vector2(300, 0)
 	add_child(_target_panel)
+	# Position above stat bars (bottom-center) instead of top-center
+	_reposition_target_panel()
 
 	var vbox: VBoxContainer = VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 4)
@@ -3562,9 +3659,9 @@ func _update_hover_label() -> void:
 	var mouse_pos: Vector2 = get_viewport().get_mouse_position()
 
 	# Don't hover when over UI panels
-	# Simple check: if mouse is in top 42px (top bar) or bottom 55px (bottom bar + action bar)
+	# Simple check: if mouse is in top 42px or bottom ~90px (compact action bar + ability bar)
 	var vp_size: Vector2 = _get_viewport_size()
-	if mouse_pos.y < 60 or mouse_pos.y > vp_size.y - 70:
+	if mouse_pos.y < 60 or mouse_pos.y > vp_size.y - 100:
 		_hover_label.visible = false
 		_hover_target = null
 		return
@@ -3776,8 +3873,10 @@ func _on_window_resized() -> void:
 	_reposition_bottom_labels()
 	# Reposition tutorial panel to top-center
 	_reposition_tutorial_panel()
+	# Reposition target info above stat bars
+	_reposition_target_panel()
 
-## Reposition the bottom action bar to horizontal center
+## Reposition the bottom action bar (compact 2x6 grid) to horizontal center
 func _reposition_action_bar() -> void:
 	if _action_bar_bg == null:
 		return
@@ -3785,8 +3884,19 @@ func _reposition_action_bar() -> void:
 	await get_tree().process_frame
 	var bar_w: float = _action_bar_bg.size.x
 	if bar_w < 10:
-		bar_w = 1040.0
-	_action_bar_bg.position = Vector2(vp_size.x / 2.0 - bar_w / 2.0, vp_size.y - 56)
+		bar_w = 246.0  # 6 buttons * 36px + 5 gaps * 3px + padding ~246px
+	var bar_h: float = _action_bar_bg.size.y
+	if bar_h < 10:
+		bar_h = 84.0  # 2 rows * 36px + gap + padding
+	_action_bar_bg.position = Vector2(vp_size.x / 2.0 - bar_w / 2.0, vp_size.y - bar_h - 4)
+
+## Reposition target info panel above stat bars (bottom-center)
+func _reposition_target_panel() -> void:
+	if _target_panel == null:
+		return
+	var vp_size: Vector2 = _get_viewport_size()
+	# Place above the buff display / stat bars stack
+	_target_panel.position = Vector2(vp_size.x / 2.0 - 150, vp_size.y - 290)
 
 ## Reposition FPS and Position labels to bottom-right
 func _reposition_bottom_labels() -> void:
@@ -3853,6 +3963,7 @@ var _minimap_viewport: SubViewport = null
 var _minimap_camera: Camera3D = null
 var _minimap_player_dot: ColorRect = null
 var _minimap_area_label: Label = null
+var _minimap_level_label: Label = null
 var _minimap_tex_rect: TextureRect = null
 var _minimap_enemy_dots: Array[ColorRect] = []
 var _minimap_npc_dots: Array[ColorRect] = []
@@ -3994,6 +4105,13 @@ func _build_minimap() -> void:
 	bottom_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(bottom_row)
 
+	# Area name + level range in a vertical stack
+	var area_info_vbox: VBoxContainer = VBoxContainer.new()
+	area_info_vbox.add_theme_constant_override("separation", 0)
+	area_info_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	area_info_vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bottom_row.add_child(area_info_vbox)
+
 	_minimap_area_label = Label.new()
 	_minimap_area_label.name = "MinimapArea"
 	_minimap_area_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -4001,7 +4119,16 @@ func _build_minimap() -> void:
 	_minimap_area_label.add_theme_font_size_override("font_size", 11)
 	_minimap_area_label.add_theme_color_override("font_color", Color(0.35, 0.55, 0.65, 0.7))
 	_minimap_area_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bottom_row.add_child(_minimap_area_label)
+	area_info_vbox.add_child(_minimap_area_label)
+
+	_minimap_level_label = Label.new()
+	_minimap_level_label.name = "MinimapLevel"
+	_minimap_level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_minimap_level_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_minimap_level_label.add_theme_font_size_override("font_size", 9)
+	_minimap_level_label.add_theme_color_override("font_color", Color(0.5, 0.65, 0.35, 0.6))
+	_minimap_level_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	area_info_vbox.add_child(_minimap_level_label)
 
 	var map_btn: Button = Button.new()
 	map_btn.text = "M"
@@ -4085,6 +4212,39 @@ func _on_minimap_click(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 ## Toggle the full world map overlay
+## Toggle world map — opens the 2D node graph world map panel
+func _toggle_world_map_panel() -> void:
+	if _world_map_panel and is_instance_valid(_world_map_panel):
+		_world_map_panel.visible = not _world_map_panel.visible
+		if _world_map_panel.visible:
+			EventBus.panel_opened.emit("world_map")
+			if _world_map_panel.has_method("refresh"):
+				_world_map_panel.refresh()
+		else:
+			EventBus.panel_closed.emit("world_map")
+		return
+
+	# Build world map panel on first open
+	var panel_style: StyleBoxFlat = StyleBoxFlat.new()
+	panel_style.bg_color = Color(0.02, 0.03, 0.06, 0.92)
+	panel_style.border_color = Color(0.15, 0.35, 0.5, 0.7)
+	panel_style.set_border_width_all(2)
+	panel_style.set_corner_radius_all(8)
+	panel_style.set_content_margin_all(8)
+
+	_world_map_panel = PanelContainer.new()
+	_world_map_panel.set_script(world_map_script)
+	_world_map_panel.add_theme_stylebox_override("panel", panel_style)
+	add_child(_world_map_panel)
+
+	# Center on screen
+	var vp_size: Vector2 = _get_viewport_size()
+	_world_map_panel.position = Vector2(
+		vp_size.x / 2.0 - 310,
+		vp_size.y / 2.0 - 270
+	)
+	EventBus.panel_opened.emit("world_map")
+
 func _toggle_full_map() -> void:
 	if _full_map_panel and is_instance_valid(_full_map_panel):
 		_full_map_panel.visible = not _full_map_panel.visible
@@ -4200,6 +4360,18 @@ func _update_minimap() -> void:
 	if _minimap_area_label:
 		var area_data: Dictionary = DataManager.get_area(GameState.current_area)
 		_minimap_area_label.text = str(area_data.get("name", GameState.current_area)) if not area_data.is_empty() else GameState.current_area
+
+	# Update level range label on minimap
+	if _minimap_level_label:
+		var level_range: Dictionary = DataManager.area_level_ranges.get(GameState.current_area, {})
+		if not level_range.is_empty():
+			var min_lv: int = int(level_range.get("min", 0))
+			var max_lv: int = int(level_range.get("max", 0))
+			_minimap_level_label.text = "Lv %d-%d" % [min_lv, max_lv]
+			_minimap_level_label.visible = true
+		else:
+			_minimap_level_label.text = ""
+			_minimap_level_label.visible = false
 
 	# Update entity dots on minimap
 	_update_minimap_dots()

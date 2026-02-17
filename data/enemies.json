@@ -11,7 +11,7 @@
     "leashRange": 18,
     "combatStyle": "nano",
     "respawnTime": 30,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Armored beetle swarm.",
     "lootTable": [
       {
@@ -46,7 +46,7 @@
     "leashRange": 20,
     "combatStyle": "nano",
     "respawnTime": 35,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Larger Chithari with reinforced chitin.",
     "lootTable": [
       {
@@ -81,7 +81,7 @@
     "leashRange": 22,
     "combatStyle": "tesla",
     "respawnTime": 40,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Floating jellyfish that shocks.",
     "lootTable": [
       {
@@ -134,7 +134,7 @@
     "leashRange": 25,
     "combatStyle": "void",
     "respawnTime": 45,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Mantis-scorpion with toxic fungal growths.",
     "lootTable": [
       {
@@ -187,7 +187,7 @@
     "leashRange": 18,
     "combatStyle": "void",
     "respawnTime": 120,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Giant slug with gravity field.",
     "lootTable": [
       {
@@ -253,7 +253,7 @@
     "leashRange": 20,
     "combatStyle": "tesla",
     "respawnTime": 120,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Psionic segmented worm.",
     "lootTable": [
       {
@@ -319,7 +319,7 @@
     "leashRange": 15.05,
     "combatStyle": "nano",
     "respawnTime": 20,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Tiny scuttling automaton beetle.",
     "lootTable": [
       {
@@ -366,7 +366,7 @@
     "leashRange": 15.05,
     "combatStyle": "tesla",
     "respawnTime": 20,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Near-invisible parasitic mite.",
     "lootTable": [
       {
@@ -412,7 +412,7 @@
     "leashRange": 15.1,
     "combatStyle": "void",
     "respawnTime": 21,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Low-slung crawler with grinding mandibles.",
     "lootTable": [
       {
@@ -459,7 +459,7 @@
     "leashRange": 15.2,
     "combatStyle": "tesla",
     "respawnTime": 21,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Acid-spitting colonial insect.",
     "lootTable": [
       {
@@ -506,7 +506,7 @@
     "leashRange": 15.2,
     "combatStyle": "void",
     "respawnTime": 21,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Bioluminescent flying pest.",
     "lootTable": [
       {
@@ -552,7 +552,7 @@
     "leashRange": 15.25,
     "combatStyle": "nano",
     "respawnTime": 22,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Armored larva burrowing through soil.",
     "lootTable": [
       {
@@ -599,7 +599,7 @@
     "leashRange": 15.25,
     "combatStyle": "tesla",
     "respawnTime": 22,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Blood-sucking tick with barbed legs.",
     "lootTable": [
       {
@@ -645,7 +645,7 @@
     "leashRange": 15.3,
     "combatStyle": "nano",
     "respawnTime": 22,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Mindless worker serving the hive.",
     "lootTable": [
       {
@@ -691,7 +691,7 @@
     "leashRange": 15.35,
     "combatStyle": "tesla",
     "respawnTime": 22,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Disease-carrying buzzing menace.",
     "lootTable": [
       {
@@ -737,7 +737,7 @@
     "leashRange": 15.35,
     "combatStyle": "void",
     "respawnTime": 22,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Ambush predator lurking in burrows.",
     "lootTable": [
       {
@@ -783,7 +783,7 @@
     "leashRange": 15.45,
     "combatStyle": "nano",
     "respawnTime": 23,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Soldier ant with blade-like mandibles.",
     "lootTable": [
       {
@@ -830,7 +830,7 @@
     "leashRange": 25,
     "combatStyle": "nano",
     "respawnTime": 130,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Bloated queen commanding the swarm.",
     "lootTable": [
       {
@@ -896,7 +896,7 @@
     "leashRange": 15.5,
     "combatStyle": "tesla",
     "respawnTime": 23,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Beetle generating electrical discharges.",
     "lootTable": [
       {
@@ -943,7 +943,7 @@
     "leashRange": 15.55,
     "combatStyle": "nano",
     "respawnTime": 23,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Guard insect with reinforced plates.",
     "lootTable": [
       {
@@ -990,7 +990,7 @@
     "leashRange": 15.6,
     "combatStyle": "void",
     "respawnTime": 24,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Subterranean insect erupting from soil.",
     "lootTable": [
       {
@@ -1037,7 +1037,7 @@
     "leashRange": 15.7,
     "combatStyle": "void",
     "respawnTime": 24,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Massive spider commanding web territory.",
     "lootTable": [
       {
@@ -1083,7 +1083,7 @@
     "leashRange": 25,
     "combatStyle": "tesla",
     "respawnTime": 140,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Giant wasp queen ruling the skies.",
     "lootTable": [
       {
@@ -1148,7 +1148,7 @@
     "leashRange": 16,
     "combatStyle": "void",
     "respawnTime": 26,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "desc": "Master weaver of lethal trap webs.",
     "lootTable": [
       {
@@ -1194,7 +1194,7 @@
     "leashRange": 16.05,
     "combatStyle": "tesla",
     "respawnTime": 26,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Small jellyfish drifting on air currents.",
     "lootTable": [
       {
@@ -1241,7 +1241,7 @@
     "leashRange": 16.05,
     "combatStyle": "nano",
     "respawnTime": 26,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Mantis with scythe-like forearms.",
     "lootTable": [
       {
@@ -1287,7 +1287,7 @@
     "leashRange": 16.1,
     "combatStyle": "void",
     "respawnTime": 27,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Camouflaged scorpion in rocky terrain.",
     "lootTable": [
       {
@@ -1334,7 +1334,7 @@
     "leashRange": 16.2,
     "combatStyle": "tesla",
     "respawnTime": 27,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Large jelly pulling in prey with tidal force.",
     "lootTable": [
       {
@@ -1381,7 +1381,7 @@
     "leashRange": 25,
     "combatStyle": "tesla",
     "respawnTime": 145,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Enormous jelly monarch ruling the tidal pools.",
     "lootTable": [
       {
@@ -1447,7 +1447,7 @@
     "leashRange": 16.25,
     "combatStyle": "nano",
     "respawnTime": 28,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Patient hunter striking with precision.",
     "lootTable": [
       {
@@ -1493,7 +1493,7 @@
     "leashRange": 16.3,
     "combatStyle": "void",
     "respawnTime": 28,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Scorpion with highly toxic venom.",
     "lootTable": [
       {
@@ -1540,7 +1540,7 @@
     "leashRange": 16.35,
     "combatStyle": "void",
     "respawnTime": 28,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Near-invisible mantis striking from nowhere.",
     "lootTable": [
       {
@@ -1586,7 +1586,7 @@
     "leashRange": 16.4,
     "combatStyle": "tesla",
     "respawnTime": 28,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Jelly channeling electrical currents.",
     "lootTable": [
       {
@@ -1633,7 +1633,7 @@
     "leashRange": 16.45,
     "combatStyle": "void",
     "respawnTime": 29,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Massive scorpion with crushing pincers.",
     "lootTable": [
       {
@@ -1680,7 +1680,7 @@
     "leashRange": 16.55,
     "combatStyle": "nano",
     "respawnTime": 29,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Battle-hardened mantis covered in scars.",
     "lootTable": [
       {
@@ -1726,7 +1726,7 @@
     "leashRange": 16.6,
     "combatStyle": "tesla",
     "respawnTime": 30,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Dark jelly phasing through dimensions.",
     "lootTable": [
       {
@@ -1773,7 +1773,7 @@
     "leashRange": 16.75,
     "combatStyle": "tesla",
     "respawnTime": 31,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Deep-dwelling jelly adapted to crushing pressure.",
     "lootTable": [
       {
@@ -1820,7 +1820,7 @@
     "leashRange": 16.8,
     "combatStyle": "void",
     "respawnTime": 31,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Disease-carrying scorpion spreading blight.",
     "lootTable": [
       {
@@ -1867,7 +1867,7 @@
     "leashRange": 16.9,
     "combatStyle": "tesla",
     "respawnTime": 31,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Crackling jelly conducting pure lightning.",
     "lootTable": [
       {
@@ -1914,7 +1914,7 @@
     "leashRange": 16.95,
     "combatStyle": "void",
     "respawnTime": 32,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Enormous scorpion of devastating power.",
     "lootTable": [
       {
@@ -1961,7 +1961,7 @@
     "leashRange": 25,
     "combatStyle": "nano",
     "respawnTime": 160,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "desc": "Alpha mantis spraying concentrated acid.",
     "lootTable": [
       {
@@ -2026,7 +2026,7 @@
     "leashRange": 17.05,
     "combatStyle": "void",
     "respawnTime": 32,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Quadruped lurking in shadows.",
     "lootTable": [
       {
@@ -2072,7 +2072,7 @@
     "leashRange": 17.1,
     "combatStyle": "void",
     "respawnTime": 33,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Nocturnal predator with darkvision.",
     "lootTable": [
       {
@@ -2118,7 +2118,7 @@
     "leashRange": 17.05,
     "combatStyle": "tesla",
     "respawnTime": 32,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Burrowing worm erupting from dust.",
     "lootTable": [
       {
@@ -2165,7 +2165,7 @@
     "leashRange": 17.1,
     "combatStyle": "nano",
     "respawnTime": 33,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Slow slug leaving corrosive trail.",
     "lootTable": [
       {
@@ -2212,7 +2212,7 @@
     "leashRange": 17.15,
     "combatStyle": "tesla",
     "respawnTime": 33,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Worm causing localized earthquakes.",
     "lootTable": [
       {
@@ -2259,7 +2259,7 @@
     "leashRange": 17.2,
     "combatStyle": "void",
     "respawnTime": 33,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Predator drawn to the scent of blood.",
     "lootTable": [
       {
@@ -2305,7 +2305,7 @@
     "leashRange": 25,
     "combatStyle": "void",
     "respawnTime": 165,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Alpha predator commanding the hunting pack.",
     "lootTable": [
       {
@@ -2370,7 +2370,7 @@
     "leashRange": 17.25,
     "combatStyle": "tesla",
     "respawnTime": 34,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Worm boring through solid rock.",
     "lootTable": [
       {
@@ -2417,7 +2417,7 @@
     "leashRange": 17.3,
     "combatStyle": "nano",
     "respawnTime": 34,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Slug oozing potent neurotoxin.",
     "lootTable": [
       {
@@ -2464,7 +2464,7 @@
     "leashRange": 17.35,
     "combatStyle": "tesla",
     "respawnTime": 34,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Worm discharging electrical shocks.",
     "lootTable": [
       {
@@ -2511,7 +2511,7 @@
     "leashRange": 17.4,
     "combatStyle": "void",
     "respawnTime": 34,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Predator with elongated saber fangs.",
     "lootTable": [
       {
@@ -2557,7 +2557,7 @@
     "leashRange": 17.45,
     "combatStyle": "nano",
     "respawnTime": 35,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Slug with crystalline shell fragments.",
     "lootTable": [
       {
@@ -2604,7 +2604,7 @@
     "leashRange": 17.55,
     "combatStyle": "tesla",
     "respawnTime": 35,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Worm generating thunderous vibrations.",
     "lootTable": [
       {
@@ -2651,7 +2651,7 @@
     "leashRange": 17.6,
     "combatStyle": "void",
     "respawnTime": 36,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Predator phasing through void tears.",
     "lootTable": [
       {
@@ -2697,7 +2697,7 @@
     "leashRange": 17.75,
     "combatStyle": "void",
     "respawnTime": 37,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Semi-transparent predator fading in and out.",
     "lootTable": [
       {
@@ -2743,7 +2743,7 @@
     "leashRange": 17.75,
     "combatStyle": "tesla",
     "respawnTime": 37,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Legendary worm of devastating power.",
     "lootTable": [
       {
@@ -2790,7 +2790,7 @@
     "leashRange": 17.8,
     "combatStyle": "nano",
     "respawnTime": 37,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Ultimate slug evolution, nearly indestructible.",
     "lootTable": [
       {
@@ -2837,7 +2837,7 @@
     "leashRange": 17.9,
     "combatStyle": "void",
     "respawnTime": 37,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Herald of destruction prowling the wastes.",
     "lootTable": [
       {
@@ -2883,7 +2883,7 @@
     "leashRange": 17.95,
     "combatStyle": "void",
     "respawnTime": 38,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "desc": "Ultimate predator at the top of the food chain.",
     "lootTable": [
       {
@@ -2929,7 +2929,7 @@
     "leashRange": 18.05,
     "combatStyle": "void",
     "respawnTime": 38,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Faint spectral entity from beyond.",
     "lootTable": [
       {
@@ -2975,7 +2975,7 @@
     "leashRange": 18.05,
     "combatStyle": "tesla",
     "respawnTime": 38,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Flickering dark energy fragment.",
     "lootTable": [
       {
@@ -3021,7 +3021,7 @@
     "leashRange": 18.1,
     "combatStyle": "nano",
     "respawnTime": 39,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Animated stone construct.",
     "lootTable": [
       {
@@ -3067,7 +3067,7 @@
     "leashRange": 18.15,
     "combatStyle": "tesla",
     "respawnTime": 39,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Amorphous mass of dark energy.",
     "lootTable": [
       {
@@ -3113,7 +3113,7 @@
     "leashRange": 18.2,
     "combatStyle": "void",
     "respawnTime": 39,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Wraith whose screams paralyze prey.",
     "lootTable": [
       {
@@ -3159,7 +3159,7 @@
     "leashRange": 18.25,
     "combatStyle": "nano",
     "respawnTime": 40,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Volcanic glass golem of deadly sharpness.",
     "lootTable": [
       {
@@ -3205,7 +3205,7 @@
     "leashRange": 18.3,
     "combatStyle": "tesla",
     "respawnTime": 40,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Chaotic mass warping reality nearby.",
     "lootTable": [
       {
@@ -3251,7 +3251,7 @@
     "leashRange": 18.35,
     "combatStyle": "void",
     "respawnTime": 40,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Wraith emitting mind-shattering howls.",
     "lootTable": [
       {
@@ -3297,7 +3297,7 @@
     "leashRange": 18.4,
     "combatStyle": "nano",
     "respawnTime": 40,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Translucent golem refracting light.",
     "lootTable": [
       {
@@ -3343,7 +3343,7 @@
     "leashRange": 18.45,
     "combatStyle": "tesla",
     "respawnTime": 41,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Mass projecting horrific visions.",
     "lootTable": [
       {
@@ -3389,7 +3389,7 @@
     "leashRange": 25,
     "combatStyle": "void",
     "respawnTime": 190,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Ancient guardian of the void boundary.",
     "lootTable": [
       {
@@ -3454,7 +3454,7 @@
     "leashRange": 18.5,
     "combatStyle": "nano",
     "respawnTime": 41,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Nearly indestructible diamond construct.",
     "lootTable": [
       {
@@ -3500,7 +3500,7 @@
     "leashRange": 18.55,
     "combatStyle": "void",
     "respawnTime": 41,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Wraith whose screams rupture reality.",
     "lootTable": [
       {
@@ -3546,7 +3546,7 @@
     "leashRange": 18.6,
     "combatStyle": "nano",
     "respawnTime": 42,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Colossal golem of staggering power.",
     "lootTable": [
       {
@@ -3592,7 +3592,7 @@
     "leashRange": 18.75,
     "combatStyle": "nano",
     "respawnTime": 43,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Millennia-old construct of forgotten origin.",
     "lootTable": [
       {
@@ -3638,7 +3638,7 @@
     "leashRange": 18.75,
     "combatStyle": "void",
     "respawnTime": 43,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Wraith from the edge of oblivion itself.",
     "lootTable": [
       {
@@ -3684,7 +3684,7 @@
     "leashRange": 18.8,
     "combatStyle": "nano",
     "respawnTime": 43,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Golem infused with void energy.",
     "lootTable": [
       {
@@ -3730,7 +3730,7 @@
     "leashRange": 18.85,
     "combatStyle": "void",
     "respawnTime": 43,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Immortal wraith existing since creation.",
     "lootTable": [
       {
@@ -3776,7 +3776,7 @@
     "leashRange": 18.85,
     "combatStyle": "tesla",
     "respawnTime": 43,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Mass of absolute nothingness.",
     "lootTable": [
       {
@@ -3822,7 +3822,7 @@
     "leashRange": 18.9,
     "combatStyle": "nano",
     "respawnTime": 43,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Multi-faceted golem splitting light.",
     "lootTable": [
       {
@@ -3868,7 +3868,7 @@
     "leashRange": 18.9,
     "combatStyle": "void",
     "respawnTime": 43,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Nearly imperceptible wraith.",
     "lootTable": [
       {
@@ -3914,7 +3914,7 @@
     "leashRange": 18.95,
     "combatStyle": "tesla",
     "respawnTime": 44,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Final form of dark energy evolution.",
     "lootTable": [
       {
@@ -3960,7 +3960,7 @@
     "leashRange": 25,
     "combatStyle": "nano",
     "respawnTime": 200,
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "desc": "Enormous crystalline titan guarding ancient secrets.",
     "lootTable": [
       {
@@ -4025,7 +4025,7 @@
     "leashRange": 19.05,
     "combatStyle": "void",
     "respawnTime": 44,
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "desc": "Floating eye observing all movement.",
     "lootTable": [
       {
@@ -4072,7 +4072,7 @@
     "leashRange": 19.05,
     "combatStyle": "tesla",
     "respawnTime": 44,
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "desc": "Small anomaly bending local space.",
     "lootTable": [
       {
@@ -4118,7 +4118,7 @@
     "leashRange": 19.15,
     "combatStyle": "void",
     "respawnTime": 45,
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "desc": "Eye projecting beams of destruction.",
     "lootTable": [
       {
@@ -4165,7 +4165,7 @@
     "leashRange": 19.2,
     "combatStyle": "tesla",
     "respawnTime": 45,
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "desc": "Anomaly distorting gravitational fields.",
     "lootTable": [
       {
@@ -4211,7 +4211,7 @@
     "leashRange": 19.25,
     "combatStyle": "void",
     "respawnTime": 46,
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "desc": "Eye spreading corruption with its gaze.",
     "lootTable": [
       {
@@ -4258,7 +4258,7 @@
     "leashRange": 19.3,
     "combatStyle": "void",
     "respawnTime": 46,
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "desc": "Commanding eye dominating lesser minds.",
     "lootTable": [
       {
@@ -4305,7 +4305,7 @@
     "leashRange": 19.35,
     "combatStyle": "void",
     "respawnTime": 46,
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "desc": "Eye peering from the void itself.",
     "lootTable": [
       {
@@ -4352,7 +4352,7 @@
     "leashRange": 19.4,
     "combatStyle": "void",
     "respawnTime": 46,
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "desc": "Eye whose gaze brings death.",
     "lootTable": [
       {
@@ -4399,7 +4399,7 @@
     "leashRange": 25,
     "combatStyle": "void",
     "respawnTime": 210,
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "desc": "Enormous eye consuming reality itself.",
     "lootTable": [
       {
@@ -4465,7 +4465,7 @@
     "leashRange": 19.55,
     "combatStyle": "void",
     "respawnTime": 47,
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "desc": "Ancient eye of unfathomable wisdom.",
     "lootTable": [
       {
@@ -4512,7 +4512,7 @@
     "leashRange": 19.6,
     "combatStyle": "void",
     "respawnTime": 48,
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "desc": "Eye perceiving cosmic truths.",
     "lootTable": [
       {
@@ -4559,7 +4559,7 @@
     "leashRange": 19.9,
     "combatStyle": "void",
     "respawnTime": 49,
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "desc": "Eye of a being beyond comprehension.",
     "lootTable": [
       {
@@ -4606,7 +4606,7 @@
     "leashRange": 25,
     "combatStyle": "tesla",
     "respawnTime": 219,
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "desc": "Entity of pure unreality, a living paradox.",
     "lootTable": [
       {

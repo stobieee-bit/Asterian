@@ -39,7 +39,7 @@
         "options": []
       },
       "advice": {
-        "text": "Start by mining Stellarite in the Asteroid Mines (far east). Smelt it at the Bio-Lab (behind me, southwest corner) to craft equipment. Then head south to the Alien Wastes to train combat.",
+        "text": "Start by mining Stellarite in the Asteroid Mines (northeast). Smelt it at the Bio-Lab (west) to craft equipment. Then head south to the Spore Marshes to train combat.",
         "options": [
           {
             "label": "Thanks!",
@@ -568,8 +568,8 @@
   "warden_krios": {
     "name": "Warden Krios",
     "position": {
-      "x": -60,
-      "z": -350
+      "x": 155,
+      "z": -395
     },
     "bodyColor": 3811866,
     "headColor": 11833456,
@@ -602,8 +602,8 @@
   "signal_officer_mira": {
     "name": "Signal Officer Mira",
     "position": {
-      "x": 30,
-      "z": -1100
+      "x": 15,
+      "z": -840
     },
     "bodyColor": 1718874,
     "headColor": 12883322,
@@ -677,7 +677,7 @@
   },
   "mycologist_thren": {
     "name": "Mycologist Thren",
-    "position": { "x": 150, "z": -100 },
+    "position": { "x": 115, "z": -60 },
     "bodyColor": 2780490,
     "headColor": 8961194,
     "desc": "A cautious researcher studying the hollows' unique fungal ecosystem.",
@@ -694,7 +694,7 @@
   },
   "sporekeeper_ixil": {
     "name": "Sporekeeper Ixil",
-    "position": { "x": 170, "z": -110 },
+    "position": { "x": 135, "z": -70 },
     "bodyColor": 3833690,
     "headColor": 11206075,
     "desc": "A cheerful trader who harvests fungal products for sale.",
@@ -722,7 +722,7 @@
   },
   "tendril_hermit": {
     "name": "Tendril the Hermit",
-    "position": { "x": 145, "z": -135 },
+    "position": { "x": 110, "z": -95 },
     "bodyColor": 1727290,
     "headColor": 7847833,
     "desc": "An old gatherer who knows every node in the hollows.",
@@ -746,7 +746,7 @@
   },
   "captain_solara": {
     "name": "Guard Captain Solara",
-    "position": { "x": 155, "z": -95 },
+    "position": { "x": 120, "z": -55 },
     "bodyColor": 4876122,
     "headColor": 13421772,
     "desc": "Station guard posted at the hollows entrance. Assigns bounties on dangerous fungal creatures.",
@@ -759,7 +759,7 @@
   },
   "forager_nim": {
     "name": "Forager Nim",
-    "position": { "x": 210, "z": -190 },
+    "position": { "x": 155, "z": -105 },
     "bodyColor": 2776906,
     "headColor": 10076330,
     "desc": "A brave forager who ventured too deep and set up camp in the Rootweb Depths.",
@@ -776,7 +776,7 @@
   },
   "banker_sprout": {
     "name": "Banker Sprout",
-    "position": { "x": 165, "z": -105 },
+    "position": { "x": 130, "z": -65 },
     "bodyColor": 3837786,
     "headColor": 12316364,
     "desc": "A mobile vault operator stationed at the hollows entrance.",
@@ -792,7 +792,7 @@
   },
   "sandwalker_ren": {
     "name": "Sandwalker Ren",
-    "position": { "x": -155, "z": -400 },
+    "position": { "x": -185, "z": -235 },
     "bodyColor": 9141050,
     "headColor": 14535816,
     "desc": "A desert nomad who has mapped every dune and ruin in the Solarith Wastes.",
@@ -809,7 +809,7 @@
   },
   "dune_merchant_azara": {
     "name": "Dune Merchant Azara",
-    "position": { "x": -160, "z": -405 },
+    "position": { "x": -190, "z": -240 },
     "bodyColor": 10193226,
     "headColor": 15654297,
     "desc": "A resourceful trader who hauls goods across the desert.",
@@ -841,7 +841,7 @@
   },
   "dr_solenne": {
     "name": "Dr. Solenne",
-    "position": { "x": -220, "z": -555 },
+    "position": { "x": -220, "z": -275 },
     "bodyColor": 8088378,
     "headColor": 13421943,
     "desc": "A driven archaeologist excavating the ancient solar research facility buried in Obsidian Canyon.",
@@ -858,7 +858,7 @@
   },
   "forge_smith_korvus": {
     "name": "Forge-Smith Korvus",
-    "position": { "x": -165, "z": -410 },
+    "position": { "x": -195, "z": -245 },
     "bodyColor": 7035178,
     "headColor": 12303206,
     "desc": "A massive smith who maintains a portable forge in the desert.",
@@ -884,7 +884,7 @@
   },
   "scout_veyla": {
     "name": "Scout Veyla",
-    "position": { "x": -150, "z": -395 },
+    "position": { "x": -180, "z": -230 },
     "bodyColor": 8092490,
     "headColor": 13421960,
     "desc": "A veteran desert scout who tracks the most dangerous creatures in the Solarith Wastes.",
@@ -897,7 +897,7 @@
   },
   "oasis_keeper_maren": {
     "name": "Oasis Keeper Maren",
-    "position": { "x": -170, "z": -415 },
+    "position": { "x": -200, "z": -250 },
     "bodyColor": 4885610,
     "headColor": 8961194,
     "desc": "Maintains a secure vault at the desert oasis trading post.",
@@ -913,7 +913,7 @@
   },
   "warden_eidolon": {
     "name": "Warden Eidolon",
-    "position": { "x": 25, "z": -910 },
+    "position": { "x": 12, "z": -635 },
     "bodyColor": 4860523,
     "headColor": 11175884,
     "desc": "The last functioning guardian AI of the citadel, manifested as a translucent humanoid figure.",
@@ -930,7 +930,7 @@
   },
   "phantom_vendor_zyra": {
     "name": "Phantom Vendor Zyra",
-    "position": { "x": 30, "z": -915 },
+    "position": { "x": 18, "z": -640 },
     "bodyColor": 3807579,
     "headColor": 10058683,
     "desc": "A spectral merchant who trades in void-forged equipment.",
@@ -962,7 +962,7 @@
   },
   "echo_sage_vael": {
     "name": "Echo-Sage Vael",
-    "position": { "x": -15, "z": -1045 },
+    "position": { "x": -15, "z": -670 },
     "bodyColor": 2755659,
     "headColor": 8939178,
     "desc": "A being caught between dimensions — partially phased out of reality.",
@@ -979,7 +979,7 @@
   },
   "arms_master_kethis": {
     "name": "Arms-Master Kethis",
-    "position": { "x": 20, "z": -905 },
+    "position": { "x": 8, "z": -630 },
     "bodyColor": 5905275,
     "headColor": 12298461,
     "desc": "A battle-hardened warrior fighting the citadel's corrupted denizens. Assigns the most dangerous hunting contracts.",
@@ -992,7 +992,7 @@
   },
   "void_smith_orin": {
     "name": "Void-Smith Orin",
-    "position": { "x": 35, "z": -920 },
+    "position": { "x": 22, "z": -645 },
     "bodyColor": 3810907,
     "headColor": 11175884,
     "desc": "A master craftsman who has learned to work void-infused materials.",
@@ -1018,13 +1018,246 @@
   },
   "dimensional_banker": {
     "name": "Dimensional Banker",
-    "position": { "x": 15, "z": -905 },
+    "position": { "x": 5, "z": -630 },
     "bodyColor": 4868715,
     "headColor": 11184812,
     "desc": "A banking terminal that operates across dimensional boundaries.",
     "dialogue": {
       "greeting": {
         "text": "Dimensional vault link established. Your assets are secure across all phase states.",
+        "options": [
+          { "label": "Access my bank.", "action": "openBank" },
+          { "label": "Goodbye.", "next": null }
+        ]
+      }
+    }
+  },
+  "marsh_warden_tova": {
+    "name": "Marsh Warden Tova",
+    "position": { "x": -10, "z": -108 },
+    "bodyColor": 3833690,
+    "headColor": 10076330,
+    "desc": "A seasoned ranger who patrols the marshes and assigns bounties on dangerous creatures.",
+    "dialogue": {
+      "greeting": {
+        "text": "__SLAYER_DYNAMIC__",
+        "options": []
+      }
+    }
+  },
+  "marsh_trader_quiln": {
+    "name": "Marsh Trader Quiln",
+    "position": { "x": -15, "z": -112 },
+    "bodyColor": 5917226,
+    "headColor": 10076330,
+    "desc": "A hardy merchant who sells supplies from a rickety marsh platform.",
+    "shop": {
+      "name": "Quiln's Marsh Supplies",
+      "specialty": "consumables",
+      "items": [
+        { "itemId": "lichen_wrap", "price": 20, "stock": 50 },
+        { "itemId": "nebula_smoothie", "price": 60, "stock": 30 },
+        { "itemId": "spore_antidote", "price": 30, "stock": 40 },
+        { "itemId": "scrap_nanoblade", "price": 80, "stock": 3 },
+        { "itemId": "scrap_coilgun", "price": 80, "stock": 3 },
+        { "itemId": "scrap_voidstaff", "price": 80, "stock": 3 }
+      ]
+    },
+    "dialogue": {
+      "greeting": {
+        "text": "The marshes are no place for the unprepared. Stock up while you can!",
+        "options": [
+          { "label": "Show me your stock.", "action": "openShop" },
+          { "label": "No thanks.", "next": null }
+        ]
+      }
+    }
+  },
+  "marsh_banker_pod": {
+    "name": "Vault Pod Alpha",
+    "position": { "x": -8, "z": -115 },
+    "bodyColor": 4474470,
+    "headColor": 11184810,
+    "desc": "A mobile vault terminal deployed in the marshes.",
+    "dialogue": {
+      "greeting": {
+        "text": "Marsh vault terminal online. Secure storage available.",
+        "options": [
+          { "label": "Access my bank.", "action": "openBank" },
+          { "label": "Goodbye.", "next": null }
+        ]
+      }
+    }
+  },
+  "hive_scout_krix": {
+    "name": "Hive Scout Krix",
+    "position": { "x": -42, "z": -238 },
+    "bodyColor": 5909034,
+    "headColor": 11567200,
+    "desc": "A fearless insect specialist who ventures deep into the hive tunnels.",
+    "dialogue": {
+      "greeting": {
+        "text": "__SLAYER_DYNAMIC__",
+        "options": []
+      }
+    }
+  },
+  "hive_merchant_chiara": {
+    "name": "Chitin Merchant Chiara",
+    "position": { "x": -48, "z": -242 },
+    "bodyColor": 7035178,
+    "headColor": 12303206,
+    "desc": "A trader specializing in chitin-crafted goods and hive products.",
+    "shop": {
+      "name": "Chiara's Chitin Works",
+      "specialty": "equipment",
+      "items": [
+        { "itemId": "ferrite_nanoblade", "price": 350, "stock": 3 },
+        { "itemId": "ferrite_coilgun", "price": 350, "stock": 3 },
+        { "itemId": "ferrite_voidstaff", "price": 350, "stock": 3 },
+        { "itemId": "ferrite_helmet", "price": 200, "stock": 3 },
+        { "itemId": "ferrite_vest", "price": 300, "stock": 3 },
+        { "itemId": "ferrite_legs", "price": 250, "stock": 3 },
+        { "itemId": "alien_burger", "price": 150, "stock": 20 }
+      ]
+    },
+    "dialogue": {
+      "greeting": {
+        "text": "The hive creatures drop excellent materials for crafting. Browse my selection!",
+        "options": [
+          { "label": "Show me your wares.", "action": "openShop" },
+          { "label": "Not now.", "next": null }
+        ]
+      }
+    }
+  },
+  "hive_banker_node": {
+    "name": "Vault Node Beta",
+    "position": { "x": -38, "z": -245 },
+    "bodyColor": 4474470,
+    "headColor": 11184810,
+    "desc": "A hardened vault terminal embedded in the hive wall.",
+    "dialogue": {
+      "greeting": {
+        "text": "Hive vault node operational. Your items are safe from the swarm.",
+        "options": [
+          { "label": "Access my bank.", "action": "openBank" },
+          { "label": "Goodbye.", "next": null }
+        ]
+      }
+    }
+  },
+  "fungal_ranger_voss": {
+    "name": "Ranger Voss",
+    "position": { "x": 68, "z": -368 },
+    "bodyColor": 3833690,
+    "headColor": 11206075,
+    "desc": "A battle-scarred ranger who tracks the deadliest predators in the fungal wastes.",
+    "dialogue": {
+      "greeting": {
+        "text": "__SLAYER_DYNAMIC__",
+        "options": []
+      }
+    }
+  },
+  "fungal_trader_myx": {
+    "name": "Myx the Mycovore",
+    "position": { "x": 73, "z": -372 },
+    "bodyColor": 4860506,
+    "headColor": 12884586,
+    "desc": "An eccentric trader who cultivates and sells fungal specimens.",
+    "shop": {
+      "name": "Myx's Fungal Bazaar",
+      "specialty": "consumables",
+      "items": [
+        { "itemId": "cobalt_nanoblade", "price": 600, "stock": 2 },
+        { "itemId": "cobalt_coilgun", "price": 600, "stock": 2 },
+        { "itemId": "cobalt_voidstaff", "price": 600, "stock": 2 },
+        { "itemId": "cobalt_helmet", "price": 350, "stock": 3 },
+        { "itemId": "cobalt_vest", "price": 500, "stock": 2 },
+        { "itemId": "cobalt_legs", "price": 450, "stock": 3 },
+        { "itemId": "fungal_tonic", "price": 90, "stock": 25 },
+        { "itemId": "rootsap_elixir", "price": 140, "stock": 15 }
+      ]
+    },
+    "dialogue": {
+      "greeting": {
+        "text": "The fungus provides everything you need — food, medicine, weapons! Take a look.",
+        "options": [
+          { "label": "Show me your stock.", "action": "openShop" },
+          { "label": "Maybe later.", "next": null }
+        ]
+      }
+    }
+  },
+  "fungal_banker_spore": {
+    "name": "Vault Spore Gamma",
+    "position": { "x": 62, "z": -375 },
+    "bodyColor": 4474470,
+    "headColor": 11184810,
+    "desc": "A vault terminal grown from symbiotic fungal-machine hybrid tissue.",
+    "dialogue": {
+      "greeting": {
+        "text": "Fungal vault link active. Your deposits are protected by bio-encryption.",
+        "options": [
+          { "label": "Access my bank.", "action": "openBank" },
+          { "label": "Goodbye.", "next": null }
+        ]
+      }
+    }
+  },
+  "stalker_hunter_drake": {
+    "name": "Hunter Drake",
+    "position": { "x": -72, "z": -488 },
+    "bodyColor": 5909034,
+    "headColor": 11567200,
+    "desc": "An elite hunter who has survived decades in the stalker reaches.",
+    "dialogue": {
+      "greeting": {
+        "text": "__SLAYER_DYNAMIC__",
+        "options": []
+      }
+    }
+  },
+  "stalker_merchant_wraith": {
+    "name": "Shade Merchant Lys",
+    "position": { "x": -78, "z": -492 },
+    "bodyColor": 3807579,
+    "headColor": 10058683,
+    "desc": "A mysterious merchant who deals in shadow-touched equipment.",
+    "shop": {
+      "name": "Lys's Shadow Market",
+      "specialty": "equipment",
+      "items": [
+        { "itemId": "duranium_nanoblade", "price": 800, "stock": 2 },
+        { "itemId": "duranium_coilgun", "price": 800, "stock": 2 },
+        { "itemId": "duranium_voidstaff", "price": 800, "stock": 2 },
+        { "itemId": "duranium_helmet", "price": 500, "stock": 3 },
+        { "itemId": "duranium_vest", "price": 700, "stock": 2 },
+        { "itemId": "duranium_legs", "price": 600, "stock": 3 },
+        { "itemId": "duranium_boots", "price": 400, "stock": 3 },
+        { "itemId": "duranium_gloves", "price": 400, "stock": 3 }
+      ]
+    },
+    "dialogue": {
+      "greeting": {
+        "text": "In the shadows, only the best-equipped survive. See what I have to offer.",
+        "options": [
+          { "label": "Show me your wares.", "action": "openShop" },
+          { "label": "Not interested.", "next": null }
+        ]
+      }
+    }
+  },
+  "stalker_banker_delta": {
+    "name": "Vault Node Delta",
+    "position": { "x": -65, "z": -495 },
+    "bodyColor": 4474470,
+    "headColor": 11184810,
+    "desc": "A reinforced vault terminal hidden in the stalker reaches.",
+    "dialogue": {
+      "greeting": {
+        "text": "Shadow vault terminal online. Maximum security guaranteed.",
         "options": [
           { "label": "Access my bank.", "action": "openBank" },
           { "label": "Goodbye.", "next": null }

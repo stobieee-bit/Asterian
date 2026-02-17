@@ -13,7 +13,7 @@
     "leashRange": 18,
     "combatStyle": "nano",
     "respawnTime": 30,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "insectoid",
     "meshParams": {
       "color": 3824170,
@@ -50,7 +50,7 @@
     "leashRange": 20,
     "combatStyle": "nano",
     "respawnTime": 35,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "insectoid",
     "meshParams": {
       "color": 2771482,
@@ -87,7 +87,7 @@
     "leashRange": 22,
     "combatStyle": "tesla",
     "respawnTime": 40,
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "jellyfish",
     "meshParams": {
       "color": 6697898,
@@ -142,7 +142,7 @@
     "leashRange": 25,
     "combatStyle": "void",
     "respawnTime": 45,
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "scorpion",
     "meshParams": {
       "color": 4872762,
@@ -198,7 +198,7 @@
     "combatStyle": "void",
     "respawnTime": 120,
     "isBoss": true,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "slug",
     "meshParams": {
       "color": 4864602,
@@ -266,7 +266,7 @@
     "combatStyle": "tesla",
     "respawnTime": 120,
     "isBoss": true,
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "worm",
     "meshParams": {
       "color": 5913210,
@@ -324,7 +324,7 @@
     "name": "Beetle Drone",
     "level": 1,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "insectoid",
     "meshParams": {
       "color": 5915936,
@@ -338,7 +338,7 @@
     "name": "Dust Mite",
     "level": 1,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "swarm_bug",
     "meshParams": {
       "color": 10127968,
@@ -351,7 +351,7 @@
     "name": "Sand Crawler",
     "level": 2,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "insectoid",
     "meshParams": {
       "color": 8022592,
@@ -365,7 +365,7 @@
     "name": "Spitting Ant",
     "level": 4,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "insectoid",
     "meshParams": {
       "color": 4868656,
@@ -379,7 +379,7 @@
     "name": "Glow Fly",
     "level": 4,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "swarm_bug",
     "meshParams": {
       "color": 5622869,
@@ -392,7 +392,7 @@
     "name": "Carapace Grub",
     "level": 5,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "insectoid",
     "meshParams": {
       "color": 9075280,
@@ -406,7 +406,7 @@
     "name": "Barbed Tick",
     "level": 5,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "arachnid",
     "meshParams": {
       "color": 5915952,
@@ -419,7 +419,7 @@
     "name": "Hive Drone",
     "level": 6,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "swarm_bug",
     "meshParams": {
       "color": 8022576,
@@ -432,7 +432,7 @@
     "name": "Plague Fly",
     "level": 7,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "swarm_bug",
     "meshParams": {
       "color": 6978112,
@@ -445,7 +445,7 @@
     "name": "Tunnel Spider",
     "level": 7,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "arachnid",
     "meshParams": {
       "color": 4864544,
@@ -458,7 +458,7 @@
     "name": "Razor Ant",
     "level": 9,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "insectoid",
     "meshParams": {
       "color": 3815968,
@@ -472,7 +472,7 @@
     "name": "Hive Queen",
     "level": 10,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "insectoid",
     "meshParams": {
       "color": 10123824,
@@ -487,7 +487,7 @@
     "name": "Spark Beetle",
     "level": 10,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "insectoid",
     "meshParams": {
       "color": 4876938,
@@ -501,7 +501,7 @@
     "name": "Chitin Sentinel",
     "level": 11,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "insectoid",
     "meshParams": {
       "color": 6974016,
@@ -515,7 +515,7 @@
     "name": "Burrowing Horror",
     "level": 12,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "insectoid",
     "meshParams": {
       "color": 3810592,
@@ -529,7 +529,7 @@
     "name": "Web Matriarch",
     "level": 14,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "arachnid",
     "meshParams": {
       "color": 6965866,
@@ -542,7 +542,7 @@
     "name": "Stingwing Matriarch",
     "level": 20,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "swarm_bug",
     "meshParams": {
       "color": 12294704,
@@ -556,7 +556,7 @@
     "name": "Death Weaver",
     "level": 20,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "spore-marshes",
     "meshTemplate": "arachnid",
     "meshParams": {
       "color": 2763338,
@@ -569,7 +569,7 @@
     "name": "Drift Jelly",
     "level": 21,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "jellyfish",
     "meshParams": {
       "color": 5614284,
@@ -583,7 +583,7 @@
     "name": "Blade Mantis",
     "level": 21,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "mantis",
     "meshParams": {
       "color": 4880970,
@@ -596,7 +596,7 @@
     "name": "Rock Scorpion",
     "level": 22,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "scorpion",
     "meshParams": {
       "color": 6969920,
@@ -610,7 +610,7 @@
     "name": "Tidal Jelly",
     "level": 24,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "jellyfish",
     "meshParams": {
       "color": 3381674,
@@ -624,7 +624,7 @@
     "name": "Tidal Jelly Monarch",
     "level": 25,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "jellyfish",
     "meshParams": {
       "color": 2271948,
@@ -639,7 +639,7 @@
     "name": "Praying Stalker",
     "level": 25,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "mantis",
     "meshParams": {
       "color": 2775594,
@@ -652,7 +652,7 @@
     "name": "Venom Scorpion",
     "level": 26,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "scorpion",
     "meshParams": {
       "color": 4876858,
@@ -666,7 +666,7 @@
     "name": "Ghost Mantis",
     "level": 27,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "mantis",
     "meshParams": {
       "color": 8026762,
@@ -679,7 +679,7 @@
     "name": "Current Jelly",
     "level": 28,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "jellyfish",
     "meshParams": {
       "color": 3372987,
@@ -693,7 +693,7 @@
     "name": "Emperor Scorpion",
     "level": 29,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "scorpion",
     "meshParams": {
       "color": 2763322,
@@ -707,7 +707,7 @@
     "name": "War Mantis",
     "level": 31,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "mantis",
     "meshParams": {
       "color": 6957610,
@@ -720,7 +720,7 @@
     "name": "Void Jelly",
     "level": 32,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "jellyfish",
     "meshParams": {
       "color": 4465322,
@@ -734,7 +734,7 @@
     "name": "Deep Jelly",
     "level": 35,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "jellyfish",
     "meshParams": {
       "color": 2241416,
@@ -748,7 +748,7 @@
     "name": "Plague Scorpion",
     "level": 36,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "scorpion",
     "meshParams": {
       "color": 5917226,
@@ -762,7 +762,7 @@
     "name": "Lightning Jelly",
     "level": 38,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "jellyfish",
     "meshParams": {
       "color": 16768324,
@@ -776,7 +776,7 @@
     "name": "Titan Scorpion",
     "level": 39,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "scorpion",
     "meshParams": {
       "color": 3816010,
@@ -790,7 +790,7 @@
     "name": "Acid Mantis Alpha",
     "level": 40,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "hive-tunnels",
     "meshTemplate": "mantis",
     "meshParams": {
       "color": 4893226,
@@ -804,7 +804,7 @@
     "name": "Shadow Stalker",
     "level": 41,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "stalker",
     "meshParams": {
       "color": 2763322,
@@ -817,7 +817,7 @@
     "name": "Dust Worm",
     "level": 41,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "worm",
     "meshParams": {
       "color": 9075280,
@@ -831,7 +831,7 @@
     "name": "Acid Slug",
     "level": 42,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "slug",
     "meshParams": {
       "color": 5933616,
@@ -845,7 +845,7 @@
     "name": "Tremor Worm",
     "level": 43,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "worm",
     "meshParams": {
       "color": 6969920,
@@ -859,7 +859,7 @@
     "name": "Blood Stalker",
     "level": 44,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "stalker",
     "meshParams": {
       "color": 4856346,
@@ -872,7 +872,7 @@
     "name": "Pack Howler Alpha",
     "level": 45,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "stalker",
     "meshParams": {
       "color": 5909034,
@@ -886,7 +886,7 @@
     "name": "Bore Worm",
     "level": 45,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "worm",
     "meshParams": {
       "color": 5917232,
@@ -900,7 +900,7 @@
     "name": "Toxic Slug",
     "level": 46,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "slug",
     "meshParams": {
       "color": 3836474,
@@ -914,7 +914,7 @@
     "name": "Shock Worm",
     "level": 47,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "worm",
     "meshParams": {
       "color": 3824250,
@@ -928,7 +928,7 @@
     "name": "Fang Stalker",
     "level": 48,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "stalker",
     "meshParams": {
       "color": 3815978,
@@ -941,7 +941,7 @@
     "name": "Crystal Slug",
     "level": 49,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "slug",
     "meshParams": {
       "color": 5929610,
@@ -955,7 +955,7 @@
     "name": "Thunder Worm",
     "level": 51,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "worm",
     "meshParams": {
       "color": 4868746,
@@ -969,7 +969,7 @@
     "name": "Void Stalker",
     "level": 52,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "stalker",
     "meshParams": {
       "color": 1710666,
@@ -982,7 +982,7 @@
     "name": "Phantom Stalker",
     "level": 55,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "stalker",
     "meshParams": {
       "color": 3816026,
@@ -995,7 +995,7 @@
     "name": "Death Worm",
     "level": 55,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "worm",
     "meshParams": {
       "color": 4856346,
@@ -1009,7 +1009,7 @@
     "name": "Omega Slug",
     "level": 56,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "slug",
     "meshParams": {
       "color": 2767450,
@@ -1023,7 +1023,7 @@
     "name": "Doom Stalker",
     "level": 58,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "stalker",
     "meshParams": {
       "color": 1706538,
@@ -1036,7 +1036,7 @@
     "name": "Apex Stalker",
     "level": 59,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "fungal-wastes",
     "meshTemplate": "stalker",
     "meshParams": {
       "color": 3807818,
@@ -1049,7 +1049,7 @@
     "name": "Lesser Wraith",
     "level": 61,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "void_wraith",
     "meshParams": {
       "color": 5921418,
@@ -1062,7 +1062,7 @@
     "name": "Shadow Wisp",
     "level": 61,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "dark_entity",
     "meshParams": {
       "color": 3816026,
@@ -1075,7 +1075,7 @@
     "name": "Stone Golem",
     "level": 62,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "crystal_golem",
     "meshParams": {
       "color": 6974058,
@@ -1088,7 +1088,7 @@
     "name": "Dark Blob",
     "level": 63,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "dark_entity",
     "meshParams": {
       "color": 2763338,
@@ -1101,7 +1101,7 @@
     "name": "Wailing Wraith",
     "level": 64,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "void_wraith",
     "meshParams": {
       "color": 6970010,
@@ -1114,7 +1114,7 @@
     "name": "Obsidian Golem",
     "level": 65,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "crystal_golem",
     "meshParams": {
       "color": 1710634,
@@ -1127,7 +1127,7 @@
     "name": "Chaos Blob",
     "level": 66,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "dark_entity",
     "meshParams": {
       "color": 4856394,
@@ -1140,7 +1140,7 @@
     "name": "Howling Wraith",
     "level": 67,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "void_wraith",
     "meshParams": {
       "color": 4864634,
@@ -1153,7 +1153,7 @@
     "name": "Quartz Golem",
     "level": 68,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "crystal_golem",
     "meshParams": {
       "color": 9075354,
@@ -1166,7 +1166,7 @@
     "name": "Nightmare Mass",
     "level": 69,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "dark_entity",
     "meshParams": {
       "color": 3803706,
@@ -1179,7 +1179,7 @@
     "name": "Void Sentinel",
     "level": 70,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "void_wraith",
     "meshParams": {
       "color": 6965930,
@@ -1193,7 +1193,7 @@
     "name": "Diamond Golem",
     "level": 70,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "crystal_golem",
     "meshParams": {
       "color": 10132138,
@@ -1206,7 +1206,7 @@
     "name": "Screaming Wraith",
     "level": 71,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "void_wraith",
     "meshParams": {
       "color": 5913226,
@@ -1219,7 +1219,7 @@
     "name": "Titan Golem",
     "level": 72,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "crystal_golem",
     "meshParams": {
       "color": 4872810,
@@ -1232,7 +1232,7 @@
     "name": "Ancient Golem",
     "level": 75,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "crystal_golem",
     "meshParams": {
       "color": 6969930,
@@ -1245,7 +1245,7 @@
     "name": "Oblivion Wraith",
     "level": 75,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "void_wraith",
     "meshParams": {
       "color": 1706586,
@@ -1258,7 +1258,7 @@
     "name": "Void Golem",
     "level": 76,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "crystal_golem",
     "meshParams": {
       "color": 2763354,
@@ -1271,7 +1271,7 @@
     "name": "Eternal Wraith",
     "level": 77,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "void_wraith",
     "meshParams": {
       "color": 5917338,
@@ -1284,7 +1284,7 @@
     "name": "Null Mass",
     "level": 77,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "dark_entity",
     "meshParams": {
       "color": 328976,
@@ -1297,7 +1297,7 @@
     "name": "Prism Golem",
     "level": 78,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "crystal_golem",
     "meshParams": {
       "color": 9071274,
@@ -1310,7 +1310,7 @@
     "name": "Phantom Wraith",
     "level": 78,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "void_wraith",
     "meshParams": {
       "color": 3816074,
@@ -1323,7 +1323,7 @@
     "name": "Omega Mass",
     "level": 79,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "dark_entity",
     "meshParams": {
       "color": 1706554,
@@ -1336,7 +1336,7 @@
     "name": "Crystal Colossus",
     "level": 80,
     "combatStyle": "nano",
-    "area": "alien-wastes",
+    "area": "stalker-reaches",
     "meshTemplate": "crystal_golem",
     "meshParams": {
       "color": 8030890,
@@ -1350,7 +1350,7 @@
     "name": "Watcher Eye",
     "level": 81,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "meshTemplate": "eldritch_eye",
     "meshParams": {
       "color": 6961770,
@@ -1364,7 +1364,7 @@
     "name": "Minor Warper",
     "level": 81,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "meshTemplate": "reality_warper",
     "meshParams": {
       "color": 4868730,
@@ -1377,7 +1377,7 @@
     "name": "Doom Eye",
     "level": 83,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "meshTemplate": "eldritch_eye",
     "meshParams": {
       "color": 4856426,
@@ -1391,7 +1391,7 @@
     "name": "Gravity Warper",
     "level": 84,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "meshTemplate": "reality_warper",
     "meshParams": {
       "color": 2767482,
@@ -1404,7 +1404,7 @@
     "name": "Blight Eye",
     "level": 85,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "meshTemplate": "eldritch_eye",
     "meshParams": {
       "color": 3824186,
@@ -1418,7 +1418,7 @@
     "name": "Tyrant Eye",
     "level": 86,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "meshTemplate": "eldritch_eye",
     "meshParams": {
       "color": 6957642,
@@ -1432,7 +1432,7 @@
     "name": "Void Eye",
     "level": 87,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "meshTemplate": "eldritch_eye",
     "meshParams": {
       "color": 2759274,
@@ -1446,7 +1446,7 @@
     "name": "Death Eye",
     "level": 88,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "meshTemplate": "eldritch_eye",
     "meshParams": {
       "color": 4852298,
@@ -1460,7 +1460,7 @@
     "name": "Reality Eater",
     "level": 90,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "meshTemplate": "eldritch_eye",
     "meshParams": {
       "color": 9058954,
@@ -1475,7 +1475,7 @@
     "name": "Elder Eye",
     "level": 91,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "meshTemplate": "eldritch_eye",
     "meshParams": {
       "color": 3811978,
@@ -1489,7 +1489,7 @@
     "name": "Cosmic Eye",
     "level": 92,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "meshTemplate": "eldritch_eye",
     "meshParams": {
       "color": 2767498,
@@ -1503,7 +1503,7 @@
     "name": "God's Eye",
     "level": 98,
     "combatStyle": "void",
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "meshTemplate": "eldritch_eye",
     "meshParams": {
       "color": 5921450,
@@ -1517,7 +1517,7 @@
     "name": "The Formless One",
     "level": 99,
     "combatStyle": "tesla",
-    "area": "alien-wastes",
+    "area": "corrupted-wastes",
     "meshTemplate": "reality_warper",
     "meshParams": {
       "color": 9071274,
@@ -1833,11 +1833,25 @@
     "respawnTime": 25,
     "area": "mycelium-hollows",
     "meshTemplate": "insectoid",
-    "meshParams": { "color": 4500070, "scale": 0.6, "variant": "drone" },
+    "meshParams": {
+      "color": 4500070,
+      "scale": 0.6,
+      "variant": "drone"
+    },
     "desc": "A small fungal insect coated in bioluminescent spores.",
     "lootTable": [
-      { "itemId": "spore_sac", "chance": 0.5, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.4, "min": 8, "max": 20 }
+      {
+        "itemId": "spore_sac",
+        "chance": 0.5,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 8,
+        "max": 20
+      }
     ]
   },
   {
@@ -1856,11 +1870,25 @@
     "respawnTime": 28,
     "area": "mycelium-hollows",
     "meshTemplate": "jellyfish",
-    "meshParams": { "color": 3399338, "scale": 0.7, "tentacles": 6 },
+    "meshParams": {
+      "color": 3399338,
+      "scale": 0.7,
+      "tentacles": 6
+    },
     "desc": "A floating fungal organism that emits electric spore bursts.",
     "lootTable": [
-      { "itemId": "glowcap_membrane", "chance": 0.5, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.4, "min": 10, "max": 25 }
+      {
+        "itemId": "glowcap_membrane",
+        "chance": 0.5,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 10,
+        "max": 25
+      }
     ]
   },
   {
@@ -1879,12 +1907,30 @@
     "respawnTime": 30,
     "area": "mycelium-hollows",
     "meshTemplate": "worm",
-    "meshParams": { "color": 2787413, "scale": 0.8 },
+    "meshParams": {
+      "color": 2787413,
+      "scale": 0.8
+    },
     "desc": "A serpentine root-creature that erupts from the ground to strike.",
     "lootTable": [
-      { "itemId": "tendril_fiber", "chance": 0.55, "min": 1, "max": 3 },
-      { "itemId": "spore_sac", "chance": 0.3, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.35, "min": 12, "max": 30 }
+      {
+        "itemId": "tendril_fiber",
+        "chance": 0.55,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "spore_sac",
+        "chance": 0.3,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.35,
+        "min": 12,
+        "max": 30
+      }
     ]
   },
   {
@@ -1903,12 +1949,31 @@
     "respawnTime": 32,
     "area": "mycelium-hollows",
     "meshTemplate": "quadruped",
-    "meshParams": { "color": 3377254, "scale": 0.85, "variant": "stalker" },
+    "meshParams": {
+      "color": 3377254,
+      "scale": 0.85,
+      "variant": "stalker"
+    },
     "desc": "A camouflaged predator that blends with the fungal undergrowth before lunging.",
     "lootTable": [
-      { "itemId": "stalker_claw", "chance": 0.45, "min": 1, "max": 2 },
-      { "itemId": "tendril_fiber", "chance": 0.3, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.4, "min": 15, "max": 40 }
+      {
+        "itemId": "stalker_claw",
+        "chance": 0.45,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "tendril_fiber",
+        "chance": 0.3,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 15,
+        "max": 40
+      }
     ]
   },
   {
@@ -1927,12 +1992,31 @@
     "respawnTime": 35,
     "area": "mycelium-hollows",
     "meshTemplate": "insectoid",
-    "meshParams": { "color": 5623944, "scale": 0.9, "variant": "sentinel" },
+    "meshParams": {
+      "color": 5623944,
+      "scale": 0.9,
+      "variant": "sentinel"
+    },
     "desc": "A heavily armored beetle that detonates toxic spore sacs on contact.",
     "lootTable": [
-      { "itemId": "chitin_shard", "chance": 0.5, "min": 2, "max": 4 },
-      { "itemId": "spore_sac", "chance": 0.4, "min": 1, "max": 3 },
-      { "itemId": "credits", "chance": 0.4, "min": 18, "max": 45 }
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.5,
+        "min": 2,
+        "max": 4
+      },
+      {
+        "itemId": "spore_sac",
+        "chance": 0.4,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 18,
+        "max": 45
+      }
     ]
   },
   {
@@ -1951,12 +2035,31 @@
     "respawnTime": 38,
     "area": "mycelium-hollows",
     "meshTemplate": "arachnid",
-    "meshParams": { "color": 2263125, "scale": 0.95, "legs": 6 },
+    "meshParams": {
+      "color": 2263125,
+      "scale": 0.95,
+      "legs": 6
+    },
     "desc": "A spider-like fungal creature that spins mycelium webs to trap prey.",
     "lootTable": [
-      { "itemId": "rootweb_silk", "chance": 0.5, "min": 1, "max": 3 },
-      { "itemId": "glowcap_membrane", "chance": 0.3, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.35, "min": 20, "max": 50 }
+      {
+        "itemId": "rootweb_silk",
+        "chance": 0.5,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "glowcap_membrane",
+        "chance": 0.3,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.35,
+        "min": 20,
+        "max": 50
+      }
     ]
   },
   {
@@ -1975,12 +2078,31 @@
     "respawnTime": 40,
     "area": "mycelium-hollows",
     "meshTemplate": "humanoid",
-    "meshParams": { "color": 4505463, "scale": 1.0, "variant": "caster" },
+    "meshParams": {
+      "color": 4505463,
+      "scale": 1.0,
+      "variant": "caster"
+    },
     "desc": "A sentient fungal entity that commands lesser spore creatures and hurls toxic bolts.",
     "lootTable": [
-      { "itemId": "shaman_spore", "chance": 0.4, "min": 1, "max": 2 },
-      { "itemId": "rootweb_silk", "chance": 0.25, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.4, "min": 25, "max": 60 }
+      {
+        "itemId": "shaman_spore",
+        "chance": 0.4,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "rootweb_silk",
+        "chance": 0.25,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 25,
+        "max": 60
+      }
     ]
   },
   {
@@ -1999,13 +2121,36 @@
     "respawnTime": 45,
     "area": "mycelium-hollows",
     "meshTemplate": "golem",
-    "meshParams": { "color": 1729092, "scale": 1.3 },
+    "meshParams": {
+      "color": 1729092,
+      "scale": 1.3
+    },
     "desc": "A massive fungal construct animated by the mycelium network. Slow but terrifyingly powerful.",
     "lootTable": [
-      { "itemId": "hulk_core", "chance": 0.35, "min": 1, "max": 1 },
-      { "itemId": "tendril_fiber", "chance": 0.5, "min": 2, "max": 4 },
-      { "itemId": "stalker_claw", "chance": 0.25, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.45, "min": 30, "max": 75 }
+      {
+        "itemId": "hulk_core",
+        "chance": 0.35,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "tendril_fiber",
+        "chance": 0.5,
+        "min": 2,
+        "max": 4
+      },
+      {
+        "itemId": "stalker_claw",
+        "chance": 0.25,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.45,
+        "min": 30,
+        "max": 75
+      }
     ]
   },
   {
@@ -2024,15 +2169,44 @@
     "respawnTime": 120,
     "area": "mycelium-hollows",
     "meshTemplate": "arachnid",
-    "meshParams": { "color": 1158741, "scale": 2.0, "legs": 8 },
+    "meshParams": {
+      "color": 1158741,
+      "scale": 2.0,
+      "legs": 8
+    },
     "isBoss": true,
-    "desc": "The queen of the hollows — a massive fungal matriarch commanding the entire mycelium network.",
+    "desc": "The queen of the hollows \u00e2\u20ac\u201d a massive fungal matriarch commanding the entire mycelium network.",
     "lootTable": [
-      { "itemId": "queen_spore_heart", "chance": 0.15, "min": 1, "max": 1 },
-      { "itemId": "hulk_core", "chance": 0.5, "min": 1, "max": 2 },
-      { "itemId": "shaman_spore", "chance": 0.6, "min": 2, "max": 4 },
-      { "itemId": "rootweb_silk", "chance": 0.7, "min": 3, "max": 6 },
-      { "itemId": "credits", "chance": 1.0, "min": 150, "max": 400 }
+      {
+        "itemId": "queen_spore_heart",
+        "chance": 0.15,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "hulk_core",
+        "chance": 0.5,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "shaman_spore",
+        "chance": 0.6,
+        "min": 2,
+        "max": 4
+      },
+      {
+        "itemId": "rootweb_silk",
+        "chance": 0.7,
+        "min": 3,
+        "max": 6
+      },
+      {
+        "itemId": "credits",
+        "chance": 1.0,
+        "min": 150,
+        "max": 400
+      }
     ]
   },
   {
@@ -2051,12 +2225,31 @@
     "respawnTime": 35,
     "area": "solarith-wastes",
     "meshTemplate": "insectoid",
-    "meshParams": { "color": 11175970, "scale": 0.9, "variant": "drone" },
+    "meshParams": {
+      "color": 11175970,
+      "scale": 0.9,
+      "variant": "drone"
+    },
     "desc": "A golden-shelled beetle that burrows through sand and strikes from below.",
     "lootTable": [
-      { "itemId": "scarab_carapace", "chance": 0.5, "min": 1, "max": 3 },
-      { "itemId": "solar_dust", "chance": 0.35, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.4, "min": 40, "max": 100 }
+      {
+        "itemId": "scarab_carapace",
+        "chance": 0.5,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "solar_dust",
+        "chance": 0.35,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 40,
+        "max": 100
+      }
     ]
   },
   {
@@ -2075,12 +2268,30 @@
     "respawnTime": 38,
     "area": "solarith-wastes",
     "meshTemplate": "golem",
-    "meshParams": { "color": 14535748, "scale": 1.0 },
+    "meshParams": {
+      "color": 14535748,
+      "scale": 1.0
+    },
     "desc": "A corrupted research drone still running patrol protocols. Fires concentrated solar beams.",
     "lootTable": [
-      { "itemId": "automaton_circuit", "chance": 0.45, "min": 1, "max": 2 },
-      { "itemId": "solar_dust", "chance": 0.4, "min": 1, "max": 3 },
-      { "itemId": "credits", "chance": 0.4, "min": 50, "max": 120 }
+      {
+        "itemId": "automaton_circuit",
+        "chance": 0.45,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "solar_dust",
+        "chance": 0.4,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 50,
+        "max": 120
+      }
     ]
   },
   {
@@ -2099,12 +2310,30 @@
     "respawnTime": 38,
     "area": "solarith-wastes",
     "meshTemplate": "serpent",
-    "meshParams": { "color": 13408580, "scale": 1.1 },
+    "meshParams": {
+      "color": 13408580,
+      "scale": 1.1
+    },
     "desc": "A shimmering serpent that bends light around itself, appearing as a heat mirage until it strikes.",
     "lootTable": [
-      { "itemId": "mirage_fang", "chance": 0.45, "min": 1, "max": 2 },
-      { "itemId": "viper_venom_sac", "chance": 0.3, "min": 1, "max": 1 },
-      { "itemId": "credits", "chance": 0.4, "min": 55, "max": 130 }
+      {
+        "itemId": "mirage_fang",
+        "chance": 0.45,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "viper_venom_sac",
+        "chance": 0.3,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 55,
+        "max": 130
+      }
     ]
   },
   {
@@ -2123,12 +2352,31 @@
     "respawnTime": 40,
     "area": "solarith-wastes",
     "meshTemplate": "quadruped",
-    "meshParams": { "color": 10058530, "scale": 1.15, "variant": "predator" },
+    "meshParams": {
+      "color": 10058530,
+      "scale": 1.15,
+      "variant": "predator"
+    },
     "desc": "A four-legged apex predator adapted to desert hunting. Uses pack tactics.",
     "lootTable": [
-      { "itemId": "reaver_hide", "chance": 0.5, "min": 1, "max": 3 },
-      { "itemId": "scarab_carapace", "chance": 0.3, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.45, "min": 60, "max": 150 }
+      {
+        "itemId": "reaver_hide",
+        "chance": 0.5,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "scarab_carapace",
+        "chance": 0.3,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.45,
+        "min": 60,
+        "max": 150
+      }
     ]
   },
   {
@@ -2147,12 +2395,30 @@
     "respawnTime": 42,
     "area": "solarith-wastes",
     "meshTemplate": "elemental",
-    "meshParams": { "color": 16755234, "scale": 1.2 },
+    "meshParams": {
+      "color": 16755234,
+      "scale": 1.2
+    },
     "desc": "Pure solar energy given form. Radiates intense heat and hurls plasma bolts.",
     "lootTable": [
-      { "itemId": "solar_core", "chance": 0.4, "min": 1, "max": 2 },
-      { "itemId": "solar_dust", "chance": 0.5, "min": 2, "max": 4 },
-      { "itemId": "credits", "chance": 0.4, "min": 70, "max": 170 }
+      {
+        "itemId": "solar_core",
+        "chance": 0.4,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "solar_dust",
+        "chance": 0.5,
+        "min": 2,
+        "max": 4
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 70,
+        "max": 170
+      }
     ]
   },
   {
@@ -2171,12 +2437,31 @@
     "respawnTime": 45,
     "area": "solarith-wastes",
     "meshTemplate": "insectoid",
-    "meshParams": { "color": 3346961, "scale": 1.2, "variant": "sentinel" },
+    "meshParams": {
+      "color": 3346961,
+      "scale": 1.2,
+      "variant": "sentinel"
+    },
     "desc": "A massive beetle with obsidian-glass armor. Nearly impervious to physical attacks.",
     "lootTable": [
-      { "itemId": "obsidian_shard", "chance": 0.5, "min": 1, "max": 3 },
-      { "itemId": "reaver_hide", "chance": 0.3, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.45, "min": 80, "max": 200 }
+      {
+        "itemId": "obsidian_shard",
+        "chance": 0.5,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "reaver_hide",
+        "chance": 0.3,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.45,
+        "min": 80,
+        "max": 200
+      }
     ]
   },
   {
@@ -2195,12 +2480,30 @@
     "respawnTime": 48,
     "area": "solarith-wastes",
     "meshTemplate": "worm",
-    "meshParams": { "color": 5587490, "scale": 1.4 },
+    "meshParams": {
+      "color": 5587490,
+      "scale": 1.4
+    },
     "desc": "A massive burrowing predator that tunnels through obsidian bedrock.",
     "lootTable": [
-      { "itemId": "wyrm_scale", "chance": 0.45, "min": 1, "max": 2 },
-      { "itemId": "obsidian_shard", "chance": 0.4, "min": 2, "max": 4 },
-      { "itemId": "credits", "chance": 0.45, "min": 90, "max": 220 }
+      {
+        "itemId": "wyrm_scale",
+        "chance": 0.45,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "obsidian_shard",
+        "chance": 0.4,
+        "min": 2,
+        "max": 4
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.45,
+        "min": 90,
+        "max": 220
+      }
     ]
   },
   {
@@ -2219,13 +2522,36 @@
     "respawnTime": 50,
     "area": "solarith-wastes",
     "meshTemplate": "drake",
-    "meshParams": { "color": 14527027, "scale": 1.5 },
+    "meshParams": {
+      "color": 14527027,
+      "scale": 1.5
+    },
     "desc": "A winged predator that absorbs solar energy through its crystalline wings.",
     "lootTable": [
-      { "itemId": "drake_wing_shard", "chance": 0.4, "min": 1, "max": 2 },
-      { "itemId": "solar_core", "chance": 0.35, "min": 1, "max": 2 },
-      { "itemId": "wyrm_scale", "chance": 0.3, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.5, "min": 100, "max": 250 }
+      {
+        "itemId": "drake_wing_shard",
+        "chance": 0.4,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "solar_core",
+        "chance": 0.35,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "wyrm_scale",
+        "chance": 0.3,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.5,
+        "min": 100,
+        "max": 250
+      }
     ]
   },
   {
@@ -2244,15 +2570,43 @@
     "respawnTime": 180,
     "area": "solarith-wastes",
     "meshTemplate": "golem",
-    "meshParams": { "color": 16763904, "scale": 3.0 },
+    "meshParams": {
+      "color": 16763904,
+      "scale": 3.0
+    },
     "isBoss": true,
-    "desc": "The original master automaton of the Solarith research station — a colossal solar-powered war machine.",
+    "desc": "The original master automaton of the Solarith research station \u00e2\u20ac\u201d a colossal solar-powered war machine.",
     "lootTable": [
-      { "itemId": "solaris_core", "chance": 0.12, "min": 1, "max": 1 },
-      { "itemId": "drake_wing_shard", "chance": 0.6, "min": 2, "max": 4 },
-      { "itemId": "solar_core", "chance": 0.7, "min": 3, "max": 6 },
-      { "itemId": "automaton_circuit", "chance": 0.8, "min": 3, "max": 5 },
-      { "itemId": "credits", "chance": 1.0, "min": 500, "max": 1200 }
+      {
+        "itemId": "solaris_core",
+        "chance": 0.12,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "drake_wing_shard",
+        "chance": 0.6,
+        "min": 2,
+        "max": 4
+      },
+      {
+        "itemId": "solar_core",
+        "chance": 0.7,
+        "min": 3,
+        "max": 6
+      },
+      {
+        "itemId": "automaton_circuit",
+        "chance": 0.8,
+        "min": 3,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 1.0,
+        "min": 500,
+        "max": 1200
+      }
     ]
   },
   {
@@ -2271,12 +2625,30 @@
     "respawnTime": 40,
     "area": "void-citadel",
     "meshTemplate": "golem",
-    "meshParams": { "color": 4465322, "scale": 1.1 },
+    "meshParams": {
+      "color": 4465322,
+      "scale": 1.1
+    },
     "desc": "An ancient citadel guard still executing patrol protocols.",
     "lootTable": [
-      { "itemId": "sentinel_core", "chance": 0.45, "min": 1, "max": 2 },
-      { "itemId": "void_shard", "chance": 0.4, "min": 1, "max": 3 },
-      { "itemId": "credits", "chance": 0.45, "min": 100, "max": 250 }
+      {
+        "itemId": "sentinel_core",
+        "chance": 0.45,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "void_shard",
+        "chance": 0.4,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.45,
+        "min": 100,
+        "max": 250
+      }
     ]
   },
   {
@@ -2295,12 +2667,31 @@
     "respawnTime": 42,
     "area": "void-citadel",
     "meshTemplate": "quadruped",
-    "meshParams": { "color": 3346090, "scale": 1.15, "variant": "stalker" },
+    "meshParams": {
+      "color": 3346090,
+      "scale": 1.15,
+      "variant": "stalker"
+    },
     "desc": "A predator that phases in and out of reality, appearing behind prey for devastating ambush attacks.",
     "lootTable": [
-      { "itemId": "phase_membrane", "chance": 0.45, "min": 1, "max": 2 },
-      { "itemId": "void_shard", "chance": 0.35, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.4, "min": 110, "max": 270 }
+      {
+        "itemId": "phase_membrane",
+        "chance": 0.45,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "void_shard",
+        "chance": 0.35,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 110,
+        "max": 270
+      }
     ]
   },
   {
@@ -2319,12 +2710,31 @@
     "respawnTime": 44,
     "area": "void-citadel",
     "meshTemplate": "jellyfish",
-    "meshParams": { "color": 6697164, "scale": 1.2, "tentacles": 10 },
+    "meshParams": {
+      "color": 6697164,
+      "scale": 1.2,
+      "tentacles": 10
+    },
     "desc": "A floating entity that manipulates tears in reality. Its tendrils reach through dimensional rifts.",
     "lootTable": [
-      { "itemId": "rift_thread", "chance": 0.45, "min": 1, "max": 2 },
-      { "itemId": "phase_membrane", "chance": 0.3, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.4, "min": 120, "max": 290 }
+      {
+        "itemId": "rift_thread",
+        "chance": 0.45,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "phase_membrane",
+        "chance": 0.3,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 120,
+        "max": 290
+      }
     ]
   },
   {
@@ -2343,12 +2753,30 @@
     "respawnTime": 46,
     "area": "void-citadel",
     "meshTemplate": "golem",
-    "meshParams": { "color": 5583547, "scale": 1.25 },
+    "meshParams": {
+      "color": 5583547,
+      "scale": 1.25
+    },
     "desc": "A heavily armored construction drone from the Architect era, repurposed for combat.",
     "lootTable": [
-      { "itemId": "architect_alloy", "chance": 0.4, "min": 1, "max": 2 },
-      { "itemId": "sentinel_core", "chance": 0.3, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.45, "min": 130, "max": 320 }
+      {
+        "itemId": "architect_alloy",
+        "chance": 0.4,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "sentinel_core",
+        "chance": 0.3,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.45,
+        "min": 130,
+        "max": 320
+      }
     ]
   },
   {
@@ -2367,12 +2795,30 @@
     "respawnTime": 48,
     "area": "void-citadel",
     "meshTemplate": "wraith",
-    "meshParams": { "color": 2228394, "scale": 1.3 },
+    "meshParams": {
+      "color": 2228394,
+      "scale": 1.3
+    },
     "desc": "A spectral entity born from gravitational distortions near the singularity.",
     "lootTable": [
-      { "itemId": "gravity_essence", "chance": 0.4, "min": 1, "max": 2 },
-      { "itemId": "rift_thread", "chance": 0.35, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.4, "min": 150, "max": 350 }
+      {
+        "itemId": "gravity_essence",
+        "chance": 0.4,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "rift_thread",
+        "chance": 0.35,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 150,
+        "max": 350
+      }
     ]
   },
   {
@@ -2391,13 +2837,36 @@
     "respawnTime": 50,
     "area": "void-citadel",
     "meshTemplate": "drake",
-    "meshParams": { "color": 4460748, "scale": 1.4 },
+    "meshParams": {
+      "color": 4460748,
+      "scale": 1.4
+    },
     "desc": "A massive beast that exists simultaneously in multiple dimensions.",
     "lootTable": [
-      { "itemId": "dimensional_fang", "chance": 0.4, "min": 1, "max": 2 },
-      { "itemId": "gravity_essence", "chance": 0.3, "min": 1, "max": 2 },
-      { "itemId": "architect_alloy", "chance": 0.25, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.45, "min": 160, "max": 380 }
+      {
+        "itemId": "dimensional_fang",
+        "chance": 0.4,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "gravity_essence",
+        "chance": 0.3,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "architect_alloy",
+        "chance": 0.25,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.45,
+        "min": 160,
+        "max": 380
+      }
     ]
   },
   {
@@ -2416,12 +2885,30 @@
     "respawnTime": 52,
     "area": "void-citadel",
     "meshTemplate": "golem",
-    "meshParams": { "color": 6693597, "scale": 1.5 },
-    "desc": "The elite guard of the Singularity Core — a towering construct imbued with concentrated void energy.",
+    "meshParams": {
+      "color": 6693597,
+      "scale": 1.5
+    },
+    "desc": "The elite guard of the Singularity Core \u00e2\u20ac\u201d a towering construct imbued with concentrated void energy.",
     "lootTable": [
-      { "itemId": "warden_fragment", "chance": 0.4, "min": 1, "max": 2 },
-      { "itemId": "dimensional_fang", "chance": 0.3, "min": 1, "max": 2 },
-      { "itemId": "credits", "chance": 0.45, "min": 180, "max": 420 }
+      {
+        "itemId": "warden_fragment",
+        "chance": 0.4,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "dimensional_fang",
+        "chance": 0.3,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.45,
+        "min": 180,
+        "max": 420
+      }
     ]
   },
   {
@@ -2440,13 +2927,36 @@
     "respawnTime": 55,
     "area": "void-citadel",
     "meshTemplate": "serpent",
-    "meshParams": { "color": 3342523, "scale": 1.6 },
+    "meshParams": {
+      "color": 3342523,
+      "scale": 1.6
+    },
     "desc": "A serpentine void entity that literally tears holes in reality as it moves.",
     "lootTable": [
-      { "itemId": "reality_shard", "chance": 0.35, "min": 1, "max": 2 },
-      { "itemId": "warden_fragment", "chance": 0.35, "min": 1, "max": 2 },
-      { "itemId": "gravity_essence", "chance": 0.3, "min": 1, "max": 3 },
-      { "itemId": "credits", "chance": 0.5, "min": 200, "max": 480 }
+      {
+        "itemId": "reality_shard",
+        "chance": 0.35,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "warden_fragment",
+        "chance": 0.35,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "gravity_essence",
+        "chance": 0.3,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.5,
+        "min": 200,
+        "max": 480
+      }
     ]
   },
   {
@@ -2465,16 +2975,416 @@
     "respawnTime": 300,
     "area": "void-citadel",
     "meshTemplate": "humanoid",
-    "meshParams": { "color": 2228479, "scale": 3.5, "variant": "sovereign" },
+    "meshParams": {
+      "color": 2228479,
+      "scale": 3.5,
+      "variant": "sovereign"
+    },
     "isBoss": true,
-    "desc": "The entity born when the singularity fractured reality — a being of pure void energy commanding absolute dominion over dimensional fabric.",
+    "desc": "The entity born when the singularity fractured reality \u00e2\u20ac\u201d a being of pure void energy commanding absolute dominion over dimensional fabric.",
     "lootTable": [
-      { "itemId": "sovereign_crown_shard", "chance": 0.08, "min": 1, "max": 1 },
-      { "itemId": "reality_shard", "chance": 0.6, "min": 2, "max": 4 },
-      { "itemId": "warden_fragment", "chance": 0.7, "min": 3, "max": 6 },
-      { "itemId": "dimensional_fang", "chance": 0.6, "min": 2, "max": 4 },
-      { "itemId": "architect_alloy", "chance": 0.8, "min": 3, "max": 5 },
-      { "itemId": "credits", "chance": 1.0, "min": 1500, "max": 4000 }
+      {
+        "itemId": "sovereign_crown_shard",
+        "chance": 0.08,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "reality_shard",
+        "chance": 0.6,
+        "min": 2,
+        "max": 4
+      },
+      {
+        "itemId": "warden_fragment",
+        "chance": 0.7,
+        "min": 3,
+        "max": 6
+      },
+      {
+        "itemId": "dimensional_fang",
+        "chance": 0.6,
+        "min": 2,
+        "max": 4
+      },
+      {
+        "itemId": "architect_alloy",
+        "chance": 0.8,
+        "min": 3,
+        "max": 5
+      },
+      {
+        "itemId": "credits",
+        "chance": 1.0,
+        "min": 1500,
+        "max": 4000
+      }
+    ]
+  },
+  {
+    "id": "mine_tick",
+    "name": "Mine Tick",
+    "level": 2,
+    "explicit": true,
+    "hp": 35,
+    "maxHp": 35,
+    "damage": 2,
+    "defense": 1,
+    "attackSpeed": 3.5,
+    "aggroRange": 5,
+    "leashRange": 15,
+    "combatStyle": "nano",
+    "respawnTime": 25,
+    "area": "asteroid-mines",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 4473924,
+      "scale": 0.5,
+      "variant": "drone"
+    },
+    "desc": "Tiny parasites that cling to ore veins.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.4,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.3,
+        "min": 2,
+        "max": 8
+      }
+    ]
+  },
+  {
+    "id": "ore_beetle",
+    "name": "Ore Beetle",
+    "level": 5,
+    "explicit": true,
+    "hp": 70,
+    "maxHp": 70,
+    "damage": 5,
+    "defense": 3,
+    "attackSpeed": 3.2,
+    "aggroRange": 5,
+    "leashRange": 15,
+    "combatStyle": "nano",
+    "respawnTime": 28,
+    "area": "asteroid-mines",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 5592405,
+      "scale": 0.6,
+      "variant": "sentinel"
+    },
+    "desc": "Armored beetles that burrow through rock.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.5,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 5,
+        "max": 15
+      }
+    ]
+  },
+  {
+    "id": "cave_spider",
+    "name": "Cave Spider",
+    "level": 8,
+    "explicit": true,
+    "hp": 100,
+    "maxHp": 100,
+    "damage": 7,
+    "defense": 4,
+    "attackSpeed": 3.0,
+    "aggroRange": 6,
+    "leashRange": 16,
+    "combatStyle": "nano",
+    "respawnTime": 30,
+    "area": "asteroid-mines",
+    "meshTemplate": "arachnid",
+    "meshParams": {
+      "color": 3355443,
+      "scale": 0.7
+    },
+    "desc": "Fast predators lurking in mine shafts.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 8,
+        "max": 25
+      }
+    ]
+  },
+  {
+    "id": "crystal_mite",
+    "name": "Crystal Mite",
+    "level": 11,
+    "explicit": true,
+    "hp": 150,
+    "maxHp": 150,
+    "damage": 10,
+    "defense": 6,
+    "attackSpeed": 3.3,
+    "aggroRange": 6,
+    "leashRange": 16,
+    "combatStyle": "tesla",
+    "respawnTime": 32,
+    "area": "asteroid-mines",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 6724095,
+      "scale": 0.65,
+      "variant": "drone"
+    },
+    "desc": "Mites that feed on crystal formations.",
+    "lootTable": [
+      {
+        "itemId": "jelly_membrane",
+        "chance": 0.3,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.5,
+        "min": 10,
+        "max": 30
+      }
+    ]
+  },
+  {
+    "id": "tunnel_lurker",
+    "name": "Tunnel Lurker",
+    "level": 15,
+    "explicit": true,
+    "hp": 200,
+    "maxHp": 200,
+    "damage": 14,
+    "defense": 8,
+    "attackSpeed": 3.0,
+    "aggroRange": 7,
+    "leashRange": 18,
+    "combatStyle": "void",
+    "respawnTime": 35,
+    "area": "asteroid-mines",
+    "meshTemplate": "worm",
+    "meshParams": {
+      "color": 4474010,
+      "scale": 0.8
+    },
+    "desc": "Ambush predators hiding in collapsed tunnels.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.7,
+        "min": 2,
+        "max": 4
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 15,
+        "max": 40
+      }
+    ]
+  },
+  {
+    "id": "bark_mite",
+    "name": "Bark Mite",
+    "level": 1,
+    "explicit": true,
+    "hp": 30,
+    "maxHp": 30,
+    "damage": 2,
+    "defense": 1,
+    "attackSpeed": 3.5,
+    "aggroRange": 4,
+    "leashRange": 14,
+    "combatStyle": "nano",
+    "respawnTime": 25,
+    "area": "gathering-grounds",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 3377441,
+      "scale": 0.45,
+      "variant": "drone"
+    },
+    "desc": "Tiny pests that nibble at plant roots.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.3,
+        "min": 1,
+        "max": 1
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.3,
+        "min": 1,
+        "max": 5
+      }
+    ]
+  },
+  {
+    "id": "thorn_beetle",
+    "name": "Thorn Beetle",
+    "level": 4,
+    "explicit": true,
+    "hp": 55,
+    "maxHp": 55,
+    "damage": 4,
+    "defense": 2,
+    "attackSpeed": 3.3,
+    "aggroRange": 5,
+    "leashRange": 15,
+    "combatStyle": "nano",
+    "respawnTime": 27,
+    "area": "gathering-grounds",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 5600310,
+      "scale": 0.55,
+      "variant": "sentinel"
+    },
+    "desc": "Beetles with thorn-like mandibles.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.5,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.3,
+        "min": 3,
+        "max": 10
+      }
+    ]
+  },
+  {
+    "id": "grove_spider",
+    "name": "Grove Spider",
+    "level": 7,
+    "explicit": true,
+    "hp": 85,
+    "maxHp": 85,
+    "damage": 6,
+    "defense": 3,
+    "attackSpeed": 3.1,
+    "aggroRange": 5,
+    "leashRange": 15,
+    "combatStyle": "nano",
+    "respawnTime": 29,
+    "area": "gathering-grounds",
+    "meshTemplate": "arachnid",
+    "meshParams": {
+      "color": 2263842,
+      "scale": 0.6
+    },
+    "desc": "Web-spinning hunters in the undergrowth.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.5,
+        "min": 1,
+        "max": 2
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 5,
+        "max": 15
+      }
+    ]
+  },
+  {
+    "id": "spore_wasp",
+    "name": "Spore Wasp",
+    "level": 10,
+    "explicit": true,
+    "hp": 120,
+    "maxHp": 120,
+    "damage": 9,
+    "defense": 4,
+    "attackSpeed": 2.8,
+    "aggroRange": 6,
+    "leashRange": 16,
+    "combatStyle": "tesla",
+    "respawnTime": 30,
+    "area": "gathering-grounds",
+    "meshTemplate": "insectoid",
+    "meshParams": {
+      "color": 8388352,
+      "scale": 0.6,
+      "variant": "drone"
+    },
+    "desc": "Aggressive wasps that spread toxic spores.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 1,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 8,
+        "max": 20
+      }
+    ]
+  },
+  {
+    "id": "root_crawler",
+    "name": "Root Crawler",
+    "level": 13,
+    "explicit": true,
+    "hp": 170,
+    "maxHp": 170,
+    "damage": 12,
+    "defense": 6,
+    "attackSpeed": 3.2,
+    "aggroRange": 6,
+    "leashRange": 16,
+    "combatStyle": "void",
+    "respawnTime": 32,
+    "area": "gathering-grounds",
+    "meshTemplate": "worm",
+    "meshParams": {
+      "color": 4481090,
+      "scale": 0.7
+    },
+    "desc": "Burrowing creatures that surface near gatherers.",
+    "lootTable": [
+      {
+        "itemId": "chitin_shard",
+        "chance": 0.6,
+        "min": 2,
+        "max": 3
+      },
+      {
+        "itemId": "credits",
+        "chance": 0.4,
+        "min": 10,
+        "max": 30
+      }
     ]
   }
 ]
