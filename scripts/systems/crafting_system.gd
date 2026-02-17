@@ -48,13 +48,15 @@ func can_craft(recipe_id: String) -> bool:
 	return true
 
 ## Craft a recipe. Returns true if successful.
-func craft(recipe_id: String) -> bool:
+## Set silent=true to suppress chat/float messages (used by craft_batch).
+func craft(recipe_id: String, silent: bool = false) -> bool:
 	var recipe: Dictionary = DataManager.get_recipe(recipe_id)
 	if recipe.is_empty():
 		return false
 
 	if not can_craft(recipe_id):
-		EventBus.chat_message.emit("Cannot craft: missing ingredients or requirements.", "system")
+		if not silent:
+			EventBus.chat_message.emit("Cannot craft: missing ingredients or requirements.", "system")
 		return false
 
 	# Consume inputs
@@ -87,26 +89,82 @@ func craft(recipe_id: String) -> bool:
 	# Emit signals
 	var recipe_name: String = str(recipe.get("name", recipe_id))
 	EventBus.crafting_complete.emit(recipe_id)
-	EventBus.chat_message.emit("Crafted %s!" % recipe_name, "loot")
 
-	# Float text on player
-	var player: Node3D = get_tree().get_first_node_in_group("player")
-	if player:
-		EventBus.float_text_requested.emit(
-			"Crafted %s" % recipe_name,
-			player.global_position + Vector3(0, 3.0, 0),
-			Color(0.2, 0.8, 1.0)
-		)
-		if xp > 0:
-			var skill_data: Dictionary = DataManager.get_skill(skill_id)
-			var skill_name: String = str(skill_data.get("name", skill_id))
+	if not silent:
+		EventBus.chat_message.emit("Crafted %s!" % recipe_name, "loot")
+
+		# Float text on player
+		var player: Node3D = get_tree().get_first_node_in_group("player")
+		if player:
 			EventBus.float_text_requested.emit(
-				"+%d %s XP" % [xp, skill_name],
-				player.global_position + Vector3(0, 3.5, 0),
-				Color(0.3, 0.9, 0.3)
+				"Crafted %s" % recipe_name,
+				player.global_position + Vector3(0, 3.0, 0),
+				Color(0.2, 0.8, 1.0)
 			)
+			if xp > 0:
+				var skill_data: Dictionary = DataManager.get_skill(skill_id)
+				var skill_name: String = str(skill_data.get("name", skill_id))
+				EventBus.float_text_requested.emit(
+					"+%d %s XP" % [xp, skill_name],
+					player.global_position + Vector3(0, 3.5, 0),
+					Color(0.3, 0.9, 0.3)
+				)
 
 	return true
+
+## Craft a recipe multiple times. Returns the number of successful crafts.
+## Shows a single combined chat message instead of one per craft.
+func craft_batch(recipe_id: String, amount: int) -> int:
+	var recipe: Dictionary = DataManager.get_recipe(recipe_id)
+	if recipe.is_empty():
+		return 0
+
+	var crafted: int = 0
+	var total_xp: int = 0
+	var xp_per: int = int(recipe.get("xp", 0))
+
+	for i in range(amount):
+		if not can_craft(recipe_id):
+			break
+		if craft(recipe_id, true):
+			crafted += 1
+			total_xp += xp_per
+
+	if crafted > 0:
+		var recipe_name: String = str(recipe.get("name", recipe_id))
+		var skill_id: String = str(recipe.get("skill", ""))
+
+		# Single combined message
+		if crafted == 1:
+			EventBus.chat_message.emit("Crafted %s!" % recipe_name, "loot")
+		else:
+			EventBus.chat_message.emit("Crafted %d x %s!" % [crafted, recipe_name], "loot")
+
+		# Float text
+		var player: Node3D = get_tree().get_first_node_in_group("player")
+		if player:
+			if crafted == 1:
+				EventBus.float_text_requested.emit(
+					"Crafted %s" % recipe_name,
+					player.global_position + Vector3(0, 3.0, 0),
+					Color(0.2, 0.8, 1.0)
+				)
+			else:
+				EventBus.float_text_requested.emit(
+					"Crafted %d x %s" % [crafted, recipe_name],
+					player.global_position + Vector3(0, 3.0, 0),
+					Color(0.2, 0.8, 1.0)
+				)
+			if total_xp > 0:
+				var skill_data: Dictionary = DataManager.get_skill(skill_id)
+				var skill_name: String = str(skill_data.get("name", skill_id))
+				EventBus.float_text_requested.emit(
+					"+%d %s XP" % [total_xp, skill_name],
+					player.global_position + Vector3(0, 3.5, 0),
+					Color(0.3, 0.9, 0.3)
+				)
+
+	return crafted
 
 ## Get all recipes for a skill that the player can see
 func get_available_recipes(skill_id: String) -> Array[Dictionary]:
