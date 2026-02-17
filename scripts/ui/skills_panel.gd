@@ -123,10 +123,13 @@ func _create_skill_row(parent: VBoxContainer, skill_id: String) -> Dictionary:
 	var name_row: HBoxContainer = HBoxContainer.new()
 	row.add_child(name_row)
 
-	var icon_label: Label = Label.new()
-	icon_label.text = _skill_icon(skill_id)
-	icon_label.add_theme_font_size_override("font_size", 16)
-	name_row.add_child(icon_label)
+	var icon_rect: TextureRect = TextureRect.new()
+	icon_rect.custom_minimum_size = Vector2(16, 16)
+	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	icon_rect.texture = ItemIcons.get_skill_texture(skill_id)
+	name_row.add_child(icon_rect)
 
 	var name_label: Label = Label.new()
 	name_label.text = " " + skill_name
@@ -223,12 +226,28 @@ func _show_skill_guide(skill_id: String) -> void:
 	back_btn.pressed.connect(_close_skill_guide)
 	header.add_child(back_btn)
 
+	var title_box: HBoxContainer = HBoxContainer.new()
+	title_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_box.add_theme_constant_override("separation", 4)
+	header.add_child(title_box)
+
+	var title_spacer: Control = Control.new()
+	title_spacer.custom_minimum_size = Vector2(4, 0)
+	title_box.add_child(title_spacer)
+
+	var title_icon: TextureRect = TextureRect.new()
+	title_icon.custom_minimum_size = Vector2(16, 16)
+	title_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	title_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	title_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	title_icon.texture = ItemIcons.get_skill_texture(skill_id)
+	title_box.add_child(title_icon)
+
 	var title: Label = Label.new()
-	title.text = "  %s %s" % [_skill_icon(skill_id), skill_name]
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title.text = skill_name
 	title.add_theme_font_size_override("font_size", 16)
 	title.add_theme_color_override("font_color", skill_color)
-	header.add_child(title)
+	title_box.add_child(title)
 
 	# ── Category badge ──
 	if skill_category != "":

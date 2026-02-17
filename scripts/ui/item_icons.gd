@@ -127,3 +127,19 @@ static func get_icon_texture(icon_name: String, item_type: String = "") -> Image
 ## Returns procedural pixel art ImageTexture for an empty equipment slot
 static func get_equip_slot_texture(slot_name: String) -> ImageTexture:
 	return ItemIconGenerator.get_slot_texture(slot_name)
+
+## Returns procedural pixel art ImageTexture for an ability icon
+static func get_ability_texture(ability_id: String) -> ImageTexture:
+	return ItemIconGenerator.get_ability_texture(ability_id)
+
+## Returns procedural pixel art ImageTexture for a skill icon
+static func get_skill_texture(skill_id: String) -> ImageTexture:
+	return ItemIconGenerator.get_skill_texture(skill_id)
+
+## Returns procedural pixel art ImageTexture for a buff icon
+static func get_buff_texture(buff_type: String) -> ImageTexture:
+	return ItemIconGenerator.get_buff_texture(buff_type)
+
+## Returns procedural pixel art ImageTexture for a misc icon (combat_swords, location_pin, food, special_attack)
+static func get_misc_texture(icon_id: String) -> ImageTexture:
+	return ItemIconGenerator.get_misc_texture(icon_id)

@@ -18,7 +18,8 @@ var _slayer_separator: HSeparator = null
 var _slayer_title: Label = null
 var _slayer_target: Label = null
 var _slayer_progress: Label = null
-var _slayer_location: Label = null
+var _slayer_location: HBoxContainer = null
+var _slayer_location_label: Label = null
 var _slayer_streak: Label = null
 
 
@@ -88,11 +89,27 @@ func _ready() -> void:
 	_slayer_progress.visible = false
 	scroll_vbox.add_child(_slayer_progress)
 
-	_slayer_location = Label.new()
-	_slayer_location.add_theme_font_size_override("font_size", 12)
-	_slayer_location.add_theme_color_override("font_color", Color(0.5, 0.6, 0.7))
+	_slayer_location = HBoxContainer.new()
+	_slayer_location.add_theme_constant_override("separation", 3)
 	_slayer_location.visible = false
 	scroll_vbox.add_child(_slayer_location)
+
+	var _loc_spacer: Control = Control.new()
+	_loc_spacer.custom_minimum_size = Vector2(8, 0)
+	_slayer_location.add_child(_loc_spacer)
+
+	var _loc_pin: TextureRect = TextureRect.new()
+	_loc_pin.custom_minimum_size = Vector2(12, 12)
+	_loc_pin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_loc_pin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_loc_pin.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_loc_pin.texture = ItemIcons.get_misc_texture("location_pin")
+	_slayer_location.add_child(_loc_pin)
+
+	_slayer_location_label = Label.new()
+	_slayer_location_label.add_theme_font_size_override("font_size", 12)
+	_slayer_location_label.add_theme_color_override("font_color", Color(0.5, 0.6, 0.7))
+	_slayer_location.add_child(_slayer_location_label)
 
 	_slayer_streak = Label.new()
 	_slayer_streak.add_theme_font_size_override("font_size", 12)
@@ -385,8 +402,8 @@ func _refresh_slayer() -> void:
 				location_text = "%s, %s" % [zone_name, area_name]
 			else:
 				location_text = area_name
-			if _slayer_location:
-				_slayer_location.text = "  📍 %s" % location_text
+			if _slayer_location_label:
+				_slayer_location_label.text = location_text
 
 			if _slayer_streak:
 				_slayer_streak.text = "  Streak: %d" % GameState.slayer_streak

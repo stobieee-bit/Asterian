@@ -681,7 +681,7 @@ func _process_dots(delta: float) -> void:
 			hp -= actual
 			hp = maxi(0, hp)
 			# Float text for DoT damage (blood drop prefix, red-orange)
-			EventBus.float_text_requested.emit("🩸 %d" % actual, global_position + Vector3(randf_range(-0.3, 0.3), 2.3, 0), Color(0.8, 0.3, 0.2))
+			EventBus.float_text_requested.emit("%d" % actual, global_position + Vector3(randf_range(-0.3, 0.3), 2.3, 0), Color(0.8, 0.3, 0.2))
 			dot["ticks_remaining"] = int(dot["ticks_remaining"]) - 1
 			dot["tick_timer"] = float(dot["tick_interval"])
 			if int(dot["ticks_remaining"]) <= 0:

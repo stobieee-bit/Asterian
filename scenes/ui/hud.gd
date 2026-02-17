@@ -1527,12 +1527,14 @@ func _update_buff_display() -> void:
 			hbox.add_theme_constant_override("separation", 3)
 			chip.add_child(hbox)
 
-			var icon_lbl: Label = Label.new()
-			icon_lbl.text = str(info["icon"])
-			icon_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			icon_lbl.add_theme_font_size_override("font_size", 12)
-			icon_lbl.add_theme_color_override("font_color", col)
-			hbox.add_child(icon_lbl)
+			var icon_rect: TextureRect = TextureRect.new()
+			icon_rect.custom_minimum_size = Vector2(12, 12)
+			icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			icon_rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			icon_rect.texture = ItemIcons.get_buff_texture(btype)
+			hbox.add_child(icon_rect)
 
 			var text_lbl: Label = Label.new()
 			text_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1544,7 +1546,7 @@ func _update_buff_display() -> void:
 			hbox.add_child(text_lbl)
 
 			_buff_container.add_child(chip)
-			_buff_labels[btype] = { "panel": chip, "icon": icon_lbl, "text": text_lbl }
+			_buff_labels[btype] = { "panel": chip, "icon": icon_rect, "text": text_lbl }
 
 		# Update timer text
 		var label_info: Dictionary = _buff_labels[btype]
@@ -1568,18 +1570,16 @@ func _update_buff_display() -> void:
 			text_lbl.text = "%s%s" % [val_str, time_str]
 
 		# Flash warning when buff is about to expire (< 5 seconds)
-		var icon_lbl: Label = label_info["icon"] as Label
-		if icon_lbl:
-			var info: Dictionary = BUFF_DISPLAY_INFO.get(btype, { "icon": "●", "color": Color(0.7, 0.7, 0.7) })
-			var col: Color = info["color"]
+		var icon_node: TextureRect = label_info["icon"] as TextureRect
+		if icon_node:
 			if remaining < 5.0:
 				# Blink effect — alternate alpha
 				var blink: float = 0.5 + 0.5 * sin(remaining * 6.0)
-				icon_lbl.modulate.a = blink
+				icon_node.modulate.a = blink
 				if text_lbl:
 					text_lbl.modulate.a = blink
 			else:
-				icon_lbl.modulate.a = 1.0
+				icon_node.modulate.a = 1.0
 				if text_lbl:
 					text_lbl.modulate.a = 1.0
 
@@ -1697,10 +1697,10 @@ func _refresh_ability_buttons() -> void:
 			var cost_text: String = "+%d ADR" % adr_gain if adr_gain > 0 else ("%d ADR" % adr_cost if adr_cost > 0 else "")
 			var slot_num: int = i + 1
 			var ab_name: String = str(ab.get("name", "Ability"))
-			var ab_icon: String = str(ab.get("icon", ""))
-			var display: String = ab_icon if ab_icon != "" else ab_name
+			var ab_id: String = str(ab.get("id", ""))
+			var ab_tex: ImageTexture = ItemIcons.get_ability_texture(ab_id) if ab_id != "" else null
 
-			var btn: Button = _make_ability_btn(str(slot_num), display, accent, adr_cost, cost_text, ab_icon != "")
+			var btn: Button = _make_ability_btn(str(slot_num), ab_name, accent, adr_cost, cost_text, false, ab_tex)
 			var cd_val: float = float(ab.get("cooldown", 0))
 			var cd_text: String = " | CD: %ds" % int(cd_val) if cd_val > 0 else ""
 			var dmg_min: float = float(ab.get("damage_min", 0))
@@ -1719,23 +1719,25 @@ func _refresh_ability_buttons() -> void:
 			_ability_buttons.append(btn)
 	else:
 		# Fallback: generic 5 buttons if DataManager doesn't have abilities yet
+		var fb_tex: ImageTexture = ItemIcons.get_ability_texture("_default")
 		var fallback_data: Array = [
-			{"key": "1", "name": "⚔️", "color": Color(0.3, 0.9, 1.0), "cost": 0, "cost_text": "+8 ADR"},
-			{"key": "2", "name": "⚔️", "color": Color(0.3, 0.9, 1.0), "cost": 0, "cost_text": "+8 ADR"},
-			{"key": "3", "name": "🔥", "color": Color(1.0, 0.6, 0.1), "cost": 50, "cost_text": "50 ADR"},
-			{"key": "4", "name": "🔥", "color": Color(1.0, 0.6, 0.1), "cost": 50, "cost_text": "50 ADR"},
-			{"key": "5", "name": "💫", "color": Color(1.0, 0.2, 0.9), "cost": 100, "cost_text": "100 ADR"},
+			{"key": "1", "name": "Attack", "color": Color(0.3, 0.9, 1.0), "cost": 0, "cost_text": "+8 ADR"},
+			{"key": "2", "name": "Attack", "color": Color(0.3, 0.9, 1.0), "cost": 0, "cost_text": "+8 ADR"},
+			{"key": "3", "name": "Threshold", "color": Color(1.0, 0.6, 0.1), "cost": 50, "cost_text": "50 ADR"},
+			{"key": "4", "name": "Threshold", "color": Color(1.0, 0.6, 0.1), "cost": 50, "cost_text": "50 ADR"},
+			{"key": "5", "name": "Ultimate", "color": Color(1.0, 0.2, 0.9), "cost": 100, "cost_text": "100 ADR"},
 		]
 		for i in range(fallback_data.size()):
 			var fb: Dictionary = fallback_data[i]
-			var btn: Button = _make_ability_btn(fb["key"], fb["name"], fb["color"], fb["cost"], fb["cost_text"], true)
+			var btn: Button = _make_ability_btn(fb["key"], fb["name"], fb["color"], fb["cost"], fb["cost_text"], false, fb_tex)
 			var slot_idx: int = i + 1
 			btn.pressed.connect(func(): _use_ability(slot_idx))
 			_ability_bar.add_child(btn)
 			_ability_buttons.append(btn)
 
 	# Eat food button — green
-	var food_btn: Button = _make_ability_btn("F", "🍖", Color(0.3, 1.0, 0.3), 0, "", true)
+	var food_tex: ImageTexture = ItemIcons.get_misc_texture("food")
+	var food_btn: Button = _make_ability_btn("F", "Food", Color(0.3, 1.0, 0.3), 0, "", false, food_tex)
 	food_btn.tooltip_text = "Eat Food — Heals HP\nUses best food in inventory"
 	food_btn.pressed.connect(func(): _eat_food())
 	_ability_bar.add_child(food_btn)
@@ -1862,19 +1864,19 @@ func _refresh_defense_buttons() -> void:
 		var ab: Dictionary = shared[i]
 		var tier: String = str(ab.get("tier", "basic"))
 		var accent: Color = tier_colors.get(tier, Color(0.5, 0.5, 0.5))
-		var ab_icon: String = str(ab.get("icon", ""))
+		var ab_id: String = str(ab.get("id", ""))
 		var ab_name: String = str(ab.get("name", ""))
-		var display: String = ab_icon if ab_icon != "" else ab_name
 		var keybind: String = keybinds[i] if i < keybinds.size() else ""
+		var ab_tex: ImageTexture = ItemIcons.get_ability_texture(ab_id) if ab_id != "" else null
 
-		var btn: Button = _make_defense_btn(keybind, display, accent, ab)
+		var btn: Button = _make_defense_btn(keybind, ab_name, accent, ab, ab_tex)
 		var slot_idx: int = i + 1
 		btn.pressed.connect(func(): _use_defensive_ability(slot_idx))
 		_defense_bar.add_child(btn)
 		_defense_buttons.append(btn)
 
 ## Create a compact defense ability button (90×36)
-func _make_defense_btn(keybind: String, label_text: String, accent: Color, ab: Dictionary) -> Button:
+func _make_defense_btn(keybind: String, label_text: String, accent: Color, ab: Dictionary, icon_texture: ImageTexture = null) -> Button:
 	var btn: Button = Button.new()
 	btn.custom_minimum_size = Vector2(56, 36)
 	btn.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -1903,15 +1905,29 @@ func _make_defense_btn(keybind: String, label_text: String, accent: Color, ab: D
 
 	btn.text = ""
 
-	# Icon label
-	var icon_lbl: Label = Label.new()
-	icon_lbl.text = label_text
-	icon_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	icon_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	icon_lbl.add_theme_font_size_override("font_size", 16)
-	icon_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	icon_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	btn.add_child(icon_lbl)
+	# Icon — pixel art TextureRect or text fallback
+	if icon_texture != null:
+		var icon_rect: TextureRect = TextureRect.new()
+		icon_rect.texture = icon_texture
+		icon_rect.custom_minimum_size = Vector2(20, 20)
+		icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon_rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		icon_rect.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+		icon_rect.position = Vector2(18, 8)
+		icon_rect.size = Vector2(20, 20)
+		icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		btn.add_child(icon_rect)
+	else:
+		var icon_lbl: Label = Label.new()
+		icon_lbl.text = label_text
+		icon_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		icon_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		icon_lbl.add_theme_font_size_override("font_size", 11)
+		icon_lbl.clip_text = true
+		icon_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		icon_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		btn.add_child(icon_lbl)
 
 	# CD overlay
 	var cd_overlay: ColorRect = ColorRect.new()
@@ -2139,7 +2155,7 @@ func _update_ability_cooldowns() -> void:
 			_special_cd_label.visible = false
 
 ## Create a styled ability button with keybind + name + cost badge
-func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost: int, cost_text_override: String = "", is_icon: bool = false) -> Button:
+func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost: int, cost_text_override: String = "", is_icon: bool = false, icon_texture: ImageTexture = null) -> Button:
 	var btn: Button = Button.new()
 	btn.custom_minimum_size = Vector2(120, 44)
 	btn.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -2190,20 +2206,22 @@ func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost:
 	key_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(key_lbl)
 
-	# Ability display — large emoji icon or clipped text fallback
-	var name_lbl: Label = Label.new()
-	name_lbl.text = label_text
-	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if is_icon:
-		# Large centered emoji icon
-		name_lbl.position = Vector2(20, -2)
-		name_lbl.size = Vector2(80, 28)
-		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		name_lbl.add_theme_font_size_override("font_size", 22)
-		name_lbl.add_theme_color_override("font_color", Color.WHITE)
+	# Ability display — pixel art TextureRect, or clipped text fallback
+	if icon_texture != null:
+		var icon_rect: TextureRect = TextureRect.new()
+		icon_rect.texture = icon_texture
+		icon_rect.position = Vector2(38, 2)
+		icon_rect.size = Vector2(24, 24)
+		icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon_rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		inner.add_child(icon_rect)
 	else:
 		# Text name fallback — clipped with ellipsis
+		var name_lbl: Label = Label.new()
+		name_lbl.text = label_text
+		name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		name_lbl.position = Vector2(20, 2)
 		name_lbl.size = Vector2(96, 20)
 		name_lbl.clip_text = true
@@ -2212,10 +2230,10 @@ func _make_ability_btn(keybind: String, label_text: String, accent: Color, cost:
 		name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		name_lbl.add_theme_font_size_override("font_size", 11)
 		name_lbl.add_theme_color_override("font_color", accent)
-	name_lbl.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.4))
-	name_lbl.add_theme_constant_override("shadow_offset_x", 1)
-	name_lbl.add_theme_constant_override("shadow_offset_y", 1)
-	inner.add_child(name_lbl)
+		name_lbl.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.4))
+		name_lbl.add_theme_constant_override("shadow_offset_x", 1)
+		name_lbl.add_theme_constant_override("shadow_offset_y", 1)
+		inner.add_child(name_lbl)
 
 	# Cost badge
 	var badge_text: String = cost_text_override if cost_text_override != "" else ("%d ADR" % cost if cost > 0 else "")
@@ -2593,24 +2611,38 @@ func _show_levelup_flash(skill_id: String, new_level: int) -> void:
 # QoL: COMBAT STATE INDICATOR — "IN COMBAT" label + red tint
 # ══════════════════════════════════════════════════════════════════
 
-var _combat_label: Label = null
+var _combat_indicator: HBoxContainer = null
 var _in_combat_state: bool = false
 
 func _build_combat_indicator() -> void:
-	_combat_label = Label.new()
-	_combat_label.name = "CombatIndicator"
-	_combat_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_combat_label.text = "⚔ IN COMBAT"
-	_combat_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_combat_label.add_theme_font_size_override("font_size", 14)
-	_combat_label.add_theme_color_override("font_color", Color(1.0, 0.3, 0.2, 0.9))
-	_combat_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.6))
-	_combat_label.add_theme_constant_override("shadow_offset_x", 1)
-	_combat_label.add_theme_constant_override("shadow_offset_y", 1)
-	_combat_label.position = Vector2(14, 126)
-	_combat_label.size = Vector2(160, 22)
-	_combat_label.visible = false
-	add_child(_combat_label)
+	_combat_indicator = HBoxContainer.new()
+	_combat_indicator.name = "CombatIndicator"
+	_combat_indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_combat_indicator.position = Vector2(14, 126)
+	_combat_indicator.size = Vector2(160, 22)
+	_combat_indicator.visible = false
+	_combat_indicator.add_theme_constant_override("separation", 4)
+
+	var swords_icon: TextureRect = TextureRect.new()
+	swords_icon.custom_minimum_size = Vector2(14, 14)
+	swords_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	swords_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	swords_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	swords_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	swords_icon.texture = ItemIcons.get_misc_texture("combat_swords")
+	_combat_indicator.add_child(swords_icon)
+
+	var combat_text: Label = Label.new()
+	combat_text.text = "IN COMBAT"
+	combat_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	combat_text.add_theme_font_size_override("font_size", 14)
+	combat_text.add_theme_color_override("font_color", Color(1.0, 0.3, 0.2, 0.9))
+	combat_text.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.6))
+	combat_text.add_theme_constant_override("shadow_offset_x", 1)
+	combat_text.add_theme_constant_override("shadow_offset_y", 1)
+	_combat_indicator.add_child(combat_text)
+
+	add_child(_combat_indicator)
 
 
 
@@ -2621,9 +2653,9 @@ func _on_combat_ended() -> void:
 	_in_combat_state = false
 
 func _update_combat_indicator() -> void:
-	if _combat_label == null:
+	if _combat_indicator == null:
 		return
-	_combat_label.visible = _in_combat_state
+	_combat_indicator.visible = _in_combat_state
 
 # ══════════════════════════════════════════════════════════════════
 # QoL: RARE LOOT TOAST — Center-screen notification for notable drops

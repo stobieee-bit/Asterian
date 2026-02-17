@@ -168,11 +168,23 @@ func _add_discovered_row(type_id: String, _entry: Dictionary) -> void:
 	line2.add_child(stats_label)
 
 	# ── Location line: zone + area ──
+	var loc_hbox: HBoxContainer = HBoxContainer.new()
+	loc_hbox.add_theme_constant_override("separation", 3)
+	row.add_child(loc_hbox)
+
+	var pin_icon: TextureRect = TextureRect.new()
+	pin_icon.custom_minimum_size = Vector2(12, 12)
+	pin_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	pin_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	pin_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	pin_icon.texture = ItemIcons.get_misc_texture("location_pin")
+	loc_hbox.add_child(pin_icon)
+
 	var loc_label: Label = Label.new()
-	loc_label.text = "📍 %s" % location_text
+	loc_label.text = location_text
 	loc_label.add_theme_font_size_override("font_size", 12)
 	loc_label.add_theme_color_override("font_color", Color(0.5, 0.6, 0.7))
-	row.add_child(loc_label)
+	loc_hbox.add_child(loc_label)
 
 	# ── Line 3: Weakness + Defense info (unlocked at 10+ bestiary entries) ──
 	var entry_count: int = GameState.collection_log.size()

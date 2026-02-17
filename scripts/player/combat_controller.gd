@@ -1330,7 +1330,7 @@ func _on_hit_landed(hit_target: Node, dmg: int, _is_crit: bool, attacker: Node =
 		GameState.player["hp"] = mini(max_hp, old_hp + heal_amount)
 		var actual_heal: int = int(GameState.player["hp"]) - old_hp
 		EventBus.float_text_requested.emit(
-			"💚 +%d" % actual_heal,
+			"+%d" % actual_heal,
 			_player.global_position + Vector3(0, 3.2, 0),
 			Color(0.3, 1.0, 0.5)
 		)
@@ -1351,7 +1351,7 @@ func _on_hit_landed(hit_target: Node, dmg: int, _is_crit: bool, attacker: Node =
 			var blocked: int = maxi(1, int(float(dmg) * 0.5))  # Block absorbs 50% of raw hit
 			dmg = maxi(1, dmg - blocked)
 			EventBus.float_text_requested.emit(
-				"🛡 Blocked!", _player.global_position + Vector3(0.3, 3.2, 0),
+				"Blocked!", _player.global_position + Vector3(0.3, 3.2, 0),
 				Color(0.3, 0.7, 1.0)
 			)
 
