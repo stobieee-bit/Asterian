@@ -13,6 +13,11 @@ const SLOT_PADDING: int = 4
 # ── Node refs ──
 var _grid: GridContainer = null
 var _slots: Array[PanelContainer] = []
+var _slot_inner: Array[Control] = []
+var _slot_icon_rect: Array[ColorRect] = []
+var _slot_icon_tex: Array[TextureRect] = []
+var _slot_item_label: Array[Label] = []
+var _slot_qty_label: Array[Label] = []
 var _title_label: Label = null
 var _close_btn: Button = null
 var _credits_label: Label = null
@@ -139,6 +144,13 @@ func _create_slot(index: int) -> PanelContainer:
 	qty_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(qty_label)
 
+	# Cache child refs for fast refresh lookups
+	_slot_inner.append(inner)
+	_slot_icon_rect.append(icon_rect)
+	_slot_icon_tex.append(icon_tex)
+	_slot_item_label.append(label)
+	_slot_qty_label.append(qty_label)
+
 	# Connect click
 	slot.gui_input.connect(_on_slot_input.bind(index))
 	slot.mouse_entered.connect(_on_slot_hover.bind(index))
@@ -150,11 +162,10 @@ func _create_slot(index: int) -> PanelContainer:
 func refresh() -> void:
 	for i in range(_slots.size()):
 		var slot: PanelContainer = _slots[i]
-		var inner: Control = slot.get_node("Inner") as Control
-		var item_label: Label = inner.get_node("ItemLabel") as Label
-		var qty_label: Label = inner.get_node("QtyLabel") as Label
-		var icon_rect: ColorRect = inner.get_node("IconRect") as ColorRect
-		var icon_tex: TextureRect = inner.get_node("IconTexture") as TextureRect
+		var item_label: Label = _slot_item_label[i]
+		var qty_label: Label = _slot_qty_label[i]
+		var icon_rect: ColorRect = _slot_icon_rect[i]
+		var icon_tex: TextureRect = _slot_icon_tex[i]
 		var style: StyleBoxFlat = slot.get_theme_stylebox("panel") as StyleBoxFlat
 
 		if i < GameState.inventory.size():
@@ -377,6 +388,29 @@ func _drop_to_ground() -> void:
 	refresh()
 
 
+## Show a confirmation context menu before dropping an item
+func _confirm_drop(item_id: String, item_name: String) -> void:
+	var confirm_options: Array = []
+	confirm_options.append({"title": "Drop %s?" % item_name, "title_color": Color(1.0, 0.5, 0.3)})
+	confirm_options.append({
+		"label": "Confirm", "icon": "!", "color": Color(0.9, 0.3, 0.3),
+		"callback": func():
+			_execute_drop(item_id, item_name)
+	})
+	EventBus.context_menu_requested.emit(confirm_options, get_global_mouse_position())
+
+
+## Actually remove the item and spawn it on the ground
+func _execute_drop(item_id: String, item_name: String) -> void:
+	GameState.remove_item(item_id, 1)
+	var player_node: Node3D = get_tree().get_first_node_in_group("player")
+	if player_node:
+		var fwd: Vector3 = -player_node.global_transform.basis.z.normalized()
+		EventBus.item_dropped_to_ground.emit(item_id, 1, player_node.global_position + fwd * 2.0)
+	EventBus.chat_message.emit("Dropped %s." % item_name, "system")
+	refresh()
+
+
 ## Cancel drag, remove preview, restore slot appearance
 func _cancel_drag() -> void:
 	if _drag_preview and is_instance_valid(_drag_preview):
@@ -574,19 +608,13 @@ func _show_item_context_menu(item_id: String, item_data: Dictionary, item_type: 
 				_use_consumable(item_id)
 		})
 
-	# Drop option for all items
+	# Drop option for all items — shows confirmation before destroying
 	options.append({
 		"label": "Drop",
 		"icon": "D",
 		"color": Color(0.8, 0.4, 0.3),
 		"callback": func():
-			GameState.remove_item(item_id, 1)
-			var player_node: Node3D = get_tree().get_first_node_in_group("player")
-			if player_node:
-				var fwd: Vector3 = -player_node.global_transform.basis.z.normalized()
-				EventBus.item_dropped_to_ground.emit(item_id, 1, player_node.global_position + fwd * 2.0)
-			EventBus.chat_message.emit("Dropped %s." % item_name, "system")
-			refresh()
+			_confirm_drop(item_id, item_name)
 	})
 
 	# Examine option for all items
