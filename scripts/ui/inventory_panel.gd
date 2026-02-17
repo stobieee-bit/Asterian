@@ -388,6 +388,27 @@ func _drop_to_ground() -> void:
 	refresh()
 
 
+## Show a confirmation context menu before dropping an item
+func _confirm_drop(item_id: String, item_name: String) -> void:
+	var confirm_options: Array = [
+		{"title": "Drop %s?" % item_name, "title_color": Color(1.0, 0.5, 0.3)},
+		{"label": "Confirm", "icon": "!", "color": Color(0.9, 0.3, 0.3),
+		 "callback": func(): _execute_drop(item_id, item_name)},
+	]
+	EventBus.context_menu_requested.emit(confirm_options, get_global_mouse_position())
+
+
+## Actually remove the item and spawn it on the ground
+func _execute_drop(item_id: String, item_name: String) -> void:
+	GameState.remove_item(item_id, 1)
+	var player_node: Node3D = get_tree().get_first_node_in_group("player")
+	if player_node:
+		var fwd: Vector3 = -player_node.global_transform.basis.z.normalized()
+		EventBus.item_dropped_to_ground.emit(item_id, 1, player_node.global_position + fwd * 2.0)
+	EventBus.chat_message.emit("Dropped %s." % item_name, "system")
+	refresh()
+
+
 ## Cancel drag, remove preview, restore slot appearance
 func _cancel_drag() -> void:
 	if _drag_preview and is_instance_valid(_drag_preview):
@@ -590,20 +611,7 @@ func _show_item_context_menu(item_id: String, item_data: Dictionary, item_type: 
 		"label": "Drop",
 		"icon": "D",
 		"color": Color(0.8, 0.4, 0.3),
-		"callback": func():
-			EventBus.context_menu_requested.emit([
-				{"title": "Drop %s?" % item_name, "title_color": Color(1.0, 0.5, 0.3)},
-				{"label": "Confirm", "icon": "!", "color": Color(0.9, 0.3, 0.3),
-				 "callback": func():
-					GameState.remove_item(item_id, 1)
-					var player_node: Node3D = get_tree().get_first_node_in_group("player")
-					if player_node:
-						var fwd: Vector3 = -player_node.global_transform.basis.z.normalized()
-						EventBus.item_dropped_to_ground.emit(item_id, 1, player_node.global_position + fwd * 2.0)
-					EventBus.chat_message.emit("Dropped %s." % item_name, "system")
-					refresh()
-				},
-			], get_global_mouse_position())
+		"callback": func(): _confirm_drop(item_id, item_name)
 	})
 
 	# Examine option for all items
