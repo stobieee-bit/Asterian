@@ -214,13 +214,15 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 		amplitude: float, falloff_start: float,
 		ring_count: int, segment_count: int) -> Dictionary:
 
-	# ── Generate all vertices + colors ──
+	# ── Generate all vertices + colors + overlap factors ──
 	var vertices: Array[Vector3] = []
 	var colors: Array[Color] = []
+	var overlaps: Array[float] = []  # Track per-vertex overlap for collision filtering
 
 	# Center vertex — apply overlap suppression
 	var center_h: float = _sample_height(cx, cz, noise, amplitude, cx, cz, radius, falloff_start)
 	var center_overlap: float = _get_overlap_factor(area_id, cx, cz)
+	overlaps.append(center_overlap)
 	if center_overlap <= 0.0:
 		vertices.append(Vector3(cx, floor_y - 50.0, cz))
 		colors.append(Color(base_color, 0.0))
@@ -238,6 +240,7 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 			var vz: float = cz + sin(angle) * ring_radius
 			var h: float = _sample_height(vx, vz, noise, amplitude, cx, cz, radius, falloff_start)
 			var overlap: float = _get_overlap_factor(area_id, vx, vz)
+			overlaps.append(overlap)
 			if overlap <= 0.0:
 				# Fully inside a smaller area — sink vertex far below
 				vertices.append(Vector3(vx, floor_y - 50.0, vz))
@@ -311,17 +314,25 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 	st.generate_normals()
 	var mesh: ArrayMesh = st.commit()
 
-	# ── Build collision face array from the same vertices ──
+	# ── Build collision face array, SKIPPING suppressed triangles ──
+	# Triangles with any fully-suppressed vertex (overlap <= 0) are omitted from
+	# collision so they don't create invisible walls at floor_y - 50.
+	# The smaller (priority) area's collision mesh fills those gaps instead.
 	var faces := PackedVector3Array()
 
-	# Center fan faces
+	# Center fan faces — skip if any vertex is suppressed
 	for seg in range(segment_count):
 		var next_seg: int = (seg + 1) % segment_count
-		faces.append(vertices[0])
-		faces.append(vertices[1 + seg])
-		faces.append(vertices[1 + next_seg])
+		var i0: int = 0
+		var i1: int = 1 + seg
+		var i2: int = 1 + next_seg
+		if overlaps[i0] <= 0.0 or overlaps[i1] <= 0.0 or overlaps[i2] <= 0.0:
+			continue
+		faces.append(vertices[i0])
+		faces.append(vertices[i1])
+		faces.append(vertices[i2])
 
-	# Ring quad faces
+	# Ring quad faces — skip triangles with any suppressed vertex
 	for ring in range(1, ring_count):
 		var base_idx: int = 1 + (ring - 1) * segment_count
 		var next_base: int = 1 + ring * segment_count
@@ -331,14 +342,16 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 			var i1: int = base_idx + next_seg
 			var i2: int = next_base + seg
 			var i3: int = next_base + next_seg
-			# Tri 1
-			faces.append(vertices[i0])
-			faces.append(vertices[i2])
-			faces.append(vertices[i1])
-			# Tri 2
-			faces.append(vertices[i1])
-			faces.append(vertices[i2])
-			faces.append(vertices[i3])
+			# Tri 1 — only if all vertices are unsuppressed
+			if overlaps[i0] > 0.0 and overlaps[i2] > 0.0 and overlaps[i1] > 0.0:
+				faces.append(vertices[i0])
+				faces.append(vertices[i2])
+				faces.append(vertices[i1])
+			# Tri 2 — only if all vertices are unsuppressed
+			if overlaps[i1] > 0.0 and overlaps[i2] > 0.0 and overlaps[i3] > 0.0:
+				faces.append(vertices[i1])
+				faces.append(vertices[i2])
+				faces.append(vertices[i3])
 
 	return { "mesh": mesh, "faces": faces }
 
