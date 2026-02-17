@@ -20,8 +20,9 @@ const GROUND_Y: float = -0.1
 # ── References ──
 @onready var world_env: WorldEnvironment = $"../WorldEnvironment"
 
-# ── Terrain generator ──
-var _terrain_gen: TerrainGenerator = null
+# ── Terrain ──
+var _terrain_gen: TerrainGenerator = null  # Procedural fallback
+var _terrain3d = null                      # Terrain3D plugin node (painted terrain)
 
 # ── Area collision detection ──
 var _area_bodies: Dictionary = {}   # { area_id: { center: Vector3, radius: float } }
@@ -36,6 +37,13 @@ var _time: float = 0.0
 
 func _ready() -> void:
 	add_to_group("area_manager")
+	# Find Terrain3D plugin node (user-painted terrain)
+	_terrain3d = _find_terrain3d(get_tree().root)
+	if _terrain3d:
+		print("AreaManager: Found Terrain3D node — using painted terrain")
+	else:
+		push_warning("AreaManager: Terrain3D node not found — using procedural fallback")
+	# Procedural fallback (used until Terrain3D regions are painted)
 	_terrain_gen = TerrainGenerator.new()
 	_build_areas()
 	_build_corridors()
@@ -45,16 +53,31 @@ func _ready() -> void:
 	_player = get_tree().get_first_node_in_group("player")
 
 ## Public API: query terrain height at any world XZ position.
+## Tries Terrain3D (painted) first, falls back to procedural generator.
 func get_terrain_height(x: float, z: float) -> float:
+	# Terrain3D plugin (painted terrain) — primary source
+	if _terrain3d and _terrain3d.data:
+		var h: float = _terrain3d.data.get_height(Vector3(x, 0.0, z))
+		if not is_nan(h):
+			return h
+	# Procedural fallback (for unpainted regions)
 	if _terrain_gen:
 		return _terrain_gen.get_height(x, z)
 	return 0.0
 
 ## Internal shorthand for prop placement.
 func _terrain_y(x: float, z: float) -> float:
-	if _terrain_gen:
-		return _terrain_gen.get_height(x, z)
-	return 0.0
+	return get_terrain_height(x, z)
+
+## Recursively search the scene tree for a Terrain3D node.
+func _find_terrain3d(node: Node):
+	if node.get_class() == "Terrain3D":
+		return node
+	for child in node.get_children():
+		var found = _find_terrain3d(child)
+		if found:
+			return found
+	return null
 
 func _process(delta: float) -> void:
 	if _player == null:
