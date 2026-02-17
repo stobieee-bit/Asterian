@@ -205,6 +205,30 @@ func _get_overlap_factor(area_id: String, wx: float, wz: float) -> float:
 	return factor
 
 
+## Get the terrain height of the highest-priority (smallest) area at (wx, wz),
+## EXCLUDING the given area_id. Used to snap suppressed vertices flush with
+## the area that's taking priority over them.
+func _get_priority_height(excluded_area_id: String, wx: float, wz: float) -> float:
+	var best_area: String = ""
+	var best_radius: float = INF
+
+	for area_id in _area_data:
+		if area_id == excluded_area_id:
+			continue
+		var data: Dictionary = _area_data[area_id]
+		var dx: float = wx - data["cx"]
+		var dz: float = wz - data["cz"]
+		var dist: float = sqrt(dx * dx + dz * dz)
+		if dist <= data["radius"] and data["radius"] < best_radius:
+			best_radius = data["radius"]
+			best_area = area_id
+
+	if best_area == "":
+		return 0.0  # Shouldn't happen — only called when inside another area
+
+	return get_height_in_area(best_area, wx, wz)
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 #  MESH GENERATION
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -217,14 +241,16 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 	# ── Generate all vertices + colors + overlap factors ──
 	var vertices: Array[Vector3] = []
 	var colors: Array[Color] = []
-	var overlaps: Array[float] = []  # Track per-vertex overlap for collision filtering
+	var overlaps: Array[float] = []  # Track per-vertex overlap for collision/visual filtering
 
 	# Center vertex — apply overlap suppression
 	var center_h: float = _sample_height(cx, cz, noise, amplitude, cx, cz, radius, falloff_start)
 	var center_overlap: float = _get_overlap_factor(area_id, cx, cz)
 	overlaps.append(center_overlap)
 	if center_overlap <= 0.0:
-		vertices.append(Vector3(cx, floor_y - 50.0, cz))
+		# Snap to priority area's height so the vertex is flush (not a cliff)
+		var priority_y: float = _get_priority_height(area_id, cx, cz)
+		vertices.append(Vector3(cx, priority_y, cz))
 		colors.append(Color(base_color, 0.0))
 	else:
 		vertices.append(Vector3(cx, floor_y + center_h * center_overlap, cz))
@@ -242,15 +268,16 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 			var overlap: float = _get_overlap_factor(area_id, vx, vz)
 			overlaps.append(overlap)
 			if overlap <= 0.0:
-				# Fully inside a smaller area — sink vertex far below
-				vertices.append(Vector3(vx, floor_y - 50.0, vz))
+				# Snap to priority area's height so it's flush, not a cliff
+				var priority_y: float = _get_priority_height(area_id, vx, vz)
+				vertices.append(Vector3(vx, priority_y, vz))
 				colors.append(Color(base_color, 0.0))
 			else:
 				# Partial or no overlap — scale height by overlap factor
 				vertices.append(Vector3(vx, floor_y + h * overlap, vz))
 				colors.append(_height_color(base_color, h * overlap, amplitude))
 
-	# ── Build triangles using SurfaceTool ──
+	# ── Build triangles using SurfaceTool (skip fully-suppressed triangles) ──
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 
@@ -260,6 +287,10 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 		var i0: int = 0              # center
 		var i1: int = 1 + seg        # ring 1, current segment
 		var i2: int = 1 + next_seg   # ring 1, next segment
+
+		# Skip triangle if ANY vertex is fully suppressed (inside priority area)
+		if overlaps[i0] <= 0.0 or overlaps[i1] <= 0.0 or overlaps[i2] <= 0.0:
+			continue
 
 		st.set_color(colors[i0])
 		st.set_normal(Vector3.UP)
@@ -284,31 +315,33 @@ func _build_circular_mesh(area_id: String, cx: float, cz: float, radius: float,
 			var i2: int = next_base + seg
 			var i3: int = next_base + next_seg
 
-			# Triangle 1
-			st.set_color(colors[i0])
-			st.set_normal(Vector3.UP)
-			st.add_vertex(vertices[i0])
+			# Triangle 1 — skip if any vertex is suppressed
+			if overlaps[i0] > 0.0 and overlaps[i2] > 0.0 and overlaps[i1] > 0.0:
+				st.set_color(colors[i0])
+				st.set_normal(Vector3.UP)
+				st.add_vertex(vertices[i0])
 
-			st.set_color(colors[i2])
-			st.set_normal(Vector3.UP)
-			st.add_vertex(vertices[i2])
+				st.set_color(colors[i2])
+				st.set_normal(Vector3.UP)
+				st.add_vertex(vertices[i2])
 
-			st.set_color(colors[i1])
-			st.set_normal(Vector3.UP)
-			st.add_vertex(vertices[i1])
+				st.set_color(colors[i1])
+				st.set_normal(Vector3.UP)
+				st.add_vertex(vertices[i1])
 
-			# Triangle 2
-			st.set_color(colors[i1])
-			st.set_normal(Vector3.UP)
-			st.add_vertex(vertices[i1])
+			# Triangle 2 — skip if any vertex is suppressed
+			if overlaps[i1] > 0.0 and overlaps[i2] > 0.0 and overlaps[i3] > 0.0:
+				st.set_color(colors[i1])
+				st.set_normal(Vector3.UP)
+				st.add_vertex(vertices[i1])
 
-			st.set_color(colors[i2])
-			st.set_normal(Vector3.UP)
-			st.add_vertex(vertices[i2])
+				st.set_color(colors[i2])
+				st.set_normal(Vector3.UP)
+				st.add_vertex(vertices[i2])
 
-			st.set_color(colors[i3])
-			st.set_normal(Vector3.UP)
-			st.add_vertex(vertices[i3])
+				st.set_color(colors[i3])
+				st.set_normal(Vector3.UP)
+				st.add_vertex(vertices[i3])
 
 	# Generate proper normals from geometry
 	st.generate_normals()
