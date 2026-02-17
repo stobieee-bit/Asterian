@@ -68,13 +68,29 @@ func _process(delta: float) -> void:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 func _build_areas() -> void:
+	# ── Pass 1: Register ALL areas so terrain generator knows full world layout ──
 	for area_id in DataManager.areas:
-		var data: Dictionary = DataManager.areas[area_id]
-		_create_area_ground(area_id, data)
+		_register_area(area_id, DataManager.areas[area_id])
 	for area_id in DataManager.corrupted_areas:
-		var data: Dictionary = DataManager.corrupted_areas[area_id]
-		_create_area_ground(area_id, data)
+		_register_area(area_id, DataManager.corrupted_areas[area_id])
+
+	# ── Pass 2: Generate terrain meshes (now with overlap awareness) ──
+	for area_id in DataManager.areas:
+		_create_area_ground(area_id, DataManager.areas[area_id])
+	for area_id in DataManager.corrupted_areas:
+		_create_area_ground(area_id, DataManager.corrupted_areas[area_id])
 	print("AreaManager: Built %d area grounds" % _area_bodies.size())
+
+
+## Pre-register an area's terrain data without building geometry.
+## Called in Pass 1 so the generator can compute overlaps during Pass 2.
+func _register_area(area_id: String, data: Dictionary) -> void:
+	var center_x: float = float(data.get("center", {}).get("x", 0.0))
+	var center_z: float = float(data.get("center", {}).get("z", 0.0))
+	var radius: float = data.get("radius", 50.0)
+	var floor_y: float = float(data.get("floorY", 0.0))
+	var terrain_params: Dictionary = data.get("terrain", {})
+	_terrain_gen.register_area(area_id, center_x, center_z, radius, floor_y, terrain_params)
 
 func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	var center_x: float = float(data.get("center", {}).get("x", 0.0))
