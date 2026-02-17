@@ -29,6 +29,12 @@ var _node_buttons: Dictionary = {}  # { area_id: Button }
 var _pulse_time: float = 0.0
 var _tooltip_label: Label = null
 
+# ── Cached world bounds (calculated once in _ready from DataManager.areas) ──
+var _map_min_x: float = -230.0
+var _map_max_x: float = 250.0
+var _map_min_z: float = -900.0
+var _map_max_z: float = 100.0
+
 # ── Area color map by type ──
 const AREA_COLORS: Dictionary = {
 	"station-hub": Color(0.3, 0.8, 0.9),     # Cyan - safe
@@ -50,6 +56,9 @@ func _ready() -> void:
 	name = "WorldMapPanel"
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	custom_minimum_size = Vector2(MAP_WIDTH + 20, MAP_HEIGHT + 60)
+
+	# Pre-compute world bounds from area data so _world_to_map is O(1) per call
+	_cache_world_bounds()
 
 	var vbox: VBoxContainer = VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 4)
@@ -87,10 +96,8 @@ func _ready() -> void:
 	_tooltip_label.add_theme_constant_override("shadow_offset_y", 1)
 	add_child(_tooltip_label)
 
-## Convert world coordinates to map pixel coordinates
-func _world_to_map(world_x: float, world_z: float) -> Vector2:
-	# Calculate world bounds dynamically from DataManager.areas so the map
-	# always scales correctly when new areas are added or positions change.
+## Compute and cache world bounds from DataManager.areas (called once at _ready)
+func _cache_world_bounds() -> void:
 	var min_x: float = INF
 	var max_x: float = -INF
 	var min_z: float = INF
@@ -106,16 +113,19 @@ func _world_to_map(world_x: float, world_z: float) -> Vector2:
 		min_z = minf(min_z, az - ar)
 		max_z = maxf(max_z, az + ar)
 
-	# Expand by 10% margin so edge nodes don't hit the panel border
-	var range_x: float = max_x - min_x
-	var range_z: float = max_z - min_z
-	min_x -= range_x * 0.05
-	max_x += range_x * 0.05
-	min_z -= range_z * 0.05
-	max_z += range_z * 0.05
+	if max_x > min_x and max_z > min_z:
+		# 5% margin on each side so edge nodes don't clip the panel border
+		var rx: float = max_x - min_x
+		var rz: float = max_z - min_z
+		_map_min_x = min_x - rx * 0.05
+		_map_max_x = max_x + rx * 0.05
+		_map_min_z = min_z - rz * 0.05
+		_map_max_z = max_z + rz * 0.05
 
-	var norm_x: float = (world_x - min_x) / (max_x - min_x)
-	var norm_z: float = (world_z - min_z) / (max_z - min_z)
+## Convert world coordinates to map pixel coordinates (O(1) — uses cached bounds)
+func _world_to_map(world_x: float, world_z: float) -> Vector2:
+	var norm_x: float = (world_x - _map_min_x) / (_map_max_x - _map_min_x)
+	var norm_z: float = (world_z - _map_min_z) / (_map_max_z - _map_min_z)
 
 	return Vector2(
 		PADDING + norm_x * (MAP_WIDTH - PADDING * 2),

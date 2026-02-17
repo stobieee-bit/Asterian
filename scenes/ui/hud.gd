@@ -3857,6 +3857,7 @@ func _close_all_panels() -> void:
 
 ## Handle window resize — reposition anchored elements
 func _on_window_resized() -> void:
+	var vp: Vector2 = _get_viewport_size()
 	# Reposition minimap to top-right corner
 	_resize_minimap()
 	# Reposition action bar to bottom-center
@@ -3875,6 +3876,19 @@ func _on_window_resized() -> void:
 	_reposition_tutorial_panel()
 	# Reposition target info above stat bars
 	_reposition_target_panel()
+	# Reposition right-anchored panels (inventory, equipment)
+	if _inventory_panel:
+		_inventory_panel.position.x = vp.x - 260
+	if _equipment_panel:
+		_equipment_panel.position.x = vp.x - 520
+	# Reposition center-anchored panels
+	if _crafting_panel and _crafting_panel.visible:
+		_crafting_panel.position.x = vp.x / 2.0 - 320
+	if _bank_panel and _bank_panel.visible:
+		_bank_panel.position = Vector2(vp.x / 2.0 - 200, 60)
+	# Reposition world map to screen center
+	if _world_map_panel and _world_map_panel.visible:
+		_world_map_panel.position = Vector2(vp.x / 2.0 - 310, vp.y / 2.0 - 270)
 
 ## Reposition the bottom action bar (compact 2x6 grid) to horizontal center
 func _reposition_action_bar() -> void:
