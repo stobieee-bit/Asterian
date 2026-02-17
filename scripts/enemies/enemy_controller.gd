@@ -164,6 +164,9 @@ func _has_modifier(mod_id: String) -> bool:
 
 func _ready() -> void:
 	add_to_group("enemies")
+	# Floor-snap settings — keeps CharacterBody3D pressed against Terrain3D surface
+	floor_snap_length = 0.5
+	floor_max_angle = deg_to_rad(50)
 	# Initial wander target
 	wander_target = spawn_position
 
@@ -220,17 +223,17 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= 20.0 * delta
 	else:
-		velocity.y = 0.0
+		velocity.y = -0.5  # Small downward nudge keeps floor_snap_length engaged
 
 	move_and_slide()
 
-	# Safety net: snap to terrain if fallen below surface
-	if state != State.DEAD and not GameState.dungeon_active and not is_on_floor():
+	# Safety net: snap to terrain if not on floor
+	if state != State.DEAD and not GameState.dungeon_active:
 		if _area_mgr == null:
 			_area_mgr = get_tree().get_first_node_in_group("area_manager")
-		if _area_mgr:
+		if _area_mgr and not is_on_floor():
 			var terrain_y: float = _area_mgr.get_terrain_height(global_position.x, global_position.z)
-			if global_position.y < terrain_y - 2.0:
+			if global_position.y < terrain_y - 0.5:
 				global_position.y = terrain_y + 0.5
 				velocity.y = 0.0
 
