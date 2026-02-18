@@ -108,7 +108,7 @@ func _add_fallback_ground() -> void:
 	print("AreaManager: Fallback ground plane added at y=0")
 
 var _gate_update_timer: float = 0.0
-var _last_rejected_gate: String = ""  # Prevents chat spam — only message once per gated area
+var _rejected_gates: Dictionary = {}  # { area_id: true } — tracks which gates already messaged
 
 func _process(delta: float) -> void:
 	if _player == null:
@@ -2331,67 +2331,79 @@ func _check_area_transition() -> void:
 	var new_area: String = _get_area_at_position(player_pos)
 
 	if new_area == "" or new_area == GameState.current_area:
-		# Player is in their own area — reset rejected gate so message can fire again later
-		_last_rejected_gate = ""
+		# Player is in their own area — reset rejected gates so messages can fire if they return
+		_rejected_gates.clear()
 		return
 
-	if new_area != GameState.current_area:
-		# ── Area gate check ──
-		if not _check_area_gate(new_area):
-			_push_player_back()
-			return
-		var old_area: String = GameState.current_area
-		GameState.current_area = new_area
-		GameState.previous_area = old_area
-		EventBus.area_entered.emit(new_area)
-		EventBus.area_exited.emit(old_area)
-		_update_atmosphere(new_area)
-		# Notify player of area entry
-		var area_data: Dictionary = DataManager.get_area(new_area)
-		var area_name: String = str(area_data.get("name", new_area))
-		EventBus.chat_message.emit("Entered: %s" % area_name, "system")
+	# ── Area gate check ──
+	if not _check_area_gate(new_area):
+		_notify_gate_blocked(new_area)
+		_push_player_back()
+		return
 
-## Check if the player meets requirements to enter an area
+	var old_area: String = GameState.current_area
+	GameState.current_area = new_area
+	GameState.previous_area = old_area
+	EventBus.area_entered.emit(new_area)
+	EventBus.area_exited.emit(old_area)
+	_update_atmosphere(new_area)
+	# Notify player of area entry
+	var area_data: Dictionary = DataManager.get_area(new_area)
+	var area_name: String = str(area_data.get("name", new_area))
+	EventBus.chat_message.emit("Entered: %s" % area_name, "system")
+
+## Check if the player meets requirements to enter an area (pure check, no side effects).
 func _check_area_gate(area_id: String) -> bool:
 	var reqs: Dictionary = DataManager.get_area_requirements(area_id)
 	if reqs.is_empty():
 		return true  # No requirements — always open
-
-	# Only show chat message once per rejected area — resets when player returns to own area
-	var can_message: bool = _last_rejected_gate != area_id
 
 	# Check combat level
 	var req_level: int = int(reqs.get("combat_level", 0))
 	if req_level > 0:
 		var player_level: int = GameState.get_combat_level()
 		if player_level < req_level:
-			if can_message:
-				var area_data: Dictionary = DataManager.get_area(area_id)
-				var area_name: String = str(area_data.get("name", area_id))
-				EventBus.chat_message.emit(
-					"Requires Combat Level %d to enter %s (current: %d)" % [req_level, area_name, player_level],
-					"system"
-				)
-				_last_rejected_gate = area_id
 			return false
 
 	# Check quest completion
 	var req_quest: String = str(reqs.get("quest", ""))
 	if req_quest != "":
 		if not GameState.completed_quests.has(req_quest):
-			if can_message:
-				var area_data: Dictionary = DataManager.get_area(area_id)
-				var area_name: String = str(area_data.get("name", area_id))
-				var quest_data: Dictionary = DataManager.get_quest(req_quest)
-				var quest_name: String = str(quest_data.get("name", req_quest))
-				EventBus.chat_message.emit(
-					"Complete \"%s\" to unlock %s" % [quest_name, area_name],
-					"system"
-				)
-				_last_rejected_gate = area_id
 			return false
 
 	return true
+
+## Emit a one-shot chat message explaining why a gate blocked the player.
+## Only fires once per area — resets when the player returns to their own area.
+func _notify_gate_blocked(area_id: String) -> void:
+	if _rejected_gates.has(area_id):
+		return  # Already told the player about this gate
+	_rejected_gates[area_id] = true
+
+	var reqs: Dictionary = DataManager.get_area_requirements(area_id)
+	var area_data: Dictionary = DataManager.get_area(area_id)
+	var area_name: String = str(area_data.get("name", area_id))
+
+	var req_level: int = int(reqs.get("combat_level", 0))
+	if req_level > 0:
+		var player_level: int = GameState.get_combat_level()
+		if player_level < req_level:
+			EventBus.chat_message.emit(
+				"Requires Combat Level %d to enter %s (current: %d)" % [req_level, area_name, player_level],
+				"system"
+			)
+			return
+
+	var req_quest: String = str(reqs.get("quest", ""))
+	if req_quest != "":
+		if not GameState.completed_quests.has(req_quest):
+			var quest_data: Dictionary = DataManager.get_quest(req_quest)
+			var quest_name: String = str(quest_data.get("name", req_quest))
+			EventBus.chat_message.emit(
+				"Complete \"%s\" to unlock %s" % [quest_name, area_name],
+				"system"
+			)
+			return
 
 ## Push the player back toward their current area center when gate check fails
 func _push_player_back() -> void:
