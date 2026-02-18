@@ -223,6 +223,7 @@ func _ready() -> void:
 	# ── Web: register beforeunload + visibilitychange to save on tab close/refresh ──
 	if OS.has_feature("web"):
 		_register_web_save_hooks()
+		_apply_web_dpi_scale()
 
 	print("=== Ready! ===")
 
@@ -274,6 +275,23 @@ func _register_web_save_hooks() -> void:
 	JavaScriptBridge.get_interface("document").addEventListener("visibilitychange", js_cb)
 
 	print("Web save hooks registered (beforeunload + visibilitychange).")
+
+
+## Detect browser DPI scaling and adjust viewport so UI stays readable.
+## On high-DPI screens (devicePixelRatio > 1) the browser canvas is large
+## but the CSS pixels are fewer, so the game viewport can end up huge and
+## UI looks tiny. We cap the effective viewport to at most 1920x1080 by
+## lowering the content_scale_factor when devicePixelRatio is high.
+func _apply_web_dpi_scale() -> void:
+	# JavaScriptBridge.eval is the standard Godot API for web JS interop
+	var dpr: float = JavaScriptBridge.eval("window.devicePixelRatio || 1.0")  # noqa: eval
+	if dpr > 1.0:
+		# Scale content up so that UI designed for 1920x1080 stays readable.
+		# e.g. dpr 2.0 -> scale 1.25, dpr 1.5 -> scale 1.1
+		var scale: float = clampf(1.0 + (dpr - 1.0) * 0.35, 1.0, 1.6)
+		get_tree().root.content_scale_factor = scale
+		print("Web DPI scale applied: dpr=%.2f -> content_scale_factor=%.2f" % [dpr, scale])
+
 
 ## Called from JavaScript when the page is about to close or become hidden
 func _web_save_callback(_args: Variant) -> void:
