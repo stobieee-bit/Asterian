@@ -1151,6 +1151,9 @@ func _on_chat_input_submitted(text: String) -> void:
 				client.send_chat(trimmed)
 			else:
 				EventBus.chat_message.emit(trimmed, "system")
+				# Still show chat bubble above local player when offline
+				if client and client.has_method("_show_local_chat_bubble"):
+					client._show_local_chat_bubble(trimmed)
 	# Clear input and release focus
 	_chat_input.text = ""
 	_chat_input.release_focus()

@@ -24,6 +24,9 @@ const MAX_RECONNECT_DELAY: float = 30.0           ## Cap for exponential backoff
 const INITIAL_RECONNECT_DELAY: float = 1.0        ## Starting backoff delay
 const CHAT_MAX_LENGTH: int = 200                  ## Max characters per chat message
 const NAMEPLATE_Y_OFFSET: float = 2.6             ## Height above remote player origin
+const CHAT_BUBBLE_Y_OFFSET: float = 2.9            ## Height above remote player for chat bubble
+const CHAT_BUBBLE_DURATION: float = 5.0            ## Seconds before chat bubble fades
+const CHAT_BUBBLE_FADE_TIME: float = 1.0           ## Seconds to fade out
 const CONNECTION_TIMEOUT: float = 15.0              ## Seconds before treating connect as failed
 
 ## Combat style → color mapping for remote player tinting
@@ -71,8 +74,8 @@ var _last_equip_hash: String = ""
 ##   {
 ##     "node": Node3D,
 ##     "nameplate": Label3D,
-##     "body": CSGCylinder3D,
-##     "head": CSGSphere3D,
+##     "mesh_root": Node3D (PlayerMeshBuilder output),
+##     "chat_bubble": Label3D,
 ##     "target_x": float,
 ##     "target_z": float,
 ##     "target_ry": float,
@@ -85,6 +88,12 @@ var _remote_players: Dictionary = {}
 # ── Cached node references ──
 
 var _player_node: CharacterBody3D = null
+var _local_chat_bubble: Label3D = null  # Chat bubble above local player
+var _local_bubble_timer: float = 0.0
+
+# ── Chat bubble timers for remote players ──
+# { pid: float } — remaining display time per player
+var _chat_bubble_timers: Dictionary = {}
 
 # ──────────────────────────────────────────────
 #  Lifecycle
@@ -180,6 +189,9 @@ func _process(delta: float) -> void:
 	# Interpolate remote player positions
 	_interpolate_remote_players(delta)
 
+	# Tick chat bubble timers (local + remote)
+	_update_chat_bubbles(delta)
+
 	# Toggle remote player visibility based on dungeon state
 	_update_remote_visibility()
 
@@ -239,6 +251,9 @@ func send_chat(text: String) -> void:
 
 	var clamped_text: String = text.substr(0, CHAT_MAX_LENGTH)
 	_send({"type": "chat", "text": clamped_text})
+
+	# Show bubble above our own head immediately (don't wait for server echo)
+	_show_local_chat_bubble(clamped_text)
 
 
 ## Broadcast an attack event to other players.
@@ -552,11 +567,18 @@ func _handle_player_move(msg: Dictionary) -> void:
 ## Handle a remote chat message.
 func _handle_chat(msg: Dictionary) -> void:
 	var sender_name: String = str(msg.get("name", "Unknown"))
+	var sender_id: String = str(msg.get("id", ""))
 	var text: String = str(msg.get("text", ""))
 	if text.length() == 0:
 		return
 
 	EventBus.chat_message.emit("%s: %s" % [sender_name, text], "multiplayer")
+
+	# Show chat bubble above the sender (local or remote)
+	if sender_id == _my_id:
+		_show_local_chat_bubble(text)
+	elif _remote_players.has(sender_id):
+		_show_remote_chat_bubble(sender_id, text)
 
 
 ## Handle a remote player's stats update.
@@ -638,27 +660,10 @@ func _spawn_remote_player(pid: String, data: Dictionary) -> void:
 	var root: Node3D = Node3D.new()
 	root.name = "RemotePlayer_%s" % pid
 
-	# --- Body (cylinder) ---
-	var body: CSGCylinder3D = CSGCylinder3D.new()
-	body.name = "Body"
-	body.radius = 0.35
-	body.height = 1.6
-	body.sides = 12
-	body.material = StandardMaterial3D.new()
-	(body.material as StandardMaterial3D).albedo_color = DEFAULT_STYLE_COLOR
-	body.position = Vector3(0, 0.8, 0)
-	root.add_child(body)
-
-	# --- Head (sphere) ---
-	var head: CSGSphere3D = CSGSphere3D.new()
-	head.name = "Head"
-	head.radius = 0.3
-	head.radial_segments = 12
-	head.rings = 6
-	head.material = StandardMaterial3D.new()
-	(head.material as StandardMaterial3D).albedo_color = Color(0.9, 0.8, 0.7)  # Skin tone
-	head.position = Vector3(0, 1.9, 0)
-	root.add_child(head)
+	# --- Full player mesh (same as local player) ---
+	var mesh_root: Node3D = PlayerMeshBuilder.build_player_mesh()
+	mesh_root.name = "MeshRoot"
+	root.add_child(mesh_root)
 
 	# --- Nameplate (Label3D) ---
 	var nameplate: Label3D = Label3D.new()
@@ -677,8 +682,12 @@ func _spawn_remote_player(pid: String, data: Dictionary) -> void:
 	var stats: Dictionary = data.get("stats", {}) as Dictionary
 	var level: int = int(stats.get("level", 1))
 	nameplate.text = "%s (Lv %d)" % [display_name, level]
-
 	root.add_child(nameplate)
+
+	# --- Chat bubble (Label3D, hidden by default) ---
+	var bubble: Label3D = _create_chat_bubble()
+	bubble.position = Vector3(0, CHAT_BUBBLE_Y_OFFSET, 0)
+	root.add_child(bubble)
 
 	# Set initial position
 	var start_x: float = float(data.get("x", 0.0))
@@ -694,8 +703,8 @@ func _spawn_remote_player(pid: String, data: Dictionary) -> void:
 	var info: Dictionary = {
 		"node": root,
 		"nameplate": nameplate,
-		"body": body,
-		"head": head,
+		"mesh_root": mesh_root,
+		"chat_bubble": bubble,
 		"target_x": start_x,
 		"target_z": start_z,
 		"target_ry": start_ry,
@@ -706,7 +715,7 @@ func _spawn_remote_player(pid: String, data: Dictionary) -> void:
 	}
 	_remote_players[pid] = info
 
-	# Apply initial combat style tint
+	# Apply initial combat style theme
 	var style: String = str(stats.get("combatStyle", str(data.get("combatStyle", "nano"))))
 	_tint_remote_player(info, style)
 
@@ -722,6 +731,7 @@ func _remove_remote_player(pid: String) -> void:
 		node.queue_free()
 
 	_remote_players.erase(pid)
+	_chat_bubble_timers.erase(pid)
 
 
 ## Remove all remote players (on disconnect or reconnect).
@@ -732,21 +742,22 @@ func _cleanup_all_remote_players() -> void:
 		if node != null and is_instance_valid(node):
 			node.queue_free()
 	_remote_players.clear()
+	_chat_bubble_timers.clear()
 
 
 ## Tint a remote player's body cylinder to match their combat style.
 func _tint_remote_player(info: Dictionary, style: String) -> void:
-	var body: CSGCylinder3D = info.get("body") as CSGCylinder3D
-	if body == null:
-		return
-	var mat: StandardMaterial3D = body.material as StandardMaterial3D
-	if mat == null:
-		return
-	mat.albedo_color = STYLE_COLORS.get(style, DEFAULT_STYLE_COLOR)
+	var mesh_root: Node3D = info.get("mesh_root") as Node3D
+	if mesh_root != null:
+		PlayerMeshBuilder.apply_style_theme(mesh_root, style)
 
 
 ## Smoothly interpolate all remote players toward their target positions.
+var _anim_time: float = 0.0
+
 func _interpolate_remote_players(delta: float) -> void:
+	_anim_time += delta * 6.0  # Walk cycle speed
+
 	for pid in _remote_players:
 		var info: Dictionary = _remote_players[pid]
 		var node: Node3D = info.get("node") as Node3D
@@ -764,6 +775,15 @@ func _interpolate_remote_players(delta: float) -> void:
 		# Smooth rotation interpolation
 		node.rotation.y = lerp_angle(node.rotation.y, target_ry, INTERPOLATION_SPEED * delta)
 
+		# Animate mesh (walk if moving, idle if stationary)
+		var mesh_root: Node3D = info.get("mesh_root") as Node3D
+		if mesh_root != null:
+			var style: String = str(info.get("stats", {}).get("combatStyle", "nano"))
+			if info.get("moving", false):
+				PlayerMeshBuilder.animate_walk(mesh_root, _anim_time, 1.0, style)
+			else:
+				PlayerMeshBuilder.animate_idle(mesh_root, _anim_time, style)
+
 
 ## Show or hide remote players when entering/exiting a dungeon.
 func _update_remote_visibility() -> void:
@@ -773,4 +793,105 @@ func _update_remote_visibility() -> void:
 		var node: Node3D = info.get("node") as Node3D
 		if node != null and is_instance_valid(node):
 			node.visible = not in_dungeon
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  CHAT BUBBLES — floating text above player heads
+# ══════════════════════════════════════════════════════════════════════════════
+
+## Create a reusable chat bubble Label3D (starts hidden).
+func _create_chat_bubble() -> Label3D:
+	var bubble: Label3D = Label3D.new()
+	bubble.name = "ChatBubble"
+	bubble.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	bubble.no_depth_test = true
+	bubble.font_size = 24
+	bubble.outline_size = 5
+	bubble.modulate = Color(1, 1, 0.85, 1)  # Warm white text
+	bubble.outline_modulate = Color(0, 0, 0, 0.9)
+	bubble.pixel_size = 0.004
+	bubble.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	bubble.width = 200.0  # Max width before wrapping
+	bubble.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	bubble.visible = false
+	return bubble
+
+
+## Show a chat bubble above the LOCAL player's head.
+func _show_local_chat_bubble(text: String) -> void:
+	if _player_node == null:
+		return
+
+	# Create the bubble if it doesn't exist yet
+	if _local_chat_bubble == null or not is_instance_valid(_local_chat_bubble):
+		_local_chat_bubble = _create_chat_bubble()
+		_local_chat_bubble.position = Vector3(0, CHAT_BUBBLE_Y_OFFSET, 0)
+		_player_node.add_child(_local_chat_bubble)
+
+	# Truncate long messages for the bubble
+	var display: String = text.substr(0, 80)
+	if text.length() > 80:
+		display += "..."
+	_local_chat_bubble.text = display
+	_local_chat_bubble.modulate = Color(1, 1, 0.85, 1)
+	_local_chat_bubble.visible = true
+	_local_bubble_timer = CHAT_BUBBLE_DURATION
+
+
+## Show a chat bubble above a REMOTE player's head.
+func _show_remote_chat_bubble(pid: String, text: String) -> void:
+	if not _remote_players.has(pid):
+		return
+	var info: Dictionary = _remote_players[pid]
+	var bubble: Label3D = info.get("chat_bubble") as Label3D
+	if bubble == null:
+		return
+
+	# Truncate long messages for the bubble
+	var display: String = text.substr(0, 80)
+	if text.length() > 80:
+		display += "..."
+	bubble.text = display
+	bubble.modulate = Color(1, 1, 0.85, 1)
+	bubble.visible = true
+	_chat_bubble_timers[pid] = CHAT_BUBBLE_DURATION
+
+
+## Tick down all chat bubble timers and fade/hide expired bubbles.
+func _update_chat_bubbles(delta: float) -> void:
+	# Local player bubble
+	if _local_bubble_timer > 0.0:
+		_local_bubble_timer -= delta
+		if _local_bubble_timer <= 0.0:
+			if _local_chat_bubble != null and is_instance_valid(_local_chat_bubble):
+				_local_chat_bubble.visible = false
+		elif _local_bubble_timer < CHAT_BUBBLE_FADE_TIME:
+			# Fade out
+			if _local_chat_bubble != null and is_instance_valid(_local_chat_bubble):
+				var alpha: float = _local_bubble_timer / CHAT_BUBBLE_FADE_TIME
+				_local_chat_bubble.modulate = Color(1, 1, 0.85, alpha)
+
+	# Remote player bubbles
+	var expired: Array[String] = []
+	for pid in _chat_bubble_timers:
+		_chat_bubble_timers[pid] -= delta
+		var remaining: float = float(_chat_bubble_timers[pid])
+
+		if remaining <= 0.0:
+			# Hide and clean up
+			if _remote_players.has(pid):
+				var bubble: Label3D = _remote_players[pid].get("chat_bubble") as Label3D
+				if bubble != null:
+					bubble.visible = false
+			expired.append(pid)
+		elif remaining < CHAT_BUBBLE_FADE_TIME:
+			# Fade out
+			if _remote_players.has(pid):
+				var bubble: Label3D = _remote_players[pid].get("chat_bubble") as Label3D
+				if bubble != null:
+					var alpha: float = remaining / CHAT_BUBBLE_FADE_TIME
+					bubble.modulate = Color(1, 1, 0.85, alpha)
+
+	for pid in expired:
+		_chat_bubble_timers.erase(pid)
 
