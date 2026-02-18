@@ -18,7 +18,7 @@ jobs:
   export-web:
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:4.4
+      image: barichello/godot-ci:4.4.1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,27 +26,45 @@ jobs:
       - name: Setup export templates
         run: |
           # The container HOME inside GitHub Actions is /github/home
-          # barichello/godot-ci stores templates in /root/.local/share/godot/templates/
-          # Godot looks for them in $HOME/.local/share/godot/export_templates/4.4.stable/
-          TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/4.4.stable"
+          # barichello/godot-ci stores templates in /root/.local/share/godot/
+          # Godot 4.4.1 looks in $HOME/.local/share/godot/export_templates/4.4.1.stable/
+          TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/4.4.1.stable"
           mkdir -p "$TEMPLATE_DIR"
 
           # Copy all templates from the Docker image's known locations
-          cp /root/.local/share/godot/templates/* "$TEMPLATE_DIR/" 2>/dev/null || true
-          cp /root/.local/share/godot/export_templates/4.4.stable/* "$TEMPLATE_DIR/" 2>/dev/null || true
+          for src in /root/.local/share/godot/templates \
+                     /root/.local/share/godot/export_templates/4.4.1.stable \
+                     /root/.local/share/godot/export_templates/4.4.stable; do
+            cp "$src"/* "$TEMPLATE_DIR/" 2>/dev/null || true
+          done
 
           # List what we have to debug
           echo "=== Templates found ==="
           ls -la "$TEMPLATE_DIR/" || echo "No templates found"
 
-          # Godot 4.4 with threads disabled looks for web_nothreads_* variants
-          # If only threaded versions exist, create nothreads copies
           cd "$TEMPLATE_DIR"
+
+          # Godot 4.4 with threads disabled needs web_nothreads_* variants
           if [ ! -f web_nothreads_release.zip ] && [ -f web_release.zip ]; then
             cp web_release.zip web_nothreads_release.zip
           fi
           if [ ! -f web_nothreads_debug.zip ] && [ -f web_debug.zip ]; then
             cp web_debug.zip web_nothreads_debug.zip
+          fi
+
+          # extensions_support=true needs web_dlink_nothreads_* variants for Terrain3D
+          if [ ! -f web_dlink_nothreads_release.zip ] && [ -f web_dlink_release.zip ]; then
+            cp web_dlink_release.zip web_dlink_nothreads_release.zip
+          fi
+          if [ ! -f web_dlink_nothreads_debug.zip ] && [ -f web_dlink_debug.zip ]; then
+            cp web_dlink_debug.zip web_dlink_nothreads_debug.zip
+          fi
+          # If no dlink variants exist at all, fall back to standard templates
+          if [ ! -f web_dlink_nothreads_release.zip ] && [ -f web_nothreads_release.zip ]; then
+            cp web_nothreads_release.zip web_dlink_nothreads_release.zip
+          fi
+          if [ ! -f web_dlink_nothreads_debug.zip ] && [ -f web_nothreads_debug.zip ]; then
+            cp web_nothreads_debug.zip web_dlink_nothreads_debug.zip
           fi
 
           echo "=== Final templates ==="
