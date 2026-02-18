@@ -108,7 +108,7 @@ func _add_fallback_ground() -> void:
 	print("AreaManager: Fallback ground plane added at y=0")
 
 var _gate_update_timer: float = 0.0
-var _gate_message_cooldown: float = 0.0  # Prevents chat spam when player bumps gated areas
+var _last_rejected_gate: String = ""  # Prevents chat spam — only message once per gated area
 
 func _process(delta: float) -> void:
 	if _player == null:
@@ -116,9 +116,6 @@ func _process(delta: float) -> void:
 		return
 	_check_area_transition()
 	_animate_world(delta)
-	# Tick down gate message cooldown
-	if _gate_message_cooldown > 0.0:
-		_gate_message_cooldown -= delta
 	# Update gate barrier colors every 2 seconds (not every frame)
 	_gate_update_timer += delta
 	if _gate_update_timer >= 2.0:
@@ -2333,7 +2330,12 @@ func _check_area_transition() -> void:
 	var player_pos: Vector2 = Vector2(_player.global_position.x, _player.global_position.z)
 	var new_area: String = _get_area_at_position(player_pos)
 
-	if new_area != "" and new_area != GameState.current_area:
+	if new_area == "" or new_area == GameState.current_area:
+		# Player is in their own area — reset rejected gate so message can fire again later
+		_last_rejected_gate = ""
+		return
+
+	if new_area != GameState.current_area:
 		# ── Area gate check ──
 		if not _check_area_gate(new_area):
 			_push_player_back()
@@ -2355,8 +2357,8 @@ func _check_area_gate(area_id: String) -> bool:
 	if reqs.is_empty():
 		return true  # No requirements — always open
 
-	# Only show chat message if cooldown has expired (prevents spam when bumping gates)
-	var can_message: bool = _gate_message_cooldown <= 0.0
+	# Only show chat message once per rejected area — resets when player returns to own area
+	var can_message: bool = _last_rejected_gate != area_id
 
 	# Check combat level
 	var req_level: int = int(reqs.get("combat_level", 0))
@@ -2370,7 +2372,7 @@ func _check_area_gate(area_id: String) -> bool:
 					"Requires Combat Level %d to enter %s (current: %d)" % [req_level, area_name, player_level],
 					"system"
 				)
-				_gate_message_cooldown = 5.0  # 5-second cooldown between gate messages
+				_last_rejected_gate = area_id
 			return false
 
 	# Check quest completion
@@ -2386,7 +2388,7 @@ func _check_area_gate(area_id: String) -> bool:
 					"Complete \"%s\" to unlock %s" % [quest_name, area_name],
 					"system"
 				)
-				_gate_message_cooldown = 5.0  # 5-second cooldown between gate messages
+				_last_rejected_gate = area_id
 			return false
 
 	return true
