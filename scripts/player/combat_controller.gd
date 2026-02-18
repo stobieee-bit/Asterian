@@ -106,6 +106,15 @@ const ADRENALINE_MAX: float = 100.0
 # ── Food cooldown ──
 const FOOD_COOLDOWN: float = 1.8  ## Seconds between eating food
 
+# ── Adrenaline spender state ──
+var _burst_mode_active: bool = false   ## 100 ADR: free abilities for 5s
+var _burst_mode_timer: float = 0.0
+var _overcharge_active: bool = false   ## 50 ADR: next ability does 2x damage
+const BURST_MODE_DURATION: float = 5.0
+
+# ── Kill streak ──
+var _kill_streak: int = 0
+
 # ── State ──
 var target: Node = null           ## Currently targeted enemy
 var is_in_combat: bool = false
@@ -207,6 +216,18 @@ func _process(delta: float) -> void:
 		if _adrenaline_gain_timer <= 0:
 			_adrenaline_gain_mult = 1.0
 			EventBus.chat_message.emit("Natural Instinct has worn off.", "combat")
+
+	# ── Tick down burst mode timer ──
+	if _burst_mode_active:
+		_burst_mode_timer -= delta
+		if _burst_mode_timer <= 0:
+			_burst_mode_active = false
+			EventBus.chat_message.emit("Burst Mode has ended.", "combat")
+			EventBus.float_text_requested.emit(
+				"Burst Off",
+				_player.global_position + Vector3(0, 3.5, 0),
+				Color(0.6, 0.6, 0.6)
+			)
 
 	# ── Tick down defensive buffs ──
 	if _resonance_timer > 0:
@@ -449,8 +470,15 @@ func _do_attack() -> void:
 				Color(0.6, 0.2, 0.9)
 			)
 
-	# Critical hit (10% chance, 1.5x damage)
-	var is_crit: bool = randf() < 0.10
+	# Get combat style early — needed for crit check
+	var style: String = GameState.player["combat_style"]
+	_last_attack_style = style
+
+	# Critical hit (10% base chance, +5% for Tesla style, 1.5x damage)
+	var crit_chance: float = 0.10
+	if style == "tesla":
+		crit_chance += 0.05
+	var is_crit: bool = randf() < crit_chance
 	if is_crit:
 		total_damage = int(float(total_damage) * 1.5)
 		# Screen shake on crit
@@ -462,9 +490,7 @@ func _do_attack() -> void:
 	var target_pos: Vector3 = (target as Node3D).global_position
 
 	# Deal damage (may kill enemy → triggers _on_enemy_killed → clears target)
-	var style: String = GameState.player["combat_style"]
-	_last_attack_style = style
-	var actual: int = target.take_damage(total_damage, style)
+	var actual: int = target.take_damage(total_damage, style, is_crit)
 
 	# Build adrenaline (small amount from auto-attacks, like RS3)
 	GameState.player["adrenaline"] = minf(ADRENALINE_MAX, float(GameState.player["adrenaline"]) + ADRENALINE_PER_AUTO * _adrenaline_gain_mult)
@@ -475,6 +501,13 @@ func _do_attack() -> void:
 	if is_crit:
 		text += "!"
 	EventBus.float_text_requested.emit(text, target_pos + Vector3(randf_range(-0.5, 0.5), 2.5, 0), color)
+
+	# Combat style passive (nano lifesteal, tesla crit handled above, void AoE splash)
+	_apply_style_passive(actual, style, target_pos, target)
+
+	# 5-piece set passive (bleed_on_hit, chain_lightning, void_explosion)
+	var target_killed: bool = (target == null or not is_instance_valid(target) or ("hp" in target and int(target.hp) <= 0))
+	_apply_set_passive(actual, style, target_pos, target, target_killed)
 
 	# Broadcast attack to multiplayer
 	var mp_client: Node = get_tree().get_first_node_in_group("multiplayer_client")
@@ -765,8 +798,8 @@ func use_weapon_special() -> bool:
 	var style: String = str(GameState.player.get("combat_style", "nano"))
 	_last_attack_style = style
 
-	# Deal primary damage
-	var actual: int = target.take_damage(total_damage, style)
+	# Deal primary damage — weapon specials always use crit flash + knockback
+	var actual: int = target.take_damage(total_damage, style, true, 1.0)
 
 	# Gold color for weapon specials
 	var spec_color: Color = Color(1.0, 0.85, 0.1)
@@ -825,6 +858,62 @@ func get_weapon_special_data() -> Dictionary:
 		return special
 	return {}
 
+# ──────────────────────────────────────────────
+#  Adrenaline Spenders
+# ──────────────────────────────────────────────
+
+## Burst Mode — 100 ADR: All abilities cost 0 adrenaline for 5 seconds.
+func activate_burst_mode() -> bool:
+	var adrenaline: float = float(GameState.player["adrenaline"])
+	if adrenaline < 100.0:
+		EventBus.chat_message.emit("Need 100 adrenaline for Burst Mode.", "combat")
+		return false
+	GameState.player["adrenaline"] = 0.0
+	_burst_mode_active = true
+	_burst_mode_timer = BURST_MODE_DURATION
+	EventBus.chat_message.emit("Burst Mode activated! Free abilities for %.0fs!" % BURST_MODE_DURATION, "combat")
+	EventBus.float_text_requested.emit(
+		"BURST MODE!",
+		_player.global_position + Vector3(0, 3.5, 0),
+		Color(1.0, 0.85, 0.1)
+	)
+	return true
+
+## Overcharge — 50 ADR: Next ability deals 2x damage.
+func activate_overcharge() -> bool:
+	var adrenaline: float = float(GameState.player["adrenaline"])
+	if adrenaline < 50.0:
+		EventBus.chat_message.emit("Need 50 adrenaline for Overcharge.", "combat")
+		return false
+	GameState.player["adrenaline"] = adrenaline - 50.0
+	_overcharge_active = true
+	EventBus.chat_message.emit("Overcharge activated! Next ability deals 2x damage!", "combat")
+	EventBus.float_text_requested.emit(
+		"OVERCHARGE!",
+		_player.global_position + Vector3(0, 3.5, 0),
+		Color(1.0, 0.5, 0.0)
+	)
+	return true
+
+## Adrenaline Rush — 25 ADR: Instantly restores 50 energy.
+func activate_adrenaline_rush() -> bool:
+	var adrenaline: float = float(GameState.player["adrenaline"])
+	if adrenaline < 25.0:
+		EventBus.chat_message.emit("Need 25 adrenaline for Adrenaline Rush.", "combat")
+		return false
+	GameState.player["adrenaline"] = adrenaline - 25.0
+	var max_energy: int = int(GameState.player["max_energy"])
+	var old_energy: int = int(GameState.player["energy"])
+	GameState.player["energy"] = mini(max_energy, old_energy + 50)
+	var actual_energy: int = int(GameState.player["energy"]) - old_energy
+	EventBus.chat_message.emit("Adrenaline Rush! +%d energy!" % actual_energy, "combat")
+	EventBus.float_text_requested.emit(
+		"+%d Energy" % actual_energy,
+		_player.global_position + Vector3(0, 3.5, 0),
+		Color(0.2, 0.8, 1.0)
+	)
+	return true
+
 ## Use style-based ability (data-driven from abilities.json).
 ## Slot 1-5 corresponds to current style's abilities sorted by slot.
 ## If GCD is active, queues the ability to fire when GCD expires (RS3-style).
@@ -874,13 +963,18 @@ func use_ability(ability_slot: int) -> bool:
 	_last_attack_style = style
 	var effects: Array = ab.get("effects", [])
 
-	if adrenaline < cost:
+	# Burst mode: skip adrenaline cost
+	var effective_cost: float = cost
+	if _burst_mode_active and cost > 0:
+		effective_cost = 0.0
+
+	if adrenaline < effective_cost:
 		EventBus.chat_message.emit("Not enough adrenaline (%d/%d)." % [int(adrenaline), int(cost)], "combat")
 		return false
 
 	# Spend or gain adrenaline (apply gain multiplier for basics)
-	if cost > 0:
-		GameState.player["adrenaline"] = adrenaline - cost
+	if effective_cost > 0:
+		GameState.player["adrenaline"] = adrenaline - effective_cost
 	elif adr_gain > 0:
 		GameState.player["adrenaline"] = minf(ADRENALINE_MAX, adrenaline + adr_gain * _adrenaline_gain_mult)
 
@@ -906,19 +1000,44 @@ func use_ability(ability_slot: int) -> bool:
 	if _has_dungeon_modifier("berserker"):
 		total_damage = int(float(total_damage) * 1.2)
 
-	# Ability crit check — top 15% of range, 10% chance → 1.5x damage
+	# Overcharge: 2x damage on next ability, then consume
+	if _overcharge_active:
+		total_damage = total_damage * 2
+		_overcharge_active = false
+		EventBus.float_text_requested.emit(
+			"OVERCHARGED!",
+			_player.global_position + Vector3(-0.3, 3.8, 0),
+			Color(1.0, 0.5, 0.0)
+		)
+
+	# Combo damage multiplier bonus
+	var combo_sys: Node = get_tree().get_first_node_in_group("combo_system")
+	if combo_sys and combo_sys.has_method("get_damage_mult"):
+		var combo_mult: float = combo_sys.get_damage_mult()
+		if combo_mult > 1.0:
+			total_damage = int(float(total_damage) * combo_mult)
+
+	# Ability crit check — top 15% of range, 10% base chance (+5% Tesla), 1.5x damage
+	var ability_crit_chance: float = 0.10
+	if style == "tesla":
+		ability_crit_chance += 0.05
 	var is_ability_crit: bool = false
 	if damage_min_val > 0 and damage_max_val > 0:
 		var crit_threshold: float = damage_max_val - (damage_max_val - damage_min_val) * 0.15
-		if damage_mult >= crit_threshold and randf() < 0.10:
+		if damage_mult >= crit_threshold and randf() < ability_crit_chance:
 			is_ability_crit = true
 			total_damage = int(float(total_damage) * 1.5)
 
 	# Capture position
 	var target_pos: Vector3 = (target as Node3D).global_position
 
-	# Deal primary damage
-	var actual: int = target.take_damage(total_damage, style)
+	# Deal primary damage — knockback on threshold/ultimate abilities
+	var ability_knockback: float = 0.0
+	if tier == "threshold":
+		ability_knockback = 0.8
+	elif tier == "ultimate":
+		ability_knockback = 1.2
+	var actual: int = target.take_damage(total_damage, style, is_ability_crit, ability_knockback)
 
 	# Tier-based color (gold for crits)
 	var ability_color: Color
@@ -948,6 +1067,13 @@ func use_ability(ability_slot: int) -> bool:
 
 	# Apply special effects
 	_apply_ability_effects(effects, target, target_pos, total_damage, style, ability_color)
+
+	# Combat style passive (nano lifesteal, tesla crit handled above, void AoE splash)
+	_apply_style_passive(actual, style, target_pos, target)
+
+	# 5-piece set passive (bleed_on_hit, chain_lightning, void_explosion)
+	var target_killed: bool = (target == null or not is_instance_valid(target) or ("hp" in target and int(target.hp) <= 0))
+	_apply_set_passive(actual, style, target_pos, target, target_killed)
 
 	# Record ability/ultimate use for achievements
 	var ach_sys: Node = get_tree().get_first_node_in_group("achievement_system")
@@ -986,7 +1112,114 @@ func use_ability(ability_slot: int) -> bool:
 	# Trigger attack animation
 	EventBus.player_attacked.emit()
 
+	# Emit for combo system
+	EventBus.ability_used.emit(ab_id, ability_slot)
+
 	return true
+
+## Apply combat style passive bonuses after damage lands.
+## Nano: 5% lifesteal. Tesla: +5% crit bonus (handled at crit roll). Void: 10% AoE splash.
+func _apply_style_passive(actual_damage: int, style: String, target_pos: Vector3, primary_target: Node) -> void:
+	if actual_damage <= 0:
+		return
+
+	match style:
+		"nano":
+			# 5% lifesteal — heal player for 5% of damage dealt
+			var heal_amount: int = maxi(1, int(float(actual_damage) * 0.05))
+			var max_hp: int = int(GameState.player["max_hp"])
+			var old_hp: int = int(GameState.player["hp"])
+			GameState.player["hp"] = mini(max_hp, old_hp + heal_amount)
+			var actual_heal: int = int(GameState.player["hp"]) - old_hp
+			if actual_heal > 0:
+				EventBus.float_text_requested.emit(
+					"+%d" % actual_heal,
+					_player.global_position + Vector3(0.3, 2.8, 0),
+					Color(0.2, 0.9, 0.3)
+				)
+
+		"void":
+			# 10% AoE splash to enemies within 4 units
+			var splash_dmg: int = maxi(1, int(float(actual_damage) * 0.10))
+			var splash_targets: Array = _find_enemies_in_radius(target_pos, 4.0)
+			for enemy in splash_targets:
+				if enemy == primary_target:
+					continue
+				if not is_instance_valid(enemy):
+					continue
+				var splash_actual: int = enemy.take_damage(splash_dmg, style)
+				if splash_actual > 0:
+					EventBus.float_text_requested.emit(
+						str(splash_actual),
+						enemy.global_position + Vector3(randf_range(-0.3, 0.3), 2.3, 0),
+						Color(0.5, 0.2, 0.8)
+					)
+
+## Apply 5-piece set bonus passive after damage lands.
+## Nano: 30% bleed on hit. Tesla: 20% chain lightning. Void: AoE on kill.
+func _apply_set_passive(actual_damage: int, style: String, target_pos: Vector3, primary_target: Node, target_killed: bool) -> void:
+	if actual_damage <= 0 or not _equipment_system:
+		return
+	if not _equipment_system.has_method("get_set_bonus_passive"):
+		return
+
+	var passive: String = _equipment_system.get_set_bonus_passive()
+	if passive == "":
+		return
+
+	match passive:
+		"bleed_on_hit":
+			# Nano 5-piece: 30% chance to apply bleed on hit
+			if randf() < 0.30 and primary_target and is_instance_valid(primary_target) and primary_target.has_method("apply_bleed"):
+				var bleed_dmg: int = maxi(1, int(float(actual_damage) * 0.2))
+				primary_target.apply_bleed(bleed_dmg, 3, 6.0, style)
+				EventBus.float_text_requested.emit(
+					"Bleed!",
+					target_pos + Vector3(0.3, 3.2, 0),
+					Color(0.9, 0.15, 0.15)
+				)
+
+		"chain_lightning":
+			# Tesla 5-piece: 20% chance to chain to 2 nearby enemies for 30% damage
+			if randf() < 0.20:
+				var chain_dmg: int = maxi(1, int(float(actual_damage) * 0.30))
+				var chain_targets: Array = _find_chain_targets(target_pos, 2, 6.0, primary_target)
+				for enemy in chain_targets:
+					if not is_instance_valid(enemy):
+						continue
+					var chain_actual: int = enemy.take_damage(chain_dmg, style)
+					if chain_actual > 0:
+						EventBus.float_text_requested.emit(
+							str(chain_actual),
+							enemy.global_position + Vector3(randf_range(-0.3, 0.3), 2.5, 0),
+							Color(0.4, 0.8, 1.0)
+						)
+						_spawn_chain_line(target_pos, enemy.global_position, Color(0.3, 0.6, 1.0))
+
+		"void_explosion":
+			# Void 5-piece: AoE explosion on kill
+			if target_killed:
+				var explosion_dmg: int = maxi(1, int(float(actual_damage) * 0.5))
+				var explosion_targets: Array = _find_enemies_in_radius(target_pos, 5.0)
+				for enemy in explosion_targets:
+					if enemy == primary_target:
+						continue
+					if not is_instance_valid(enemy):
+						continue
+					var exp_actual: int = enemy.take_damage(explosion_dmg, style)
+					if exp_actual > 0:
+						EventBus.float_text_requested.emit(
+							str(exp_actual),
+							enemy.global_position + Vector3(randf_range(-0.3, 0.3), 2.5, 0),
+							Color(0.6, 0.1, 0.9)
+						)
+				# Visual feedback — purple explosion ring
+				_spawn_impact_ring(target_pos, Color(0.6, 0.1, 0.9), 3)
+				EventBus.float_text_requested.emit(
+					"Void Burst!",
+					target_pos + Vector3(0, 3.5, 0),
+					Color(0.7, 0.2, 1.0)
+				)
 
 ## Apply special effects from ability data (DoT, AoE, chain, stun, debuff, heal)
 func _apply_ability_effects(effects: Array, primary_target: Node, target_pos: Vector3, base_dmg: int, style: String, color: Color) -> void:
@@ -1135,6 +1368,48 @@ func _apply_ability_effects(effects: Array, primary_target: Node, target_pos: Ve
 					Color(0.9, 0.9, 0.2)
 				)
 
+			"poison":
+				# Stacking poison DoT on primary target (max 5 stacks)
+				if primary_target and is_instance_valid(primary_target) and primary_target.has_method("apply_poison"):
+					var ticks: int = int(effect.get("ticks", 4))
+					var tick_mult: float = float(effect.get("tick_damage_mult", 0.3))
+					var duration: float = float(effect.get("duration", 8.0))
+					var weapon_damage: int = _get_weapon_damage()
+					var tick_dmg: int = maxi(1, int(float(base_damage + weapon_damage) * tick_mult))
+					primary_target.apply_poison(tick_dmg, ticks, duration, style)
+					EventBus.status_effect_applied.emit(primary_target, "poison", 1)
+
+			"bleed":
+				# Stacking bleed DoT on primary target (max 3 stacks, refreshes duration)
+				if primary_target and is_instance_valid(primary_target) and primary_target.has_method("apply_bleed"):
+					var ticks: int = int(effect.get("ticks", 3))
+					var tick_mult: float = float(effect.get("tick_damage_mult", 0.5))
+					var duration: float = float(effect.get("duration", 6.0))
+					var weapon_damage: int = _get_weapon_damage()
+					var tick_dmg: int = maxi(1, int(float(base_damage + weapon_damage) * tick_mult))
+					primary_target.apply_bleed(tick_dmg, ticks, duration, style)
+					EventBus.status_effect_applied.emit(primary_target, "bleed", 1)
+
+			"burn":
+				# AoE DoT that can spread to nearby enemies (20% chance per tick)
+				if primary_target and is_instance_valid(primary_target) and primary_target.has_method("apply_burn"):
+					var ticks: int = int(effect.get("ticks", 4))
+					var tick_mult: float = float(effect.get("tick_damage_mult", 0.4))
+					var duration: float = float(effect.get("duration", 6.0))
+					var spread_radius: float = float(effect.get("spread_radius", 3.0))
+					var weapon_damage: int = _get_weapon_damage()
+					var tick_dmg: int = maxi(1, int(float(base_damage + weapon_damage) * tick_mult))
+					primary_target.apply_burn(tick_dmg, ticks, duration, style, spread_radius)
+					EventBus.status_effect_applied.emit(primary_target, "burn", 1)
+
+			"slow":
+				# Attack speed debuff on primary target
+				if primary_target and is_instance_valid(primary_target) and primary_target.has_method("apply_slow"):
+					var slow_value: float = float(effect.get("value", 0.3))
+					var duration: float = float(effect.get("duration", 6.0))
+					primary_target.apply_slow(slow_value, duration)
+					EventBus.status_effect_applied.emit(primary_target, "slow", 1)
+
 			"channel":
 				# Start channeled ability — multiple hits over time
 				_channeling = true
@@ -1164,7 +1439,7 @@ func _channel_do_hit() -> void:
 		var bonuses: Dictionary = prestige_sys.get_prestige_bonuses()
 		hit_dmg = int(float(hit_dmg) * float(bonuses.get("damage_mult", 1.0)))
 
-	var actual: int = _channel_target.take_damage(hit_dmg, _channel_style)
+	var actual: int = _channel_target.take_damage(hit_dmg, _channel_style, false, 0.0)
 	_last_attack_style = _channel_style
 
 	EventBus.float_text_requested.emit(
@@ -1408,6 +1683,24 @@ func _on_hit_landed(hit_target: Node, dmg: int, _is_crit: bool, attacker: Node =
 	EventBus.player_damaged.emit(actual, "enemy")
 	EventBus.float_text_requested.emit(str(actual), _player.global_position + Vector3(randf_range(-0.3, 0.3), 2.8, 0), Color(0.9, 0.1, 0.1))
 
+	# Kill streak: reset if hit takes >20% max HP
+	var max_hp: int = int(GameState.player["max_hp"])
+	if max_hp > 0 and float(actual) / float(max_hp) > 0.20 and _kill_streak > 0:
+		_kill_streak = 0
+		EventBus.kill_streak_updated.emit(0)
+
+	# Screen shake when hit by a boss
+	if attacker and is_instance_valid(attacker) and "is_boss" in attacker and attacker.is_boss:
+		var cam_rig: Node = _player.get_node_or_null("CameraRig")
+		if cam_rig and cam_rig.has_method("shake"):
+			cam_rig.shake(0.5)
+
+	# Auto-retaliate: if not targeting anything, auto-target the attacker
+	if target == null and GameState.settings.get("auto_retaliate", true):
+		if attacker and is_instance_valid(attacker) and attacker.is_in_group("enemies"):
+			if "state" in attacker and attacker.state != attacker.State.DEAD:
+				_set_target(attacker)
+
 	# Death check
 	if GameState.player["hp"] <= 0:
 		_player_death()
@@ -1585,6 +1878,19 @@ func _on_enemy_killed(eid: String, _etype: String) -> void:
 		# ── Dungeon: register kill, roll loot, check room clear ──
 		if GameState.dungeon_active:
 			_handle_dungeon_kill(target)
+
+		# Kill streak tracking
+		_kill_streak += 1
+		if _kill_streak > int(GameState.player.get("max_kill_streak", 0)):
+			GameState.player["max_kill_streak"] = _kill_streak
+		EventBus.kill_streak_updated.emit(_kill_streak)
+		if _kill_streak > 0 and _kill_streak % 5 == 0:
+			EventBus.float_text_requested.emit(
+				"%d Kill Streak!" % _kill_streak,
+				_player.global_position + Vector3(0, 4.0, 0),
+				Color(1.0, 0.85, 0.1)
+			)
+			EventBus.chat_message.emit("%d Kill Streak!" % _kill_streak, "combat")
 
 		# Broadcast kill to multiplayer
 		var mp_client: Node = get_tree().get_first_node_in_group("multiplayer_client")

@@ -81,6 +81,7 @@
     "leashRange": 22,
     "combatStyle": "tesla",
     "respawnTime": 40,
+    "weakness": "nano",
     "area": "spore-marshes",
     "desc": "Floating jellyfish that shocks.",
     "lootTable": [
@@ -134,6 +135,7 @@
     "leashRange": 25,
     "combatStyle": "void",
     "respawnTime": 45,
+    "weakness": "tesla",
     "area": "hive-tunnels",
     "desc": "Mantis-scorpion with toxic fungal growths.",
     "lootTable": [
@@ -187,6 +189,8 @@
     "leashRange": 18,
     "combatStyle": "void",
     "respawnTime": 120,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "fungal-wastes",
     "desc": "Giant slug with gravity field.",
     "lootTable": [
@@ -253,6 +257,8 @@
     "leashRange": 20,
     "combatStyle": "tesla",
     "respawnTime": 120,
+    "weakness": "nano",
+    "resistance": "void",
     "area": "fungal-wastes",
     "desc": "Psionic segmented worm.",
     "lootTable": [
@@ -459,6 +465,7 @@
     "leashRange": 15.2,
     "combatStyle": "tesla",
     "respawnTime": 21,
+    "weakness": "nano",
     "area": "spore-marshes",
     "desc": "Acid-spitting colonial insect.",
     "lootTable": [
@@ -599,6 +606,7 @@
     "leashRange": 15.25,
     "combatStyle": "tesla",
     "respawnTime": 22,
+    "weakness": "nano",
     "area": "spore-marshes",
     "desc": "Blood-sucking tick with barbed legs.",
     "lootTable": [
@@ -737,6 +745,7 @@
     "leashRange": 15.35,
     "combatStyle": "void",
     "respawnTime": 22,
+    "weakness": "tesla",
     "area": "spore-marshes",
     "desc": "Ambush predator lurking in burrows.",
     "lootTable": [
@@ -830,6 +839,7 @@
     "leashRange": 25,
     "combatStyle": "nano",
     "respawnTime": 130,
+    "weakness": "void",
     "area": "spore-marshes",
     "desc": "Bloated queen commanding the swarm.",
     "lootTable": [
@@ -943,6 +953,7 @@
     "leashRange": 15.55,
     "combatStyle": "nano",
     "respawnTime": 23,
+    "weakness": "void",
     "area": "spore-marshes",
     "desc": "Guard insect with reinforced plates.",
     "lootTable": [
@@ -990,6 +1001,7 @@
     "leashRange": 15.6,
     "combatStyle": "void",
     "respawnTime": 24,
+    "weakness": "tesla",
     "area": "spore-marshes",
     "desc": "Subterranean insect erupting from soil.",
     "lootTable": [
@@ -1037,6 +1049,7 @@
     "leashRange": 15.7,
     "combatStyle": "void",
     "respawnTime": 24,
+    "weakness": "tesla",
     "area": "spore-marshes",
     "desc": "Massive spider commanding web territory.",
     "lootTable": [
@@ -1083,6 +1096,8 @@
     "leashRange": 25,
     "combatStyle": "tesla",
     "respawnTime": 140,
+    "weakness": "nano",
+    "resistance": "void",
     "area": "spore-marshes",
     "desc": "Giant wasp queen ruling the skies.",
     "lootTable": [
@@ -1148,6 +1163,7 @@
     "leashRange": 16,
     "combatStyle": "void",
     "respawnTime": 26,
+    "weakness": "tesla",
     "area": "spore-marshes",
     "desc": "Master weaver of lethal trap webs.",
     "lootTable": [
@@ -1241,6 +1257,7 @@
     "leashRange": 16.05,
     "combatStyle": "nano",
     "respawnTime": 26,
+    "weakness": "void",
     "area": "hive-tunnels",
     "desc": "Mantis with scythe-like forearms.",
     "lootTable": [
@@ -1381,6 +1398,7 @@
     "leashRange": 25,
     "combatStyle": "tesla",
     "respawnTime": 145,
+    "weakness": "nano",
     "area": "hive-tunnels",
     "desc": "Enormous jelly monarch ruling the tidal pools.",
     "lootTable": [
@@ -1493,6 +1511,7 @@
     "leashRange": 16.3,
     "combatStyle": "void",
     "respawnTime": 28,
+    "weakness": "tesla",
     "area": "hive-tunnels",
     "desc": "Scorpion with highly toxic venom.",
     "lootTable": [
@@ -1586,6 +1605,7 @@
     "leashRange": 16.4,
     "combatStyle": "tesla",
     "respawnTime": 28,
+    "weakness": "nano",
     "area": "hive-tunnels",
     "desc": "Jelly channeling electrical currents.",
     "lootTable": [
@@ -1633,6 +1653,7 @@
     "leashRange": 16.45,
     "combatStyle": "void",
     "respawnTime": 29,
+    "weakness": "tesla",
     "area": "hive-tunnels",
     "desc": "Massive scorpion with crushing pincers.",
     "lootTable": [
@@ -1820,6 +1841,8 @@
     "leashRange": 16.8,
     "combatStyle": "void",
     "respawnTime": 31,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "hive-tunnels",
     "desc": "Disease-carrying scorpion spreading blight.",
     "lootTable": [
@@ -1867,6 +1890,7 @@
     "leashRange": 16.9,
     "combatStyle": "tesla",
     "respawnTime": 31,
+    "weakness": "nano",
     "area": "hive-tunnels",
     "desc": "Crackling jelly conducting pure lightning.",
     "lootTable": [
@@ -1961,6 +1985,8 @@
     "leashRange": 25,
     "combatStyle": "nano",
     "respawnTime": 160,
+    "weakness": "void",
+    "resistance": "tesla",
     "area": "hive-tunnels",
     "desc": "Alpha mantis spraying concentrated acid.",
     "lootTable": [
@@ -2026,6 +2052,8 @@
     "leashRange": 17.05,
     "combatStyle": "void",
     "respawnTime": 32,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "fungal-wastes",
     "desc": "Quadruped lurking in shadows.",
     "lootTable": [
@@ -2072,6 +2100,7 @@
     "leashRange": 17.1,
     "combatStyle": "void",
     "respawnTime": 33,
+    "weakness": "tesla",
     "area": "fungal-wastes",
     "desc": "Nocturnal predator with darkvision.",
     "lootTable": [
@@ -2165,6 +2194,8 @@
     "leashRange": 17.1,
     "combatStyle": "nano",
     "respawnTime": 33,
+    "weakness": "void",
+    "resistance": "tesla",
     "area": "fungal-wastes",
     "desc": "Slow slug leaving corrosive trail.",
     "lootTable": [
@@ -2259,6 +2290,8 @@
     "leashRange": 17.2,
     "combatStyle": "void",
     "respawnTime": 33,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "fungal-wastes",
     "desc": "Predator drawn to the scent of blood.",
     "lootTable": [
@@ -2305,6 +2338,8 @@
     "leashRange": 25,
     "combatStyle": "void",
     "respawnTime": 165,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "fungal-wastes",
     "desc": "Alpha predator commanding the hunting pack.",
     "lootTable": [
@@ -2370,6 +2405,7 @@
     "leashRange": 17.25,
     "combatStyle": "tesla",
     "respawnTime": 34,
+    "weakness": "nano",
     "area": "fungal-wastes",
     "desc": "Worm boring through solid rock.",
     "lootTable": [
@@ -2417,6 +2453,7 @@
     "leashRange": 17.3,
     "combatStyle": "nano",
     "respawnTime": 34,
+    "weakness": "void",
     "area": "fungal-wastes",
     "desc": "Slug oozing potent neurotoxin.",
     "lootTable": [
@@ -2511,6 +2548,7 @@
     "leashRange": 17.4,
     "combatStyle": "void",
     "respawnTime": 34,
+    "weakness": "tesla",
     "area": "fungal-wastes",
     "desc": "Predator with elongated saber fangs.",
     "lootTable": [
@@ -2604,6 +2642,8 @@
     "leashRange": 17.55,
     "combatStyle": "tesla",
     "respawnTime": 35,
+    "weakness": "nano",
+    "resistance": "void",
     "area": "fungal-wastes",
     "desc": "Worm generating thunderous vibrations.",
     "lootTable": [
@@ -2651,6 +2691,8 @@
     "leashRange": 17.6,
     "combatStyle": "void",
     "respawnTime": 36,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "fungal-wastes",
     "desc": "Predator phasing through void tears.",
     "lootTable": [
@@ -2743,6 +2785,8 @@
     "leashRange": 17.75,
     "combatStyle": "tesla",
     "respawnTime": 37,
+    "weakness": "nano",
+    "resistance": "void",
     "area": "fungal-wastes",
     "desc": "Legendary worm of devastating power.",
     "lootTable": [
@@ -2790,6 +2834,8 @@
     "leashRange": 17.8,
     "combatStyle": "nano",
     "respawnTime": 37,
+    "weakness": "void",
+    "resistance": "tesla",
     "area": "fungal-wastes",
     "desc": "Ultimate slug evolution, nearly indestructible.",
     "lootTable": [
@@ -2883,6 +2929,7 @@
     "leashRange": 17.95,
     "combatStyle": "void",
     "respawnTime": 38,
+    "weakness": "tesla",
     "area": "fungal-wastes",
     "desc": "Ultimate predator at the top of the food chain.",
     "lootTable": [
@@ -2929,6 +2976,8 @@
     "leashRange": 18.05,
     "combatStyle": "void",
     "respawnTime": 38,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "stalker-reaches",
     "desc": "Faint spectral entity from beyond.",
     "lootTable": [
@@ -3021,6 +3070,8 @@
     "leashRange": 18.1,
     "combatStyle": "nano",
     "respawnTime": 39,
+    "weakness": "void",
+    "resistance": "tesla",
     "area": "stalker-reaches",
     "desc": "Animated stone construct.",
     "lootTable": [
@@ -3113,6 +3164,7 @@
     "leashRange": 18.2,
     "combatStyle": "void",
     "respawnTime": 39,
+    "weakness": "tesla",
     "area": "stalker-reaches",
     "desc": "Wraith whose screams paralyze prey.",
     "lootTable": [
@@ -3159,6 +3211,8 @@
     "leashRange": 18.25,
     "combatStyle": "nano",
     "respawnTime": 40,
+    "weakness": "void",
+    "resistance": "tesla",
     "area": "stalker-reaches",
     "desc": "Volcanic glass golem of deadly sharpness.",
     "lootTable": [
@@ -3251,6 +3305,8 @@
     "leashRange": 18.35,
     "combatStyle": "void",
     "respawnTime": 40,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "stalker-reaches",
     "desc": "Wraith emitting mind-shattering howls.",
     "lootTable": [
@@ -3343,6 +3399,8 @@
     "leashRange": 18.45,
     "combatStyle": "tesla",
     "respawnTime": 41,
+    "weakness": "nano",
+    "resistance": "void",
     "area": "stalker-reaches",
     "desc": "Mass projecting horrific visions.",
     "lootTable": [
@@ -3389,6 +3447,8 @@
     "leashRange": 25,
     "combatStyle": "void",
     "respawnTime": 190,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "stalker-reaches",
     "desc": "Ancient guardian of the void boundary.",
     "lootTable": [
@@ -3454,6 +3514,8 @@
     "leashRange": 18.5,
     "combatStyle": "nano",
     "respawnTime": 41,
+    "weakness": "void",
+    "resistance": "tesla",
     "area": "stalker-reaches",
     "desc": "Nearly indestructible diamond construct.",
     "lootTable": [
@@ -3546,6 +3608,7 @@
     "leashRange": 18.6,
     "combatStyle": "nano",
     "respawnTime": 42,
+    "weakness": "void",
     "area": "stalker-reaches",
     "desc": "Colossal golem of staggering power.",
     "lootTable": [
@@ -3638,6 +3701,7 @@
     "leashRange": 18.75,
     "combatStyle": "void",
     "respawnTime": 43,
+    "weakness": "tesla",
     "area": "stalker-reaches",
     "desc": "Wraith from the edge of oblivion itself.",
     "lootTable": [
@@ -3684,6 +3748,8 @@
     "leashRange": 18.8,
     "combatStyle": "nano",
     "respawnTime": 43,
+    "weakness": "void",
+    "resistance": "tesla",
     "area": "stalker-reaches",
     "desc": "Golem infused with void energy.",
     "lootTable": [
@@ -3730,6 +3796,8 @@
     "leashRange": 18.85,
     "combatStyle": "void",
     "respawnTime": 43,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "stalker-reaches",
     "desc": "Immortal wraith existing since creation.",
     "lootTable": [
@@ -3868,6 +3936,7 @@
     "leashRange": 18.9,
     "combatStyle": "void",
     "respawnTime": 43,
+    "weakness": "tesla",
     "area": "stalker-reaches",
     "desc": "Nearly imperceptible wraith.",
     "lootTable": [
@@ -3914,6 +3983,7 @@
     "leashRange": 18.95,
     "combatStyle": "tesla",
     "respawnTime": 44,
+    "weakness": "nano",
     "area": "stalker-reaches",
     "desc": "Final form of dark energy evolution.",
     "lootTable": [
@@ -3960,6 +4030,8 @@
     "leashRange": 25,
     "combatStyle": "nano",
     "respawnTime": 200,
+    "weakness": "void",
+    "resistance": "tesla",
     "area": "stalker-reaches",
     "desc": "Enormous crystalline titan guarding ancient secrets.",
     "lootTable": [
@@ -4025,6 +4097,8 @@
     "leashRange": 19.05,
     "combatStyle": "void",
     "respawnTime": 44,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "corrupted-wastes",
     "desc": "Floating eye observing all movement.",
     "lootTable": [
@@ -4072,6 +4146,8 @@
     "leashRange": 19.05,
     "combatStyle": "tesla",
     "respawnTime": 44,
+    "weakness": "nano",
+    "resistance": "void",
     "area": "corrupted-wastes",
     "desc": "Small anomaly bending local space.",
     "lootTable": [
@@ -4165,6 +4241,8 @@
     "leashRange": 19.2,
     "combatStyle": "tesla",
     "respawnTime": 45,
+    "weakness": "nano",
+    "resistance": "void",
     "area": "corrupted-wastes",
     "desc": "Anomaly distorting gravitational fields.",
     "lootTable": [
@@ -4211,6 +4289,7 @@
     "leashRange": 19.25,
     "combatStyle": "void",
     "respawnTime": 46,
+    "weakness": "tesla",
     "area": "corrupted-wastes",
     "desc": "Eye spreading corruption with its gaze.",
     "lootTable": [
@@ -4305,6 +4384,8 @@
     "leashRange": 19.35,
     "combatStyle": "void",
     "respawnTime": 46,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "corrupted-wastes",
     "desc": "Eye peering from the void itself.",
     "lootTable": [
@@ -4399,6 +4480,8 @@
     "leashRange": 25,
     "combatStyle": "void",
     "respawnTime": 210,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "corrupted-wastes",
     "desc": "Enormous eye consuming reality itself.",
     "lootTable": [
@@ -4465,6 +4548,7 @@
     "leashRange": 19.55,
     "combatStyle": "void",
     "respawnTime": 47,
+    "weakness": "tesla",
     "area": "corrupted-wastes",
     "desc": "Ancient eye of unfathomable wisdom.",
     "lootTable": [
@@ -4559,6 +4643,8 @@
     "leashRange": 19.9,
     "combatStyle": "void",
     "respawnTime": 49,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "corrupted-wastes",
     "desc": "Eye of a being beyond comprehension.",
     "lootTable": [
@@ -4606,6 +4692,8 @@
     "leashRange": 25,
     "combatStyle": "tesla",
     "respawnTime": 219,
+    "weakness": "nano",
+    "resistance": "void",
     "area": "corrupted-wastes",
     "desc": "Entity of pure unreality, a living paradox.",
     "lootTable": [
@@ -4671,6 +4759,8 @@
     "leashRange": 20,
     "combatStyle": "void",
     "respawnTime": 50,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "the-abyss",
     "desc": "First creature encountered in the abyss.",
     "lootTable": [
@@ -4763,6 +4853,8 @@
     "leashRange": 20.2,
     "combatStyle": "nano",
     "respawnTime": 51,
+    "weakness": "void",
+    "resistance": "tesla",
     "area": "the-abyss",
     "desc": "Elongated predator of dark waters.",
     "lootTable": [
@@ -4809,6 +4901,8 @@
     "leashRange": 20.4,
     "combatStyle": "tesla",
     "respawnTime": 52,
+    "weakness": "nano",
+    "resistance": "void",
     "area": "the-abyss",
     "desc": "Serpent adapted to crushing pressures.",
     "lootTable": [
@@ -4855,6 +4949,8 @@
     "leashRange": 25,
     "combatStyle": "void",
     "respawnTime": 230,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "the-abyss",
     "desc": "Massive serpent ruling the upper abyss.",
     "lootTable": [
@@ -4966,6 +5062,7 @@
     "leashRange": 20.8,
     "combatStyle": "void",
     "respawnTime": 55,
+    "weakness": "tesla",
     "area": "the-abyss",
     "desc": "All mouth and hunger from the deep.",
     "lootTable": [
@@ -5058,6 +5155,8 @@
     "leashRange": 25,
     "combatStyle": "void",
     "respawnTime": 245,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "the-abyss",
     "desc": "Insatiable hunger consuming all matter.",
     "lootTable": [
@@ -5123,6 +5222,8 @@
     "leashRange": 21.1,
     "combatStyle": "tesla",
     "respawnTime": 57,
+    "weakness": "nano",
+    "resistance": "void",
     "area": "the-abyss",
     "desc": "Serpent corroding with toxic brine.",
     "lootTable": [
@@ -5169,6 +5270,8 @@
     "leashRange": 21.5,
     "combatStyle": "nano",
     "respawnTime": 59,
+    "weakness": "void",
+    "resistance": "tesla",
     "area": "the-abyss",
     "desc": "Ancient serpent of immense size and wisdom.",
     "lootTable": [
@@ -5215,6 +5318,7 @@
     "leashRange": 22.1,
     "combatStyle": "nano",
     "respawnTime": 63,
+    "weakness": "void",
     "area": "the-abyss",
     "desc": "Automaton enforcing cosmic law.",
     "lootTable": [
@@ -5261,6 +5365,8 @@
     "leashRange": 22.3,
     "combatStyle": "void",
     "respawnTime": 64,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "the-abyss",
     "desc": "Sentinel guarding cosmic boundaries.",
     "lootTable": [
@@ -5307,6 +5413,8 @@
     "leashRange": 25,
     "combatStyle": "void",
     "respawnTime": 270,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "the-abyss",
     "desc": "Warden of the cosmic barrier between realms.",
     "lootTable": [
@@ -5418,6 +5526,7 @@
     "leashRange": 22.8,
     "combatStyle": "void",
     "respawnTime": 67,
+    "weakness": "tesla",
     "area": "the-abyss",
     "desc": "Knight sworn to serve the void.",
     "lootTable": [
@@ -5464,6 +5573,8 @@
     "leashRange": 23,
     "combatStyle": "nano",
     "respawnTime": 68,
+    "weakness": "void",
+    "resistance": "tesla",
     "area": "the-abyss",
     "desc": "Elite warrior of cosmic origin.",
     "lootTable": [
@@ -5556,6 +5667,7 @@
     "leashRange": 23.3,
     "combatStyle": "nano",
     "respawnTime": 70,
+    "weakness": "void",
     "area": "the-abyss",
     "desc": "Unstoppable cosmic war machine.",
     "lootTable": [
@@ -5602,6 +5714,8 @@
     "leashRange": 23.5,
     "combatStyle": "void",
     "respawnTime": 71,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "the-abyss",
     "desc": "Judge of cosmic conflicts.",
     "lootTable": [
@@ -5648,6 +5762,8 @@
     "leashRange": 25,
     "combatStyle": "nano",
     "respawnTime": 295,
+    "weakness": "void",
+    "resistance": "tesla",
     "area": "the-abyss",
     "desc": "Being from before the dawn of creation.",
     "lootTable": [
@@ -5713,6 +5829,8 @@
     "leashRange": 25,
     "combatStyle": "void",
     "respawnTime": 320,
+    "weakness": "tesla",
+    "resistance": "nano",
     "area": "the-abyss",
     "desc": "The living embodiment of entropy itself.",
     "lootTable": [

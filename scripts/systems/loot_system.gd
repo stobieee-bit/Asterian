@@ -100,6 +100,10 @@ func _on_enemy_killed(eid: String, _etype: String) -> void:
 	var loot_table: Array = enemy_data.get("lootTable", [])
 	var spawn_pos: Vector3 = (enemy_node as Node3D).global_position
 
+	# Elite loot bonus: 1.5x drop chances
+	var is_elite: bool = ("is_elite" in enemy_node and enemy_node.is_elite)
+	var elite_mult: float = 1.5 if is_elite else 1.0
+
 	# Bestiary loot bonus: +1% per 10 bestiary entries (max +10%)
 	var bestiary_bonus: float = minf(0.10, float(GameState.collection_log.size()) * 0.001)
 
@@ -107,6 +111,7 @@ func _on_enemy_killed(eid: String, _etype: String) -> void:
 	for entry in loot_table:
 		var chance: float = float(entry.get("chance", 0.0))
 		chance += bestiary_bonus  # Bestiary completion bonus
+		chance *= elite_mult      # Elite bonus
 		if randf() > chance:
 			continue
 
@@ -168,6 +173,13 @@ func _spawn_ground_item(item_id: String, quantity: int, pos: Vector3) -> void:
 
 	_ground_items.append(gitem)
 
+	# Loot beam for rare items (tier 4+)
+	var item_data: Dictionary = DataManager.get_item(item_id)
+	var tier: int = int(item_data.get("tier", 0))
+	if tier >= 4:
+		_spawn_loot_beam(drop_pos, tier)
+		EventBus.rare_loot_dropped.emit(item_id, drop_pos)
+
 ## Try to pick up a ground item
 func _pickup_item(gitem: Node3D, index: int) -> void:
 	var item_id: String = str(gitem.get_meta("item_id", ""))
@@ -227,3 +239,34 @@ func try_click_pickup(gitem: Node3D) -> void:
 	var idx: int = _ground_items.find(gitem)
 	if idx >= 0:
 		_pickup_item(gitem, idx)
+
+## Spawn a loot beam (emissive CSGCylinder3D) at a position for rare drops
+func _spawn_loot_beam(pos: Vector3, tier: int) -> void:
+	var beam: CSGCylinder3D = CSGCylinder3D.new()
+	beam.radius = 0.08
+	beam.height = 15.0
+	beam.sides = 6
+	beam.global_position = pos + Vector3(0, 7.5, 0)
+
+	# Color by tier
+	var beam_color: Color
+	match tier:
+		4: beam_color = Color(0.2, 0.6, 1.0)     # Blue
+		5: beam_color = Color(0.8, 0.2, 1.0)      # Purple
+		_: beam_color = Color(1.0, 0.85, 0.1)     # Gold (tier 6+)
+
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	mat.albedo_color = beam_color
+	mat.emission_enabled = true
+	mat.emission = beam_color
+	mat.emission_energy_multiplier = 2.0
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.albedo_color.a = 0.6
+	beam.material = mat
+
+	add_child(beam)
+
+	# Fade out over 10 seconds
+	var tween: Tween = create_tween()
+	tween.tween_property(mat, "albedo_color:a", 0.0, 10.0)
+	tween.tween_callback(beam.queue_free)

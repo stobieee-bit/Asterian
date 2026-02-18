@@ -33,6 +33,10 @@ signal combat_style_changed(new_style: String)
 signal buff_applied(buff_type: String, value: float, duration: float)
 signal buff_expired(buff_type: String)
 
+# ── Status effect signals ──
+signal status_effect_applied(target: Node, effect_type: String, stacks: int)
+signal status_effect_expired(target: Node, effect_type: String)
+
 # ── Equipment & Inventory signals ──
 signal item_added(item_id: String, quantity: int)
 signal item_removed(item_id: String, quantity: int)
@@ -101,3 +105,10 @@ signal multiplayer_player_left(player_name: String)
 signal tutorial_step_completed(step_id: String)
 signal tutorial_skipped
 signal tutorial_completed
+
+# ── Combo & Kill streak signals ──
+signal ability_used(ability_id: String, slot: int)
+signal combo_completed(combo_id: String, combo_name: String)
+signal combo_progress(combo_id: String, step: int, total: int)
+signal kill_streak_updated(streak: int)
+signal rare_loot_dropped(item_id: String, position: Vector3)

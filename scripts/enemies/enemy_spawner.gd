@@ -239,6 +239,10 @@ func _spawn_enemy(type_id: String, pos: Vector3, zone_id: String) -> void:
 		boss_ai.set_script(boss_ai_script)
 		enemy.add_child(boss_ai)
 
+	# 10% chance to make non-boss enemies elite
+	if not enemy.is_boss and randf() < 0.10:
+		enemy.setup_elite()
+
 ## Remove enemies far from player
 func _despawn_far_enemies() -> void:
 	if _player == null:

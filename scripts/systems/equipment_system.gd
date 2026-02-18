@@ -218,15 +218,15 @@ const SET_ARMOR_SLOTS: Array = ["head", "body", "legs", "boots", "gloves"]
 const SET_BONUSES: Dictionary = {
 	"nano": {
 		3: { "damage": 5, "desc": "+5 Damage" },
-		5: { "damage": 12, "attack_speed_mult": 0.9, "desc": "+12 Damage, +10% Attack Speed" },
+		5: { "damage": 12, "attack_speed_mult": 0.9, "passive": "bleed_on_hit", "desc": "+12 Damage, +10% Attack Speed, 30% Bleed on Hit" },
 	},
 	"tesla": {
 		3: { "accuracy": 8, "desc": "+8 Accuracy" },
-		5: { "accuracy": 15, "armor": 10, "desc": "+15 Accuracy, +10 Armor" },
+		5: { "accuracy": 15, "armor": 10, "passive": "chain_lightning", "desc": "+15 Accuracy, +10 Armor, 20% Chain Lightning" },
 	},
 	"void": {
 		3: { "range": 1.0, "desc": "+1.0 Attack Range" },
-		5: { "range": 2.0, "damage": 8, "desc": "+2.0 Range, +8 Damage" },
+		5: { "range": 2.0, "damage": 8, "passive": "void_explosion", "desc": "+2.0 Range, +8 Damage, AoE on Kill" },
 	},
 }
 
@@ -305,6 +305,13 @@ func get_set_bonus_range() -> float:
 func get_set_bonus_attack_speed_mult() -> float:
 	var bonus: Dictionary = get_current_set_bonus()
 	return float(bonus.get("attack_speed_mult", 1.0))
+
+## Get 5-piece set passive name (empty string if not active)
+func get_set_bonus_passive() -> String:
+	var bonus: Dictionary = get_current_set_bonus()
+	if int(bonus.get("threshold", 0)) >= 5:
+		return str(bonus.get("passive", ""))
+	return ""
 
 ## Recalculate player stats based on equipment
 func _recalc_stats() -> void:

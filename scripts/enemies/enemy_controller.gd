@@ -29,6 +29,19 @@ var mesh_color: Color = Color(0.5, 0.3, 0.2)
 var mesh_template: String = ""          # e.g. "insectoid", "jellyfish"
 var mesh_params: Dictionary = {}        # color, scale, variant from JSON data
 
+# ── Weakness / Resistance (separate from combat triangle) ──
+var weakness: String = ""      # Combat style that deals 1.5x (e.g. "void")
+var resistance: String = ""    # Combat style that deals 0.5x (e.g. "nano")
+
+# ── Elite system ──
+var is_elite: bool = false
+var elite_affix: String = ""    # "vampiric", "shielded", "explosive", "regenerating"
+
+# ── Telegraph system ──
+var _telegraph_cooldown: float = 0.0
+const TELEGRAPH_COOLDOWN: float = 12.0  # Seconds between heavy attacks
+const TELEGRAPH_MIN_LEVEL: int = 15     # Only level 15+ enemies telegraph
+
 # ── Mesh builder ──
 var _mesh_builder: EnemyMeshBuilder = null  # Template builder for this enemy
 var _mesh_root: Node3D = null               # Root of the built mesh hierarchy
@@ -92,6 +105,8 @@ func setup(type_id: String, spawn_pos: Vector3) -> void:
 	combat_style = str(data.get("combatStyle", "nano"))
 	is_boss = bool(data.get("isBoss", false))
 	respawn_time = float(data.get("respawnTime", 30.0))
+	weakness = str(data.get("weakness", ""))
+	resistance = str(data.get("resistance", ""))
 
 	# Loot table
 	var lt: Variant = data.get("lootTable", [])
@@ -143,6 +158,43 @@ func setup(type_id: String, spawn_pos: Vector3) -> void:
 			nameplate.modulate = Color(1.0, 0.3, 0.3, 1.0)
 		else:
 			nameplate.modulate = Color(1.0, 1.0, 0.6, 1.0)
+
+## Configure this enemy as an elite with the given affix.
+## Doubles HP, 1.5x damage, adds glowing aura, updates nameplate.
+func setup_elite(affix: String = "") -> void:
+	if affix == "":
+		affix = EliteAffixes.random_affix()
+
+	is_elite = true
+	elite_affix = affix
+
+	# Stat boosts
+	max_hp = int(float(max_hp) * 2.0)
+	hp = max_hp
+	damage = int(float(damage) * 1.5)
+
+	# Nameplate — show affix name and elite marker
+	if nameplate:
+		var affix_display: String = affix.capitalize()
+		nameplate.text = "[E] %s (Lv %d) [%s]" % [enemy_name, level, affix_display]
+		nameplate.modulate = EliteAffixes.get_color(affix)
+		nameplate.outline_size = 10
+
+	# Glowing aura (emissive ring at feet)
+	var aura: CSGCylinder3D = CSGCylinder3D.new()
+	aura.radius = 1.2
+	aura.height = 0.08
+	aura.sides = 16
+	aura.name = "EliteAura"
+	var aura_color: Color = EliteAffixes.get_color(affix)
+	var aura_mat: StandardMaterial3D = StandardMaterial3D.new()
+	aura_mat.albedo_color = Color(aura_color.r, aura_color.g, aura_color.b, 0.3)
+	aura_mat.emission_enabled = true
+	aura_mat.emission = aura_color
+	aura_mat.emission_energy_multiplier = 1.5
+	aura_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	aura.material = aura_mat
+	add_child(aura)
 
 ## Apply dungeon modifier stat changes. Called by dungeon_renderer after setup().
 func apply_dungeon_modifiers(modifiers: Array) -> void:
@@ -207,6 +259,15 @@ func _physics_process(delta: float) -> void:
 			var heal_amount: int = int(float(max_hp) * 0.02)
 			hp = mini(max_hp, hp + heal_amount)
 			_update_hp_bar()
+
+	# ── Elite: Regenerating affix ──
+	if is_elite and elite_affix == "regenerating" and state != State.DEAD and hp < max_hp:
+		EliteAffixes.apply_regenerating(self, delta)
+		_update_hp_bar()
+
+	# ── Telegraph cooldown ──
+	if _telegraph_cooldown > 0:
+		_telegraph_cooldown -= delta
 
 	match state:
 		State.IDLE:
@@ -312,11 +373,13 @@ func _process_chase(delta: float) -> void:
 
 	var melee_reach: float = _get_melee_reach()
 	if dist_2d > melee_reach:
-		# Chase
-		var dir: Vector2 = to_player.normalized()
-		velocity.x = dir.x * move_speed
-		velocity.z = dir.y * move_speed
-		rotation.y = lerp_angle(rotation.y, atan2(-dir.x, -dir.y), 8.0 * delta)
+		# Chase — apply formation offset if 3+ enemies are chasing
+		var chase_dir: Vector2 = to_player.normalized()
+		var formation_offset: Vector2 = _get_formation_offset()
+		var target_dir: Vector2 = (chase_dir + formation_offset * 0.3).normalized()
+		velocity.x = target_dir.x * move_speed
+		velocity.z = target_dir.y * move_speed
+		rotation.y = lerp_angle(rotation.y, atan2(-target_dir.x, -target_dir.y), 8.0 * delta)
 	else:
 		# In attack range
 		velocity.x = 0.0
@@ -370,11 +433,11 @@ func _process_attacking(delta: float) -> void:
 	velocity.x = 0.0
 	velocity.z = 0.0
 
-	# Attack timer
+	# Attack timer (slow debuff increases interval)
 	_attack_timer -= delta
 	if _attack_timer <= 0:
 		_do_attack()
-		_attack_timer = attack_speed
+		_attack_timer = get_effective_attack_speed()
 
 # ── State: RETURNING ──
 
@@ -408,6 +471,13 @@ func _process_dead(delta: float) -> void:
 func _do_attack() -> void:
 	if _player == null:
 		return
+
+	# Telegraph heavy attack: level 15+, 30% chance, not on cooldown, not a boss (bosses have their own AI)
+	if level >= TELEGRAPH_MIN_LEVEL and not is_boss and _telegraph_cooldown <= 0 and randf() < 0.30:
+		_telegraph_cooldown = TELEGRAPH_COOLDOWN
+		_do_telegraphed_heavy_attack()
+		return
+
 	# Emit attack signal with effective damage (reduced by debuffs)
 	var eff_damage: int = get_effective_damage()
 	EventBus.hit_landed.emit(_player, eff_damage, false, self)
@@ -418,8 +488,81 @@ func _do_attack() -> void:
 		hp = mini(max_hp, hp + heal)
 		_update_hp_bar()
 
+	# Elite: Vampiric — heal 10% of damage dealt
+	if is_elite and elite_affix == "vampiric" and state != State.DEAD:
+		var elite_heal: int = EliteAffixes.apply_vampiric(self, eff_damage)
+		if elite_heal > 0:
+			_update_hp_bar()
+
+## Calculate angular spread offset when 3+ enemies chase the same player.
+## This prevents enemies from stacking directly on top of each other.
+func _get_formation_offset() -> Vector2:
+	if _player == null:
+		return Vector2.ZERO
+
+	# Count nearby chasing/attacking enemies
+	var chasers: Array = []
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		if enemy == self or not is_instance_valid(enemy):
+			continue
+		if enemy.state != State.CHASE and enemy.state != State.ATTACKING:
+			continue
+		if enemy.global_position.distance_to(_player.global_position) > 15.0:
+			continue
+		chasers.append(enemy)
+
+	if chasers.size() < 2:  # Less than 3 total (self + 2 others)
+		return Vector2.ZERO
+
+	# Determine our index in the group (sorted by instance_id for consistency)
+	var all_chasers: Array = [self] + chasers
+	all_chasers.sort_custom(func(a, b): return a.get_instance_id() < b.get_instance_id())
+	var my_index: int = all_chasers.find(self)
+	var total: int = all_chasers.size()
+
+	# Spread enemies around the player in a circle
+	var angle: float = (float(my_index) / float(total)) * TAU
+	return Vector2(cos(angle), sin(angle))
+
+
+## Telegraphed heavy attack — shows a circle indicator before dealing 2x damage.
+func _do_telegraphed_heavy_attack() -> void:
+	if _player == null:
+		return
+
+	var telegraph_delay: float = 1.5  # Seconds of warning
+	var telegraph_radius: float = 3.0
+	var telegraph_pos: Vector3 = _player.global_position
+
+	# Show circle telegraph at player's current position
+	EnemyTelegraph.create_circle(
+		telegraph_pos, telegraph_radius, telegraph_delay,
+		Color(1.0, 0.2, 0.2, 0.3),
+		self
+	)
+
+	# After delay, deal double damage if player is still in range
+	var tween: Tween = create_tween()
+	tween.tween_interval(telegraph_delay)
+	tween.tween_callback(func():
+		if state == State.DEAD or _player == null:
+			return
+		var dist: float = _player.global_position.distance_to(telegraph_pos)
+		if dist <= telegraph_radius:
+			var heavy_dmg: int = get_effective_damage() * 2
+			EventBus.hit_landed.emit(_player, heavy_dmg, false, self)
+			EventBus.float_text_requested.emit(
+				"HEAVY HIT!",
+				_player.global_position + Vector3(0, 3.5, 0),
+				Color(1.0, 0.2, 0.1)
+			)
+	)
+
+
 ## Take damage from player. Returns actual damage dealt.
-func take_damage(amount: int, from_style: String = "") -> int:
+## is_crit: whether this was a critical hit (stronger flash)
+## knockback: push distance away from player on XZ plane (0 = none)
+func take_damage(amount: int, from_style: String = "", is_crit: bool = false, knockback: float = 0.0) -> int:
 	if state == State.DEAD:
 		return 0
 
@@ -428,9 +571,21 @@ func take_damage(amount: int, from_style: String = "") -> int:
 	if from_style != "" and combat_style != "":
 		style_mult = _get_style_multiplier(from_style, combat_style)
 
+	# Weakness/resistance (separate from combat triangle)
+	if weakness != "" and from_style == weakness:
+		style_mult *= 1.5
+		EventBus.float_text_requested.emit("WEAK!", global_position + Vector3(0.4, 3.0, 0), Color(0.3, 1.0, 0.3))
+	elif resistance != "" and from_style == resistance:
+		style_mult *= 0.5
+		EventBus.float_text_requested.emit("RESIST!", global_position + Vector3(0.4, 3.0, 0), Color(0.6, 0.6, 0.6))
+
 	# Apply effective defense (reduced by defense debuff)
 	var eff_defense: int = get_effective_defense()
 	var actual: int = maxi(1, int(amount * style_mult) - eff_defense / 2)
+
+	# Elite: Shielded — cap incoming damage at 50
+	if is_elite and elite_affix == "shielded":
+		actual = EliteAffixes.apply_shielded(actual)
 	hp -= actual
 	hp = maxi(0, hp)
 
@@ -439,12 +594,26 @@ func take_damage(amount: int, from_style: String = "") -> int:
 		var reflect_dmg: int = maxi(1, int(float(actual) * 0.1))
 		EventBus.hit_landed.emit(_player, reflect_dmg, false, self)
 
-	# Hit flash on template mesh
+	# Hit flash on template mesh — crits get stronger/longer flash + scale punch
 	if _mesh_root != null:
-		EnemyMeshBuilder.flash_hit(_mesh_root, 0.8)
-		# Reset flash after a short delay via tween
+		var flash_intensity: float = 1.0 if is_crit else 0.6
+		var flash_duration: float = 0.25 if is_crit else 0.12
+		EnemyMeshBuilder.flash_hit(_mesh_root, flash_intensity)
 		var tween: Tween = create_tween()
-		tween.tween_callback(func() -> void: EnemyMeshBuilder.flash_hit(_mesh_root, 0.0)).set_delay(0.15)
+		tween.tween_callback(func() -> void: EnemyMeshBuilder.flash_hit(_mesh_root, 0.0)).set_delay(flash_duration)
+		# Crit scale punch: briefly enlarge mesh then settle back
+		if is_crit:
+			var punch_tween: Tween = create_tween()
+			var original_scale: Vector3 = _mesh_root.scale
+			punch_tween.tween_property(_mesh_root, "scale", original_scale * 1.05, 0.06)
+			punch_tween.tween_property(_mesh_root, "scale", original_scale, 0.1)
+
+	# Knockback on big hits (threshold/ultimate abilities)
+	if knockback > 0.0 and state != State.DEAD and _player != null:
+		var away_dir: Vector3 = (global_position - _player.global_position).normalized()
+		away_dir.y = 0.0
+		if away_dir.length() > 0.01:
+			global_position += away_dir.normalized() * knockback
 
 	# If we were idle, aggro on damage
 	if state == State.IDLE or state == State.RETURNING:
@@ -470,6 +639,10 @@ func _die() -> void:
 				global_position + Vector3(0, 2.5, 0),
 				Color(1.0, 0.4, 0.1)
 			)
+
+	# Elite: Explosive — AoE on death
+	if is_elite and elite_affix == "explosive":
+		EliteAffixes.apply_explosive(global_position, level, get_tree())
 
 	# Emit signals
 	EventBus.enemy_killed.emit(enemy_id, enemy_id)
@@ -630,6 +803,94 @@ func apply_dot(damage_per_tick: int, ticks: int, duration: float, from_style: St
 		"from_style": from_style,
 	})
 
+## Apply poison — stacking DoT (max 5 stacks). Each call adds a new stack.
+func apply_poison(damage_per_tick: int, ticks: int, duration: float, from_style: String = "") -> void:
+	if state == State.DEAD:
+		return
+	# Count existing poison stacks
+	var poison_count: int = 0
+	for dot in _active_dots:
+		if dot.get("dot_type", "") == "poison":
+			poison_count += 1
+	if poison_count >= 5:
+		return  # Max 5 poison stacks
+	var tick_interval: float = duration / float(ticks) if ticks > 0 else 2.0
+	_active_dots.append({
+		"damage_per_tick": damage_per_tick,
+		"tick_interval": tick_interval,
+		"ticks_remaining": ticks,
+		"tick_timer": tick_interval,
+		"from_style": from_style,
+		"dot_type": "poison",
+		"dot_color": Color(0.2, 0.9, 0.15),
+	})
+	EventBus.float_text_requested.emit("POISON x%d" % (poison_count + 1), global_position + Vector3(0, 3.0, 0), Color(0.2, 0.9, 0.15))
+
+## Apply bleed — stacking DoT (max 3 stacks). Refreshes duration on reapply.
+func apply_bleed(damage_per_tick: int, ticks: int, duration: float, from_style: String = "") -> void:
+	if state == State.DEAD:
+		return
+	var tick_interval: float = duration / float(ticks) if ticks > 0 else 2.0
+	# Refresh existing bleed stacks' duration
+	var bleed_count: int = 0
+	for dot in _active_dots:
+		if dot.get("dot_type", "") == "bleed":
+			bleed_count += 1
+			dot["ticks_remaining"] = ticks
+			dot["tick_timer"] = minf(float(dot["tick_timer"]), tick_interval)
+	if bleed_count >= 3:
+		EventBus.float_text_requested.emit("BLEED x%d" % bleed_count, global_position + Vector3(0, 3.0, 0), Color(0.9, 0.15, 0.15))
+		return  # Max 3 bleed stacks, but we refreshed existing ones
+	_active_dots.append({
+		"damage_per_tick": damage_per_tick,
+		"tick_interval": tick_interval,
+		"ticks_remaining": ticks,
+		"tick_timer": tick_interval,
+		"from_style": from_style,
+		"dot_type": "bleed",
+		"dot_color": Color(0.9, 0.15, 0.15),
+	})
+	EventBus.float_text_requested.emit("BLEED x%d" % (bleed_count + 1), global_position + Vector3(0, 3.0, 0), Color(0.9, 0.15, 0.15))
+
+## Apply burn — AoE DoT. 20% chance per tick to spread to nearby enemies within radius.
+func apply_burn(damage_per_tick: int, ticks: int, duration: float, from_style: String = "", spread_radius: float = 3.0) -> void:
+	if state == State.DEAD:
+		return
+	# Only one burn at a time per enemy — refresh if already burning
+	for dot in _active_dots:
+		if dot.get("dot_type", "") == "burn":
+			dot["ticks_remaining"] = ticks
+			dot["damage_per_tick"] = damage_per_tick
+			EventBus.float_text_requested.emit("BURN!", global_position + Vector3(0, 3.0, 0), Color(1.0, 0.5, 0.1))
+			return
+	var tick_interval: float = duration / float(ticks) if ticks > 0 else 2.0
+	_active_dots.append({
+		"damage_per_tick": damage_per_tick,
+		"tick_interval": tick_interval,
+		"ticks_remaining": ticks,
+		"tick_timer": tick_interval,
+		"from_style": from_style,
+		"dot_type": "burn",
+		"dot_color": Color(1.0, 0.5, 0.1),
+		"spread_radius": spread_radius,
+	})
+	EventBus.float_text_requested.emit("BURN!", global_position + Vector3(0, 3.0, 0), Color(1.0, 0.5, 0.1))
+
+## Apply slow — attack speed debuff
+func apply_slow(value: float, duration: float) -> void:
+	if state == State.DEAD:
+		return
+	_debuffs["slow"] = { "value": value, "duration": duration, "timer": duration }
+	EventBus.float_text_requested.emit("SLOWED", global_position + Vector3(0, 2.5, 0), Color(0.3, 0.5, 1.0))
+
+## Get attack speed after slow debuff
+func get_effective_attack_speed() -> float:
+	var eff: float = attack_speed
+	if _debuffs.has("slow"):
+		var slow_val: float = float(_debuffs["slow"].get("value", 0.0))
+		eff *= (1.0 + slow_val)  # slow_val 0.3 = 30% slower
+	return eff
+
 ## Get defense after debuffs
 func get_effective_defense() -> int:
 	var eff: int = defense
@@ -658,6 +919,7 @@ func _process_debuffs(delta: float) -> void:
 			expired.append(debuff_type)
 	for debuff_type in expired:
 		_debuffs.erase(debuff_type)
+		EventBus.status_effect_expired.emit(self, debuff_type)
 
 ## Process DoT effects (called each physics frame)
 func _process_dots(delta: float) -> void:
@@ -680,8 +942,13 @@ func _process_dots(delta: float) -> void:
 			var actual: int = maxi(1, int(float(tick_dmg) * style_mult) - eff_def / 4)
 			hp -= actual
 			hp = maxi(0, hp)
-			# Float text for DoT damage (blood drop prefix, red-orange)
-			EventBus.float_text_requested.emit("%d" % actual, global_position + Vector3(randf_range(-0.3, 0.3), 2.3, 0), Color(0.8, 0.3, 0.2))
+			# Float text — use dot_color if present (typed DoTs), else red-orange
+			var text_color: Color = dot.get("dot_color", Color(0.8, 0.3, 0.2)) as Color
+			EventBus.float_text_requested.emit("%d" % actual, global_position + Vector3(randf_range(-0.3, 0.3), 2.3, 0), text_color)
+			# Burn spread: 20% chance per tick to spread to a nearby enemy
+			if dot.get("dot_type", "") == "burn" and randf() < 0.20:
+				var spread_r: float = float(dot.get("spread_radius", 3.0))
+				_try_spread_burn(dot, spread_r)
 			dot["ticks_remaining"] = int(dot["ticks_remaining"]) - 1
 			dot["tick_timer"] = float(dot["tick_interval"])
 			if int(dot["ticks_remaining"]) <= 0:
@@ -690,10 +957,35 @@ func _process_dots(delta: float) -> void:
 				_die()
 				return
 
-	# Remove finished DoTs (iterate backwards)
+	# Remove finished DoTs (iterate backwards) and emit expiry signals
 	finished.reverse()
 	for idx in finished:
+		var expired_dot: Dictionary = _active_dots[idx]
+		var expired_type: String = str(expired_dot.get("dot_type", "dot"))
+		EventBus.status_effect_expired.emit(self, expired_type)
 		_active_dots.remove_at(idx)
+
+## Spread burn to a random nearby enemy within radius
+func _try_spread_burn(dot: Dictionary, radius: float) -> void:
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		if enemy == self or not is_instance_valid(enemy):
+			continue
+		if enemy.state == State.DEAD:
+			continue
+		if enemy.global_position.distance_to(global_position) > radius:
+			continue
+		# Check if already burning
+		var already_burning: bool = false
+		for edot in enemy._active_dots:
+			if edot.get("dot_type", "") == "burn":
+				already_burning = true
+				break
+		if already_burning:
+			continue
+		# Spread burn (half damage, same duration)
+		var spread_dmg: int = maxi(1, int(dot["damage_per_tick"]) / 2)
+		enemy.apply_burn(spread_dmg, int(dot["ticks_remaining"]), float(dot["tick_interval"]) * float(dot["ticks_remaining"]), str(dot.get("from_style", "")), float(dot.get("spread_radius", 3.0)))
+		break  # Only spread to one enemy per tick
 
 ## Build enemy mesh from the template system (replaces placeholder CSG)
 func _build_template_mesh() -> void:

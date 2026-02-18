@@ -202,6 +202,14 @@ func _ready() -> void:
 	add_child(mp_client)
 	print("Multiplayer client ready.")
 
+	# Spawn combo system
+	var combo_sys: Node = Node.new()
+	combo_sys.name = "ComboSystem"
+	var combo_script: GDScript = load("res://scripts/systems/combo_system.gd")
+	combo_sys.set_script(combo_script)
+	add_child(combo_sys)
+	print("Combo system ready.")
+
 	# Spawn HUD
 	hud = hud_scene.instantiate()
 	hud.add_to_group("hud")

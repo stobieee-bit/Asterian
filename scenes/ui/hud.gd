@@ -52,6 +52,8 @@ var _multiplayer_panel: PanelContainer = null
 var _tooltip_panel: PanelContainer = null
 var _tutorial_panel: PanelContainer = null
 var _world_map_panel: PanelContainer = null
+var _combat_log_panel: PanelContainer = null
+var _dps_meter: PanelContainer = null
 var _context_menu: PanelContainer = null
 var _context_menu_vbox: VBoxContainer = null
 var _context_menu_title: Label = null
@@ -74,6 +76,8 @@ var achievement_script: GDScript = preload("res://scripts/ui/achievement_panel.g
 var tooltip_script: GDScript = preload("res://scripts/ui/tooltip_panel.gd")
 var tutorial_script: GDScript = preload("res://scripts/ui/tutorial_panel.gd")
 var world_map_script: GDScript = preload("res://scripts/ui/world_map_panel.gd")
+var combat_log_script: GDScript = preload("res://scripts/ui/combat_log_panel.gd")
+var dps_meter_script: GDScript = preload("res://scripts/ui/dps_meter.gd")
 # context_menu is built inline in _build_context_menu()
 
 # ── Chat log ──
@@ -340,13 +344,23 @@ func _process(delta: float) -> void:
 		if _energy_text:
 			_energy_text.text = "EN: %d / %d" % [GameState.player["energy"], GameState.player["max_energy"]]
 
-	# Update adrenaline bar + text
+	# Update adrenaline bar + text (show burst mode timer when active)
 	if _adrenaline_bar:
 		var adr_val: float = float(GameState.player["adrenaline"])
 		_adrenaline_bar.value = adr_val
 		_adrenaline_bar.max_value = 100.0
 		if _adrenaline_text:
-			_adrenaline_text.text = "%d%%" % int(adr_val)
+			var combat: Node = _player.get_node_or_null("CombatController") if _player else null
+			if combat and "._burst_mode_active" != "" and combat.get("_burst_mode_active"):
+				var burst_t: float = float(combat.get("_burst_mode_timer"))
+				_adrenaline_text.text = "BURST %.1fs" % burst_t
+				_adrenaline_text.add_theme_color_override("font_color", Color(1.0, 0.85, 0.1, 0.95))
+			elif combat and combat.get("_overcharge_active"):
+				_adrenaline_text.text = "%d%% [OC]" % int(adr_val)
+				_adrenaline_text.add_theme_color_override("font_color", Color(1.0, 0.5, 0.0, 0.95))
+			else:
+				_adrenaline_text.text = "%d%%" % int(adr_val)
+				_adrenaline_text.add_theme_color_override("font_color", Color(0.85, 0.95, 0.75, 0.9))
 
 	# ── QoL: Low HP vignette pulse ──
 	_update_low_hp_vignette(delta)
@@ -649,6 +663,22 @@ func _build_panels() -> void:
 	_multiplayer_panel.custom_minimum_size = Vector2(300, 220)
 	add_child(_multiplayer_panel)
 	_build_multiplayer_panel_contents()
+
+	# Combat log panel
+	_combat_log_panel = PanelContainer.new()
+	_combat_log_panel.set_script(combat_log_script)
+	_combat_log_panel.add_theme_stylebox_override("panel", panel_style.duplicate())
+	_combat_log_panel.visible = false
+	_combat_log_panel.position = Vector2(10, 350)
+	add_child(_combat_log_panel)
+
+	# DPS meter
+	_dps_meter = PanelContainer.new()
+	_dps_meter.set_script(dps_meter_script)
+	_dps_meter.add_theme_stylebox_override("panel", panel_style.duplicate())
+	_dps_meter.visible = false
+	_dps_meter.position = Vector2(10, 280)
+	add_child(_dps_meter)
 
 	# Tooltip (always exists, but hidden — added last so it renders on top)
 	_tooltip_panel = PanelContainer.new()
@@ -983,6 +1013,14 @@ func _build_action_bar() -> void:
 	var ach_btn: Button = _make_icon_btn("ui_achieve", "Achievements (J)", gold)
 	ach_btn.pressed.connect(func(): _toggle_panel(_achievement_panel, "achievements"))
 	grid.add_child(ach_btn)
+
+	var clog_btn: Button = _make_icon_btn("ui_clog", "Combat Log", Color(0.8, 0.4, 0.3))
+	clog_btn.pressed.connect(func(): _toggle_panel(_combat_log_panel, "combat_log"))
+	grid.add_child(clog_btn)
+
+	var dps_btn: Button = _make_icon_btn("ui_dps", "DPS Meter", Color(1.0, 0.7, 0.2))
+	dps_btn.pressed.connect(func(): _toggle_panel(_dps_meter, "dps_meter"))
+	grid.add_child(dps_btn)
 
 	var set_btn: Button = _make_icon_btn("ui_settings", "Settings", Color(0.5, 0.5, 0.6))
 	set_btn.pressed.connect(func(): _toggle_panel(_settings_panel, "settings"))
@@ -1479,6 +1517,85 @@ func _build_adrenaline_bar() -> void:
 	_adrenaline_text.add_theme_constant_override("shadow_offset_y", 1)
 	_adrenaline_text.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_adrenaline_bar.add_child(_adrenaline_text)
+
+	# ── Adrenaline spender buttons ──
+	_build_adrenaline_spender_buttons(adr_row)
+
+var _burst_btn: Button = null
+var _overcharge_btn: Button = null
+var _rush_btn: Button = null
+
+## Build 3 small adrenaline spender buttons next to the adrenaline bar
+func _build_adrenaline_spender_buttons(parent: HBoxContainer) -> void:
+	var btn_style: StyleBoxFlat = StyleBoxFlat.new()
+	btn_style.bg_color = Color(0.08, 0.12, 0.06, 0.7)
+	btn_style.set_corner_radius_all(3)
+	btn_style.border_color = Color(0.25, 0.5, 0.15, 0.4)
+	btn_style.set_border_width_all(1)
+	btn_style.content_margin_left = 3
+	btn_style.content_margin_right = 3
+	btn_style.content_margin_top = 1
+	btn_style.content_margin_bottom = 1
+
+	# Burst Mode (100 ADR)
+	_burst_btn = Button.new()
+	_burst_btn.text = "B"
+	_burst_btn.tooltip_text = "Burst Mode (100 ADR): Free abilities for 5s"
+	_burst_btn.custom_minimum_size = Vector2(22, 16)
+	_burst_btn.add_theme_font_size_override("font_size", 9)
+	_burst_btn.add_theme_color_override("font_color", Color(1.0, 0.85, 0.1))
+	_burst_btn.add_theme_stylebox_override("normal", btn_style)
+	_burst_btn.add_theme_stylebox_override("hover", btn_style)
+	_burst_btn.add_theme_stylebox_override("pressed", btn_style)
+	_burst_btn.pressed.connect(_on_burst_pressed)
+	parent.add_child(_burst_btn)
+
+	# Overcharge (50 ADR)
+	_overcharge_btn = Button.new()
+	_overcharge_btn.text = "O"
+	_overcharge_btn.tooltip_text = "Overcharge (50 ADR): Next ability deals 2x damage"
+	_overcharge_btn.custom_minimum_size = Vector2(22, 16)
+	_overcharge_btn.add_theme_font_size_override("font_size", 9)
+	_overcharge_btn.add_theme_color_override("font_color", Color(1.0, 0.5, 0.0))
+	_overcharge_btn.add_theme_stylebox_override("normal", btn_style)
+	_overcharge_btn.add_theme_stylebox_override("hover", btn_style)
+	_overcharge_btn.add_theme_stylebox_override("pressed", btn_style)
+	_overcharge_btn.pressed.connect(_on_overcharge_pressed)
+	parent.add_child(_overcharge_btn)
+
+	# Adrenaline Rush (25 ADR)
+	_rush_btn = Button.new()
+	_rush_btn.text = "R"
+	_rush_btn.tooltip_text = "Adrenaline Rush (25 ADR): Instant +50 energy"
+	_rush_btn.custom_minimum_size = Vector2(22, 16)
+	_rush_btn.add_theme_font_size_override("font_size", 9)
+	_rush_btn.add_theme_color_override("font_color", Color(0.2, 0.8, 1.0))
+	_rush_btn.add_theme_stylebox_override("normal", btn_style)
+	_rush_btn.add_theme_stylebox_override("hover", btn_style)
+	_rush_btn.add_theme_stylebox_override("pressed", btn_style)
+	_rush_btn.pressed.connect(_on_rush_pressed)
+	parent.add_child(_rush_btn)
+
+func _on_burst_pressed() -> void:
+	if _player == null:
+		return
+	var combat: Node = _player.get_node_or_null("CombatController")
+	if combat and combat.has_method("activate_burst_mode"):
+		combat.activate_burst_mode()
+
+func _on_overcharge_pressed() -> void:
+	if _player == null:
+		return
+	var combat: Node = _player.get_node_or_null("CombatController")
+	if combat and combat.has_method("activate_overcharge"):
+		combat.activate_overcharge()
+
+func _on_rush_pressed() -> void:
+	if _player == null:
+		return
+	var combat: Node = _player.get_node_or_null("CombatController")
+	if combat and combat.has_method("activate_adrenaline_rush"):
+		combat.activate_adrenaline_rush()
 
 # ── Buff display ──
 
@@ -2695,6 +2812,61 @@ func _build_combat_indicator() -> void:
 
 	add_child(_combat_indicator)
 
+	# ── Kill streak & combo overlay ──
+	_build_streak_combo_overlay()
+
+var _streak_label: Label = null
+var _combo_label: Label = null
+
+func _build_streak_combo_overlay() -> void:
+	# Kill streak counter
+	_streak_label = Label.new()
+	_streak_label.name = "KillStreakLabel"
+	_streak_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_streak_label.position = Vector2(14, 148)
+	_streak_label.add_theme_font_size_override("font_size", 12)
+	_streak_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.1, 0.9))
+	_streak_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.6))
+	_streak_label.add_theme_constant_override("shadow_offset_x", 1)
+	_streak_label.add_theme_constant_override("shadow_offset_y", 1)
+	_streak_label.visible = false
+	add_child(_streak_label)
+
+	# Combo progress
+	_combo_label = Label.new()
+	_combo_label.name = "ComboLabel"
+	_combo_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_combo_label.position = Vector2(14, 164)
+	_combo_label.add_theme_font_size_override("font_size", 11)
+	_combo_label.add_theme_color_override("font_color", Color(1.0, 0.6, 0.2, 0.9))
+	_combo_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.6))
+	_combo_label.add_theme_constant_override("shadow_offset_x", 1)
+	_combo_label.add_theme_constant_override("shadow_offset_y", 1)
+	_combo_label.visible = false
+	add_child(_combo_label)
+
+	# Connect signals
+	EventBus.kill_streak_updated.connect(_on_kill_streak_updated)
+	EventBus.combo_completed.connect(_on_combo_completed)
+
+func _on_kill_streak_updated(streak: int) -> void:
+	if _streak_label == null:
+		return
+	if streak >= 3:
+		_streak_label.text = "Streak: %d" % streak
+		_streak_label.visible = true
+	else:
+		_streak_label.visible = false
+
+func _on_combo_completed(_combo_id: String, combo_name: String) -> void:
+	if _combo_label == null:
+		return
+	_combo_label.text = combo_name + "!"
+	_combo_label.visible = true
+	# Auto-hide after 3 seconds
+	var tween: Tween = create_tween()
+	tween.tween_interval(3.0)
+	tween.tween_callback(func(): _combo_label.visible = false)
 
 
 func _on_combat_started(_enemy_id: String) -> void:
@@ -3187,20 +3359,38 @@ func _update_target_info() -> void:
 	_target_style_label.text = estyle.capitalize() if estyle != "" else "Unknown"
 	_target_style_label.add_theme_color_override("font_color", style_color)
 
-	# Weakness (combat triangle: nano < void, tesla < nano, void < tesla)
-	var weakness: String = ""
+	# Weakness & resistance — prefer enemy-specific data, fall back to combat triangle
+	var weak_str: String = str(tgt.get("weakness")) if "weakness" in tgt else ""
+	var resist_str: String = str(tgt.get("resistance")) if "resistance" in tgt else ""
+	var weakness_text: String = ""
 	var weak_color: Color = Color(0.3, 1.0, 0.3)
-	match estyle:
-		"nano":
-			weakness = "Weak: Void"
-			weak_color = Color(0.6, 0.2, 0.9)
-		"tesla":
-			weakness = "Weak: Nano"
-			weak_color = Color(0.3, 0.9, 1.0)
-		"void":
-			weakness = "Weak: Tesla"
-			weak_color = Color(1.0, 0.9, 0.2)
-	_target_weakness_label.text = weakness
+	if weak_str != "" or resist_str != "":
+		# Enemy has explicit weakness/resistance data
+		var parts: Array[String] = []
+		if weak_str != "":
+			parts.append("Weak: %s" % weak_str.capitalize())
+		if resist_str != "":
+			parts.append("Resist: %s" % resist_str.capitalize())
+		weakness_text = " | ".join(parts)
+		# Color based on weakness style
+		match weak_str:
+			"nano": weak_color = Color(0.3, 0.9, 1.0)
+			"tesla": weak_color = Color(1.0, 0.9, 0.2)
+			"void": weak_color = Color(0.6, 0.2, 0.9)
+			_: weak_color = Color(0.3, 1.0, 0.3)
+	else:
+		# Fall back to combat triangle
+		match estyle:
+			"nano":
+				weakness_text = "Weak: Void"
+				weak_color = Color(0.6, 0.2, 0.9)
+			"tesla":
+				weakness_text = "Weak: Nano"
+				weak_color = Color(0.3, 0.9, 1.0)
+			"void":
+				weakness_text = "Weak: Tesla"
+				weak_color = Color(1.0, 0.9, 0.2)
+	_target_weakness_label.text = weakness_text
 	_target_weakness_label.add_theme_color_override("font_color", weak_color)
 
 # ══════════════════════════════════════════════════════════════════

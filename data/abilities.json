@@ -28,9 +28,9 @@
     "adr_cost": 0,
     "adr_gain": 8,
     "cooldown": 0,
-    "description": "Lashes with nano-swarm tendrils, leaving a damage-over-time effect.",
+    "description": "Lashes with nano-swarm tendrils, injecting corrosive nanites that poison the target.",
     "effects": [
-      { "type": "dot", "ticks": 3, "tick_damage_mult": 0.4, "duration": 6.0 }
+      { "type": "poison", "ticks": 4, "tick_damage_mult": 0.3, "duration": 8.0 }
     ]
   },
   "molecular_storm": {
@@ -64,9 +64,10 @@
     "adr_cost": 50,
     "adr_gain": 0,
     "cooldown": 15,
-    "description": "Nano-parasites leech life force, healing you for a portion of damage dealt.",
+    "description": "Nano-parasites leech life force, healing you and leaving the target bleeding.",
     "effects": [
-      { "type": "heal", "heal_percent": 0.5 }
+      { "type": "heal", "heal_percent": 0.5 },
+      { "type": "bleed", "ticks": 3, "tick_damage_mult": 0.4, "duration": 6.0 }
     ]
   },
   "swarm_apocalypse": {
@@ -82,10 +83,10 @@
     "adr_cost": 100,
     "adr_gain": 0,
     "cooldown": 60,
-    "description": "Unleashes a catastrophic nano-swarm that consumes everything nearby.",
+    "description": "Unleashes a catastrophic nano-swarm that consumes everything nearby, leaving deadly poison.",
     "effects": [
       { "type": "aoe", "radius": 3.0 },
-      { "type": "dot", "ticks": 5, "tick_damage_mult": 1.0, "duration": 10.0 }
+      { "type": "poison", "ticks": 5, "tick_damage_mult": 0.8, "duration": 10.0 }
     ]
   },
   "nano_frenzy": {
@@ -153,9 +154,10 @@
     "adr_cost": 50,
     "adr_gain": 0,
     "cooldown": 20,
-    "description": "Overloads the target with electricity, stunning them briefly.",
+    "description": "Overloads the target with electricity, stunning and igniting them.",
     "effects": [
-      { "type": "stun", "duration": 2.0 }
+      { "type": "stun", "duration": 2.0 },
+      { "type": "burn", "ticks": 3, "tick_damage_mult": 0.35, "duration": 5.0, "spread_radius": 3.0 }
     ]
   },
   "tesla_cage": {
@@ -171,9 +173,10 @@
     "adr_cost": 50,
     "adr_gain": 0,
     "cooldown": 25,
-    "description": "Creates an electrified zone that damages enemies standing within it.",
+    "description": "Creates an electrified zone that damages and slows enemies standing within it.",
     "effects": [
-      { "type": "ground_aoe", "radius": 4.0, "tick_damage_mult": 0.5, "duration": 5.0 }
+      { "type": "ground_aoe", "radius": 4.0, "tick_damage_mult": 0.5, "duration": 5.0 },
+      { "type": "slow", "value": 0.3, "duration": 5.0 }
     ]
   },
   "thunderstrike": {
@@ -189,9 +192,10 @@
     "adr_cost": 100,
     "adr_gain": 0,
     "cooldown": 60,
-    "description": "Calls a massive lightning strike that chains to all nearby enemies.",
+    "description": "Calls a massive lightning strike that chains to all nearby enemies, setting them ablaze.",
     "effects": [
-      { "type": "chain", "chain_count": 99, "chain_range": 8.0, "chain_damage_mult": 0.45 }
+      { "type": "chain", "chain_count": 99, "chain_range": 8.0, "chain_damage_mult": 0.45 },
+      { "type": "burn", "ticks": 4, "tick_damage_mult": 0.5, "duration": 8.0, "spread_radius": 4.0 }
     ]
   },
   "rapid_discharge": {
@@ -241,9 +245,10 @@
     "adr_cost": 0,
     "adr_gain": 8,
     "cooldown": 0,
-    "description": "Distorts gravity around the target, weakening their defenses.",
+    "description": "Distorts gravity around the target, weakening defenses and slowing attacks.",
     "effects": [
-      { "type": "debuff", "debuff_type": "defense", "value": 0.2, "duration": 8.0 }
+      { "type": "debuff", "debuff_type": "defense", "value": 0.2, "duration": 8.0 },
+      { "type": "slow", "value": 0.25, "duration": 6.0 }
     ]
   },
   "void_rend": {
@@ -259,9 +264,10 @@
     "adr_cost": 50,
     "adr_gain": 0,
     "cooldown": 20,
-    "description": "Tears at the target's essence, reducing their damage output.",
+    "description": "Tears at the target's essence, reducing damage output and causing deep bleeding.",
     "effects": [
-      { "type": "debuff", "debuff_type": "damage", "value": 0.25, "duration": 6.0 }
+      { "type": "debuff", "debuff_type": "damage", "value": 0.25, "duration": 6.0 },
+      { "type": "bleed", "ticks": 3, "tick_damage_mult": 0.5, "duration": 6.0 }
     ]
   },
   "dark_singularity": {
@@ -299,7 +305,8 @@
     "effects": [
       { "type": "debuff", "debuff_type": "defense", "value": 0.2, "duration": 8.0 },
       { "type": "debuff", "debuff_type": "damage", "value": 0.25, "duration": 6.0 },
-      { "type": "dot", "ticks": 3, "tick_damage_mult": 0.8, "duration": 6.0 }
+      { "type": "bleed", "ticks": 4, "tick_damage_mult": 0.6, "duration": 8.0 },
+      { "type": "poison", "ticks": 4, "tick_damage_mult": 0.5, "duration": 8.0 }
     ]
   },
   "void_channel": {
