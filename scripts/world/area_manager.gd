@@ -39,7 +39,26 @@ func _ready() -> void:
 	# Find Terrain3D plugin node (user-painted terrain)
 	_terrain3d = _find_terrain3d(get_tree().root)
 	if _terrain3d:
-		print("AreaManager: Found Terrain3D node")
+		# Verify Terrain3D actually has usable data (GDExtension may load but data may fail)
+		var has_data: bool = false
+		if _terrain3d.get("data") != null:
+			has_data = true
+			# Quick sanity check — if height at origin is NaN, data is broken
+			var test_h: float = _terrain3d.data.get_height(Vector3.ZERO)
+			if is_nan(test_h):
+				has_data = false
+		if has_data:
+			print("AreaManager: Found Terrain3D node with valid data")
+		else:
+			push_warning("AreaManager: Terrain3D found but data is broken — disabling and using fallback")
+			_terrain3d.visible = false
+			# Disable Terrain3D collision so raycasts hit the fallback ground instead
+			if _terrain3d.has_method("set_collision_enabled"):
+				_terrain3d.set_collision_enabled(false)
+			elif "collision_enabled" in _terrain3d:
+				_terrain3d.collision_enabled = false
+			_terrain3d = null
+			_add_fallback_ground()
 	else:
 		push_warning("AreaManager: Terrain3D node not found — adding fallback ground plane")
 		_add_fallback_ground()
@@ -108,13 +127,18 @@ func _add_fallback_ground() -> void:
 	print("AreaManager: Fallback ground plane added at y=0")
 
 var _gate_update_timer: float = 0.0
+var _area_check_timer: float = 0.0  # Throttle area transition checks
 var _rejected_gates: Dictionary = {}  # { area_id: true } — tracks which gates already messaged
 
 func _process(delta: float) -> void:
 	if _player == null:
 		_player = get_tree().get_first_node_in_group("player")
 		return
-	_check_area_transition()
+	# Throttle area transition checks to 10 Hz (not every frame)
+	_area_check_timer += delta
+	if _area_check_timer >= 0.1:
+		_area_check_timer = 0.0
+		_check_area_transition()
 	_animate_world(delta)
 	# Update gate barrier colors every 2 seconds (not every frame)
 	_gate_update_timer += delta
@@ -2331,8 +2355,6 @@ func _check_area_transition() -> void:
 	var new_area: String = _get_area_at_position(player_pos)
 
 	if new_area == "" or new_area == GameState.current_area:
-		# Player is in their own area — reset rejected gates so messages can fire if they return
-		_rejected_gates.clear()
 		return
 
 	# ── Area gate check ──
@@ -2341,6 +2363,8 @@ func _check_area_transition() -> void:
 		_push_player_back()
 		return
 
+	# Successfully entered a new area — clear rejected gates so messages can fire again
+	_rejected_gates.clear()
 	var old_area: String = GameState.current_area
 	GameState.current_area = new_area
 	GameState.previous_area = old_area

@@ -3983,6 +3983,7 @@ var _minimap_enemy_dots: Array[ColorRect] = []
 var _minimap_npc_dots: Array[ColorRect] = []
 var _minimap_gather_dots: Array[ColorRect] = []
 var _minimap_dot_container: Control = null
+var _minimap_dot_timer: float = 0.0  # Throttle dot updates to 5 FPS
 var _minimap_player_arrow: Polygon2D = null
 const MINIMAP_DOT_POOL_SIZE: int = 30
 const MINIMAP_GATHER_POOL_SIZE: int = 20
@@ -4387,8 +4388,11 @@ func _update_minimap() -> void:
 			_minimap_level_label.text = ""
 			_minimap_level_label.visible = false
 
-	# Update entity dots on minimap
-	_update_minimap_dots()
+	# Update entity dots on minimap (throttled — 5 FPS is plenty for dots)
+	_minimap_dot_timer += get_process_delta_time()
+	if _minimap_dot_timer >= 0.2:
+		_minimap_dot_timer = 0.0
+		_update_minimap_dots()
 
 	# Update full map camera if visible
 	if _full_map_panel and _full_map_panel.visible and _full_map_camera:
