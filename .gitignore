@@ -5,7 +5,23 @@
 # Export builds
 export/
 *.pck
-*.zip
+
+# Web export artifacts (root-level)
+index.html
+index.js
+index.wasm
+index.side.wasm
+index.png
+index.icon.png
+index.manifest.json
+index.service.worker.js
+index.offline.html
+index.apple-touch-icon.png
+index.*.png
+index.audio.*.js
+icon.png
+libterrain.*.wasm
+terrain_data/
 
 # Debug files
 data/_debug_eval.js
