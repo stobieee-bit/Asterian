@@ -962,9 +962,9 @@ func _build_action_bar() -> void:
 	bar_bg.add_theme_stylebox_override("panel", bg_style)
 	add_child(bar_bg)
 
-	# 2-row grid layout
+	# 2-row grid layout (7 columns to fit 14 buttons in 2 rows)
 	var grid: GridContainer = GridContainer.new()
-	grid.columns = 6
+	grid.columns = 7
 	grid.add_theme_constant_override("h_separation", 3)
 	grid.add_theme_constant_override("v_separation", 3)
 	bar_bg.add_child(grid)
@@ -4084,7 +4084,7 @@ func _reposition_action_bar() -> void:
 	await get_tree().process_frame
 	var bar_w: float = _action_bar_bg.size.x
 	if bar_w < 10:
-		bar_w = 246.0  # 6 buttons * 36px + 5 gaps * 3px + padding ~246px
+		bar_w = 282.0  # 7 buttons * 36px + 6 gaps * 3px + padding ~282px
 	var bar_h: float = _action_bar_bg.size.y
 	if bar_h < 10:
 		bar_h = 84.0  # 2 rows * 36px + gap + padding
@@ -4101,10 +4101,11 @@ func _reposition_target_panel() -> void:
 ## Reposition FPS and Position labels to bottom-right
 func _reposition_bottom_labels() -> void:
 	var vp_size: Vector2 = _get_viewport_size()
+	# Place above the action bar to avoid overlap
 	if fps_label:
-		fps_label.position = Vector2(vp_size.x - 100, vp_size.y - 26)
+		fps_label.position = Vector2(vp_size.x - 100, vp_size.y - 100)
 	if pos_label:
-		pos_label.position = Vector2(vp_size.x - 200, vp_size.y - 26)
+		pos_label.position = Vector2(vp_size.x - 200, vp_size.y - 100)
 
 func _reposition_tutorial_panel() -> void:
 	if _tutorial_panel == null:
@@ -4113,8 +4114,30 @@ func _reposition_tutorial_panel() -> void:
 	_tutorial_panel.position = Vector2(vp_size.x / 2.0 - 180, 16)
 
 
-## Cycle minimap zoom level (small → medium → large)
-var _minimap_zoom_level: int = 0  # 0=small (160), 1=medium (220), 2=large (300)
+## Minimap camera zoom — scroll wheel or +/- buttons
+var _minimap_zoom_level: int = 0  # 0=small, 1=medium, 2=large (panel size)
+var _minimap_cam_zoom: float = 80.0  # Camera ortho size (smaller = zoomed in)
+const MINIMAP_CAM_ZOOM_MIN: float = 20.0  # Closest zoom
+const MINIMAP_CAM_ZOOM_MAX: float = 250.0  # Farthest zoom
+const MINIMAP_CAM_ZOOM_STEP: float = 15.0  # Per scroll tick
+var _minimap_zoom_label: Label = null
+
+func _minimap_zoom_in() -> void:
+	_minimap_cam_zoom = maxf(_minimap_cam_zoom - MINIMAP_CAM_ZOOM_STEP, MINIMAP_CAM_ZOOM_MIN)
+	if _minimap_camera:
+		_minimap_camera.size = _minimap_cam_zoom
+	_update_minimap_zoom_label()
+
+func _minimap_zoom_out() -> void:
+	_minimap_cam_zoom = minf(_minimap_cam_zoom + MINIMAP_CAM_ZOOM_STEP, MINIMAP_CAM_ZOOM_MAX)
+	if _minimap_camera:
+		_minimap_camera.size = _minimap_cam_zoom
+	_update_minimap_zoom_label()
+
+func _update_minimap_zoom_label() -> void:
+	if _minimap_zoom_label:
+		var pct: int = int(100.0 * (MINIMAP_CAM_ZOOM_MAX - _minimap_cam_zoom) / (MINIMAP_CAM_ZOOM_MAX - MINIMAP_CAM_ZOOM_MIN))
+		_minimap_zoom_label.text = "%d%%" % pct
 
 func _cycle_minimap_zoom() -> void:
 	_minimap_zoom_level = (_minimap_zoom_level + 1) % 3
@@ -4124,10 +4147,11 @@ func _resize_minimap() -> void:
 	if _minimap_container == null or _minimap_viewport == null:
 		return
 
-	var sizes: Array[int] = [180, 250, 340]
-	var cam_sizes: Array[float] = [40.0, 60.0, 90.0]
+	var sizes: Array[int] = [360, 500, 680]
+	var cam_defaults: Array[float] = [80.0, 120.0, 180.0]
 	var map_size: int = sizes[_minimap_zoom_level]
-	var cam_size: float = cam_sizes[_minimap_zoom_level]
+	# Keep current camera zoom unless panel size changes
+	_minimap_cam_zoom = cam_defaults[_minimap_zoom_level]
 
 	# Update container position and size (use actual viewport, not design size)
 	var vp_size: Vector2 = _get_viewport_size()
@@ -4139,7 +4163,7 @@ func _resize_minimap() -> void:
 
 	# Update camera orthographic size
 	if _minimap_camera:
-		_minimap_camera.size = cam_size
+		_minimap_camera.size = _minimap_cam_zoom
 
 	# Update TextureRect size directly
 	if _minimap_tex_rect:
@@ -4152,6 +4176,7 @@ func _resize_minimap() -> void:
 	if _minimap_player_arrow:
 		_minimap_player_arrow.position = center_pos
 
+	_update_minimap_zoom_label()
 	EventBus.chat_message.emit("Minimap: %s" % ["Small", "Medium", "Large"][_minimap_zoom_level], "system")
 
 # ══════════════════════════════════════════════════════════════════
@@ -4180,7 +4205,7 @@ var _full_map_viewport: SubViewport = null
 var _full_map_camera: Camera3D = null
 
 func _build_minimap() -> void:
-	var map_size: int = 180
+	var map_size: int = 360
 
 	# Outer panel — clean, minimal
 	var style: StyleBoxFlat = StyleBoxFlat.new()
@@ -4255,10 +4280,10 @@ func _build_minimap() -> void:
 	# Directional arrow using Polygon2D — points upward by default
 	_minimap_player_arrow = Polygon2D.new()
 	_minimap_player_arrow.polygon = PackedVector2Array([
-		Vector2(0, -5),   # Tip (forward/up)
-		Vector2(-4, 4),   # Bottom-left
-		Vector2(0, 2),    # Notch
-		Vector2(4, 4),    # Bottom-right
+		Vector2(0, -10),   # Tip (forward/up)
+		Vector2(-8, 8),    # Bottom-left
+		Vector2(0, 4),     # Notch
+		Vector2(8, 8),     # Bottom-right
 	])
 	_minimap_player_arrow.color = Color(0.1, 1.0, 0.3, 0.95)
 	_minimap_player_arrow.position = _minimap_player_dot.position
@@ -4275,7 +4300,7 @@ func _build_minimap() -> void:
 	for _i in range(MINIMAP_DOT_POOL_SIZE):
 		var edot: ColorRect = ColorRect.new()
 		edot.color = Color(1.0, 0.2, 0.1, 0.9)
-		edot.size = Vector2(4, 4)
+		edot.size = Vector2(7, 7)
 		edot.visible = false
 		edot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_minimap_dot_container.add_child(edot)
@@ -4285,7 +4310,7 @@ func _build_minimap() -> void:
 	for _i in range(8):
 		var ndot: ColorRect = ColorRect.new()
 		ndot.color = Color(0.2, 0.9, 1.0, 0.9)
-		ndot.size = Vector2(5, 5)
+		ndot.size = Vector2(8, 8)
 		ndot.visible = false
 		ndot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_minimap_dot_container.add_child(ndot)
@@ -4295,7 +4320,7 @@ func _build_minimap() -> void:
 	for _i in range(MINIMAP_GATHER_POOL_SIZE):
 		var gdot: ColorRect = ColorRect.new()
 		gdot.color = Color(1.0, 0.85, 0.15, 0.85)
-		gdot.size = Vector2(4, 4)
+		gdot.size = Vector2(7, 7)
 		gdot.visible = false
 		gdot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_minimap_dot_container.add_child(gdot)
@@ -4349,6 +4374,52 @@ func _build_minimap() -> void:
 	map_btn.pressed.connect(_toggle_full_map)
 	bottom_row.add_child(map_btn)
 
+	# Zoom controls row: [-] [zoom %] [+]
+	var zoom_row: HBoxContainer = HBoxContainer.new()
+	zoom_row.add_theme_constant_override("separation", 2)
+	zoom_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	inner.add_child(zoom_row)
+
+	var zoom_btn_style: StyleBoxFlat = StyleBoxFlat.new()
+	zoom_btn_style.bg_color = Color(0.05, 0.08, 0.15, 0.5)
+	zoom_btn_style.set_corner_radius_all(2)
+	zoom_btn_style.set_content_margin_all(0)
+	var zoom_btn_hover: StyleBoxFlat = zoom_btn_style.duplicate()
+	zoom_btn_hover.bg_color = Color(0.1, 0.18, 0.3, 0.7)
+
+	var zoom_out_btn: Button = Button.new()
+	zoom_out_btn.text = "-"
+	zoom_out_btn.add_theme_font_size_override("font_size", 14)
+	zoom_out_btn.custom_minimum_size = Vector2(22, 16)
+	zoom_out_btn.add_theme_stylebox_override("normal", zoom_btn_style)
+	zoom_out_btn.add_theme_stylebox_override("hover", zoom_btn_hover)
+	zoom_out_btn.add_theme_color_override("font_color", Color(0.4, 0.6, 0.8, 0.7))
+	zoom_out_btn.add_theme_color_override("font_hover_color", Color(0.5, 0.75, 0.95))
+	zoom_out_btn.tooltip_text = "Zoom Out"
+	zoom_out_btn.pressed.connect(_minimap_zoom_out)
+	zoom_row.add_child(zoom_out_btn)
+
+	_minimap_zoom_label = Label.new()
+	_minimap_zoom_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_minimap_zoom_label.custom_minimum_size = Vector2(40, 0)
+	_minimap_zoom_label.add_theme_font_size_override("font_size", 10)
+	_minimap_zoom_label.add_theme_color_override("font_color", Color(0.4, 0.55, 0.65, 0.7))
+	_minimap_zoom_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	zoom_row.add_child(_minimap_zoom_label)
+	_update_minimap_zoom_label()
+
+	var zoom_in_btn: Button = Button.new()
+	zoom_in_btn.text = "+"
+	zoom_in_btn.add_theme_font_size_override("font_size", 14)
+	zoom_in_btn.custom_minimum_size = Vector2(22, 16)
+	zoom_in_btn.add_theme_stylebox_override("normal", zoom_btn_style.duplicate())
+	zoom_in_btn.add_theme_stylebox_override("hover", zoom_btn_hover.duplicate())
+	zoom_in_btn.add_theme_color_override("font_color", Color(0.4, 0.6, 0.8, 0.7))
+	zoom_in_btn.add_theme_color_override("font_hover_color", Color(0.5, 0.75, 0.95))
+	zoom_in_btn.tooltip_text = "Zoom In"
+	zoom_in_btn.pressed.connect(_minimap_zoom_in)
+	zoom_row.add_child(zoom_in_btn)
+
 	# Legend row — minimal
 	var legend: HBoxContainer = HBoxContainer.new()
 	legend.add_theme_constant_override("separation", 3)
@@ -4363,7 +4434,7 @@ func _build_minimap() -> void:
 	]
 	for item in legend_items:
 		var ldot: ColorRect = ColorRect.new()
-		ldot.custom_minimum_size = Vector2(6, 6)
+		ldot.custom_minimum_size = Vector2(8, 8)
 		ldot.color = item["color"]
 		ldot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		legend.add_child(ldot)
@@ -4374,8 +4445,18 @@ func _build_minimap() -> void:
 		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		legend.add_child(lbl)
 
-## Handle click on minimap — convert to world position and walk there
+## Handle click/scroll on minimap — click to walk, scroll to zoom
 func _on_minimap_click(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed:
+		# Scroll wheel zoom
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_minimap_zoom_in()
+			get_viewport().set_input_as_handled()
+			return
+		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_minimap_zoom_out()
+			get_viewport().set_input_as_handled()
+			return
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if _player == null or _minimap_camera == null or _minimap_tex_rect == null:
 			return

@@ -221,8 +221,13 @@ func _set_mode(mode: String) -> void:
 
 ## Tear down and recreate all slot nodes for the current mode
 func _rebuild_grid() -> void:
-	# Clear existing slots
+	# Clear existing slots and cached refs
 	_slots.clear()
+	_slot_inner.clear()
+	_slot_icon_bg.clear()
+	_slot_icon_tex.clear()
+	_slot_item_label.clear()
+	_slot_qty_label.clear()
 	for child in _grid.get_children():
 		child.queue_free()
 
