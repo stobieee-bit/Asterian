@@ -3912,8 +3912,8 @@ func _reposition_target_panel() -> void:
 	if _target_panel == null:
 		return
 	var vp_size: Vector2 = _get_viewport_size()
-	# Place above the buff display / stat bars stack
-	_target_panel.position = Vector2(vp_size.x / 2.0 - 150, vp_size.y - 290)
+	# Place near top-center of screen for easy visibility
+	_target_panel.position = Vector2(vp_size.x / 2.0 - 150, 10)
 
 ## Reposition FPS and Position labels to bottom-right
 func _reposition_bottom_labels() -> void:
