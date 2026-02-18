@@ -484,13 +484,13 @@ func _make_recipe_card(recipe_id: String, recipe_name: String, req_level: int, m
 	# Status indicator dot
 	var dot: Label = Label.new()
 	if can_craft:
-		dot.text = "●"
+		dot.text = "[+]"
 		dot.add_theme_color_override("font_color", COL_CRAFTABLE)
 	elif meets_level:
-		dot.text = "○"
+		dot.text = "[-]"
 		dot.add_theme_color_override("font_color", COL_TEXT_DIM)
 	else:
-		dot.text = "✕"
+		dot.text = "[x]"
 		dot.add_theme_color_override("font_color", COL_LOCKED)
 	dot.add_theme_font_size_override("font_size", 10)
 	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -651,7 +651,7 @@ func _make_ingredient_row(item_name: String, needed: int, have: int, enough: boo
 
 	# Colored item dot
 	var dot: Label = Label.new()
-	dot.text = "◆"
+	dot.text = "*"
 	dot.add_theme_font_size_override("font_size", 10)
 	dot.add_theme_color_override("font_color", COL_HAVE_ENOUGH if enough else COL_NEED_MORE)
 	dot.custom_minimum_size = Vector2(14, 0)
@@ -681,7 +681,7 @@ func _make_output_row(item_name: String, qty: int) -> HBoxContainer:
 	row.add_theme_constant_override("separation", 6)
 
 	var arrow: Label = Label.new()
-	arrow.text = "►"
+	arrow.text = "->"
 	arrow.add_theme_font_size_override("font_size", 10)
 	arrow.add_theme_color_override("font_color", COL_ACCENT)
 	arrow.custom_minimum_size = Vector2(14, 0)

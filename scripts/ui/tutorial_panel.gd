@@ -235,7 +235,7 @@ func _ready() -> void:
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	btn_row.add_child(spacer)
 
-	_next_btn = _make_button("Next  →", Color(0.3, 0.7, 0.9, 0.9), _on_next_pressed)
+	_next_btn = _make_button("Next  ->", Color(0.3, 0.7, 0.9, 0.9), _on_next_pressed)
 	btn_row.add_child(_next_btn)
 
 
@@ -310,7 +310,7 @@ func _show_step(index: int) -> void:
 
 	# Update UI
 	if is_final:
-		_step_number_label.text = "★"
+		_step_number_label.text = "[*]"
 	else:
 		_step_number_label.text = "(%d)" % (index + 1)
 	_title_label.text = step["title"]
@@ -332,7 +332,7 @@ func _show_step(index: int) -> void:
 		_step_completed = true
 	else:
 		_skip_btn.visible = true
-		_next_btn.text = "Next  →"
+		_next_btn.text = "Next  ->"
 		_next_btn.disabled = true
 		_set_btn_color(_next_btn, Color(0.3, 0.4, 0.5, 0.4))
 
@@ -371,7 +371,7 @@ func _on_step_completed() -> void:
 	# Enable Next button with cyan highlight
 	_next_btn.disabled = false
 	_set_btn_color(_next_btn, Color(0.3, 0.75, 0.95, 0.95))
-	_next_btn.text = "Next  →  ✓"
+	_next_btn.text = "Next  ->  [x]"
 
 	# Emit for other systems
 	EventBus.tutorial_step_completed.emit(step_id)

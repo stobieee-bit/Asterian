@@ -179,10 +179,10 @@ func _build_achievement_row(entry: Dictionary, cat_color: Color) -> void:
 	var icon_label: Label = Label.new()
 	icon_label.add_theme_font_size_override("font_size", 14)
 	if is_unlocked:
-		icon_label.text = "★"
+		icon_label.text = "[*]"
 		icon_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
 	else:
-		icon_label.text = "☆"
+		icon_label.text = "[ ]"
 		icon_label.add_theme_color_override("font_color", Color(0.35, 0.35, 0.4))
 	row.add_child(icon_label)
 

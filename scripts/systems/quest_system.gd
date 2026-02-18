@@ -253,67 +253,70 @@ func _advance_steps(step_type: String, match_key: String, match_value: String, a
 
 		var steps: Array = quest_data.get("steps", [])
 		var tracking: Dictionary = GameState.active_quests[quest_id]
-		var current_step: int = int(tracking.get("step", 0))
 		var progress: Dictionary = tracking.get("progress", {})
 		var changed: bool = false
-
-		# Only advance the current step (quests are sequential)
-		if current_step < 0 or current_step >= steps.size():
-			continue
-
-		var step: Dictionary = steps[current_step]
-		var stype: String = str(step.get("type", ""))
-		if stype != step_type:
-			continue
-
-		var target_val: String = str(step.get(match_key, ""))
-		if target_val != match_value:
-			continue
-
-		var required: int = int(step.get("count", 1))
-		var step_key: String = str(current_step)
-		if not progress.has(step_key):
-			progress[step_key] = { "count": 0 }
-
-		var current_count: int = int(progress[step_key]["count"])
-		if current_count >= required:
-			# Step already done, nothing to do
-			continue
-
-		# Increment progress (clamp to required so we don't overshoot)
-		current_count = mini(current_count + amount, required)
-		progress[step_key]["count"] = current_count
-		changed = true
-
-		# Chat progress update — strip existing (x/y) from desc to avoid duplication
 		var quest_name: String = str(quest_data.get("name", str(quest_id)))
-		var step_desc: String = str(step.get("desc", ""))
-		# Remove trailing " (x/y)" pattern from JSON desc if present
-		var paren_idx: int = step_desc.rfind(" (")
-		if paren_idx >= 0 and step_desc.ends_with(")"):
-			step_desc = step_desc.substr(0, paren_idx)
-		EventBus.chat_message.emit(
-			"%s — %s (%d/%d)" % [quest_name, step_desc, current_count, required],
-			"quest"
-		)
 
-		# Check if this step is now complete → advance to next step
-		if current_count >= required:
-			var next_step: int = current_step + 1
-			tracking["step"] = next_step
-			EventBus.quest_progress.emit(str(quest_id), next_step)
+		# Check ALL steps in parallel (not just the current one)
+		for i in range(steps.size()):
+			var step: Dictionary = steps[i]
+			var stype: String = str(step.get("type", ""))
+			if stype != step_type:
+				continue
 
-			# If all steps are done, notify the player
-			if next_step >= steps.size():
+			var target_val: String = str(step.get(match_key, ""))
+			if target_val != match_value:
+				continue
+
+			var required: int = int(step.get("count", 1))
+			var step_key: String = str(i)
+			if not progress.has(step_key):
+				progress[step_key] = { "count": 0 }
+
+			var current_count: int = int(progress[step_key]["count"])
+			if current_count >= required:
+				continue  # Step already done
+
+			# Increment progress (clamp to required so we don't overshoot)
+			current_count = mini(current_count + amount, required)
+			progress[step_key]["count"] = current_count
+			changed = true
+
+			# Chat progress update — strip existing (x/y) from desc to avoid duplication
+			var step_desc: String = str(step.get("desc", ""))
+			var paren_idx: int = step_desc.rfind(" (")
+			if paren_idx >= 0 and step_desc.ends_with(")"):
+				step_desc = step_desc.substr(0, paren_idx)
+			EventBus.chat_message.emit(
+				"%s — %s (%d/%d)" % [quest_name, step_desc, current_count, required],
+				"quest"
+			)
+
+		# Recalculate the "step" pointer — advance to the first incomplete step
+		if changed:
+			var all_done: bool = true
+			var first_incomplete: int = steps.size()
+			for i in range(steps.size()):
+				var step_key: String = str(i)
+				var step_data: Dictionary = steps[i]
+				var required: int = int(step_data.get("count", 1))
+				var count: int = int(progress.get(step_key, {}).get("count", 0))
+				if count < required:
+					all_done = false
+					if i < first_incomplete:
+						first_incomplete = i
+
+			tracking["step"] = first_incomplete if not all_done else steps.size()
+			tracking["progress"] = progress
+			GameState.active_quests[quest_id] = tracking
+
+			EventBus.quest_progress.emit(str(quest_id), int(tracking["step"]))
+
+			if all_done:
 				EventBus.chat_message.emit(
 					"%s — All objectives complete! Return to turn in." % quest_name,
 					"quest"
 				)
-
-		# Write back updated tracking
-		if changed:
-			tracking["progress"] = progress
-			GameState.active_quests[quest_id] = tracking
 
 
 ## Grant all rewards defined in a quest's rewards dictionary.

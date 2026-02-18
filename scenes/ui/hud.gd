@@ -1215,7 +1215,7 @@ func _build_chat_resize_handle() -> Control:
 
 	# Draw a small diagonal grip icon
 	var grip_label: Label = Label.new()
-	grip_label.text = "⋱"
+	grip_label.text = "..."
 	grip_label.add_theme_font_size_override("font_size", 12)
 	grip_label.add_theme_color_override("font_color", Color(0.3, 0.5, 0.6, 0.5))
 	grip_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1484,12 +1484,12 @@ func _build_adrenaline_bar() -> void:
 
 ## Buff type → { icon emoji, color }
 const BUFF_DISPLAY_INFO: Dictionary = {
-	"damage": { "icon": "⚔", "color": Color(1.0, 0.45, 0.2) },
-	"defense": { "icon": "🛡", "color": Color(0.3, 0.7, 1.0) },
-	"accuracy": { "icon": "◎", "color": Color(0.9, 0.85, 0.3) },
-	"speed": { "icon": "⚡", "color": Color(0.4, 0.95, 0.5) },
-	"all": { "icon": "★", "color": Color(0.95, 0.75, 0.2) },
-	"healOverTime": { "icon": "♥", "color": Color(0.3, 0.95, 0.4) },
+	"damage": { "icon": "ATK", "color": Color(1.0, 0.45, 0.2) },
+	"defense": { "icon": "DEF", "color": Color(0.3, 0.7, 1.0) },
+	"accuracy": { "icon": "ACC", "color": Color(0.9, 0.85, 0.3) },
+	"speed": { "icon": "SPD", "color": Color(0.4, 0.95, 0.5) },
+	"all": { "icon": "ALL", "color": Color(0.95, 0.75, 0.2) },
+	"healOverTime": { "icon": "HOT", "color": Color(0.3, 0.95, 0.4) },
 }
 
 func _build_buff_display() -> void:
@@ -1549,7 +1549,7 @@ func _update_buff_display() -> void:
 			var chip: PanelContainer = PanelContainer.new()
 			chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			var chip_style: StyleBoxFlat = StyleBoxFlat.new()
-			var info: Dictionary = BUFF_DISPLAY_INFO.get(btype, { "icon": "●", "color": Color(0.7, 0.7, 0.7) })
+			var info: Dictionary = BUFF_DISPLAY_INFO.get(btype, { "icon": "BUF", "color": Color(0.7, 0.7, 0.7) })
 			var col: Color = info["color"]
 			chip_style.bg_color = Color(col.r * 0.15, col.g * 0.15, col.b * 0.15, 0.75)
 			chip_style.border_color = Color(col.r * 0.6, col.g * 0.6, col.b * 0.6, 0.5)
@@ -2716,11 +2716,7 @@ func _on_combat_started(_enemy_id: String) -> void:
 		if panel and panel.visible:
 			panel.visible = false
 			_combat_hidden_panels.append(panel_name)
-	# Reduce chat opacity
-	if _chat_bg:
-		_pre_combat_chat_alpha = _chat_bg.modulate.a
-		var tween: Tween = create_tween()
-		tween.tween_property(_chat_bg, "modulate:a", 0.3, 0.3)
+	# Chat stays fully visible during combat for readability
 
 func _on_combat_ended() -> void:
 	_in_combat_state = false
@@ -2744,10 +2740,7 @@ func _on_combat_ended() -> void:
 			if panel:
 				panel.visible = true
 	_combat_hidden_panels.clear()
-	# Restore chat opacity
-	if _chat_bg:
-		var tween: Tween = create_tween()
-		tween.tween_property(_chat_bg, "modulate:a", _pre_combat_chat_alpha, 0.5)
+	# Chat opacity no longer changes during combat
 
 func _update_combat_indicator() -> void:
 	if _combat_indicator == null:

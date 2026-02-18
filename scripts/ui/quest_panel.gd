@@ -210,11 +210,11 @@ func _build_quest_entry(quest_id: String) -> void:
 
 		if done:
 			# Completed step — green with checkmark
-			step_label.text = "  ✓ %s (%d/%d)" % [desc, required, required]
+			step_label.text = "  [x] %s (%d/%d)" % [desc, required, required]
 			step_label.add_theme_color_override("font_color", Color(0.3, 0.9, 0.3))
 		else:
-			# Incomplete step — gray with circle
-			step_label.text = "  ○ %s (%d/%d)" % [desc, current, required]
+			# Incomplete step — gray
+			step_label.text = "  [ ] %s (%d/%d)" % [desc, current, required]
 			step_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
 
 		quest_box.add_child(step_label)
