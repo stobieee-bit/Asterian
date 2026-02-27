@@ -175,22 +175,10 @@ func build_mesh(params: Dictionary) -> Node3D:
 	EnemyMeshBuilder.add_cone(head, 0.012, 0.04,
 		Vector3(0.11, 0.02, -0.03), mat_mandible, Vector3(0.0, 0.0, -0.5))
 
-	# ── 4 radial mandibles ──
-	var mandible_offsets: Array = [
-		Vector3(0.14, 0.06, 0.0),   # top
-		Vector3(0.14, -0.1, 0.0),   # bottom
-		Vector3(0.14, -0.02, 0.06), # right
-		Vector3(0.14, -0.02, -0.06) # left
-	]
-	var mandible_rots: Array = [
-		Vector3(0.0, 0.0, -0.4),   # top curves out
-		Vector3(0.0, 0.0, 0.4),    # bottom curves out
-		Vector3(0.4, 0.0, 0.0),    # right curves out
-		Vector3(-0.4, 0.0, 0.0)    # left curves out
-	]
-	for m: int in range(4):
-		EnemyMeshBuilder.add_cone(head, 0.025, 0.1,
-			mandible_offsets[m], mat_mandible, mandible_rots[m])
+	# ── Maw (radial mouth with teeth, replaces 4 individual mandible cones) ──
+	EnemyMeshBuilder.add_maw(head, 0.10,
+		Vector3(0.12, -0.02, 0.0), mat_mandible,
+		Vector3(0.0, PI * 0.5, 0.0), 4, 0.08)
 
 	# ── Clitellum band (prominent ring on segment 3, index 2) ──
 	var clitellum_seg: Node3D = segment_nodes[2]

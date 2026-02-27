@@ -434,6 +434,14 @@ func _do_attack() -> void:
 	if _has_dungeon_modifier("berserker"):
 		total_damage = int(float(total_damage) * 1.2)
 
+	# Entropy mastery bonus — permanent damage boost for mastered enemy types
+	if target and "enemy_id" in target:
+		var entropy_sys: Node = get_tree().get_first_node_in_group("entropy_engineering_system")
+		if entropy_sys and entropy_sys.has_method("get_mastery_bonus"):
+			var mastery_mult: float = entropy_sys.get_mastery_bonus(str(target.enemy_id))
+			if mastery_mult > 1.0:
+				total_damage = int(float(total_damage) * mastery_mult)
+
 	# Small random variance (±15%)
 	var variance: float = randf_range(0.85, 1.15)
 	total_damage = int(float(total_damage) * variance)
@@ -481,10 +489,6 @@ func _do_attack() -> void:
 	var is_crit: bool = randf() < crit_chance
 	if is_crit:
 		total_damage = int(float(total_damage) * 1.5)
-		# Screen shake on crit
-		var cam_rig: Node = _player.get_node_or_null("CameraRig")
-		if cam_rig and cam_rig.has_method("shake"):
-			cam_rig.shake(0.3)
 
 	# Capture position BEFORE damage — target may die and get cleared
 	var target_pos: Vector3 = (target as Node3D).global_position

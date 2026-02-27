@@ -30,6 +30,9 @@ var skills: Dictionary = {
 	"bioforge": { "level": 1, "xp": 0 },
 	"circuitry": { "level": 1, "xp": 0 },
 	"xenocook": { "level": 1, "xp": 0 },
+	"signal_archaeology": { "level": 1, "xp": 0 },
+	"entropy_engineering": { "level": 1, "xp": 0 },
+	"dimensional_weaving": { "level": 1, "xp": 0 },
 }
 
 # ── Equipment: { slot_name: item_id or null } ──
@@ -101,6 +104,11 @@ var dungeon_max_floor: int = 0
 # ── Pets ──
 var active_pet: String = ""
 var owned_pets: Dictionary = {}  # { pet_id: { level: int, xp: int } }
+
+# ── Exploration skill state ──
+var entropy_scans: Dictionary = {}         # { enemy_id: scan_count }
+var entropy_mastery: Dictionary = {}       # { enemy_id: true }
+var active_constructs: Array[Dictionary] = []  # { type, position, uses_remaining, expires_at }
 
 # ── Active buffs from food/consumables ──
 # Array of { type: String, value: float, remaining: float, source: String }
@@ -316,6 +324,9 @@ func to_save_data() -> Dictionary:
 		"total_play_time": total_play_time,
 		"panel_layout": panel_layout.duplicate(true),
 		"tutorial": tutorial.duplicate(true),
+		"entropy_scans": entropy_scans.duplicate(true),
+		"entropy_mastery": entropy_mastery.duplicate(true),
+		"active_constructs": active_constructs.duplicate(true),
 	}
 
 ## Load state from a save Dictionary
@@ -338,6 +349,9 @@ func from_save_data(data: Dictionary) -> void:
 		"void": { "level": 1, "xp": 0 }, "astromining": { "level": 1, "xp": 0 },
 		"xenobotany": { "level": 1, "xp": 0 }, "bioforge": { "level": 1, "xp": 0 },
 		"circuitry": { "level": 1, "xp": 0 }, "xenocook": { "level": 1, "xp": 0 },
+		"signal_archaeology": { "level": 1, "xp": 0 },
+		"entropy_engineering": { "level": 1, "xp": 0 },
+		"dimensional_weaving": { "level": 1, "xp": 0 },
 	}
 	for skill_id in default_skills:
 		if not skills.has(skill_id):
@@ -369,3 +383,9 @@ func from_save_data(data: Dictionary) -> void:
 	total_play_time = data.get("total_play_time", 0.0)
 	panel_layout = data.get("panel_layout", {})
 	tutorial = data.get("tutorial", tutorial)
+	entropy_scans = data.get("entropy_scans", {})
+	entropy_mastery = data.get("entropy_mastery", {})
+	var saved_constructs: Array = data.get("active_constructs", [])
+	active_constructs.clear()
+	for c in saved_constructs:
+		active_constructs.append(c)

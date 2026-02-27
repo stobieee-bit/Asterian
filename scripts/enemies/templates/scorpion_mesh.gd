@@ -400,7 +400,11 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("telson", [telson])
 	root.set_meta("barb", [barb])
 	root.set_meta("walk_legs", walk_legs)
+	var venom_drip_base_y: Array = []
+	for vd: MeshInstance3D in venom_drips:
+		venom_drip_base_y.append(vd.position.y)
 	root.set_meta("venom_drips", venom_drips)
+	root.set_meta("venom_drip_base_y", venom_drip_base_y)
 	root.set_meta("scale", s)
 	root.set_meta("y_base", y_base)
 
@@ -503,9 +507,13 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 
 	# ── Venom drip sway ──
 	var venom_drips: Array = root.get_meta("venom_drips", [])
+	var venom_base_y: Array = root.get_meta("venom_drip_base_y", [])
 	for i: int in range(venom_drips.size()):
 		var drip: MeshInstance3D = venom_drips[i] as MeshInstance3D
 		var drip_sway: float = sin(phase * 1.5 + float(i)) * 0.15
 		drip.rotation.z += (drip_sway - drip.rotation.z) * delta * 4.0
 		var drip_bob: float = sin(phase * 1.5 + float(i) + 0.5) * 0.005 * s
-		drip.position.y += drip_bob * delta * 4.0
+		if i < venom_base_y.size():
+			drip.position.y = (venom_base_y[i] as float) + drip_bob
+		else:
+			drip.position.y += drip_bob * delta * 4.0

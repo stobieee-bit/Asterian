@@ -1,0 +1,823 @@
+[gd_scene load_steps=77 format=3]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xk10r"]
+albedo_color = Color(0.02, 0, 0.04, 1)
+emission_enabled = true
+emission = Color(0.05, 0, 0.08, 1)
+emission_energy_multiplier = 0.2
+
+[sub_resource type="SphereMesh" id="SphereMesh_a6jy1"]
+radius = 0.22
+height = 0.44
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pnqvm"]
+transparency = 1
+albedo_color = Color(0.501961, 0.501961, 0.501961, 0.7)
+metallic = 0.6
+roughness = 0.35
+emission_enabled = true
+emission = Color(0.501961, 0.501961, 0.501961, 1)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="SphereMesh" id="SphereMesh_7w7hl"]
+radius = 0.35
+height = 0.7
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_05loc"]
+radius = 0.2
+height = 0.4
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dy47t"]
+transparency = 1
+albedo_color = Color(0.351961, 0.351961, 0.351961, 0.65)
+metallic = 0.6
+roughness = 0.35
+emission_enabled = true
+emission = Color(0.401961, 0.401961, 0.401961, 1)
+emission_energy_multiplier = 0.3
+
+[sub_resource type="SphereMesh" id="SphereMesh_kpfva"]
+radius = 0.2
+height = 0.4
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_1om0r"]
+radius = 0.2
+height = 0.4
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_1xgcq"]
+radius = 0.2
+height = 0.4
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_th8ir"]
+radius = 0.2
+height = 0.4
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hhu6f"]
+albedo_color = Color(0.9, 0.95, 1, 1)
+metallic = 0.1
+roughness = 0.2
+emission_enabled = true
+emission = Color(0.7, 0.95, 1, 1)
+emission_energy_multiplier = 6.0
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_wim3i"]
+radius = 0.012
+height = 0.474
+radial_segments = 16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rcuvn"]
+albedo_color = Color(1, 0.85, 0.7, 1)
+metallic = 0.1
+roughness = 0.2
+emission_enabled = true
+emission = Color(1, 0.7, 0.4, 1)
+emission_energy_multiplier = 4.5
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_rxajg"]
+radius = 0.012
+height = 0.424
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_7hgw8"]
+radius = 0.012
+height = 0.404
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_g31s2"]
+radius = 0.012
+height = 0.444
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_vygwm"]
+radius = 0.012
+height = 0.374
+radial_segments = 16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_63lsw"]
+albedo_color = Color(0.581961, 0.581961, 0.581961, 1)
+metallic = 0.5
+roughness = 0.4
+emission_enabled = true
+emission = Color(0.621961, 0.621961, 0.621961, 1)
+emission_energy_multiplier = 0.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_tkn4k"]
+size = Vector3(0.06, 0.078, 0.048)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fbnwt"]
+albedo_color = Color(0.441961, 0.441961, 0.441961, 1)
+metallic = 0.5
+roughness = 0.4
+emission_enabled = true
+emission = Color(0.501961, 0.501961, 0.501961, 1)
+emission_energy_multiplier = 0.4
+
+[sub_resource type="SphereMesh" id="SphereMesh_nsk6t"]
+radius = 0.04
+height = 0.08
+radial_segments = 16
+rings = 8
+
+[sub_resource type="BoxMesh" id="BoxMesh_58q0m"]
+size = Vector3(0.05, 0.065, 0.04)
+
+[sub_resource type="SphereMesh" id="SphereMesh_2uxcl"]
+radius = 0.05
+height = 0.1
+radial_segments = 16
+rings = 8
+
+[sub_resource type="BoxMesh" id="BoxMesh_mk8pu"]
+size = Vector3(0.04, 0.052, 0.032)
+
+[sub_resource type="SphereMesh" id="SphereMesh_6kmo1"]
+radius = 0.035
+height = 0.07
+radial_segments = 16
+rings = 8
+
+[sub_resource type="BoxMesh" id="BoxMesh_e6vyc"]
+size = Vector3(0.055, 0.0715, 0.044)
+
+[sub_resource type="SphereMesh" id="SphereMesh_vjok6"]
+radius = 0.045
+height = 0.09
+radial_segments = 16
+rings = 8
+
+[sub_resource type="BoxMesh" id="BoxMesh_henkb"]
+size = Vector3(0.045, 0.0585, 0.036)
+
+[sub_resource type="SphereMesh" id="SphereMesh_axydi"]
+radius = 0.05
+height = 0.1
+radial_segments = 16
+rings = 8
+
+[sub_resource type="BoxMesh" id="BoxMesh_jhoy8"]
+size = Vector3(0.04, 0.052, 0.032)
+
+[sub_resource type="SphereMesh" id="SphereMesh_0njoo"]
+radius = 0.035
+height = 0.07
+radial_segments = 16
+rings = 8
+
+[sub_resource type="BoxMesh" id="BoxMesh_687ap"]
+size = Vector3(0.05, 0.065, 0.04)
+
+[sub_resource type="SphereMesh" id="SphereMesh_5fcmw"]
+radius = 0.04
+height = 0.08
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s5kek"]
+transparency = 1
+albedo_color = Color(0.651961, 0.651961, 0.651961, 0.5)
+metallic = 0.3
+roughness = 0.3
+emission_enabled = true
+emission = Color(0.701961, 0.701961, 0.701961, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="TorusMesh" id="TorusMesh_rvtcm"]
+inner_radius = 0.18
+outer_radius = 0.24
+rings = 20
+ring_segments = 16
+
+[sub_resource type="TorusMesh" id="TorusMesh_elhl6"]
+inner_radius = 0.215
+outer_radius = 0.265
+rings = 20
+ring_segments = 16
+
+[sub_resource type="TorusMesh" id="TorusMesh_afipr"]
+inner_radius = 0.17
+outer_radius = 0.21
+rings = 20
+ring_segments = 16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0amfy"]
+transparency = 1
+albedo_color = Color(0.8, 0.9, 1, 0.6)
+roughness = 0.1
+emission_enabled = true
+emission = Color(0.7, 0.9, 1, 1)
+emission_energy_multiplier = 8.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_osgbc"]
+radius = 0.1
+height = 0.2
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jnb1c"]
+transparency = 1
+albedo_color = Color(0.8, 0.95, 1, 0.5)
+roughness = 0.1
+emission_enabled = true
+emission = Color(0.6, 0.9, 1, 1)
+emission_energy_multiplier = 5.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_uglkl"]
+radius = 0.018
+height = 0.036
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_op1x2"]
+radius = 0.018
+height = 0.036
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_4qbqt"]
+radius = 0.018
+height = 0.036
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_1bow2"]
+radius = 0.018
+height = 0.036
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_1bsty"]
+radius = 0.018
+height = 0.036
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_xv87e"]
+radius = 0.018
+height = 0.036
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kadj7"]
+transparency = 1
+albedo_color = Color(0.601961, 0.601961, 0.601961, 0.06)
+emission_enabled = true
+emission = Color(0.501961, 0.501961, 0.501961, 1)
+emission_energy_multiplier = 0.3
+
+[sub_resource type="SphereMesh" id="SphereMesh_ppsvj"]
+radius = 0.6
+height = 1.2
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_67yan"]
+transparency = 1
+albedo_color = Color(1, 0, 0.5, 0.5)
+roughness = 0.2
+emission_enabled = true
+emission = Color(1, 0, 0.5, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="TorusMesh" id="TorusMesh_17g7a"]
+inner_radius = 0.0225
+outer_radius = 0.0375
+rings = 20
+ring_segments = 16
+
+[sub_resource type="SphereMesh" id="SphereMesh_v1gqn"]
+radius = 0.03
+height = 0.06
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_qria5"]
+radius = 0.04
+height = 0.08
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u4e10"]
+transparency = 1
+albedo_color = Color(0.601961, 0.601961, 0.601961, 0.4)
+metallic = 0.2
+roughness = 0.4
+emission_enabled = true
+emission = Color(0.501961, 0.501961, 0.501961, 1)
+emission_energy_multiplier = 1.2
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_vm0mi"]
+radius = 0.015
+height = 0.23
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_1rh4e"]
+radius = 0.015
+height = 0.23
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_lc1hn"]
+radius = 0.015
+height = 0.23
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_i70vr"]
+radius = 0.015
+height = 0.23
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_bqons"]
+radius = 0.015
+height = 0.23
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_ut31b"]
+radius = 0.015
+height = 0.23
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_myicl"]
+radius = 0.012
+height = 0.384
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_00uxv"]
+radius = 0.012
+height = 0.424
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_blhlk"]
+radius = 0.012
+height = 0.354
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_m8oaq"]
+radius = 0.012
+height = 0.404
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_il3yy"]
+radius = 0.012
+height = 0.444
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_i7kg4"]
+radius = 0.012
+height = 0.374
+radial_segments = 16
+
+[sub_resource type="TorusMesh" id="TorusMesh_qo2yg"]
+inner_radius = 0.1975
+outer_radius = 0.2425
+rings = 20
+ring_segments = 16
+
+[sub_resource type="TorusMesh" id="TorusMesh_4eyrt"]
+inner_radius = 0.175
+outer_radius = 0.225
+rings = 20
+ring_segments = 16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nhva2"]
+albedo_color = Color(0, 1, 0.5, 1)
+roughness = 0.2
+emission_enabled = true
+emission = Color(0, 1, 0.5, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_c0nl3"]
+size = Vector3(0.03, 0.03, 0.03)
+
+[sub_resource type="BoxMesh" id="BoxMesh_lkuix"]
+size = Vector3(0.03, 0.03, 0.03)
+
+[sub_resource type="BoxMesh" id="BoxMesh_77nf0"]
+size = Vector3(0.03, 0.03, 0.03)
+
+[sub_resource type="BoxMesh" id="BoxMesh_mslh5"]
+size = Vector3(0.03, 0.03, 0.03)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_ebfhy"]
+radius = 0.006
+height = 0.212
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_8iwii"]
+radius = 0.006
+height = 0.212
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_q420t"]
+radius = 0.006
+height = 0.212
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_llkua"]
+radius = 0.006
+height = 0.212
+radial_segments = 16
+
+[node name="reality_warper" type="Node3D"]
+metadata/frag_pivot = Object(Node3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"script":null)
+
+metadata/fragments = Array[MeshInstance3D]([Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 0.1, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_63lsw"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("BoxMesh_tkn4k"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1.2, 0.353694, -0.08, 0.353413),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_fbnwt"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_nsk6t"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.321451, 0.629501, 0.707388, 0.320997, 0.630364, -0.706825, -0.890859, 0.454279, 0.000563275, 0.000477796, 0.15, 0.6),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_63lsw"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("BoxMesh_58q0m"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1.2, -0.319407, -0.12, 0.316985),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_fbnwt"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_2uxcl"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(-0.586883, 0.809672, 1.26811e-06, 0.000643976, 0.000468346, -1, -0.809671, -0.586883, -0.000796273, -0.579999, 0.05, 0.000923739),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_63lsw"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("BoxMesh_mk8pu"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1.2, -0.366587, -0.05, -0.3688),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_fbnwt"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_6kmo1"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(-0.699529, -0.108889, 0.70626, -0.697487, -0.110984, -0.707951, 0.155472, -0.987839, 0.00168722, -0.00114671, 0.18, -0.479999),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_63lsw"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("BoxMesh_e6vyc"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1.2, 0.396855, -0.15, -0.395103),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_fbnwt"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_vjok6"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.83454, -0.151714, 0.529647, 0.300346, 0.931208, -0.206503, -0.461882, 0.331413, 0.822697, 0.538048, 0.08, 0.308066),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_63lsw"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("BoxMesh_henkb"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1.2, 0.179035, -0.18, 0.434565),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_fbnwt"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_axydi"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.327316, 0.758666, 0.563285, 0.649358, 0.252457, -0.717356, -0.686439, 0.600575, -0.410013, -0.224719, 0.2, 0.491021),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_63lsw"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("BoxMesh_jhoy8"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1.2, -0.545338, -0.1, 0.22518),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_fbnwt"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_0njoo"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(-0.501392, 0.858387, 0.108522, -0.0634663, 0.088601, -0.994043, -0.862889, -0.505293, 0.0100549, -0.250033, 0.14, -0.444504),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_63lsw"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("BoxMesh_687ap"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1.2, 0.215447, -0.06, -0.527714),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_fbnwt"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_5fcmw"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+])
+metadata/ring_pivots = Array[Node3D]([Object(Node3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.980067, -0.198669, 0, 0.182987, 0.902701, -0.389418, 0.0773655, 0.381656, 0.921061, 0, 1, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"script":null)
+, Object(Node3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.713053, 0.147977, 0.685316, -0.458013, 0.838387, 0.29552, -0.53083, -0.524605, 0.665589, 0, 1, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"script":null)
+, Object(Node3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.955337, 0.275436, 0.107084, 0, 0.362358, -0.932039, -0.29552, 0.890411, 0.346174, 0, 1, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"script":null)
+, Object(Node3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.30358, -0.879421, -0.366685, 0.599122, 0.475434, -0.644218, 0.740873, -0.0241171, 0.671212, 0, 1, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"script":null)
+, Object(Node3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.919182, -0.178642, 0.350987, -0.183698, 0.593847, 0.783327, -0.348368, -0.784496, 0.513037, 0, 1, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"script":null)
+])
+metadata/cracks = Array[MeshInstance3D]([Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.713053, -0.147977, 0.685316, 0.458013, 0.838387, -0.29552, -0.53083, 0.524605, 0.665589, 0, 1.1, -0.05),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_hhu6f"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_wim3i"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.821954, 0.507082, 0.259343, -0.565354, 0.671212, 0.479426, 0.0690335, -0.540687, 0.838387, 0.08, 0.95, 0.06),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_rcuvn"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_rxajg"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.852861, -0.428856, -0.297844, 0.151951, 0.749596, -0.644218, 0.499539, 0.504171, 0.704466, -0.06, 1.08, 0.04),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_hhu6f"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_7hgw8"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.565574, -3.76254e-05, 0.824698, -0.289629, 0.936293, 0.198669, -0.772166, -0.351219, 0.529532, 0.04, 1, -0.1),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_rcuvn"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_g31s2"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.896755, -0.424946, 0.123495, 0.350987, 0.513037, -0.783327, 0.269514, 0.745798, 0.609219, -0.03, 0.9, 0.08),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_hhu6f"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_vygwm"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.463138, -0.852065, -0.243903, 0.646508, 0.513037, -0.564642, 0.606243, 0.103822, 0.788473, 0.1, 1.06, 0.05),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_hhu6f"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_myicl"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.799437, -0.0939188, 0.593364, -0.182987, 0.902701, 0.389418, -0.572204, -0.419893, 0.704466, -0.09, 1, -0.08),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_rcuvn"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_00uxv"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.832923, 0.550753, 0.0539402, -0.259035, 0.47416, -0.841471, -0.489019, 0.686908, 0.537603, 0.05, 0.93, 0.1),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_hhu6f"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_blhlk"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.940022, 0.0692148, -0.334019, 0.205891, 0.665589, 0.717356, 0.271971, -0.743102, 0.611418, -0.07, 1.1, 0.06),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_rcuvn"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_m8oaq"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.655997, 0.311613, 0.687434, 0.0876121, 0.873198, -0.479426, -0.749662, 0.374729, 0.545514, 0.02, 0.94, -0.12),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_hhu6f"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_il3yy"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.579007, -0.503856, -0.640999, 0.713772, 0.693226, 0.0998334, 0.394056, -0.515332, 0.761021, -0.1, 1.04, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_rcuvn"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_i7kg4"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+])
+metadata/shell_main = Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_pnqvm"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_7w7hl"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+
+metadata/core_glow = Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_0amfy"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_osgbc"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+
+metadata/motes = Array[MeshInstance3D]([Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 1.2, 0.15),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_jnb1c"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_uglkl"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.85, 0.25),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_jnb1c"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_op1x2"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 1.3, -0.3),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_jnb1c"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_4qbqt"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 1.1, -0.2),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_jnb1c"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_1bow2"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 0.75, -0.1),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_jnb1c"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_1bsty"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 1.35, 0.1),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_jnb1c"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_xv87e"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+])
+metadata/mote_base_y = [1.2, 0.85, 1.3, 1.1, 0.75, 1.35]
+metadata/outer_shell = Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_kadj7"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_ppsvj"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+
+metadata/void_eye = Array[MeshInstance3D]([Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 1.05, -0.33),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_67yan"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("TorusMesh_17g7a"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+])
+metadata/tendrils = Array[MeshInstance3D]([Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.696707, 0.717356, 0, -0.685316, 0.665589, -0.29552, -0.211993, 0.205891, 0.955337, 0.25, 1.1, 0.15),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_u4e10"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_vm0mi"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.764842, -0.644218, 0, 0.593364, 0.704466, -0.389418, 0.25087, 0.297844, 0.921061, -0.22, 1.12, 0.18),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_u4e10"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_1rh4e"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.921061, 0.389418, 0, -0.341747, 0.808307, 0.479426, 0.186697, -0.44158, 0.877583, 0.18, 0.9, -0.22),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_u4e10"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_lc1hn"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.825336, -0.564642, 0, 0.539424, 0.788473, 0.29552, -0.166863, -0.243903, 0.955337, -0.2, 0.92, -0.2),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_u4e10"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_i70vr"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 0.696707, -0.717356, 0, 0.717356, 0.696707, 0, 1.25, 0.2),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_u4e10"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_bqons"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.980067, -0.198669, 0, 0.151951, 0.749596, 0.644218, -0.127986, -0.631376, 0.764842, 0, 0.78, -0.18),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_u4e10"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_ut31b"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+])
+metadata/glitch_frags = Array[MeshInstance3D]([Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1.15, -0.1),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_nhva2"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("BoxMesh_c0nl3"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.488111, 0.467572, 0.73697, 0.297844, 0.704466, -0.644218, -0.820388, 0.533951, 0.204594, -0.28, 0.9, 0.22),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_nhva2"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("BoxMesh_lkuix"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(-0.232583, 0.968622, 0.0876183, 0.121927, 0.118417, -0.98545, -0.964904, -0.218515, -0.145643, 0.12, 0.8, -0.28),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_nhva2"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("BoxMesh_77nf0"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(-0.816386, 0.46147, 0.347216, -0.470536, -0.182935, -0.863209, -0.334828, -0.86809, 0.366484, -0.18, 1.25, 0.12),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_nhva2"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("BoxMesh_mslh5"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+])
+metadata/body_y = 1.0
+metadata/scale = 1.0
+metadata/bake_base_color = Color(0.501961, 0.501961, 0.501961, 1)
+metadata/bake_scale = 1.0
+
+[node name="VoidCore" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_xk10r")
+mesh = SubResource("SphereMesh_a6jy1")
+
+[node name="ShellMain" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_pnqvm")
+mesh = SubResource("SphereMesh_7w7hl")
+
+[node name="Shard0" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.7, 0, 0, 0, 0.85, 0, 0, 0, 0.9, 0.12, 1.1, 0.08)
+material_override = SubResource("StandardMaterial3D_pnqvm")
+mesh = SubResource("SphereMesh_05loc")
+
+[node name="Shard1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.8, 0, 0, 0, 0.7, 0, 0, 0, 0.85, -0.1, 1.12, -0.06)
+material_override = SubResource("StandardMaterial3D_dy47t")
+mesh = SubResource("SphereMesh_kpfva")
+
+[node name="Shard2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.85, 0, 0, 0, 0.75, 0, 0, 0, 0.8, 0.06, 0.88, 0.1)
+material_override = SubResource("StandardMaterial3D_pnqvm")
+mesh = SubResource("SphereMesh_1om0r")
+
+[node name="Shard3" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.75, 0, 0, 0, 0.8, 0, 0, 0, 0.7, -0.08, 0.92, -0.12)
+material_override = SubResource("StandardMaterial3D_dy47t")
+mesh = SubResource("SphereMesh_1xgcq")
+
+[node name="Shard4" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.65, 0, 0, 0, 0.9, 0, 0, 0, 0.75, 0.14, 1, -0.1)
+material_override = SubResource("StandardMaterial3D_pnqvm")
+mesh = SubResource("SphereMesh_th8ir")
+
+[node name="Crack0" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.713053, -0.147977, 0.685316, 0.458013, 0.838387, -0.29552, -0.53083, 0.524605, 0.665589, 0, 1.1, -0.05)
+material_override = SubResource("StandardMaterial3D_hhu6f")
+mesh = SubResource("CapsuleMesh_wim3i")
+
+[node name="Crack1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.821954, 0.507082, 0.259343, -0.565354, 0.671212, 0.479426, 0.0690335, -0.540687, 0.838387, 0.08, 0.95, 0.06)
+material_override = SubResource("StandardMaterial3D_rcuvn")
+mesh = SubResource("CapsuleMesh_rxajg")
+
+[node name="Crack2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.852861, -0.428856, -0.297844, 0.151951, 0.749596, -0.644218, 0.499539, 0.504171, 0.704466, -0.06, 1.08, 0.04)
+material_override = SubResource("StandardMaterial3D_hhu6f")
+mesh = SubResource("CapsuleMesh_7hgw8")
+
+[node name="Crack3" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.565574, -3.76254e-05, 0.824698, -0.289629, 0.936293, 0.198669, -0.772166, -0.351219, 0.529532, 0.04, 1, -0.1)
+material_override = SubResource("StandardMaterial3D_rcuvn")
+mesh = SubResource("CapsuleMesh_g31s2")
+
+[node name="Crack4" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.896755, -0.424946, 0.123495, 0.350987, 0.513037, -0.783327, 0.269514, 0.745798, 0.609219, -0.03, 0.9, 0.08)
+material_override = SubResource("StandardMaterial3D_hhu6f")
+mesh = SubResource("CapsuleMesh_vygwm")
+
+[node name="FragmentPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="Fragment0" type="MeshInstance3D" parent="FragmentPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 0.1, 0)
+material_override = SubResource("StandardMaterial3D_63lsw")
+mesh = SubResource("BoxMesh_tkn4k")
+
+[node name="Fragment1" type="MeshInstance3D" parent="FragmentPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1.2, 0.353694, -0.08, 0.353413)
+material_override = SubResource("StandardMaterial3D_fbnwt")
+mesh = SubResource("SphereMesh_nsk6t")
+
+[node name="Fragment2" type="MeshInstance3D" parent="FragmentPivot"]
+transform = Transform3D(0.321451, 0.629501, 0.707388, 0.320997, 0.630364, -0.706825, -0.890859, 0.454279, 0.000563275, 0.000477796, 0.15, 0.6)
+material_override = SubResource("StandardMaterial3D_63lsw")
+mesh = SubResource("BoxMesh_58q0m")
+
+[node name="Fragment3" type="MeshInstance3D" parent="FragmentPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1.2, -0.319407, -0.12, 0.316985)
+material_override = SubResource("StandardMaterial3D_fbnwt")
+mesh = SubResource("SphereMesh_2uxcl")
+
+[node name="Fragment4" type="MeshInstance3D" parent="FragmentPivot"]
+transform = Transform3D(-0.586883, 0.809672, 1.26811e-06, 0.000643976, 0.000468346, -1, -0.809671, -0.586883, -0.000796273, -0.579999, 0.05, 0.000923739)
+material_override = SubResource("StandardMaterial3D_63lsw")
+mesh = SubResource("BoxMesh_mk8pu")
+
+[node name="Fragment5" type="MeshInstance3D" parent="FragmentPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1.2, -0.366587, -0.05, -0.3688)
+material_override = SubResource("StandardMaterial3D_fbnwt")
+mesh = SubResource("SphereMesh_6kmo1")
+
+[node name="Fragment6" type="MeshInstance3D" parent="FragmentPivot"]
+transform = Transform3D(-0.699529, -0.108889, 0.70626, -0.697487, -0.110984, -0.707951, 0.155472, -0.987839, 0.00168722, -0.00114671, 0.18, -0.479999)
+material_override = SubResource("StandardMaterial3D_63lsw")
+mesh = SubResource("BoxMesh_e6vyc")
+
+[node name="Fragment7" type="MeshInstance3D" parent="FragmentPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1.2, 0.396855, -0.15, -0.395103)
+material_override = SubResource("StandardMaterial3D_fbnwt")
+mesh = SubResource("SphereMesh_vjok6")
+
+[node name="Fragment8" type="MeshInstance3D" parent="FragmentPivot"]
+transform = Transform3D(0.83454, -0.151714, 0.529647, 0.300346, 0.931208, -0.206503, -0.461882, 0.331413, 0.822697, 0.538048, 0.08, 0.308066)
+material_override = SubResource("StandardMaterial3D_63lsw")
+mesh = SubResource("BoxMesh_henkb")
+
+[node name="Fragment9" type="MeshInstance3D" parent="FragmentPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1.2, 0.179035, -0.18, 0.434565)
+material_override = SubResource("StandardMaterial3D_fbnwt")
+mesh = SubResource("SphereMesh_axydi")
+
+[node name="Fragment10" type="MeshInstance3D" parent="FragmentPivot"]
+transform = Transform3D(0.327316, 0.758666, 0.563285, 0.649358, 0.252457, -0.717356, -0.686439, 0.600575, -0.410013, -0.224719, 0.2, 0.491021)
+material_override = SubResource("StandardMaterial3D_63lsw")
+mesh = SubResource("BoxMesh_jhoy8")
+
+[node name="Fragment11" type="MeshInstance3D" parent="FragmentPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1.2, -0.545338, -0.1, 0.22518)
+material_override = SubResource("StandardMaterial3D_fbnwt")
+mesh = SubResource("SphereMesh_0njoo")
+
+[node name="Fragment12" type="MeshInstance3D" parent="FragmentPivot"]
+transform = Transform3D(-0.501392, 0.858387, 0.108522, -0.0634663, 0.088601, -0.994043, -0.862889, -0.505293, 0.0100549, -0.250033, 0.14, -0.444504)
+material_override = SubResource("StandardMaterial3D_63lsw")
+mesh = SubResource("BoxMesh_687ap")
+
+[node name="Fragment13" type="MeshInstance3D" parent="FragmentPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.8, 0, 0, 0, 1.2, 0.215447, -0.06, -0.527714)
+material_override = SubResource("StandardMaterial3D_fbnwt")
+mesh = SubResource("SphereMesh_5fcmw")
+
+[node name="RingPivot0" type="Node3D" parent="."]
+transform = Transform3D(0.980067, -0.198669, 0, 0.182987, 0.902701, -0.389418, 0.0773655, 0.381656, 0.921061, 0, 1, 0)
+
+[node name="Ring0" type="MeshInstance3D" parent="RingPivot0"]
+material_override = SubResource("StandardMaterial3D_s5kek")
+mesh = SubResource("TorusMesh_rvtcm")
+
+[node name="RingPivot1" type="Node3D" parent="."]
+transform = Transform3D(0.713053, 0.147977, 0.685316, -0.458013, 0.838387, 0.29552, -0.53083, -0.524605, 0.665589, 0, 1, 0)
+
+[node name="Ring1" type="MeshInstance3D" parent="RingPivot1"]
+material_override = SubResource("StandardMaterial3D_s5kek")
+mesh = SubResource("TorusMesh_elhl6")
+
+[node name="RingPivot2" type="Node3D" parent="."]
+transform = Transform3D(0.955337, 0.275436, 0.107084, 0, 0.362358, -0.932039, -0.29552, 0.890411, 0.346174, 0, 1, 0)
+
+[node name="Ring2" type="MeshInstance3D" parent="RingPivot2"]
+material_override = SubResource("StandardMaterial3D_s5kek")
+mesh = SubResource("TorusMesh_afipr")
+
+[node name="CoreGlow" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_0amfy")
+mesh = SubResource("SphereMesh_osgbc")
+
+[node name="Mote0" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 1.2, 0.15)
+material_override = SubResource("StandardMaterial3D_jnb1c")
+mesh = SubResource("SphereMesh_uglkl")
+
+[node name="Mote1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.85, 0.25)
+material_override = SubResource("StandardMaterial3D_jnb1c")
+mesh = SubResource("SphereMesh_op1x2")
+
+[node name="Mote2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 1.3, -0.3)
+material_override = SubResource("StandardMaterial3D_jnb1c")
+mesh = SubResource("SphereMesh_4qbqt")
+
+[node name="Mote3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 1.1, -0.2)
+material_override = SubResource("StandardMaterial3D_jnb1c")
+mesh = SubResource("SphereMesh_1bow2")
+
+[node name="Mote4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 0.75, -0.1)
+material_override = SubResource("StandardMaterial3D_jnb1c")
+mesh = SubResource("SphereMesh_1bsty")
+
+[node name="Mote5" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 1.35, 0.1)
+material_override = SubResource("StandardMaterial3D_jnb1c")
+mesh = SubResource("SphereMesh_xv87e")
+
+[node name="OuterShell" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_kadj7")
+mesh = SubResource("SphereMesh_ppsvj")
+
+[node name="IrisTorus" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 1.05, -0.33)
+material_override = SubResource("StandardMaterial3D_67yan")
+mesh = SubResource("TorusMesh_17g7a")
+
+[node name="Pupil" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, -0.35)
+material_override = SubResource("StandardMaterial3D_xk10r")
+mesh = SubResource("SphereMesh_v1gqn")
+
+[node name="EyeGlow" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, -0.32)
+material_override = SubResource("StandardMaterial3D_67yan")
+mesh = SubResource("SphereMesh_qria5")
+
+[node name="Tendril0" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.696707, 0.717356, 0, -0.685316, 0.665589, -0.29552, -0.211993, 0.205891, 0.955337, 0.25, 1.1, 0.15)
+material_override = SubResource("StandardMaterial3D_u4e10")
+mesh = SubResource("CapsuleMesh_vm0mi")
+
+[node name="Tendril1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.764842, -0.644218, 0, 0.593364, 0.704466, -0.389418, 0.25087, 0.297844, 0.921061, -0.22, 1.12, 0.18)
+material_override = SubResource("StandardMaterial3D_u4e10")
+mesh = SubResource("CapsuleMesh_1rh4e")
+
+[node name="Tendril2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.921061, 0.389418, 0, -0.341747, 0.808307, 0.479426, 0.186697, -0.44158, 0.877583, 0.18, 0.9, -0.22)
+material_override = SubResource("StandardMaterial3D_u4e10")
+mesh = SubResource("CapsuleMesh_lc1hn")
+
+[node name="Tendril3" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.825336, -0.564642, 0, 0.539424, 0.788473, 0.29552, -0.166863, -0.243903, 0.955337, -0.2, 0.92, -0.2)
+material_override = SubResource("StandardMaterial3D_u4e10")
+mesh = SubResource("CapsuleMesh_i70vr")
+
+[node name="Tendril4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.696707, -0.717356, 0, 0.717356, 0.696707, 0, 1.25, 0.2)
+material_override = SubResource("StandardMaterial3D_u4e10")
+mesh = SubResource("CapsuleMesh_bqons")
+
+[node name="Tendril5" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.980067, -0.198669, 0, 0.151951, 0.749596, 0.644218, -0.127986, -0.631376, 0.764842, 0, 0.78, -0.18)
+material_override = SubResource("StandardMaterial3D_u4e10")
+mesh = SubResource("CapsuleMesh_ut31b")
+
+[node name="Crack5" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.463138, -0.852065, -0.243903, 0.646508, 0.513037, -0.564642, 0.606243, 0.103822, 0.788473, 0.1, 1.06, 0.05)
+material_override = SubResource("StandardMaterial3D_hhu6f")
+mesh = SubResource("CapsuleMesh_myicl")
+
+[node name="Crack6" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.799437, -0.0939188, 0.593364, -0.182987, 0.902701, 0.389418, -0.572204, -0.419893, 0.704466, -0.09, 1, -0.08)
+material_override = SubResource("StandardMaterial3D_rcuvn")
+mesh = SubResource("CapsuleMesh_00uxv")
+
+[node name="Crack7" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.832923, 0.550753, 0.0539402, -0.259035, 0.47416, -0.841471, -0.489019, 0.686908, 0.537603, 0.05, 0.93, 0.1)
+material_override = SubResource("StandardMaterial3D_hhu6f")
+mesh = SubResource("CapsuleMesh_blhlk")
+
+[node name="Crack8" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.940022, 0.0692148, -0.334019, 0.205891, 0.665589, 0.717356, 0.271971, -0.743102, 0.611418, -0.07, 1.1, 0.06)
+material_override = SubResource("StandardMaterial3D_rcuvn")
+mesh = SubResource("CapsuleMesh_m8oaq")
+
+[node name="Crack9" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.655997, 0.311613, 0.687434, 0.0876121, 0.873198, -0.479426, -0.749662, 0.374729, 0.545514, 0.02, 0.94, -0.12)
+material_override = SubResource("StandardMaterial3D_hhu6f")
+mesh = SubResource("CapsuleMesh_il3yy")
+
+[node name="Crack10" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.579007, -0.503856, -0.640999, 0.713772, 0.693226, 0.0998334, 0.394056, -0.515332, 0.761021, -0.1, 1.04, 0)
+material_override = SubResource("StandardMaterial3D_rcuvn")
+mesh = SubResource("CapsuleMesh_i7kg4")
+
+[node name="RingPivot3" type="Node3D" parent="."]
+transform = Transform3D(0.30358, -0.879421, -0.366685, 0.599122, 0.475434, -0.644218, 0.740873, -0.0241171, 0.671212, 0, 1, 0)
+
+[node name="Ring3" type="MeshInstance3D" parent="RingPivot3"]
+material_override = SubResource("StandardMaterial3D_s5kek")
+mesh = SubResource("TorusMesh_qo2yg")
+
+[node name="RingPivot4" type="Node3D" parent="."]
+transform = Transform3D(0.919182, -0.178642, 0.350987, -0.183698, 0.593847, 0.783327, -0.348368, -0.784496, 0.513037, 0, 1, 0)
+
+[node name="Ring4" type="MeshInstance3D" parent="RingPivot4"]
+material_override = SubResource("StandardMaterial3D_s5kek")
+mesh = SubResource("TorusMesh_4eyrt")
+
+[node name="GlitchFrag0" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1.15, -0.1)
+material_override = SubResource("StandardMaterial3D_nhva2")
+mesh = SubResource("BoxMesh_c0nl3")
+
+[node name="GlitchFrag1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.488111, 0.467572, 0.73697, 0.297844, 0.704466, -0.644218, -0.820388, 0.533951, 0.204594, -0.28, 0.9, 0.22)
+material_override = SubResource("StandardMaterial3D_nhva2")
+mesh = SubResource("BoxMesh_lkuix")
+
+[node name="GlitchFrag2" type="MeshInstance3D" parent="."]
+transform = Transform3D(-0.232583, 0.968622, 0.0876183, 0.121927, 0.118417, -0.98545, -0.964904, -0.218515, -0.145643, 0.12, 0.8, -0.28)
+material_override = SubResource("StandardMaterial3D_nhva2")
+mesh = SubResource("BoxMesh_77nf0")
+
+[node name="GlitchFrag3" type="MeshInstance3D" parent="."]
+transform = Transform3D(-0.816386, 0.46147, 0.347216, -0.470536, -0.182935, -0.863209, -0.334828, -0.86809, 0.366484, -0.18, 1.25, 0.12)
+material_override = SubResource("StandardMaterial3D_nhva2")
+mesh = SubResource("BoxMesh_mslh5")
+
+[node name="ShellRidge0" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.825336, -0.564642, 0, 0.553387, 0.808884, -0.198669, 0.112177, 0.163969, 0.980067, 0, 1.15, -0.3)
+material_override = SubResource("StandardMaterial3D_pnqvm")
+mesh = SubResource("CapsuleMesh_ebfhy")
+
+[node name="ShellRidge1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.764842, -0.25087, 0.593364, 0, 0.921061, 0.389418, -0.644218, -0.297844, 0.704466, 0.28, 1.05, 0.12)
+material_override = SubResource("StandardMaterial3D_pnqvm")
+mesh = SubResource("CapsuleMesh_8iwii")
+
+[node name="ShellRidge2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.906312, 0.333677, -0.259343, -0.420736, 0.770151, -0.479426, 0.0397604, 0.543624, 0.838387, -0.26, 0.92, 0.1)
+material_override = SubResource("StandardMaterial3D_pnqvm")
+mesh = SubResource("CapsuleMesh_q420t")
+
+[node name="ShellRidge3" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.814944, -0.482254, 0.321401, 0.243903, 0.788473, 0.564642, -0.525717, -0.381761, 0.760184, 0.1, 0.86, -0.25)
+material_override = SubResource("StandardMaterial3D_pnqvm")
+mesh = SubResource("CapsuleMesh_llkua")

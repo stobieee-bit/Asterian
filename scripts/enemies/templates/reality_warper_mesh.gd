@@ -420,7 +420,11 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("cracks", cracks)
 	root.set_meta("shell_main", shell_main)
 	root.set_meta("core_glow", core_glow)
+	var mote_base_y: Array = []
+	for m: MeshInstance3D in motes:
+		mote_base_y.append(m.position.y)
 	root.set_meta("motes", motes)
+	root.set_meta("mote_base_y", mote_base_y)
 	root.set_meta("outer_shell", outer_shell)
 	root.set_meta("void_eye", void_eye)
 	root.set_meta("tendrils", tendrils)
@@ -507,8 +511,9 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 			crack.scale = Vector3(flicker, 1.0, flicker)
 
 	# ── Energy motes — gentle drift and scale pulse ──
-	if root.has_meta("motes"):
+	if root.has_meta("motes") and root.has_meta("mote_base_y"):
 		var motes: Array = root.get_meta("motes") as Array
+		var mote_base_y: Array = root.get_meta("mote_base_y") as Array
 		for i: int in range(motes.size()):
 			var mote: MeshInstance3D = motes[i] as MeshInstance3D
 			if mote == null:
@@ -518,7 +523,7 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 			var mote_pulse: float = 1.0 + sin(mote_phase) * 0.4
 			mote.scale = Vector3(mote_pulse, mote_pulse, mote_pulse)
 			# Subtle positional drift
-			mote.position.y += sin(mote_phase * 0.7) * delta * 0.01
+			mote.position.y = (mote_base_y[i] as float) + sin(mote_phase * 0.7) * 0.01
 
 	# ── Void eye iris — steady rotation ──
 	if root.has_meta("void_eye"):

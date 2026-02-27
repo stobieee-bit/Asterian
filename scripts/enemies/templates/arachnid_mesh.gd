@@ -189,9 +189,9 @@ func build_mesh(params: Dictionary) -> Node3D:
 		Vector3(-0.02 * s, 0.20 * s, -0.66 * s),
 		mat_silk, Vector3(PI * 0.52, 0.0, -0.1))
 
-	# ── Carapace edge rim (torus at cephalothorax-abdomen junction) ──
-	EnemyMeshBuilder.add_torus(
-		root, 0.015 * s, 0.14 * s,
+	# ── Carapace edge rim (flat armor ring at cephalothorax-abdomen junction) ──
+	EnemyMeshBuilder.add_ring_band(
+		root, 0.10 * s, 0.14 * s, 0.02 * s,
 		Vector3(0.0, 0.26 * s, -0.08 * s),
 		mat_joint, Vector3(PI * 0.5, 0.0, 0.0))
 
@@ -323,6 +323,11 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("legs_upper", legs_upper)
 	root.set_meta("legs_joint", legs_joint)
 	root.set_meta("legs_lower", legs_lower)
+	# Store original lower-leg Y positions so animate() can offset from base (not accumulate)
+	var legs_lower_base_y: Array[float] = []
+	for ll_node: MeshInstance3D in legs_lower:
+		legs_lower_base_y.append(ll_node.position.y)
+	root.set_meta("legs_lower_base_y", legs_lower_base_y)
 	root.set_meta("tarsal_claws", tarsal_claws)
 	root.set_meta("pedipalps", [pp_l, pp_r, pp_tip_l, pp_tip_r,
 		pp_joint_l, pp_joint_r, pp_seg_l, pp_seg_r])
@@ -331,6 +336,10 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("cephalothorax", cephalothorax)
 	root.set_meta("silk_threads", [silk_l, silk_r])
 	root.set_meta("eye_highlights", eye_highlights)
+	var eh_base_y: Array[float] = []
+	for eh: MeshInstance3D in eye_highlights:
+		eh_base_y.append(eh.position.y)
+	root.set_meta("eye_highlight_base_y", eh_base_y)
 
 	# Built facing +Z, rotate to face -Z (Godot forward)
 	root.rotation.y = PI
@@ -344,6 +353,7 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 	if root.has_meta("legs_upper") and root.has_meta("legs_lower"):
 		var uppers: Array = root.get_meta("legs_upper") as Array
 		var lowers: Array = root.get_meta("legs_lower") as Array
+		var base_ys: Array = root.get_meta("legs_lower_base_y") as Array if root.has_meta("legs_lower_base_y") else []
 
 		for i: int in range(uppers.size()):
 			var upper: MeshInstance3D = uppers[i] as MeshInstance3D
@@ -369,13 +379,20 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 				upper.rotation.x = swing * 0.5
 				# Lower leg bends at knee during lift
 				lower.rotation.x = swing * 0.3 - 0.1
-				lower.position.y += lift * delta * 10.0
+				# Absolute Y positioning from stored base (no accumulation drift)
+				if i < base_ys.size():
+					lower.position.y = base_ys[i] + lift
+				else:
+					lower.position.y += lift * delta * 10.0
 			else:
 				# Idle — subtle curl/breathe
 				var idle_phase: float = phase * 1.5 + float(i) * 0.4
 				var curl: float = sin(idle_phase) * 0.06
 				upper.rotation.x = curl
 				lower.rotation.x = curl * 0.5
+				# Reset Y to base position during idle
+				if i < base_ys.size():
+					lower.position.y = base_ys[i]
 
 	# ── Tarsal claw animation — follow lower leg motion ──
 	if root.has_meta("tarsal_claws") and root.has_meta("legs_lower"):
@@ -444,10 +461,14 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 	# ── Eye highlight shimmer — subtle position oscillation ──
 	if root.has_meta("eye_highlights"):
 		var highlights: Array = root.get_meta("eye_highlights") as Array
+		var eh_base_y: Array = root.get_meta("eye_highlight_base_y") as Array if root.has_meta("eye_highlight_base_y") else []
 		for i: int in range(highlights.size()):
 			var hl: MeshInstance3D = highlights[i] as MeshInstance3D
 			var shimmer: float = sin(phase * 3.0 + float(i) * 1.2) * 0.002
-			hl.position.y += shimmer * delta * 5.0
+			if i < eh_base_y.size():
+				hl.position.y = (eh_base_y[i] as float) + shimmer
+			else:
+				hl.position.y += shimmer * delta * 5.0
 
 	# ── Whole-body idle bob ──
 	if not is_moving:

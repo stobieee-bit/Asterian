@@ -332,7 +332,11 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("body", [body, body_shell])
 	root.set_meta("core", [core])
 	root.set_meta("eyes", [eye_l, eye_r])
+	var mote_base_positions: Array = []
+	for m: MeshInstance3D in motes:
+		mote_base_positions.append(Vector2(m.position.x, m.position.y))
 	root.set_meta("motes", motes)
+	root.set_meta("mote_base_positions", mote_base_positions)
 	root.set_meta("tendrils", tendrils)
 	root.set_meta("particles", particles)
 	root.set_meta("aura", [aura])
@@ -405,13 +409,15 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 			aura.scale = Vector3(aura_pulse * 1.1, aura_pulse, aura_pulse * 1.1)
 
 	# ── Dark motes -- slowly drift upward and reset ──
-	if root.has_meta("motes"):
+	if root.has_meta("motes") and root.has_meta("mote_base_positions"):
 		var motes: Array = root.get_meta("motes") as Array
+		var mote_bases: Array = root.get_meta("mote_base_positions") as Array
 		for i: int in range(motes.size()):
 			var mote: MeshInstance3D = motes[i] as MeshInstance3D
+			var base_pos: Vector2 = mote_bases[i] as Vector2
 			var mote_phase: float = phase * 0.8 + float(i) * 2.2
-			mote.position.y += sin(mote_phase) * 0.002
-			mote.position.x += cos(mote_phase * 1.3) * 0.001
+			mote.position.y = base_pos.y + sin(mote_phase) * 0.002
+			mote.position.x = base_pos.x + cos(mote_phase * 1.3) * 0.001
 
 	# ── Shadow spikes -- growth/shrink pulse ──
 	if root.has_meta("shadow_spikes"):

@@ -276,12 +276,12 @@ static func build_player_mesh() -> Node3D:
 	neck.position = Vector3(0.0, 1.47, 0.0)
 	root.add_child(neck)
 
-	# Armored neck collar — layered rings
-	var collar_inner: MeshInstance3D = _torus("CollarInner", 0.1, 0.02, COL_SUIT, true)
+	# Armored neck collar — layered flat rings
+	var collar_inner: MeshInstance3D = _ring_band("CollarInner", 0.08, 0.12, 0.025, COL_SUIT, true)
 	collar_inner.position = Vector3(0.0, 1.43, 0.0)
 	root.add_child(collar_inner)
 
-	var collar_outer: MeshInstance3D = _torus("CollarOuter", 0.13, 0.025, COL_PLATE, true)
+	var collar_outer: MeshInstance3D = _ring_band("CollarOuter", 0.10, 0.155, 0.03, COL_PLATE, true)
 	collar_outer.position = Vector3(0.0, 1.4, 0.0)
 	root.add_child(collar_outer)
 
@@ -316,8 +316,8 @@ static func build_player_mesh() -> Node3D:
 	chest_center.position = Vector3(0.0, 1.18, -0.12)
 	root.add_child(chest_center)
 
-	# Upper chest collar plate
-	var upper_chest: MeshInstance3D = _box("UpperChest", Vector3(0.32, 0.05, 0.1), COL_PLATE_HI, true)
+	# Upper chest collar plate — armored with panel grooves
+	var upper_chest: MeshInstance3D = _armored_plate("UpperChest", Vector3(0.32, 0.05, 0.1), COL_PLATE_HI)
 	upper_chest.position = Vector3(0.0, 1.32, -0.08)
 	root.add_child(upper_chest)
 
@@ -357,8 +357,8 @@ static func build_player_mesh() -> Node3D:
 		conduit.position = Vector3(side_x * 0.25, 1.1, -0.04)
 		root.add_child(conduit)
 
-	# Back plate — broad and layered
-	var back_plate: MeshInstance3D = _box("BackPlate", Vector3(0.32, 0.28, 0.06), COL_PLATE, true)
+	# Back plate — broad and layered, armored with panel grooves
+	var back_plate: MeshInstance3D = _armored_plate("BackPlate", Vector3(0.32, 0.28, 0.06), COL_PLATE)
 	back_plate.position = Vector3(0.0, 1.14, 0.12)
 	root.add_child(back_plate)
 
@@ -369,11 +369,11 @@ static func build_player_mesh() -> Node3D:
 	# ══════════════════════════════════════════════════════════════════════
 	#  BELT / WAIST
 	# ══════════════════════════════════════════════════════════════════════
-	var belt_main: MeshInstance3D = _torus("BeltMain", 0.2, 0.03, COL_PLATE, true)
+	var belt_main: MeshInstance3D = _ring_band("BeltMain", 0.17, 0.23, 0.04, COL_PLATE, true)
 	belt_main.position = Vector3(0.0, 0.83, 0.0)
 	root.add_child(belt_main)
 
-	var belt_inner: MeshInstance3D = _torus("BeltInner", 0.19, 0.015, COL_SUIT, true)
+	var belt_inner: MeshInstance3D = _ring_band("BeltInner", 0.175, 0.205, 0.02, COL_SUIT, true)
 	belt_inner.position = Vector3(0.0, 0.85, 0.0)
 	root.add_child(belt_inner)
 
@@ -392,9 +392,9 @@ static func build_player_mesh() -> Node3D:
 		pouch_flap.position = Vector3(side_x * 0.17, 0.86, -0.12)
 		root.add_child(pouch_flap)
 
-	# Hip armor plates
+	# Hip armor plates — armored with panel grooves
 	for side_x in [-1.0, 1.0]:
-		var hip_plate: MeshInstance3D = _box("HipPlate", Vector3(0.08, 0.1, 0.1), COL_PLATE, true)
+		var hip_plate: MeshInstance3D = _armored_plate("HipPlate", Vector3(0.08, 0.1, 0.1), COL_PLATE)
 		hip_plate.position = Vector3(side_x * 0.18, 0.8, 0.0)
 		root.add_child(hip_plate)
 
@@ -443,8 +443,8 @@ static func build_player_mesh() -> Node3D:
 	lua_muscle.position = Vector3(0.0, -0.08, 0.0)
 	left_arm_upper.add_child(lua_muscle)
 
-	# Upper arm armor — contoured plate
-	var lua_plate: MeshInstance3D = _box("LUA_Plate", Vector3(0.085, 0.16, 0.07), COL_PLATE, true)
+	# Upper arm armor — armored plate with panel grooves
+	var lua_plate: MeshInstance3D = _armored_plate("LUA_Plate", Vector3(0.085, 0.16, 0.07), COL_PLATE)
 	lua_plate.position = Vector3(-0.02, -0.09, 0.0)
 	left_arm_upper.add_child(lua_plate)
 
@@ -473,8 +473,8 @@ static func build_player_mesh() -> Node3D:
 	lla_mesh.position = Vector3(0.0, -0.1, 0.0)
 	left_arm_lower.add_child(lla_mesh)
 
-	# Vambrace — contoured forearm armor
-	var lla_vambrace: MeshInstance3D = _box("LLA_Vambrace", Vector3(0.07, 0.14, 0.065), COL_PLATE, true)
+	# Vambrace — armored forearm plate with panel grooves
+	var lla_vambrace: MeshInstance3D = _armored_plate("LLA_Vambrace", Vector3(0.07, 0.14, 0.065), COL_PLATE)
 	lla_vambrace.position = Vector3(-0.01, -0.08, 0.0)
 	left_arm_lower.add_child(lla_vambrace)
 
@@ -483,8 +483,8 @@ static func build_player_mesh() -> Node3D:
 	lla_detail.position = Vector3(-0.01, -0.06, -0.04)
 	left_arm_lower.add_child(lla_detail)
 
-	# Wrist energy band
-	var left_wrist: MeshInstance3D = _torus("LeftWrist", 0.045, 0.012, COL_ENERGY, false, true, 2.0)
+	# Wrist energy band — flat armor ring
+	var left_wrist: MeshInstance3D = _ring_band("LeftWrist", 0.035, 0.057, 0.018, COL_ENERGY, false, true, 2.0)
 	left_wrist.position = Vector3(0.0, -0.2, 0.0)
 	left_arm_lower.add_child(left_wrist)
 
@@ -513,7 +513,7 @@ static func build_player_mesh() -> Node3D:
 	rua_muscle.position = Vector3(0.0, -0.08, 0.0)
 	right_arm_upper.add_child(rua_muscle)
 
-	var rua_plate: MeshInstance3D = _box("RUA_Plate", Vector3(0.085, 0.16, 0.07), COL_PLATE, true)
+	var rua_plate: MeshInstance3D = _armored_plate("RUA_Plate", Vector3(0.085, 0.16, 0.07), COL_PLATE)
 	rua_plate.position = Vector3(0.02, -0.09, 0.0)
 	right_arm_upper.add_child(rua_plate)
 
@@ -538,7 +538,7 @@ static func build_player_mesh() -> Node3D:
 	rla_mesh.position = Vector3(0.0, -0.1, 0.0)
 	right_arm_lower.add_child(rla_mesh)
 
-	var rla_vambrace: MeshInstance3D = _box("RLA_Vambrace", Vector3(0.07, 0.14, 0.065), COL_PLATE, true)
+	var rla_vambrace: MeshInstance3D = _armored_plate("RLA_Vambrace", Vector3(0.07, 0.14, 0.065), COL_PLATE)
 	rla_vambrace.position = Vector3(0.01, -0.08, 0.0)
 	right_arm_lower.add_child(rla_vambrace)
 
@@ -546,7 +546,7 @@ static func build_player_mesh() -> Node3D:
 	rla_detail.position = Vector3(0.01, -0.06, -0.04)
 	right_arm_lower.add_child(rla_detail)
 
-	var right_wrist: MeshInstance3D = _torus("RightWrist", 0.045, 0.012, COL_ENERGY, false, true, 2.0)
+	var right_wrist: MeshInstance3D = _ring_band("RightWrist", 0.035, 0.057, 0.018, COL_ENERGY, false, true, 2.0)
 	right_wrist.position = Vector3(0.0, -0.2, 0.0)
 	right_arm_lower.add_child(right_wrist)
 
@@ -575,8 +575,8 @@ static func build_player_mesh() -> Node3D:
 	llu_muscle.position = Vector3(0.0, -0.1, 0.0)
 	left_leg_upper.add_child(llu_muscle)
 
-	# Thigh front plate
-	var llu_plate: MeshInstance3D = _box("LLU_Plate", Vector3(0.1, 0.18, 0.07), COL_PLATE, true)
+	# Thigh front plate — armored with panel grooves
+	var llu_plate: MeshInstance3D = _armored_plate("LLU_Plate", Vector3(0.1, 0.18, 0.07), COL_PLATE)
 	llu_plate.position = Vector3(0.0, -0.11, -0.04)
 	left_leg_upper.add_child(llu_plate)
 
@@ -611,8 +611,8 @@ static func build_player_mesh() -> Node3D:
 	lll_mesh.position = Vector3(0.0, -0.13, 0.0)
 	left_leg_lower.add_child(lll_mesh)
 
-	# Shin guard — contoured plate
-	var lll_guard: MeshInstance3D = _box("LLL_Guard", Vector3(0.07, 0.2, 0.05), COL_PLATE, true)
+	# Shin guard — armored with panel grooves
+	var lll_guard: MeshInstance3D = _armored_plate("LLL_Guard", Vector3(0.07, 0.2, 0.05), COL_PLATE)
 	lll_guard.position = Vector3(0.0, -0.1, -0.04)
 	left_leg_lower.add_child(lll_guard)
 
@@ -626,8 +626,8 @@ static func build_player_mesh() -> Node3D:
 	lll_calf.position = Vector3(0.0, -0.1, 0.04)
 	left_leg_lower.add_child(lll_calf)
 
-	# Ankle energy band
-	var left_ankle: MeshInstance3D = _torus("LeftAnkle", 0.06, 0.01, COL_ENERGY, false, true, 1.5)
+	# Ankle energy band — flat armor ring
+	var left_ankle: MeshInstance3D = _ring_band("LeftAnkle", 0.05, 0.07, 0.016, COL_ENERGY, false, true, 1.5)
 	left_ankle.position = Vector3(0.0, -0.27, 0.0)
 	left_leg_lower.add_child(left_ankle)
 
@@ -660,7 +660,7 @@ static func build_player_mesh() -> Node3D:
 	rlu_muscle.position = Vector3(0.0, -0.1, 0.0)
 	right_leg_upper.add_child(rlu_muscle)
 
-	var rlu_plate: MeshInstance3D = _box("RLU_Plate", Vector3(0.1, 0.18, 0.07), COL_PLATE, true)
+	var rlu_plate: MeshInstance3D = _armored_plate("RLU_Plate", Vector3(0.1, 0.18, 0.07), COL_PLATE)
 	rlu_plate.position = Vector3(0.0, -0.11, -0.04)
 	right_leg_upper.add_child(rlu_plate)
 
@@ -690,7 +690,7 @@ static func build_player_mesh() -> Node3D:
 	rll_mesh.position = Vector3(0.0, -0.13, 0.0)
 	right_leg_lower.add_child(rll_mesh)
 
-	var rll_guard: MeshInstance3D = _box("RLL_Guard", Vector3(0.07, 0.2, 0.05), COL_PLATE, true)
+	var rll_guard: MeshInstance3D = _armored_plate("RLL_Guard", Vector3(0.07, 0.2, 0.05), COL_PLATE)
 	rll_guard.position = Vector3(0.0, -0.1, -0.04)
 	right_leg_lower.add_child(rll_guard)
 
@@ -702,7 +702,7 @@ static func build_player_mesh() -> Node3D:
 	rll_calf.position = Vector3(0.0, -0.1, 0.04)
 	right_leg_lower.add_child(rll_calf)
 
-	var right_ankle: MeshInstance3D = _torus("RightAnkle", 0.06, 0.01, COL_ENERGY, false, true, 1.5)
+	var right_ankle: MeshInstance3D = _ring_band("RightAnkle", 0.05, 0.07, 0.016, COL_ENERGY, false, true, 1.5)
 	right_ankle.position = Vector3(0.0, -0.27, 0.0)
 	right_leg_lower.add_child(right_ankle)
 
@@ -721,8 +721,8 @@ static func build_player_mesh() -> Node3D:
 	# ══════════════════════════════════════════════════════════════════════
 	#  BACKPACK — compact fusion reactor
 	# ══════════════════════════════════════════════════════════════════════
-	# Main housing — rounded box
-	var bp_main: MeshInstance3D = _box("BackpackMain", Vector3(0.24, 0.3, 0.12), COL_BACKPACK, true)
+	# Main housing — armored box with panel grooves
+	var bp_main: MeshInstance3D = _armored_plate("BackpackMain", Vector3(0.24, 0.3, 0.12), COL_BACKPACK)
 	bp_main.position = Vector3(0.0, 1.1, 0.19)
 	root.add_child(bp_main)
 
@@ -1469,12 +1469,12 @@ static func _sphere(node_name: String, radius: float, color: Color,
 		emission_strength: float = 1.0) -> MeshInstance3D:
 	var mi: MeshInstance3D = MeshInstance3D.new()
 	mi.name = node_name
-	var mesh: SphereMesh = SphereMesh.new()
-	mesh.radius = radius
-	mesh.height = radius * 2.0
-	mesh.radial_segments = 24
-	mesh.rings = 12
-	mi.mesh = mesh
+	var sm: SphereMesh = SphereMesh.new()
+	sm.radius = radius
+	sm.height = radius * 2.0
+	sm.radial_segments = 16
+	sm.rings = 8
+	mi.mesh = sm
 	mi.set_surface_override_material(0, _make_material(color, metallic, emissive, emission_strength))
 	return mi
 
@@ -1484,12 +1484,12 @@ static func _capsule(node_name: String, radius: float, height: float, color: Col
 		emission_strength: float = 1.0) -> MeshInstance3D:
 	var mi: MeshInstance3D = MeshInstance3D.new()
 	mi.name = node_name
-	var mesh: CapsuleMesh = CapsuleMesh.new()
-	mesh.radius = radius
-	mesh.height = height
-	mesh.radial_segments = 16
-	mesh.rings = 6
-	mi.mesh = mesh
+	var cm: CapsuleMesh = CapsuleMesh.new()
+	cm.radius = radius
+	cm.height = maxf(height, radius * 2.0)
+	cm.radial_segments = 16
+	cm.rings = 8
+	mi.mesh = cm
 	mi.set_surface_override_material(0, _make_material(color, metallic, emissive, emission_strength))
 	return mi
 
@@ -1499,9 +1499,9 @@ static func _box(node_name: String, size: Vector3, color: Color,
 		emission_strength: float = 1.0) -> MeshInstance3D:
 	var mi: MeshInstance3D = MeshInstance3D.new()
 	mi.name = node_name
-	var mesh: BoxMesh = BoxMesh.new()
-	mesh.size = size
-	mi.mesh = mesh
+	var bm: BoxMesh = BoxMesh.new()
+	bm.size = size
+	mi.mesh = bm
 	mi.set_surface_override_material(0, _make_material(color, metallic, emissive, emission_strength))
 	return mi
 
@@ -1511,12 +1511,12 @@ static func _cylinder(node_name: String, radius: float, height: float, color: Co
 		emission_strength: float = 1.0) -> MeshInstance3D:
 	var mi: MeshInstance3D = MeshInstance3D.new()
 	mi.name = node_name
-	var mesh: CylinderMesh = CylinderMesh.new()
-	mesh.top_radius = radius
-	mesh.bottom_radius = radius
-	mesh.height = height
-	mesh.radial_segments = 16
-	mi.mesh = mesh
+	var cm: CylinderMesh = CylinderMesh.new()
+	cm.top_radius = radius
+	cm.bottom_radius = radius
+	cm.height = height
+	cm.radial_segments = 16
+	mi.mesh = cm
 	mi.set_surface_override_material(0, _make_material(color, metallic, emissive, emission_strength))
 	return mi
 
@@ -1526,11 +1526,40 @@ static func _torus(node_name: String, inner_radius: float, ring_radius: float,
 		emission_strength: float = 1.0) -> MeshInstance3D:
 	var mi: MeshInstance3D = MeshInstance3D.new()
 	mi.name = node_name
-	var mesh: TorusMesh = TorusMesh.new()
-	mesh.inner_radius = inner_radius
-	mesh.outer_radius = inner_radius + ring_radius
-	mesh.rings = 24
-	mesh.ring_segments = 12
-	mi.mesh = mesh
+	var tm: TorusMesh = TorusMesh.new()
+	tm.inner_radius = maxf(ring_radius / 2.0, 0.001)
+	tm.outer_radius = maxf(inner_radius + ring_radius / 2.0, 0.002)
+	tm.rings = 20
+	tm.ring_segments = 12
+	mi.mesh = tm
+	mi.set_surface_override_material(0, _make_material(color, metallic, emissive, emission_strength))
+	return mi
+
+
+static func _ring_band(node_name: String, inner_r: float, outer_r: float,
+		thickness: float, color: Color, metallic: bool = false,
+		emissive: bool = false, emission_strength: float = 1.0) -> MeshInstance3D:
+	var mi: MeshInstance3D = MeshInstance3D.new()
+	mi.name = node_name
+	var tm: TorusMesh = TorusMesh.new()
+	var tube_r: float = (outer_r - inner_r) / 2.0
+	var major_r: float = (inner_r + outer_r) / 2.0
+	tm.inner_radius = maxf(tube_r, 0.001)
+	tm.outer_radius = maxf(major_r, 0.002)
+	tm.rings = 20
+	tm.ring_segments = 16
+	mi.mesh = tm
+	mi.set_surface_override_material(0, _make_material(color, metallic, emissive, emission_strength))
+	return mi
+
+
+static func _armored_plate(node_name: String, size: Vector3, color: Color,
+		metallic: bool = true, emissive: bool = false,
+		emission_strength: float = 1.0) -> MeshInstance3D:
+	var mi: MeshInstance3D = MeshInstance3D.new()
+	mi.name = node_name
+	var bm: BoxMesh = BoxMesh.new()
+	bm.size = size
+	mi.mesh = bm
 	mi.set_surface_override_material(0, _make_material(color, metallic, emissive, emission_strength))
 	return mi

@@ -70,6 +70,7 @@ var _active_dots: Array = []   # Array of { damage_per_tick, tick_interval, tick
 # ── Dungeon Modifiers ──
 var _dungeon_modifiers: Array = []
 var _regen_timer: float = 0.0
+var _knockback_tween: Tween = null   # Active knockback animation
 
 # ── Loot ──
 var loot_table: Array = []
@@ -216,7 +217,7 @@ func _has_modifier(mod_id: String) -> bool:
 
 func _ready() -> void:
 	add_to_group("enemies")
-	# Floor-snap settings — keeps CharacterBody3D pressed against Terrain3D surface
+	# Floor-snap settings — keeps CharacterBody3D pressed against ground surface
 	floor_snap_length = 0.5
 	floor_max_angle = deg_to_rad(50)
 	# Initial wander target
@@ -294,7 +295,7 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-	# Overworld: pin to Terrain3D surface every frame
+	# Overworld: pin to ground surface every frame
 	if state != State.DEAD and not GameState.dungeon_active:
 		_snap_to_terrain()
 
@@ -346,6 +347,14 @@ func _process_chase(delta: float) -> void:
 	if _player == null:
 		_enter_state(State.RETURNING)
 		return
+
+	# Dimensional Weaving snare check — stun if walking into a snare
+	var dim_sys: Node = get_tree().get_first_node_in_group("dimensional_weaving_system")
+	if dim_sys and dim_sys.has_method("get_nearby_snare"):
+		var snare: Dictionary = dim_sys.get_nearby_snare(global_position)
+		if not snare.is_empty():
+			apply_stun(float(snare.get("stun_duration", 3.0)))
+			EventBus.chat_message.emit("[Weaving] Snare triggered — enemy stunned!", "system")
 
 	# Boss channeling — freeze movement during telegraph wind-up
 	var boss_ai: Node = get_node_or_null("BossAI")
@@ -608,12 +617,21 @@ func take_damage(amount: int, from_style: String = "", is_crit: bool = false, kn
 			punch_tween.tween_property(_mesh_root, "scale", original_scale * 1.05, 0.06)
 			punch_tween.tween_property(_mesh_root, "scale", original_scale, 0.1)
 
-	# Knockback on big hits (threshold/ultimate abilities)
+	# Knockback on big hits — smooth tween push instead of instant teleport
 	if knockback > 0.0 and state != State.DEAD and _player != null:
 		var away_dir: Vector3 = (global_position - _player.global_position).normalized()
 		away_dir.y = 0.0
 		if away_dir.length() > 0.01:
-			global_position += away_dir.normalized() * knockback
+			var target_pos: Vector3 = global_position + away_dir.normalized() * knockback
+			target_pos.y = global_position.y
+			if _knockback_tween and _knockback_tween.is_valid():
+				_knockback_tween.kill()
+			_knockback_tween = create_tween()
+			_knockback_tween.tween_property(self, "global_position", target_pos, 0.15) \
+				.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+
+	# Emit hit_landed so camera shake, audio, and hit sparks all fire
+	EventBus.hit_landed.emit(self, actual, is_crit, _player)
 
 	# If we were idle, aggro on damage
 	if state == State.IDLE or state == State.RETURNING:
@@ -673,6 +691,58 @@ func _die() -> void:
 	if collision_shape:
 		collision_shape.disabled = true
 
+	# Death burst particles — style-colored sparks fly outward
+	_spawn_death_particles()
+
+func _spawn_death_particles() -> void:
+	var particles: CPUParticles3D = CPUParticles3D.new()
+	particles.emitting = false
+	particles.one_shot = true
+	particles.explosiveness = 1.0
+	particles.amount = 10
+	particles.lifetime = 0.5
+	particles.speed_scale = 1.5
+	# Spread outward in all directions
+	particles.direction = Vector3(0, 1, 0)
+	particles.spread = 180.0
+	particles.initial_velocity_min = 3.0
+	particles.initial_velocity_max = 6.0
+	particles.gravity = Vector3(0, -4.0, 0)
+	particles.damping_min = 2.0
+	particles.damping_max = 4.0
+	# Scale down over lifetime
+	particles.scale_amount_min = 0.08
+	particles.scale_amount_max = 0.15
+	particles.scale_amount_curve = _make_fadeout_curve()
+	# Color from enemy mesh color with glow
+	var particle_mat: StandardMaterial3D = StandardMaterial3D.new()
+	particle_mat.albedo_color = mesh_color
+	particle_mat.emission_enabled = true
+	particle_mat.emission = mesh_color
+	particle_mat.emission_energy_multiplier = 2.5
+	particle_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	particle_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	var sphere: SphereMesh = SphereMesh.new()
+	sphere.radius = 0.06
+	sphere.height = 0.12
+	sphere.material = particle_mat
+	particles.mesh = sphere
+	# Add to scene at enemy position, auto-cleanup after particles finish
+	particles.top_level = true
+	particles.global_position = global_position + Vector3(0, 1.0, 0)
+	get_tree().current_scene.add_child(particles)
+	particles.emitting = true
+	# Self-destruct after lifetime
+	var cleanup_tween: Tween = particles.create_tween()
+	cleanup_tween.tween_callback(particles.queue_free).set_delay(1.0)
+
+func _make_fadeout_curve() -> Curve:
+	var curve: Curve = Curve.new()
+	curve.add_point(Vector2(0.0, 1.0))
+	curve.add_point(Vector2(0.7, 0.6))
+	curve.add_point(Vector2(1.0, 0.0))
+	return curve
+
 func _respawn() -> void:
 	hp = max_hp
 	global_position = spawn_position
@@ -713,9 +783,8 @@ func _get_melee_reach() -> float:
 		return (collision_shape.shape as CapsuleShape3D).radius + 1.0
 	return 2.0
 
-## Snap this enemy's Y position to the Terrain3D surface.
-## Called every physics frame in the overworld (Terrain3D has no physics collider,
-## so gravity/is_on_floor() cannot work — we query height directly instead).
+## Snap this enemy's Y position to the ground surface.
+## Called every physics frame in the overworld.
 func _snap_to_terrain() -> void:
 	if _area_mgr == null:
 		_area_mgr = get_tree().get_first_node_in_group("area_manager")
@@ -726,6 +795,10 @@ func _snap_to_terrain() -> void:
 
 func _can_aggro() -> bool:
 	if _player == null:
+		return false
+	# Aggro stop: enemies don't aggro if player combat level >= 2.1x their level
+	var player_combat_level: int = GameState.get_combat_level()
+	if player_combat_level >= int(ceil(float(level) * 2.1)):
 		return false
 	return global_position.distance_squared_to(_player.global_position) <= aggro_range * aggro_range
 
@@ -988,26 +1061,41 @@ func _try_spread_burn(dot: Dictionary, radius: float) -> void:
 		break  # Only spread to one enemy per tick
 
 ## Build enemy mesh from the template system (replaces placeholder CSG)
+## Tries to load a pre-baked .tscn scene first; falls back to build_mesh().
 func _build_template_mesh() -> void:
 	if mesh_template == "":
 		return
 
-	# Look up the mesh builder for this template
+	# Look up the mesh builder for this template (needed for animate())
 	_mesh_builder = EnemyMeshBuilder.get_builder(mesh_template)
 	if _mesh_builder == null:
 		push_warning("EnemyController: No mesh builder for template '%s'" % mesh_template)
 		return
 
-	# Build the mesh with parameters from the enemy data
+	# Prepare params
 	var params: Dictionary = mesh_params.duplicate()
-	# Ensure color is an int for the builder
 	if params.has("color"):
 		if params["color"] is float:
 			params["color"] = int(params["color"])
-	# Scale up 4x to match JS world scale (JS does: params.scale = baseScale * 4)
 	var base_scale: float = float(params.get("scale", 1.0))
 	params["scale"] = base_scale * 4.0
-	_mesh_root = _mesh_builder.build_mesh(params)
+
+	# Try loading a pre-baked scene first
+	var scene_path: String = "res://scenes/enemies/meshes/%s.tscn" % mesh_template
+	if ResourceLoader.exists(scene_path):
+		var scene: PackedScene = load(scene_path)
+		if scene:
+			_mesh_root = scene.instantiate()
+			# Apply scale (baked at scale=1.0, need to scale to actual)
+			var s: float = params.get("scale", 4.0) as float
+			_mesh_root.scale = Vector3(s, s, s)
+			# Apply color shift from baked neutral gray to actual color
+			var actual_color: Color = EnemyMeshBuilder.int_to_color(params.get("color", 0x808080) as int)
+			_recolor_scene(_mesh_root, actual_color)
+
+	# Fall back to procedural build if no scene
+	if _mesh_root == null:
+		_mesh_root = _mesh_builder.build_mesh(params)
 
 	if _mesh_root == null:
 		push_warning("EnemyController: Mesh builder returned null for '%s'" % mesh_template)
@@ -1044,6 +1132,40 @@ func _build_template_mesh() -> void:
 
 	# Randomize animation phase so enemies aren't in sync
 	_anim_phase = randf() * TAU
+
+## Recolor a loaded scene's materials from baked neutral gray to the actual base color.
+## Materials derived from base_color (equal RGB channels when baked with gray) get shifted.
+## Fixed-color materials (eyes, fangs, etc. with unequal channels) are left alone.
+func _recolor_scene(root: Node3D, actual_base: Color) -> void:
+	var baked_base: Color = Color(0.5, 0.5, 0.5)
+	if root.has_meta("bake_base_color"):
+		baked_base = root.get_meta("bake_base_color")
+	var delta_r: float = actual_base.r - baked_base.r
+	var delta_g: float = actual_base.g - baked_base.g
+	var delta_b: float = actual_base.b - baked_base.b
+	for child in root.get_children():
+		if child is MeshInstance3D and child.material_override is StandardMaterial3D:
+			var src: StandardMaterial3D = child.material_override
+			var c: Color = src.albedo_color
+			# Check if this material was derived from base_color (equal channels when gray)
+			var avg: float = (c.r + c.g + c.b) / 3.0
+			var channel_spread: float = maxf(absf(c.r - avg), maxf(absf(c.g - avg), absf(c.b - avg)))
+			if channel_spread > 0.06:
+				continue  # Fixed color (eyes, fangs, etc.) — leave alone
+			var mat: StandardMaterial3D = src.duplicate()
+			mat.albedo_color = Color(
+				clampf(c.r + delta_r, 0.0, 1.0),
+				clampf(c.g + delta_g, 0.0, 1.0),
+				clampf(c.b + delta_b, 0.0, 1.0),
+				c.a)
+			if mat.emission_enabled:
+				var e: Color = mat.emission
+				mat.emission = Color(
+					clampf(e.r + delta_r, 0.0, 1.0),
+					clampf(e.g + delta_g, 0.0, 1.0),
+					clampf(e.b + delta_b, 0.0, 1.0),
+					e.a)
+			child.material_override = mat
 
 func _apply_visuals() -> void:
 	# Scale based on level and boss status

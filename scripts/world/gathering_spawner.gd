@@ -261,6 +261,78 @@ func _define_spawn_zones() -> void:
 		]
 	})
 
+	# ── Dimensional Weaving — Thread anchor nodes across all areas ──
+
+	# Station Hub: minor + standard threads
+	c = _area_center("station-hub")
+	_spawn_defs.append({
+		"area": "station-hub",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.7,
+		"skill": "dimensional_weaving",
+		"nodes": [
+			{"level": 1, "item": "minor_thread_filament", "color": Color(0.6, 0.3, 0.9), "count": 6},
+			{"level": 10, "item": "standard_thread_filament", "color": Color(0.7, 0.4, 0.95), "count": 4},
+		]
+	})
+
+	# Asteroid Mines: standard + major threads
+	c = _area_center("asteroid-mines")
+	_spawn_defs.append({
+		"area": "asteroid-mines",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.8,
+		"skill": "dimensional_weaving",
+		"nodes": [
+			{"level": 10, "item": "standard_thread_filament", "color": Color(0.7, 0.4, 0.95), "count": 5},
+			{"level": 20, "item": "major_thread_filament", "color": Color(0.8, 0.45, 1.0), "count": 3},
+		]
+	})
+
+	# Gathering Grounds: minor + major threads
+	c = _area_center("gathering-grounds")
+	_spawn_defs.append({
+		"area": "gathering-grounds",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.8,
+		"skill": "dimensional_weaving",
+		"nodes": [
+			{"level": 1, "item": "minor_thread_filament", "color": Color(0.6, 0.3, 0.9), "count": 5},
+			{"level": 20, "item": "major_thread_filament", "color": Color(0.8, 0.45, 1.0), "count": 3},
+		]
+	})
+
+	# Solarith Wastes: superior threads
+	c = _area_center("solarith-wastes")
+	_spawn_defs.append({
+		"area": "solarith-wastes",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.8,
+		"skill": "dimensional_weaving",
+		"nodes": [
+			{"level": 40, "item": "superior_thread_filament", "color": Color(0.85, 0.5, 1.0), "count": 4},
+		]
+	})
+
+	# Stalker Reaches: pristine threads
+	c = _area_center("stalker-reaches")
+	_spawn_defs.append({
+		"area": "stalker-reaches",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.75,
+		"skill": "dimensional_weaving",
+		"nodes": [
+			{"level": 60, "item": "pristine_thread_filament", "color": Color(0.9, 0.55, 1.0), "count": 3},
+		]
+	})
+
+	# Void Citadel: pristine + primordial threads
+	c = _area_center("void-citadel")
+	_spawn_defs.append({
+		"area": "void-citadel",
+		"cx": c.cx, "cz": c.cz, "radius": c.radius * 0.8,
+		"skill": "dimensional_weaving",
+		"nodes": [
+			{"level": 60, "item": "pristine_thread_filament", "color": Color(0.9, 0.55, 1.0), "count": 3},
+			{"level": 90, "item": "primordial_thread_filament", "color": Color(1.0, 0.6, 1.0), "count": 2},
+		]
+	})
+
 func _spawn_all_nodes() -> void:
 	var total: int = 0
 	var area_mgr: Node3D = get_tree().get_first_node_in_group("area_manager")

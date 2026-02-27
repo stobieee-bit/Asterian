@@ -68,9 +68,9 @@ func build_mesh(params: Dictionary) -> Node3D:
 		mat_rock,
 		Vector3(1.1, 0.95, 0.9))
 
-	# ── Torso belly plate (overlapping rock slab) ──
-	var belly: MeshInstance3D = EnemyMeshBuilder.add_box(
-		root, Vector3(0.50 * s, 0.35 * s, 0.25 * s),
+	# ── Torso belly plate (armored plate with panel-line grooves) ──
+	var belly: MeshInstance3D = EnemyMeshBuilder.add_armored_plate(
+		root, 0.50 * s, 0.35 * s, 0.25 * s,
 		Vector3(0.0, 0.80 * s, 0.20 * s),
 		mat_rock_dark,
 		Vector3(0.1, 0.0, 0.0))
@@ -147,71 +147,62 @@ func build_mesh(params: Dictionary) -> Node3D:
 		Vector3(-0.22 * s, 0.04 * s, 0.04 * s),
 		mat_rock_dark)
 
-	# ── Crystal spike growths on body (8 cones/boxes at angles) ──
+	# ── Crystal spike growths on body (faceted hexagonal crystals) ──
 	var crystals: Array[MeshInstance3D] = []
 
+	# Helper: add a faceted crystal spike (hexagonal tapered cylinder)
+	var _add_crystal := func(r: float, h: float, pt: float, pos: Vector3, rot: Vector3) -> MeshInstance3D:
+		var mi: MeshInstance3D = MeshInstance3D.new()
+		var cm: CylinderMesh = CylinderMesh.new()
+		cm.top_radius = maxf(pt * 0.15, 0.001)
+		cm.bottom_radius = r
+		cm.height = h + pt
+		cm.radial_segments = 6
+		mi.mesh = cm
+		mi.material_override = mat_crystal
+		mi.position = pos
+		mi.rotation = rot
+		root.add_child(mi)
+		return mi
+
 	# Right shoulder spike (large)
-	var c1: MeshInstance3D = EnemyMeshBuilder.add_cone(
-		root, 0.06 * s, 0.30 * s,
-		Vector3(0.40 * s, 1.35 * s, -0.05 * s),
-		mat_crystal,
-		Vector3(-0.3, 0.0, -0.6))
+	var c1: MeshInstance3D = _add_crystal.call(0.06 * s, 0.22 * s, 0.12 * s,
+		Vector3(0.40 * s, 1.35 * s, -0.05 * s), Vector3(-0.3, 0.0, -0.6))
 	crystals.append(c1)
 
 	# Left shoulder spike (large)
-	var c2: MeshInstance3D = EnemyMeshBuilder.add_cone(
-		root, 0.055 * s, 0.28 * s,
-		Vector3(-0.38 * s, 1.38 * s, 0.02 * s),
-		mat_crystal,
-		Vector3(-0.2, 0.0, 0.7))
+	var c2: MeshInstance3D = _add_crystal.call(0.055 * s, 0.20 * s, 0.10 * s,
+		Vector3(-0.38 * s, 1.38 * s, 0.02 * s), Vector3(-0.2, 0.0, 0.7))
 	crystals.append(c2)
 
 	# Back spike (tall)
-	var c3: MeshInstance3D = EnemyMeshBuilder.add_cone(
-		root, 0.05 * s, 0.35 * s,
-		Vector3(0.05 * s, 1.25 * s, -0.30 * s),
-		mat_crystal,
-		Vector3(0.4, 0.2, 0.0))
+	var c3: MeshInstance3D = _add_crystal.call(0.05 * s, 0.25 * s, 0.14 * s,
+		Vector3(0.05 * s, 1.25 * s, -0.30 * s), Vector3(0.4, 0.2, 0.0))
 	crystals.append(c3)
 
 	# Back spike small
-	var c4: MeshInstance3D = EnemyMeshBuilder.add_cone(
-		root, 0.035 * s, 0.20 * s,
-		Vector3(-0.12 * s, 1.15 * s, -0.28 * s),
-		mat_crystal,
-		Vector3(0.5, -0.3, 0.0))
+	var c4: MeshInstance3D = _add_crystal.call(0.035 * s, 0.14 * s, 0.08 * s,
+		Vector3(-0.12 * s, 1.15 * s, -0.28 * s), Vector3(0.5, -0.3, 0.0))
 	crystals.append(c4)
 
-	# Right arm crystal shard (box shape)
-	var c5: MeshInstance3D = EnemyMeshBuilder.add_box(
-		root, Vector3(0.04 * s, 0.18 * s, 0.04 * s),
-		Vector3(0.60 * s, 0.90 * s, 0.0),
-		mat_crystal,
-		Vector3(0.0, 0.3, -0.8))
+	# Right arm crystal shard
+	var c5: MeshInstance3D = _add_crystal.call(0.035 * s, 0.14 * s, 0.06 * s,
+		Vector3(0.60 * s, 0.90 * s, 0.0), Vector3(0.0, 0.3, -0.8))
 	crystals.append(c5)
 
-	# Left arm crystal shard (box shape)
-	var c6: MeshInstance3D = EnemyMeshBuilder.add_box(
-		root, Vector3(0.035 * s, 0.15 * s, 0.035 * s),
-		Vector3(-0.58 * s, 0.85 * s, 0.05 * s),
-		mat_crystal,
-		Vector3(0.2, -0.2, 0.7))
+	# Left arm crystal shard
+	var c6: MeshInstance3D = _add_crystal.call(0.03 * s, 0.12 * s, 0.05 * s,
+		Vector3(-0.58 * s, 0.85 * s, 0.05 * s), Vector3(0.2, -0.2, 0.7))
 	crystals.append(c6)
 
 	# Chest crystal emergence
-	var c7: MeshInstance3D = EnemyMeshBuilder.add_cone(
-		root, 0.04 * s, 0.16 * s,
-		Vector3(0.15 * s, 1.05 * s, 0.32 * s),
-		mat_crystal,
-		Vector3(-0.8, 0.2, 0.0))
+	var c7: MeshInstance3D = _add_crystal.call(0.04 * s, 0.12 * s, 0.06 * s,
+		Vector3(0.15 * s, 1.05 * s, 0.32 * s), Vector3(-0.8, 0.2, 0.0))
 	crystals.append(c7)
 
 	# Head crystal spike (small, sticking up)
-	var c8: MeshInstance3D = EnemyMeshBuilder.add_cone(
-		root, 0.03 * s, 0.14 * s,
-		Vector3(0.04 * s, 1.50 * s, -0.02 * s),
-		mat_crystal,
-		Vector3(0.15, 0.0, -0.2))
+	var c8: MeshInstance3D = _add_crystal.call(0.03 * s, 0.10 * s, 0.06 * s,
+		Vector3(0.04 * s, 1.50 * s, -0.02 * s), Vector3(0.15, 0.0, -0.2))
 	crystals.append(c8)
 
 	# ── Ground crystal cluster at feet (3 small cones sticking up) ──

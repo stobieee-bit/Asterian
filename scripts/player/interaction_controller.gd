@@ -310,6 +310,20 @@ func _try_right_click(event: InputEvent) -> void:
 			_player.get_viewport().set_input_as_handled()
 			return
 
+	# Check enemies (layer 4) — Entropy Scan context menu
+	var enemy_query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, from + dir * 200.0)
+	enemy_query.collision_mask = 4
+	enemy_query.exclude = [_player.get_rid()]
+	var enemy_result: Dictionary = space_state.intersect_ray(enemy_query)
+	if enemy_result:
+		var hit: Node = enemy_result.collider
+		while hit and not hit.is_in_group("enemies"):
+			hit = hit.get_parent()
+		if hit and hit.is_in_group("enemies"):
+			_show_enemy_context_menu(hit, screen_pos)
+			_player.get_viewport().set_input_as_handled()
+			return
+
 	# Check gathering nodes (layer 16)
 	var gather_query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, from + dir * 200.0)
 	gather_query.collision_mask = 16
@@ -323,3 +337,64 @@ func _try_right_click(event: InputEvent) -> void:
 			hit.show_context_menu(screen_pos)
 			_player.get_viewport().set_input_as_handled()
 			return
+
+## Show right-click context menu for enemies (includes Entropy Scan option)
+func _show_enemy_context_menu(enemy_node: Node, screen_pos: Vector2) -> void:
+	var enemy_name: String = "Enemy"
+	if "display_name" in enemy_node:
+		enemy_name = str(enemy_node.display_name)
+	elif "enemy_id" in enemy_node:
+		enemy_name = str(enemy_node.enemy_id).capitalize()
+
+	var enemy_level: int = 0
+	if "level" in enemy_node:
+		enemy_level = int(enemy_node.level)
+
+	var options: Array = []
+	options.append({"title": "%s (Lv %d)" % [enemy_name, enemy_level], "title_color": Color(0.9, 0.3, 0.3)})
+
+	# Attack option
+	options.append({
+		"label": "Attack",
+		"icon": "A",
+		"color": Color(0.9, 0.3, 0.3),
+		"callback": func():
+			var combat: Node = _player.get_node_or_null("CombatController")
+			if combat and "target" in combat:
+				combat.target = enemy_node
+	})
+
+	# Entropy Scan option
+	options.append({
+		"label": "Entropy Scan",
+		"icon": "E",
+		"color": Color(1.0, 0.4, 0.27),
+		"callback": func():
+			var entropy_sys: Node = get_tree().get_first_node_in_group("entropy_engineering_system")
+			if entropy_sys and entropy_sys.has_method("entropy_scan_enemy"):
+				entropy_sys.entropy_scan_enemy(enemy_node)
+			else:
+				EventBus.chat_message.emit("[Entropy] System not available.", "system")
+	})
+
+	# Examine option
+	var enemy_id: String = ""
+	if "enemy_id" in enemy_node:
+		enemy_id = str(enemy_node.enemy_id)
+	var scan_count: int = int(GameState.entropy_scans.get(enemy_id, 0))
+	var mastered: bool = GameState.entropy_mastery.has(enemy_id)
+	var examine_text: String = "%s — Lv %d" % [enemy_name, enemy_level]
+	if scan_count > 0:
+		examine_text += " | Scans: %d" % scan_count
+	if mastered:
+		examine_text += " | MASTERED"
+
+	options.append({
+		"label": "Examine",
+		"icon": "?",
+		"color": Color(0.6, 0.7, 0.8),
+		"callback": func():
+			EventBus.chat_message.emit(examine_text, "system")
+	})
+
+	EventBus.context_menu_requested.emit(options, screen_pos)

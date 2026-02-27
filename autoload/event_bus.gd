@@ -112,3 +112,13 @@ signal combo_completed(combo_id: String, combo_name: String)
 signal combo_progress(combo_id: String, step: int, total: int)
 signal kill_streak_updated(streak: int)
 signal rare_loot_dropped(item_id: String, position: Vector3)
+
+# ── Exploration skill signals ──
+signal scan_mode_toggled(active: bool)
+signal signal_fragment_collected(fragment_id: String)
+signal entropy_scan_performed(enemy_id: String, scan_count: int)
+signal entropy_mastery_unlocked(enemy_id: String)
+signal item_deconstructed(item_id: String, outputs: Dictionary)
+signal construct_placed(construct_type: String, position: Vector3)
+signal construct_expired(construct_type: String)
+signal thread_anchor_revealed(position: Vector3)

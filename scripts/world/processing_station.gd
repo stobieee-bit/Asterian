@@ -236,5 +236,11 @@ func _get_skill_color() -> Color:
 			return Color(0.2, 0.7, 0.7)
 		"astromining":
 			return Color(0.6, 0.6, 0.55)
+		"signal_archaeology":
+			return Color(0.2, 0.7, 0.9)
+		"entropy_engineering":
+			return Color(0.9, 0.35, 0.2)
+		"dimensional_weaving":
+			return Color(0.6, 0.3, 0.9)
 		_:
 			return Color(0.4, 0.4, 0.4)

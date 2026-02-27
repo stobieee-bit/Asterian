@@ -1,0 +1,902 @@
+[gd_scene load_steps=87 format=3]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jr7vt"]
+albedo_color = Color(0.501961, 0.501961, 0.501961, 1)
+metallic = 0.35
+roughness = 0.45
+
+[sub_resource type="SphereMesh" id="SphereMesh_hbbrd"]
+radius = 0.16
+height = 0.32
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6jix8"]
+albedo_color = Color(0.9, 0.1, 0.05, 1)
+metallic = 0.6
+roughness = 0.2
+emission_enabled = true
+emission = Color(0.9, 0.1, 0.05, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_ghvrj"]
+radius = 0.09
+height = 0.18
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_udjde"]
+radius = 0.09
+height = 0.18
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_65whd"]
+albedo_color = Color(0.75, 0.08, 0.04, 1)
+metallic = 0.7
+roughness = 0.15
+emission_enabled = true
+emission = Color(0.75, 0.08, 0.04, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="SphereMesh" id="SphereMesh_31mnp"]
+radius = 0.035
+height = 0.07
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_ql5ud"]
+radius = 0.032
+height = 0.064
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_u33dp"]
+radius = 0.03
+height = 0.06
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_x0uhh"]
+radius = 0.035
+height = 0.07
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_bmah2"]
+radius = 0.032
+height = 0.064
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_7ngbi"]
+radius = 0.03
+height = 0.06
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r3fw5"]
+albedo_color = Color(0.381961, 0.381961, 0.381961, 1)
+metallic = 0.3
+roughness = 0.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_m2gr2"]
+top_radius = 0.001
+bottom_radius = 0.025
+height = 0.08
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_8gmlx"]
+top_radius = 0.001
+bottom_radius = 0.025
+height = 0.08
+radial_segments = 16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ikxpx"]
+albedo_color = Color(0.421961, 0.421961, 0.421961, 1)
+metallic = 0.2
+roughness = 0.6
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_fx051"]
+radius = 0.01
+height = 0.37
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_w7de8"]
+radius = 0.01
+height = 0.37
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_p1ovf"]
+radius = 0.07
+height = 0.49
+radial_segments = 16
+
+[sub_resource type="TorusMesh" id="TorusMesh_lxcs3"]
+inner_radius = 0.0265
+outer_radius = 0.0385
+rings = 20
+ring_segments = 16
+
+[sub_resource type="TorusMesh" id="TorusMesh_ealpa"]
+inner_radius = 0.0265
+outer_radius = 0.0385
+rings = 20
+ring_segments = 16
+
+[sub_resource type="TorusMesh" id="TorusMesh_mo77w"]
+inner_radius = 0.0265
+outer_radius = 0.0385
+rings = 20
+ring_segments = 16
+
+[sub_resource type="SphereMesh" id="SphereMesh_dvgnh"]
+radius = 0.18
+height = 0.36
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_yt3q8"]
+radius = 0.16
+height = 0.32
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_qb3es"]
+radius = 0.15
+height = 0.3
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_rixr8"]
+radius = 0.14
+height = 0.28
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_0ldd5"]
+radius = 0.13
+height = 0.26
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eimpr"]
+transparency = 1
+albedo_color = Color(0.201961, 0.201961, 0.201961, 0.6)
+metallic = 0.15
+roughness = 0.7
+
+[sub_resource type="TorusMesh" id="TorusMesh_qd5nv"]
+inner_radius = 0.066
+outer_radius = 0.074
+rings = 20
+ring_segments = 16
+
+[sub_resource type="TorusMesh" id="TorusMesh_y2pcq"]
+inner_radius = 0.05975
+outer_radius = 0.06775
+rings = 20
+ring_segments = 16
+
+[sub_resource type="TorusMesh" id="TorusMesh_bohs6"]
+inner_radius = 0.0535
+outer_radius = 0.0615
+rings = 20
+ring_segments = 16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_87dyc"]
+albedo_color = Color(0.55, 0.38, 0.18, 1)
+metallic = 0.15
+roughness = 0.75
+
+[sub_resource type="SphereMesh" id="SphereMesh_bm1lh"]
+radius = 0.06
+height = 0.12
+radial_segments = 16
+rings = 8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_13quw"]
+radius = 0.03
+height = 0.13
+radial_segments = 16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qu6dj"]
+transparency = 1
+albedo_color = Color(0.701961, 0.701961, 0.701961, 0.4)
+metallic = 0.1
+roughness = 0.3
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_colwl"]
+radius = 0.03
+height = 0.24
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_02aje"]
+radius = 0.005
+height = 0.15
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_nudk6"]
+radius = 0.004
+height = 0.128
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_htutw"]
+radius = 0.004
+height = 0.108
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_2ggnt"]
+radius = 0.003
+height = 0.086
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_2n47f"]
+radius = 0.03
+height = 0.24
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_pkcc6"]
+radius = 0.005
+height = 0.15
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_cjw4u"]
+radius = 0.004
+height = 0.128
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_4iysa"]
+radius = 0.004
+height = 0.108
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_k3u51"]
+radius = 0.003
+height = 0.086
+radial_segments = 16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q8ekd"]
+albedo_color = Color(0.601961, 0.601961, 0.601961, 1)
+metallic = 0.5
+roughness = 0.35
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_xd2v7"]
+radius = 0.04
+height = 0.28
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_kvt5l"]
+radius = 0.035
+height = 0.29
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_yx4m2"]
+radius = 0.025
+height = 0.25
+radial_segments = 16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8wl4j"]
+albedo_color = Color(0.301961, 0.301961, 0.301961, 1)
+metallic = 0.6
+roughness = 0.3
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_jgp6s"]
+top_radius = 0.001
+bottom_radius = 0.012
+height = 0.05
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_4h8jd"]
+top_radius = 0.001
+bottom_radius = 0.012
+height = 0.05
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_dop0c"]
+top_radius = 0.001
+bottom_radius = 0.012
+height = 0.05
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_0ca5w"]
+top_radius = 0.001
+bottom_radius = 0.01
+height = 0.04
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_vfd0k"]
+top_radius = 0.001
+bottom_radius = 0.01
+height = 0.04
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_f6uie"]
+top_radius = 0.001
+bottom_radius = 0.01
+height = 0.04
+radial_segments = 16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6kp62"]
+albedo_color = Color(0.651961, 0.651961, 0.651961, 1)
+metallic = 0.1
+roughness = 0.8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_way5c"]
+radius = 0.008
+height = 0.056
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_eotc7"]
+radius = 0.008
+height = 0.056
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_htoaj"]
+radius = 0.04
+height = 0.28
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_5av0f"]
+radius = 0.035
+height = 0.29
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_n2lul"]
+radius = 0.025
+height = 0.25
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_iih2d"]
+top_radius = 0.001
+bottom_radius = 0.012
+height = 0.05
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ib8j1"]
+top_radius = 0.001
+bottom_radius = 0.012
+height = 0.05
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_3f6qc"]
+top_radius = 0.001
+bottom_radius = 0.012
+height = 0.05
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ikdun"]
+top_radius = 0.001
+bottom_radius = 0.01
+height = 0.04
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_hew7u"]
+top_radius = 0.001
+bottom_radius = 0.01
+height = 0.04
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_gfomi"]
+top_radius = 0.001
+bottom_radius = 0.01
+height = 0.04
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_0wnx7"]
+radius = 0.008
+height = 0.056
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_yih2d"]
+radius = 0.008
+height = 0.056
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_70nq2"]
+radius = 0.02
+height = 0.22
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_0oube"]
+radius = 0.015
+height = 0.18
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_npi8q"]
+radius = 0.012
+height = 0.104
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_e0ryn"]
+top_radius = 0.001
+bottom_radius = 0.008
+height = 0.025
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_w8v84"]
+radius = 0.02
+height = 0.22
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_cpfsj"]
+radius = 0.015
+height = 0.18
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_63lwg"]
+radius = 0.012
+height = 0.104
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_2clkr"]
+top_radius = 0.001
+bottom_radius = 0.008
+height = 0.025
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_6bb0y"]
+radius = 0.02
+height = 0.22
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_cxjvl"]
+radius = 0.015
+height = 0.18
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_6sbx8"]
+radius = 0.012
+height = 0.104
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ovci8"]
+top_radius = 0.001
+bottom_radius = 0.008
+height = 0.025
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_kfsej"]
+radius = 0.02
+height = 0.22
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_q0y4i"]
+radius = 0.015
+height = 0.18
+radial_segments = 16
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_wp3oi"]
+radius = 0.012
+height = 0.104
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_4c7ph"]
+top_radius = 0.001
+bottom_radius = 0.008
+height = 0.025
+radial_segments = 16
+
+[node name="mantis" type="Node3D"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+metadata/head = [Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 0.75, 0, 0, 0, 0.85, 0, 0.75, 0.65),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_jr7vt"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_hbbrd"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+]
+metadata/antennae = [Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.955337, 0.29552, 0, -0.205891, 0.665589, 0.717356, 0.211993, -0.685316, 0.696707, -0.06, 0.88, 0.75),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_ikxpx"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_fx051"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.955337, -0.29552, 0, 0.205891, 0.665589, 0.717356, -0.211993, -0.685316, 0.696707, 0.06, 0.88, 0.75),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_ikxpx"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_w7de8"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+]
+metadata/prothorax = [Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 0.921061, -0.389418, 0, 0.389418, 0.921061, 0, 0.7, 0.35),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_jr7vt"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CapsuleMesh_p1ovf"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+]
+metadata/mesothorax = [Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1.1, 0, 0, 0, 0.7, 0, 0, 0, 1.3, 0, 0.5, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_jr7vt"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_dvgnh"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+]
+metadata/abdomen = [Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 0.75, 0, 0, 0, 1.15, 0, 0.45, -0.2),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_jr7vt"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_yt3q8"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 0.75, 0, 0, 0, 1.15, 0, 0.41, -0.38),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_r3fw5"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_qb3es"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 0.75, 0, 0, 0, 1.15, 0, 0.37, -0.56),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_jr7vt"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_rixr8"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 0.75, 0, 0, 0, 1.15, 0, 0.33, -0.74),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_r3fw5"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_0ldd5"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+]
+metadata/rapt_arms = [Object(Node3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.6, 0.2),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"script":null)
+, Object(Node3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.6, 0.2),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"script":null)
+]
+metadata/walk_legs = [Object(Node3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.16, 0.4, 0.05),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"script":null)
+, Object(Node3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16, 0.4, 0.05),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"script":null)
+, Object(Node3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.16, 0.4, -0.15),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"script":null)
+, Object(Node3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16, 0.4, -0.15),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"script":null)
+]
+metadata/eyes = [Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.78, 0.7),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_6jix8"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_ghvrj"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+, Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"physics_interpolation_mode":0,"auto_translate_mode":0,"editor_description":"","transform":Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.78, 0.7),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":SubResource("StandardMaterial3D_6jix8"),"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_texel_scale":1.0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("SphereMesh_udjde"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+]
+metadata/scale = 1.0
+metadata/bake_base_color = Color(0.501961, 0.501961, 0.501961, 1)
+metadata/bake_scale = 1.0
+
+[node name="mantis_part_0" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.75, 0, 0, 0, 0.85, 0, 0.75, 0.65)
+material_override = SubResource("StandardMaterial3D_jr7vt")
+mesh = SubResource("SphereMesh_hbbrd")
+
+[node name="mantis_part_1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.78, 0.7)
+material_override = SubResource("StandardMaterial3D_6jix8")
+mesh = SubResource("SphereMesh_ghvrj")
+
+[node name="mantis_part_2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.78, 0.7)
+material_override = SubResource("StandardMaterial3D_6jix8")
+mesh = SubResource("SphereMesh_udjde")
+
+[node name="mantis_part_3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.14, 0.82, 0.72)
+material_override = SubResource("StandardMaterial3D_65whd")
+mesh = SubResource("SphereMesh_31mnp")
+
+[node name="mantis_part_4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0.81, 0.74)
+material_override = SubResource("StandardMaterial3D_65whd")
+mesh = SubResource("SphereMesh_ql5ud")
+
+[node name="mantis_part_5" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.13, 0.76, 0.73)
+material_override = SubResource("StandardMaterial3D_65whd")
+mesh = SubResource("SphereMesh_u33dp")
+
+[node name="mantis_part_6" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.14, 0.82, 0.72)
+material_override = SubResource("StandardMaterial3D_65whd")
+mesh = SubResource("SphereMesh_x0uhh")
+
+[node name="mantis_part_7" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.81, 0.74)
+material_override = SubResource("StandardMaterial3D_65whd")
+mesh = SubResource("SphereMesh_bmah2")
+
+[node name="mantis_part_8" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13, 0.76, 0.73)
+material_override = SubResource("StandardMaterial3D_65whd")
+mesh = SubResource("SphereMesh_7ngbi")
+
+[node name="mantis_part_9" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.980067, -0.198669, 0, 0.163969, 0.808884, -0.564642, 0.112177, 0.553387, 0.825336, -0.05, 0.7, 0.78)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CylinderMesh_m2gr2")
+
+[node name="mantis_part_10" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.980067, 0.198669, 0, -0.163969, 0.808884, -0.564642, -0.112177, 0.553387, 0.825336, 0.05, 0.7, 0.78)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CylinderMesh_8gmlx")
+
+[node name="mantis_part_11" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.955337, 0.29552, 0, -0.205891, 0.665589, 0.717356, 0.211993, -0.685316, 0.696707, -0.06, 0.88, 0.75)
+material_override = SubResource("StandardMaterial3D_ikxpx")
+mesh = SubResource("CapsuleMesh_fx051")
+
+[node name="mantis_part_12" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.955337, -0.29552, 0, 0.205891, 0.665589, 0.717356, -0.211993, -0.685316, 0.696707, 0.06, 0.88, 0.75)
+material_override = SubResource("StandardMaterial3D_ikxpx")
+mesh = SubResource("CapsuleMesh_w7de8")
+
+[node name="mantis_part_13" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.921061, -0.389418, 0, 0.389418, 0.921061, 0, 0.7, 0.35)
+material_override = SubResource("StandardMaterial3D_jr7vt")
+mesh = SubResource("CapsuleMesh_p1ovf")
+
+[node name="mantis_part_14" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.921061, -0.389418, 0, 0.389418, 0.921061, 0, 0.72, 0.48)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("TorusMesh_lxcs3")
+
+[node name="mantis_part_15" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.921061, -0.389418, 0, 0.389418, 0.921061, 0, 0.71, 0.415)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("TorusMesh_ealpa")
+
+[node name="mantis_part_16" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.921061, -0.389418, 0, 0.389418, 0.921061, 0, 0.7, 0.35)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("TorusMesh_mo77w")
+
+[node name="mantis_part_17" type="MeshInstance3D" parent="."]
+transform = Transform3D(1.1, 0, 0, 0, 0.7, 0, 0, 0, 1.3, 0, 0.5, 0)
+material_override = SubResource("StandardMaterial3D_jr7vt")
+mesh = SubResource("SphereMesh_dvgnh")
+
+[node name="mantis_part_18" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.75, 0, 0, 0, 1.15, 0, 0.45, -0.2)
+material_override = SubResource("StandardMaterial3D_jr7vt")
+mesh = SubResource("SphereMesh_yt3q8")
+
+[node name="mantis_part_19" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.75, 0, 0, 0, 1.15, 0, 0.41, -0.38)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("SphereMesh_qb3es")
+
+[node name="mantis_part_20" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.75, 0, 0, 0, 1.15, 0, 0.37, -0.56)
+material_override = SubResource("StandardMaterial3D_jr7vt")
+mesh = SubResource("SphereMesh_rixr8")
+
+[node name="mantis_part_21" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.75, 0, 0, 0, 1.15, 0, 0.33, -0.74)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("SphereMesh_0ldd5")
+
+[node name="mantis_part_22" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.43, -0.29)
+material_override = SubResource("StandardMaterial3D_eimpr")
+mesh = SubResource("TorusMesh_qd5nv")
+
+[node name="mantis_part_23" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.39, -0.47)
+material_override = SubResource("StandardMaterial3D_eimpr")
+mesh = SubResource("TorusMesh_y2pcq")
+
+[node name="mantis_part_24" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, -0.65)
+material_override = SubResource("StandardMaterial3D_eimpr")
+mesh = SubResource("TorusMesh_bohs6")
+
+[node name="mantis_part_25" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9, 0, 0, 0, 0.8, 0, 0, 0, 1.2, 0, 0.29, -0.86)
+material_override = SubResource("StandardMaterial3D_87dyc")
+mesh = SubResource("SphereMesh_bm1lh")
+
+[node name="mantis_part_26" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.980067, -0.198669, 0, 0.198669, 0.980067, 0, 0.27, -0.92)
+material_override = SubResource("StandardMaterial3D_87dyc")
+mesh = SubResource("CapsuleMesh_13quw")
+
+[node name="mantis_part_27" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.640702, 0.743961, -0.189796, -0.685316, 0.665589, 0.29552, 0.346182, -0.0592702, 0.936293, -0.18, 0.58, -0.08)
+material_override = SubResource("StandardMaterial3D_qu6dj")
+mesh = SubResource("CapsuleMesh_colwl")
+
+[node name="mantis_part_28" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.657204, 0.740069, -0.142764, -0.685316, 0.665589, 0.29552, 0.313727, -0.0963786, 0.944609, -0.17, 0.59, -0.07)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_02aje")
+
+[node name="mantis_part_29" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.649172, 0.70469, -0.286333, -0.660448, 0.708942, 0.247404, 0.377337, 0.0285004, 0.925637, -0.19, 0.58, -0.09)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_nudk6")
+
+[node name="mantis_part_30" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.630968, 0.77012, -0.0937808, -0.705732, 0.61997, 0.342898, 0.322214, -0.150173, 0.93468, -0.2, 0.57, -0.06)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_htutw")
+
+[node name="mantis_part_31" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.674586, 0.657264, -0.336063, -0.631376, 0.749596, 0.198669, 0.38249, 0.0781625, 0.920648, -0.16, 0.6, -0.1)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_2ggnt")
+
+[node name="mantis_part_32" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.640702, -0.743961, 0.189796, 0.685316, 0.665589, 0.29552, -0.346182, -0.0592702, 0.936293, 0.18, 0.58, -0.08)
+material_override = SubResource("StandardMaterial3D_qu6dj")
+mesh = SubResource("CapsuleMesh_2n47f")
+
+[node name="mantis_part_33" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.657204, -0.740069, 0.142764, 0.685316, 0.665589, 0.29552, -0.313727, -0.0963786, 0.944609, 0.17, 0.59, -0.07)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_pkcc6")
+
+[node name="mantis_part_34" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.649172, -0.70469, 0.286333, 0.660448, 0.708942, 0.247404, -0.377337, 0.0285004, 0.925637, 0.19, 0.58, -0.09)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_cjw4u")
+
+[node name="mantis_part_35" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.630968, -0.77012, 0.0937808, 0.705732, 0.61997, 0.342898, -0.322214, -0.150173, 0.93468, 0.2, 0.57, -0.06)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_4iysa")
+
+[node name="mantis_part_36" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.674586, -0.657264, 0.336063, 0.631376, 0.749596, 0.198669, -0.38249, 0.0781625, 0.920648, 0.16, 0.6, -0.1)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_k3u51")
+
+[node name="@Node3D@341" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.6, 0.2)
+
+[node name="@MeshInstance3D@342" type="MeshInstance3D" parent="@Node3D@341"]
+transform = Transform3D(0.988771, 0.149438, 0, -0.123337, 0.816068, 0.564642, 0.0843791, -0.558302, 0.825336, -0.05, 0.05, 0.1)
+material_override = SubResource("StandardMaterial3D_q8ekd")
+mesh = SubResource("CapsuleMesh_xd2v7")
+
+[node name="@MeshInstance3D@343" type="MeshInstance3D" parent="@Node3D@341"]
+transform = Transform3D(0.995004, 0.0998334, 0, -0.0953745, 0.950564, 0.29552, 0.0295028, -0.294044, 0.955337, -0.08, -0.1, 0.25)
+material_override = SubResource("StandardMaterial3D_q8ekd")
+mesh = SubResource("CapsuleMesh_kvt5l")
+
+[node name="@MeshInstance3D@344" type="MeshInstance3D" parent="@Node3D@341"]
+transform = Transform3D(0.99875, 0.0499792, 0, -0.0460339, 0.91991, -0.389418, -0.0194628, 0.388932, 0.921061, -0.06, -0.25, 0.35)
+material_override = SubResource("StandardMaterial3D_q8ekd")
+mesh = SubResource("CapsuleMesh_yx4m2")
+
+[node name="@MeshInstance3D@345" type="MeshInstance3D" parent="@Node3D@341"]
+transform = Transform3D(0.362358, 0.932039, 0, -0.932039, 0.362358, 0, 0, 0, 1, -0.12, -0.05, 0.22)
+material_override = SubResource("StandardMaterial3D_8wl4j")
+mesh = SubResource("CylinderMesh_jgp6s")
+
+[node name="@MeshInstance3D@346" type="MeshInstance3D" parent="@Node3D@341"]
+transform = Transform3D(0.362358, 0.932039, 0, -0.932039, 0.362358, 0, 0, 0, 1, -0.13, -0.09, 0.25)
+material_override = SubResource("StandardMaterial3D_8wl4j")
+mesh = SubResource("CylinderMesh_4h8jd")
+
+[node name="@MeshInstance3D@347" type="MeshInstance3D" parent="@Node3D@341"]
+transform = Transform3D(0.362358, 0.932039, 0, -0.932039, 0.362358, 0, 0, 0, 1, -0.14, -0.13, 0.28)
+material_override = SubResource("StandardMaterial3D_8wl4j")
+mesh = SubResource("CylinderMesh_dop0c")
+
+[node name="@MeshInstance3D@348" type="MeshInstance3D" parent="@Node3D@341"]
+transform = Transform3D(0.540302, 0.841471, 0, -0.841471, 0.540302, 0, 0, 0, 1, -0.08, -0.2, 0.32)
+material_override = SubResource("StandardMaterial3D_8wl4j")
+mesh = SubResource("CylinderMesh_0ca5w")
+
+[node name="@MeshInstance3D@349" type="MeshInstance3D" parent="@Node3D@341"]
+transform = Transform3D(0.540302, 0.841471, 0, -0.841471, 0.540302, 0, 0, 0, 1, -0.0875, -0.23, 0.34)
+material_override = SubResource("StandardMaterial3D_8wl4j")
+mesh = SubResource("CylinderMesh_vfd0k")
+
+[node name="@MeshInstance3D@350" type="MeshInstance3D" parent="@Node3D@341"]
+transform = Transform3D(0.540302, 0.841471, 0, -0.841471, 0.540302, 0, 0, 0, 1, -0.095, -0.26, 0.36)
+material_override = SubResource("StandardMaterial3D_8wl4j")
+mesh = SubResource("CylinderMesh_f6uie")
+
+[node name="@MeshInstance3D@351" type="MeshInstance3D" parent="@Node3D@341"]
+transform = Transform3D(0.877583, 0.479426, 0, -0.458013, 0.838387, 0.29552, 0.14168, -0.259343, 0.955337, -0.06, -0.06, 0.23)
+material_override = SubResource("StandardMaterial3D_6kp62")
+mesh = SubResource("CapsuleMesh_way5c")
+
+[node name="@MeshInstance3D@352" type="MeshInstance3D" parent="@Node3D@341"]
+transform = Transform3D(0.900447, 0.434966, 0, -0.421443, 0.872454, 0.247404, 0.107612, -0.222774, 0.968912, -0.065, -0.12, 0.27)
+material_override = SubResource("StandardMaterial3D_6kp62")
+mesh = SubResource("CapsuleMesh_eotc7")
+
+[node name="@Node3D@353" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.6, 0.2)
+
+[node name="@MeshInstance3D@354" type="MeshInstance3D" parent="@Node3D@353"]
+transform = Transform3D(0.988771, -0.149438, 0, 0.123337, 0.816068, 0.564642, -0.0843791, -0.558302, 0.825336, 0.05, 0.05, 0.1)
+material_override = SubResource("StandardMaterial3D_q8ekd")
+mesh = SubResource("CapsuleMesh_htoaj")
+
+[node name="@MeshInstance3D@355" type="MeshInstance3D" parent="@Node3D@353"]
+transform = Transform3D(0.995004, -0.0998334, 0, 0.0953745, 0.950564, 0.29552, -0.0295028, -0.294044, 0.955337, 0.08, -0.1, 0.25)
+material_override = SubResource("StandardMaterial3D_q8ekd")
+mesh = SubResource("CapsuleMesh_5av0f")
+
+[node name="@MeshInstance3D@356" type="MeshInstance3D" parent="@Node3D@353"]
+transform = Transform3D(0.99875, -0.0499792, 0, 0.0460339, 0.91991, -0.389418, 0.0194628, 0.388932, 0.921061, 0.06, -0.25, 0.35)
+material_override = SubResource("StandardMaterial3D_q8ekd")
+mesh = SubResource("CapsuleMesh_n2lul")
+
+[node name="@MeshInstance3D@357" type="MeshInstance3D" parent="@Node3D@353"]
+transform = Transform3D(0.362358, -0.932039, 0, 0.932039, 0.362358, 0, 0, 0, 1, 0.12, -0.05, 0.22)
+material_override = SubResource("StandardMaterial3D_8wl4j")
+mesh = SubResource("CylinderMesh_iih2d")
+
+[node name="@MeshInstance3D@358" type="MeshInstance3D" parent="@Node3D@353"]
+transform = Transform3D(0.362358, -0.932039, 0, 0.932039, 0.362358, 0, 0, 0, 1, 0.13, -0.09, 0.25)
+material_override = SubResource("StandardMaterial3D_8wl4j")
+mesh = SubResource("CylinderMesh_ib8j1")
+
+[node name="@MeshInstance3D@359" type="MeshInstance3D" parent="@Node3D@353"]
+transform = Transform3D(0.362358, -0.932039, 0, 0.932039, 0.362358, 0, 0, 0, 1, 0.14, -0.13, 0.28)
+material_override = SubResource("StandardMaterial3D_8wl4j")
+mesh = SubResource("CylinderMesh_3f6qc")
+
+[node name="@MeshInstance3D@360" type="MeshInstance3D" parent="@Node3D@353"]
+transform = Transform3D(0.540302, -0.841471, 0, 0.841471, 0.540302, 0, 0, 0, 1, 0.08, -0.2, 0.32)
+material_override = SubResource("StandardMaterial3D_8wl4j")
+mesh = SubResource("CylinderMesh_ikdun")
+
+[node name="@MeshInstance3D@361" type="MeshInstance3D" parent="@Node3D@353"]
+transform = Transform3D(0.540302, -0.841471, 0, 0.841471, 0.540302, 0, 0, 0, 1, 0.0875, -0.23, 0.34)
+material_override = SubResource("StandardMaterial3D_8wl4j")
+mesh = SubResource("CylinderMesh_hew7u")
+
+[node name="@MeshInstance3D@362" type="MeshInstance3D" parent="@Node3D@353"]
+transform = Transform3D(0.540302, -0.841471, 0, 0.841471, 0.540302, 0, 0, 0, 1, 0.095, -0.26, 0.36)
+material_override = SubResource("StandardMaterial3D_8wl4j")
+mesh = SubResource("CylinderMesh_gfomi")
+
+[node name="@MeshInstance3D@363" type="MeshInstance3D" parent="@Node3D@353"]
+transform = Transform3D(0.877583, -0.479426, 0, 0.458013, 0.838387, 0.29552, -0.14168, -0.259343, 0.955337, 0.06, -0.06, 0.23)
+material_override = SubResource("StandardMaterial3D_6kp62")
+mesh = SubResource("CapsuleMesh_0wnx7")
+
+[node name="@MeshInstance3D@364" type="MeshInstance3D" parent="@Node3D@353"]
+transform = Transform3D(0.900447, -0.434966, 0, 0.421443, 0.872454, 0.247404, -0.107612, -0.222774, 0.968912, 0.065, -0.12, 0.27)
+material_override = SubResource("StandardMaterial3D_6kp62")
+mesh = SubResource("CapsuleMesh_yih2d")
+
+[node name="@Node3D@365" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.16, 0.4, 0.05)
+
+[node name="@MeshInstance3D@366" type="MeshInstance3D" parent="@Node3D@365"]
+transform = Transform3D(0.764842, 0.644218, 0, -0.644218, 0.764842, 0, 0, 0, 1, -0.08, -0.05, 0)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_70nq2")
+
+[node name="@MeshInstance3D@367" type="MeshInstance3D" parent="@Node3D@365"]
+transform = Transform3D(0.955337, 0.29552, 0, -0.289629, 0.936293, -0.198669, -0.0587108, 0.189796, 0.980067, -0.2, -0.15, 0)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_0oube")
+
+[node name="@MeshInstance3D@368" type="MeshInstance3D" parent="@Node3D@365"]
+transform = Transform3D(1, 0, 0, 0, 0.877583, -0.479426, 0, 0.479426, 0.877583, -0.25, -0.28, 0.02)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_npi8q")
+
+[node name="@MeshInstance3D@369" type="MeshInstance3D" parent="@Node3D@365"]
+transform = Transform3D(0.980067, 0.198669, 0, -0.138414, 0.682819, -0.717356, -0.142517, 0.703057, 0.696707, -0.27, -0.32, 0.03)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CylinderMesh_e0ryn")
+
+[node name="@Node3D@370" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16, 0.4, 0.05)
+
+[node name="@MeshInstance3D@371" type="MeshInstance3D" parent="@Node3D@370"]
+transform = Transform3D(0.764842, -0.644218, 0, 0.644218, 0.764842, 0, 0, 0, 1, 0.08, -0.05, 0)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_w8v84")
+
+[node name="@MeshInstance3D@372" type="MeshInstance3D" parent="@Node3D@370"]
+transform = Transform3D(0.955337, -0.29552, 0, 0.289629, 0.936293, -0.198669, 0.0587108, 0.189796, 0.980067, 0.2, -0.15, 0)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_cpfsj")
+
+[node name="@MeshInstance3D@373" type="MeshInstance3D" parent="@Node3D@370"]
+transform = Transform3D(1, 0, 0, 0, 0.877583, -0.479426, 0, 0.479426, 0.877583, 0.25, -0.28, 0.02)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_63lwg")
+
+[node name="@MeshInstance3D@374" type="MeshInstance3D" parent="@Node3D@370"]
+transform = Transform3D(0.980067, -0.198669, 0, 0.138414, 0.682819, -0.717356, 0.142517, 0.703057, 0.696707, 0.27, -0.32, 0.03)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CylinderMesh_2clkr")
+
+[node name="@Node3D@375" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.16, 0.4, -0.15)
+
+[node name="@MeshInstance3D@376" type="MeshInstance3D" parent="@Node3D@375"]
+transform = Transform3D(0.764842, 0.644218, 0, -0.644218, 0.764842, 0, 0, 0, 1, -0.08, -0.05, 0)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_6bb0y")
+
+[node name="@MeshInstance3D@377" type="MeshInstance3D" parent="@Node3D@375"]
+transform = Transform3D(0.955337, 0.29552, 0, -0.289629, 0.936293, -0.198669, -0.0587108, 0.189796, 0.980067, -0.2, -0.15, 0)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_cxjvl")
+
+[node name="@MeshInstance3D@378" type="MeshInstance3D" parent="@Node3D@375"]
+transform = Transform3D(1, 0, 0, 0, 0.877583, -0.479426, 0, 0.479426, 0.877583, -0.25, -0.28, 0.02)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_6sbx8")
+
+[node name="@MeshInstance3D@379" type="MeshInstance3D" parent="@Node3D@375"]
+transform = Transform3D(0.980067, 0.198669, 0, -0.138414, 0.682819, -0.717356, -0.142517, 0.703057, 0.696707, -0.27, -0.32, 0.03)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CylinderMesh_ovci8")
+
+[node name="@Node3D@380" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16, 0.4, -0.15)
+
+[node name="@MeshInstance3D@381" type="MeshInstance3D" parent="@Node3D@380"]
+transform = Transform3D(0.764842, -0.644218, 0, 0.644218, 0.764842, 0, 0, 0, 1, 0.08, -0.05, 0)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_kfsej")
+
+[node name="@MeshInstance3D@382" type="MeshInstance3D" parent="@Node3D@380"]
+transform = Transform3D(0.955337, -0.29552, 0, 0.289629, 0.936293, -0.198669, 0.0587108, 0.189796, 0.980067, 0.2, -0.15, 0)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_q0y4i")
+
+[node name="@MeshInstance3D@383" type="MeshInstance3D" parent="@Node3D@380"]
+transform = Transform3D(1, 0, 0, 0, 0.877583, -0.479426, 0, 0.479426, 0.877583, 0.25, -0.28, 0.02)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CapsuleMesh_wp3oi")
+
+[node name="@MeshInstance3D@384" type="MeshInstance3D" parent="@Node3D@380"]
+transform = Transform3D(0.980067, -0.198669, 0, 0.138414, 0.682819, -0.717356, 0.142517, 0.703057, 0.696707, 0.27, -0.32, 0.03)
+material_override = SubResource("StandardMaterial3D_r3fw5")
+mesh = SubResource("CylinderMesh_4c7ph")

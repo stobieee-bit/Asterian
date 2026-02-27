@@ -1,8 +1,9 @@
-## EnemyMeshBuilder — Base class for procedural enemy mesh templates
+## EnemyMeshBuilder — Base class for enemy mesh templates
 ##
-## Provides shared utilities for building enemy meshes from CSG primitives
-## and MeshInstance3D nodes. Each template (insectoid, jellyfish, etc.)
-## extends this class and implements build_mesh().
+## Provides shared utilities for building enemy meshes using Godot's built-in
+## PrimitiveMesh resources (SphereMesh, BoxMesh, CylinderMesh, etc.).
+## Each template (insectoid, jellyfish, etc.) extends this class and
+## implements build_mesh().
 ##
 ## Usage:
 ##   var builder: EnemyMeshBuilder = InsectoidMeshBuilder.new()
@@ -63,102 +64,161 @@ static func mat_basic(color: Color, opacity: float = 1.0) -> StandardMaterial3D:
 		mat.albedo_color.a = opacity
 	return mat
 
-## Add a sphere mesh to a parent node
+# ── Primitive Mesh Helpers ─────────────────────────────────────────────────
+
+## Add a sphere mesh (SphereMesh) to a parent node
 static func add_sphere(parent: Node3D, radius: float, pos: Vector3,
 		material: StandardMaterial3D, scale_xyz: Vector3 = Vector3.ONE) -> MeshInstance3D:
-	var mesh: MeshInstance3D = MeshInstance3D.new()
-	var sphere: SphereMesh = SphereMesh.new()
-	sphere.radius = radius
-	sphere.height = radius * 2.0
-	sphere.radial_segments = 16
-	sphere.rings = 8
-	mesh.mesh = sphere
-	mesh.material_override = material
-	mesh.position = pos
-	mesh.scale = scale_xyz
-	parent.add_child(mesh)
-	return mesh
+	var mi: MeshInstance3D = MeshInstance3D.new()
+	var sm: SphereMesh = SphereMesh.new()
+	sm.radius = radius
+	sm.height = radius * 2.0
+	sm.radial_segments = 16
+	sm.rings = 8
+	mi.mesh = sm
+	mi.material_override = material
+	mi.position = pos
+	mi.scale = scale_xyz
+	parent.add_child(mi)
+	return mi
 
-## Add a capsule mesh to a parent node
+## Add a capsule mesh (CapsuleMesh) to a parent node
 static func add_capsule(parent: Node3D, radius: float, height: float, pos: Vector3,
 		material: StandardMaterial3D, rot: Vector3 = Vector3.ZERO) -> MeshInstance3D:
-	var mesh: MeshInstance3D = MeshInstance3D.new()
-	var capsule: CapsuleMesh = CapsuleMesh.new()
-	capsule.radius = radius
-	capsule.height = height + radius * 2.0
-	mesh.mesh = capsule
-	mesh.material_override = material
-	mesh.position = pos
-	mesh.rotation = rot
-	parent.add_child(mesh)
-	return mesh
+	var mi: MeshInstance3D = MeshInstance3D.new()
+	var cm: CapsuleMesh = CapsuleMesh.new()
+	cm.radius = radius
+	cm.height = maxf(height + radius * 2.0, radius * 2.0)
+	cm.radial_segments = 16
+	cm.rings = 8
+	mi.mesh = cm
+	mi.material_override = material
+	mi.position = pos
+	mi.rotation = rot
+	parent.add_child(mi)
+	return mi
 
-## Add a cylinder mesh to a parent node
+## Add a cylinder mesh (CylinderMesh) to a parent node
 static func add_cylinder(parent: Node3D, top_radius: float, bottom_radius: float,
 		height: float, pos: Vector3, material: StandardMaterial3D,
 		rot: Vector3 = Vector3.ZERO) -> MeshInstance3D:
-	var mesh: MeshInstance3D = MeshInstance3D.new()
-	var cyl: CylinderMesh = CylinderMesh.new()
-	cyl.top_radius = top_radius
-	cyl.bottom_radius = bottom_radius
-	cyl.height = height
-	cyl.radial_segments = 12
-	mesh.mesh = cyl
-	mesh.material_override = material
-	mesh.position = pos
-	mesh.rotation = rot
-	parent.add_child(mesh)
-	return mesh
+	var mi: MeshInstance3D = MeshInstance3D.new()
+	var cm: CylinderMesh = CylinderMesh.new()
+	cm.top_radius = maxf(top_radius, 0.001)
+	cm.bottom_radius = maxf(bottom_radius, 0.001)
+	cm.height = height
+	cm.radial_segments = 16
+	mi.mesh = cm
+	mi.material_override = material
+	mi.position = pos
+	mi.rotation = rot
+	parent.add_child(mi)
+	return mi
 
-## Add a cone (cylinder with top_radius=0)
+## Add a cone (CylinderMesh with top_radius near 0)
 static func add_cone(parent: Node3D, radius: float, height: float, pos: Vector3,
 		material: StandardMaterial3D, rot: Vector3 = Vector3.ZERO) -> MeshInstance3D:
-	return add_cylinder(parent, 0.0, radius, height, pos, material, rot)
+	return add_cylinder(parent, 0.001, radius, height, pos, material, rot)
 
-## Add a box mesh to a parent node
+## Add a box mesh (BoxMesh) to a parent node
 static func add_box(parent: Node3D, size: Vector3, pos: Vector3,
 		material: StandardMaterial3D, rot: Vector3 = Vector3.ZERO) -> MeshInstance3D:
-	var mesh: MeshInstance3D = MeshInstance3D.new()
-	var box: BoxMesh = BoxMesh.new()
-	box.size = size
-	mesh.mesh = box
-	mesh.material_override = material
-	mesh.position = pos
-	mesh.rotation = rot
-	parent.add_child(mesh)
-	return mesh
+	var mi: MeshInstance3D = MeshInstance3D.new()
+	var bm: BoxMesh = BoxMesh.new()
+	bm.size = size
+	mi.mesh = bm
+	mi.material_override = material
+	mi.position = pos
+	mi.rotation = rot
+	parent.add_child(mi)
+	return mi
 
-## Add a torus mesh to a parent node
+## Add a torus mesh (TorusMesh) to a parent node
+## inner_radius / outer_radius refer to the overall torus hole/outer-edge radii
 static func add_torus(parent: Node3D, inner_radius: float, outer_radius: float,
 		pos: Vector3, material: StandardMaterial3D,
 		rot: Vector3 = Vector3.ZERO) -> MeshInstance3D:
-	var mesh: MeshInstance3D = MeshInstance3D.new()
-	var torus: TorusMesh = TorusMesh.new()
-	torus.inner_radius = inner_radius
-	torus.outer_radius = outer_radius
-	torus.rings = 16
-	torus.ring_segments = 12
-	mesh.mesh = torus
-	mesh.material_override = material
-	mesh.position = pos
-	mesh.rotation = rot
-	parent.add_child(mesh)
-	return mesh
+	var mi: MeshInstance3D = MeshInstance3D.new()
+	var tm: TorusMesh = TorusMesh.new()
+	var tube_r: float = (outer_radius - inner_radius) / 2.0
+	var major_r: float = (inner_radius + outer_radius) / 2.0
+	tm.inner_radius = maxf(tube_r, 0.001)
+	tm.outer_radius = maxf(major_r, 0.002)
+	tm.rings = 20
+	tm.ring_segments = 16
+	mi.mesh = tm
+	mi.material_override = material
+	mi.position = pos
+	mi.rotation = rot
+	parent.add_child(mi)
+	return mi
+
+## Add an armored plate (BoxMesh approximation)
+static func add_armored_plate(parent: Node3D, width: float, height: float, depth: float,
+		pos: Vector3, material: StandardMaterial3D,
+		rot: Vector3 = Vector3.ZERO) -> MeshInstance3D:
+	return add_box(parent, Vector3(width, height, depth), pos, material, rot)
+
+## Add a segmented limb (CapsuleMesh approximation)
+static func add_segmented_limb(parent: Node3D, length: float, radius: float,
+		pos: Vector3, material: StandardMaterial3D,
+		rot: Vector3 = Vector3.ZERO, joints: int = 2,
+		bulge: float = 1.3, taper: float = 0.7) -> MeshInstance3D:
+	return add_capsule(parent, radius, length, pos, material, rot)
+
+## Add a ridge strip (BoxMesh approximation — flat raised strip)
+static func add_ridge_strip(parent: Node3D, length: float, width: float,
+		pos: Vector3, material: StandardMaterial3D,
+		rot: Vector3 = Vector3.ZERO, ridges: int = 5,
+		ridge_height: float = 0.02) -> MeshInstance3D:
+	return add_box(parent, Vector3(width, ridge_height * ridges, length), pos, material, rot)
+
+## Add a maw (TorusMesh approximation — ring opening)
+static func add_maw(parent: Node3D, radius: float, pos: Vector3,
+		material: StandardMaterial3D, rot: Vector3 = Vector3.ZERO,
+		teeth: int = 6, tooth_len: float = 0.1) -> MeshInstance3D:
+	var mi: MeshInstance3D = MeshInstance3D.new()
+	var tm: TorusMesh = TorusMesh.new()
+	tm.inner_radius = radius * 0.3
+	tm.outer_radius = radius
+	tm.rings = 16
+	tm.ring_segments = 12
+	mi.mesh = tm
+	mi.material_override = material
+	mi.position = pos
+	mi.rotation = rot
+	parent.add_child(mi)
+	return mi
+
+## Add a ring band (TorusMesh — flat annular ring)
+static func add_ring_band(parent: Node3D, inner_r: float, outer_r: float,
+		thickness: float, pos: Vector3, material: StandardMaterial3D,
+		rot: Vector3 = Vector3.ZERO) -> MeshInstance3D:
+	var mi: MeshInstance3D = MeshInstance3D.new()
+	var tm: TorusMesh = TorusMesh.new()
+	var tube_r: float = (outer_r - inner_r) / 2.0
+	var major_r: float = (inner_r + outer_r) / 2.0
+	tm.inner_radius = maxf(tube_r, 0.001)
+	tm.outer_radius = maxf(major_r, 0.002)
+	tm.rings = 20
+	tm.ring_segments = 16
+	mi.mesh = tm
+	mi.material_override = material
+	mi.position = pos
+	mi.rotation = rot
+	parent.add_child(mi)
+	return mi
+
+# ── Base Class Methods ─────────────────────────────────────────────────────
 
 ## Build the enemy mesh. Override in subclasses.
-## Returns the root Node3D containing all mesh parts.
-## params: Dictionary with "color" (int), "scale" (float), "variant" (String), etc.
 func build_mesh(params: Dictionary) -> Node3D:
 	push_warning("EnemyMeshBuilder.build_mesh() not overridden!")
 	var root: Node3D = Node3D.new()
-	# Fallback: magenta debug sphere
 	add_sphere(root, 0.5, Vector3(0, 0.5, 0), mat_basic(Color(1, 0, 1)))
 	return root
 
 ## Animate the mesh each frame. Override in subclasses for walk/idle cycles.
-## phase: accumulated animation time (radians)
-## is_moving: whether the enemy is walking
-## delta: frame delta time
 func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 	pass
 
@@ -176,9 +236,7 @@ static func animate_death(root: Node3D, progress: float) -> void:
 	root.scale = Vector3(s, s, s)
 	root.position.y = -0.5 * progress
 
-# ── Template Registry ──
-# Maps mesh template names to builder instances.
-# Populated by _register_templates() called once at startup.
+# ── Template Registry ──────────────────────────────────────────────────────
 static var _builders: Dictionary = {}
 static var _initialized: bool = false
 

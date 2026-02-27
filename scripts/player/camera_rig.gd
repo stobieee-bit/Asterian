@@ -37,6 +37,31 @@ func _ready() -> void:
 	_follow_target = get_parent()
 	# Make this node top-level so it doesn't rotate with the player
 	top_level = true
+	# Connect combat signals for screen shake
+	EventBus.hit_landed.connect(_on_hit_landed)
+	EventBus.combo_completed.connect(_on_combo_completed)
+	EventBus.enemy_killed.connect(_on_enemy_killed)
+
+## Screen shake on hit — scales with damage, stronger for crits
+func _on_hit_landed(target: Node, damage: int, is_crit: bool, attacker: Node) -> void:
+	var player: Node = get_parent()
+	if target == player:
+		# Player taking damage — moderate shake
+		shake(clampf(float(damage) / 40.0, 0.08, 0.25))
+	elif attacker == player:
+		# Player dealing damage — light shake, stronger for crits
+		var base: float = clampf(float(damage) / 60.0, 0.03, 0.15)
+		if is_crit:
+			base *= 2.0
+		shake(base)
+
+## Stronger shake on combo completion
+func _on_combo_completed(_combo_id: String, _combo_name: String) -> void:
+	shake(0.3)
+
+## Brief shake on enemy kill
+func _on_enemy_killed(_enemy_id: String, _enemy_type: String) -> void:
+	shake(0.12)
 
 func _process(delta: float) -> void:
 	if _follow_target == null:

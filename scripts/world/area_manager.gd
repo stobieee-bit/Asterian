@@ -1,7 +1,7 @@
 ## AreaManager — Builds a richly detailed 3D sci-fi world from JSON area data
 ##
 ## Reads AREAS and CORRIDORS from DataManager and generates:
-## - Ground discs for each area (CSGCylinder3D) with layered detail
+## - Ground discs for each area (MeshInstance3D via PrimitiveMesh) with layered detail
 ## - Corridor ground boxes with guide lights and wall structures
 ## - Environmental props: energy pylons, tech panels, alien flora, crystals,
 ##   floating debris, light columns, pipe structures, ruined walls, platforms
@@ -20,8 +20,7 @@ const GROUND_Y: float = -0.1
 # ── References ──
 @onready var world_env: WorldEnvironment = $"../WorldEnvironment"
 
-# ── Terrain ──
-var _terrain3d = null  # Terrain3D plugin node (painted terrain)
+# ── Terrain (removed Terrain3D — using flat ground + navmesh) ──
 
 # ── Area collision detection ──
 var _area_bodies: Dictionary = {}   # { area_id: { center: Vector3, radius: float } }
@@ -36,65 +35,26 @@ var _time: float = 0.0
 
 func _ready() -> void:
 	add_to_group("area_manager")
-	# Find Terrain3D plugin node (user-painted terrain)
-	_terrain3d = _find_terrain3d(get_tree().root)
-	if _terrain3d:
-		# Verify Terrain3D actually has usable data (GDExtension may load but data may fail)
-		var has_data: bool = false
-		if _terrain3d.get("data") != null:
-			has_data = true
-			# Quick sanity check — if height at origin is NaN, data is broken
-			var test_h: float = _terrain3d.data.get_height(Vector3.ZERO)
-			if is_nan(test_h):
-				has_data = false
-		if has_data:
-			print("AreaManager: Found Terrain3D node with valid data")
-		else:
-			push_warning("AreaManager: Terrain3D found but data is broken — disabling and using fallback")
-			_terrain3d.visible = false
-			# Disable Terrain3D collision so raycasts hit the fallback ground instead
-			if _terrain3d.has_method("set_collision_enabled"):
-				_terrain3d.set_collision_enabled(false)
-			elif "collision_enabled" in _terrain3d:
-				_terrain3d.collision_enabled = false
-			_terrain3d = null
-			_add_fallback_ground()
-	else:
-		push_warning("AreaManager: Terrain3D node not found — adding fallback ground plane")
-		_add_fallback_ground()
+	_add_fallback_ground()
 	_build_areas()
 	_build_corridors()
 	_build_corridor_gates()
 	_add_area_boundaries()
 	_add_safety_floor()
+	_setup_enhanced_glow()
 	await get_tree().process_frame
 	_player = get_tree().get_first_node_in_group("player")
 
 ## Public API: query terrain height at any world XZ position.
-## Uses Terrain3D plugin (painted terrain in editor).
-func get_terrain_height(x: float, z: float) -> float:
-	if _terrain3d and _terrain3d.data:
-		var h: float = _terrain3d.data.get_height(Vector3(x, 0.0, z))
-		if not is_nan(h):
-			return h
+## Returns 0.0 (flat ground plane). Override or extend for elevation.
+func get_terrain_height(_x: float, _z: float) -> float:
 	return 0.0
 
 ## Internal shorthand for prop placement.
-func _terrain_y(x: float, z: float) -> float:
-	return get_terrain_height(x, z)
+func _terrain_y(_x: float, _z: float) -> float:
+	return 0.0
 
-## Recursively search the scene tree for a Terrain3D node.
-func _find_terrain3d(node: Node):
-	if node.get_class() == "Terrain3D":
-		return node
-	for child in node.get_children():
-		var found = _find_terrain3d(child)
-		if found:
-			return found
-	return null
-
-## Add a visible ground plane when Terrain3D is not available (web export fallback).
-## Creates a large flat mesh + collision at y=0 so the world has a visible floor.
+## Add a visible ground plane with collision at y=0.
 func _add_fallback_ground() -> void:
 	var body := StaticBody3D.new()
 	body.name = "FallbackGround"
@@ -107,24 +67,68 @@ func _add_fallback_ground() -> void:
 	col.shape = shape
 	body.add_child(col)
 
-	# Visible mesh — large flat plane with a subtle sci-fi ground color
+	# Visible mesh — large flat plane with subtle sci-fi feel
 	var mesh_inst := MeshInstance3D.new()
 	var plane_mesh := PlaneMesh.new()
 	plane_mesh.size = Vector2(2000.0, 2000.0)
-	plane_mesh.subdivide_width = 0
-	plane_mesh.subdivide_depth = 0
+	plane_mesh.subdivide_width = 4
+	plane_mesh.subdivide_depth = 4
 	mesh_inst.mesh = plane_mesh
 
 	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.12, 0.14, 0.16, 1.0)  # Dark sci-fi ground
-	mat.roughness = 0.95
-	mat.metallic = 0.05
+	mat.albedo_color = Color(0.06, 0.08, 0.12, 1.0)  # Dark blue-gray sci-fi ground
+	mat.roughness = 0.85
+	mat.metallic = 0.15
+	mat.emission_enabled = true
+	mat.emission = Color(0.015, 0.02, 0.04)
+	mat.emission_energy_multiplier = 0.2
 	mesh_inst.material_override = mat
 	body.add_child(mesh_inst)
 
 	body.position = Vector3(0, -0.25, 0)  # Mesh surface at y=0
 	add_child(body)
 	print("AreaManager: Fallback ground plane added at y=0")
+
+## Add a colored ground disc per area.
+func _add_area_ground_disc(area_id: String, cx: float, cz: float, radius: float,
+		base_color: Color, floor_y: float) -> void:
+	# Outer disc — area base color
+	var disc := MeshInstance3D.new()
+	disc.name = "GroundDisc_%s" % area_id
+	var _disc_mesh := CylinderMesh.new()
+	_disc_mesh.top_radius = radius
+	_disc_mesh.bottom_radius = radius
+	_disc_mesh.height = 0.15
+	_disc_mesh.radial_segments = 16
+	disc.mesh = _disc_mesh
+	disc.position = Vector3(cx, floor_y + 0.08, cz)
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = base_color
+	mat.roughness = 0.8
+	mat.metallic = 0.1
+	mat.emission_enabled = true
+	mat.emission = base_color.darkened(0.5)
+	mat.emission_energy_multiplier = 0.15
+	disc.material_override = mat
+	add_child(disc)
+
+	# Inner disc — lighter center for visual depth
+	var inner := MeshInstance3D.new()
+	inner.name = "GroundDiscInner_%s" % area_id
+	var inner_r: float = radius * 0.7
+	var _inner_mesh := CylinderMesh.new()
+	_inner_mesh.top_radius = inner_r
+	_inner_mesh.bottom_radius = inner_r
+	_inner_mesh.height = 0.16
+	_inner_mesh.radial_segments = 16
+	inner.mesh = _inner_mesh
+	inner.position = Vector3(cx, floor_y + 0.09, cz)
+	var inner_mat := StandardMaterial3D.new()
+	inner_mat.albedo_color = base_color.lightened(0.08)
+	inner_mat.roughness = 0.75
+	inner_mat.metallic = 0.12
+	inner.material_override = inner_mat
+	add_child(inner)
 
 var _gate_update_timer: float = 0.0
 var _area_check_timer: float = 0.0  # Throttle area transition checks
@@ -151,9 +155,29 @@ func _process(delta: float) -> void:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 func _build_areas() -> void:
+	var loaded_count: int = 0
+	var built_count: int = 0
 	for area_id in DataManager.areas:
-		_create_area_ground(area_id, DataManager.areas[area_id])
-	print("AreaManager: Built %d area grounds" % _area_bodies.size())
+		var data: Dictionary = DataManager.areas[area_id]
+		# Always register area body for detection (needed even if loading a scene)
+		var cx: float = float(data.get("center", {}).get("x", 0.0))
+		var cz: float = float(data.get("center", {}).get("z", 0.0))
+		var radius: float = data.get("radius", 50.0)
+		var floor_y: float = float(data.get("floorY", 0.0))
+		_area_bodies[area_id] = { "center": Vector3(cx, floor_y, cz), "radius": radius }
+		# Try loading baked scene
+		var scene_path: String = "res://scenes/areas/%s.tscn" % area_id
+		if ResourceLoader.exists(scene_path):
+			var scene: PackedScene = load(scene_path)
+			if scene:
+				var instance: Node3D = scene.instantiate()
+				add_child(instance)
+				loaded_count += 1
+				continue
+		# Fallback: procedural building
+		_create_area_ground(area_id, data)
+		built_count += 1
+	print("AreaManager: %d areas loaded from scenes, %d built procedurally" % [loaded_count, built_count])
 
 func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	var center_x: float = float(data.get("center", {}).get("x", 0.0))
@@ -162,10 +186,15 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	var ground_color_int: int = int(data.get("groundColor", 0x1a2030))
 	var floor_y: float = float(data.get("floorY", 0.0))
 
-	var logical_center: Vector3 = Vector3(center_x, floor_y, center_z)
-	_area_bodies[area_id] = { "center": logical_center, "radius": radius }
+	# _area_bodies is now registered in _build_areas() before scene loading
+	if not _area_bodies.has(area_id):
+		var logical_center: Vector3 = Vector3(center_x, floor_y, center_z)
+		_area_bodies[area_id] = { "center": logical_center, "radius": radius }
 
 	var base_color: Color = _hex_to_color(ground_color_int)
+
+	# ── Area ground disc ──
+	_add_area_ground_disc(area_id, center_x, center_z, radius, base_color, floor_y)
 
 	# ── Area label (terrain-relative, with subtle pole) ──
 	var label_y: float = _terrain_y(center_x, center_z) + 8.0
@@ -180,15 +209,18 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	label.no_depth_test = true
 	add_child(label)
 	# Holographic sign pole
-	var sign_pole: CSGCylinder3D = CSGCylinder3D.new()
-	sign_pole.radius = 0.04
-	sign_pole.height = 8.0
-	sign_pole.sides = 4
-	sign_pole.position = Vector3(center_x, _terrain_y(center_x, center_z) + 4.0, center_z)
 	var pole_mat: StandardMaterial3D = StandardMaterial3D.new()
 	pole_mat.albedo_color = Color(0.3, 0.5, 0.6, 0.4)
 	pole_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	sign_pole.material = pole_mat
+	var sign_pole: MeshInstance3D = MeshInstance3D.new()
+	var _pole_mesh := CylinderMesh.new()
+	_pole_mesh.top_radius = 0.04
+	_pole_mesh.bottom_radius = 0.04
+	_pole_mesh.height = 8.0
+	_pole_mesh.radial_segments = 16
+	sign_pole.mesh = _pole_mesh
+	sign_pole.material_override = pole_mat
+	sign_pole.position = Vector3(center_x, _terrain_y(center_x, center_z) + 4.0, center_z)
 	add_child(sign_pole)
 
 	# y_base kept for compatibility with decoration functions (they'll use _terrain_y internally)
@@ -214,7 +246,7 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 	_add_area_unique_structures(area_id, center_x, center_z, radius, base_color, y_base)
 	_add_point_lights(area_id, center_x, center_z, radius, base_color, y_base)
 
-	# ── Edge atmosphere — subtle glow ring at terrain boundary ──
+	# ── Edge atmosphere — subtle glow ring at terrain boundaries ──
 	_add_edge_atmosphere(area_id, center_x, center_z, radius, base_color, floor_y)
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -222,7 +254,7 @@ func _create_area_ground(area_id: String, data: Dictionary) -> void:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 ## Adds a ring of faint glowing fog at the terrain edge to mask the hard boundary.
-## Uses a CSGTorus3D with a semi-transparent emissive material.
+## Uses a MeshInstance3D + TorusMesh with a semi-transparent emissive material.
 func _add_edge_atmosphere(area_id: String, cx: float, cz: float, radius: float,
 		base_color: Color, floor_y: float) -> void:
 	# Skip very small areas (like bio-lab) — edges aren't visible
@@ -232,24 +264,28 @@ func _add_edge_atmosphere(area_id: String, cx: float, cz: float, radius: float,
 	var edge_y: float = _terrain_y(cx + radius * 0.85, cz) if radius < 100.0 \
 		else floor_y
 
-	# Outer fog ring — wide, very faint
-	var fog_ring: CSGTorus3D = CSGTorus3D.new()
-	fog_ring.inner_radius = radius * 0.88
-	fog_ring.outer_radius = radius * 1.02
-	fog_ring.ring_sides = 8
-	fog_ring.sides = 48 if radius > 100.0 else 32
+	# Outer fog ring — thin, very faint glow at terrain edge
+	var fog_ring: MeshInstance3D = MeshInstance3D.new()
+	var ir: float = radius * 0.97
+	var or_: float = radius * 1.01
+	var _fog_torus := TorusMesh.new()
+	_fog_torus.inner_radius = ir
+	_fog_torus.outer_radius = or_
+	_fog_torus.rings = 20
+	_fog_torus.ring_segments = 16
+	fog_ring.mesh = _fog_torus
 	fog_ring.position = Vector3(cx, floor_y + 0.3, cz)
 
 	var fog_mat: StandardMaterial3D = StandardMaterial3D.new()
 	var fog_color: Color = base_color.lightened(0.2)
-	fog_mat.albedo_color = Color(fog_color.r, fog_color.g, fog_color.b, 0.08)
+	fog_mat.albedo_color = Color(fog_color.r, fog_color.g, fog_color.b, 0.04)
 	fog_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	fog_mat.emission_enabled = true
 	fog_mat.emission = fog_color
-	fog_mat.emission_energy_multiplier = 0.3
+	fog_mat.emission_energy_multiplier = 0.15
 	fog_mat.no_depth_test = false
 	fog_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	fog_ring.material = fog_mat
+	fog_ring.material_override = fog_mat
 	fog_ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(fog_ring)
 
@@ -331,21 +367,41 @@ func _clutter_density(area_id: String) -> float:
 #  DETAIL LAYERS
 # ═══════════════════════════════════════════════════════════════════════════════
 
-## Scatter rocks and boulders of various sizes
+## Scatter rocks and boulders of various sizes with material variety
 func _add_rocks_and_boulders(area_id: String, cx: float, cz: float, radius: float,
 		base_color: Color, y_base: float) -> void:
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = area_id.hash()
 
-	var rock_mat: StandardMaterial3D = StandardMaterial3D.new()
-	rock_mat.albedo_color = base_color.darkened(0.3)
-	rock_mat.roughness = 0.85
-	rock_mat.metallic = 0.1
+	# Create 5 material variants for visual variety
+	var rock_variants: Array[StandardMaterial3D] = []
+	for v in range(5):
+		var vm := StandardMaterial3D.new()
+		var shift: float = (v - 2) * 0.04  # -0.08, -0.04, 0, 0.04, 0.08
+		vm.albedo_color = base_color.darkened(0.3 + shift)
+		vm.roughness = 0.75 + v * 0.04
+		vm.metallic = 0.08 + v * 0.03
+		# Some variants have faint emission (glowing mineral veins)
+		if v == 0 or v == 4:
+			vm.emission_enabled = true
+			vm.emission = base_color.lightened(0.4)
+			vm.emission_energy_multiplier = 0.12
+		rock_variants.append(vm)
 
 	# Scale count by area size, reduced by per-area clutter density
 	var rock_count: int = int((12 + radius * 0.08) * _clutter_density(area_id))
 	rock_count = maxi(rock_count, 2)  # Always at least a couple
 	rock_count = mini(rock_count, 40)  # Cap for performance
+
+	# Create 5 rock blob variants (approximated with SphereMesh)
+	var rock_meshes: Array[SphereMesh] = []
+	for v in range(5):
+		var _rock_sph := SphereMesh.new()
+		_rock_sph.radius = 1.0
+		_rock_sph.height = 2.0
+		_rock_sph.radial_segments = 16
+		_rock_sph.rings = 8
+		rock_meshes.append(_rock_sph)
 
 	for i in range(rock_count):
 		var angle: float = rng.randf() * TAU
@@ -353,24 +409,17 @@ func _add_rocks_and_boulders(area_id: String, cx: float, cz: float, radius: floa
 		var rock_r: float = rng.randf_range(0.3, 2.5)
 		var rx: float = cx + cos(angle) * dist
 		var rz: float = cz + sin(angle) * dist
-		var rock: CSGSphere3D = CSGSphere3D.new()
-		rock.radius = rock_r
-		rock.radial_segments = 6
-		rock.rings = 4
-		rock.position = Vector3(
-			rx,
-			_terrain_y(rx, rz) + rock_r * 0.2,
-			rz
-		)
+		var rock: MeshInstance3D = MeshInstance3D.new()
+		rock.mesh = rock_meshes[i % rock_meshes.size()]
+		rock.position = Vector3(rx, _terrain_y(rx, rz) + rock_r * 0.2, rz)
 		rock.scale = Vector3(
-			1.0 + rng.randf() * 0.6,
-			0.25 + rng.randf() * 0.5,
-			1.0 + rng.randf() * 0.6
+			rock_r * (1.0 + rng.randf() * 0.6),
+			rock_r * (0.25 + rng.randf() * 0.5),
+			rock_r * (1.0 + rng.randf() * 0.6)
 		)
 		rock.rotation.y = rng.randf() * TAU
-		rock.material = rock_mat
+		rock.material_override = rock_variants[i % rock_variants.size()]
 		add_child(rock)
-		# No collision — scatter rocks are decorative; collision traps the player
 
 ## Energy pylons — tall glowing pillars scattered through the area
 func _add_energy_pylons(area_id: String, cx: float, cz: float, radius: float,
@@ -390,24 +439,29 @@ func _add_energy_pylons(area_id: String, cx: float, cz: float, radius: float,
 		var height: float = rng.randf_range(4.0, 12.0)
 
 		# Base pedestal
-		var pedestal: CSGCylinder3D = CSGCylinder3D.new()
-		pedestal.radius = 0.8
-		pedestal.height = 0.6
-		pedestal.sides = 6
+		var pedestal: MeshInstance3D = MeshInstance3D.new()
+		var _ped_mesh := CylinderMesh.new()
+		_ped_mesh.top_radius = 0.8
+		_ped_mesh.bottom_radius = 0.8
+		_ped_mesh.height = 0.6
+		_ped_mesh.radial_segments = 16
+		pedestal.mesh = _ped_mesh
 		pedestal.position = Vector3(px, ty + 0.3, pz)
 		var ped_mat: StandardMaterial3D = StandardMaterial3D.new()
 		ped_mat.albedo_color = base_color.darkened(0.2)
 		ped_mat.metallic = 0.6
 		ped_mat.roughness = 0.3
-		pedestal.material = ped_mat
+		pedestal.material_override = ped_mat
 		add_child(pedestal)
-		# No collision — thin pylons are walk-through scenery to avoid trapping player
 
 		# Main column
-		var column: CSGCylinder3D = CSGCylinder3D.new()
-		column.radius = 0.25
-		column.height = height
-		column.sides = 8
+		var column: MeshInstance3D = MeshInstance3D.new()
+		var _col_mesh := CylinderMesh.new()
+		_col_mesh.top_radius = 0.25
+		_col_mesh.bottom_radius = 0.25
+		_col_mesh.height = height
+		_col_mesh.radial_segments = 16
+		column.mesh = _col_mesh
 		column.position = Vector3(px, ty + height * 0.5 + 0.6, pz)
 		var col_mat: StandardMaterial3D = StandardMaterial3D.new()
 		col_mat.albedo_color = base_color.darkened(0.1)
@@ -416,31 +470,36 @@ func _add_energy_pylons(area_id: String, cx: float, cz: float, radius: float,
 		col_mat.emission_enabled = true
 		col_mat.emission = base_color.lightened(0.3)
 		col_mat.emission_energy_multiplier = 0.5
-		column.material = col_mat
+		column.material_override = col_mat
 		add_child(column)
 
 		# Glowing energy orb on top
-		var orb: CSGSphere3D = CSGSphere3D.new()
-		orb.radius = 0.4
-		orb.radial_segments = 12
-		orb.rings = 6
+		var orb: MeshInstance3D = MeshInstance3D.new()
+		var _orb_mesh := SphereMesh.new()
+		_orb_mesh.radius = 0.4
+		_orb_mesh.height = 0.8
+		_orb_mesh.radial_segments = 16
+		_orb_mesh.rings = 8
+		orb.mesh = _orb_mesh
 		orb.position = Vector3(px, ty + height + 1.0, pz)
 		var orb_mat: StandardMaterial3D = StandardMaterial3D.new()
 		orb_mat.albedo_color = base_color.lightened(0.5)
 		orb_mat.emission_enabled = true
 		orb_mat.emission = base_color.lightened(0.6)
 		orb_mat.emission_energy_multiplier = 2.0
-		orb.material = orb_mat
+		orb.material_override = orb_mat
 		add_child(orb)
 
 		# Horizontal ring around the orb
-		var h_ring: CSGTorus3D = CSGTorus3D.new()
-		h_ring.inner_radius = 0.55
-		h_ring.outer_radius = 0.7
-		h_ring.ring_sides = 6
-		h_ring.sides = 16
+		var h_ring: MeshInstance3D = MeshInstance3D.new()
+		var _hring_torus := TorusMesh.new()
+		_hring_torus.inner_radius = 0.55
+		_hring_torus.outer_radius = 0.7
+		_hring_torus.rings = 20
+		_hring_torus.ring_segments = 16
+		h_ring.mesh = _hring_torus
 		h_ring.position = Vector3(px, ty + height + 1.0, pz)
-		h_ring.material = orb_mat
+		h_ring.material_override = orb_mat
 		add_child(h_ring)
 
 		# Register orb for animation (gentle hover + pulse)
@@ -473,12 +532,9 @@ func _add_tech_panels(area_id: String, cx: float, cz: float, radius: float,
 		var pz: float = cz + sin(angle) * dist
 		var ty: float = _terrain_y(px, pz)
 
-		var panel: CSGBox3D = CSGBox3D.new()
 		var pw: float = rng.randf_range(1.5, 4.0)
 		var pd: float = rng.randf_range(1.0, 3.0)
-		panel.size = Vector3(pw, 0.08, pd)
-		panel.position = Vector3(px, ty + 0.04, pz)  # Flush with terrain surface
-		panel.rotation.y = rng.randf() * TAU
+		var panel_yaw: float = rng.randf() * TAU
 
 		var panel_mat: StandardMaterial3D = StandardMaterial3D.new()
 		var panel_color: Color = base_color.lightened(0.3)
@@ -488,19 +544,29 @@ func _add_tech_panels(area_id: String, cx: float, cz: float, radius: float,
 		panel_mat.emission_energy_multiplier = 1.5
 		panel_mat.metallic = 0.8
 		panel_mat.roughness = 0.1
-		panel.material = panel_mat
+
+		var panel: MeshInstance3D = MeshInstance3D.new()
+		var _panel_box := BoxMesh.new()
+		_panel_box.size = Vector3(pw, 0.08, pd)
+		panel.mesh = _panel_box
+		panel.material_override = panel_mat
+		panel.position = Vector3(px, ty + 0.04, pz)
+		panel.rotation.y = panel_yaw
 		add_child(panel)
 
 		# Border frame around panel
-		var frame: CSGBox3D = CSGBox3D.new()
-		frame.size = Vector3(pw + 0.2, 0.12, pd + 0.2)
-		frame.position = Vector3(px, ty + 0.02, pz)
-		frame.rotation.y = panel.rotation.y
 		var frame_mat: StandardMaterial3D = StandardMaterial3D.new()
 		frame_mat.albedo_color = base_color.darkened(0.15)
 		frame_mat.metallic = 0.5
 		frame_mat.roughness = 0.3
-		frame.material = frame_mat
+
+		var frame: MeshInstance3D = MeshInstance3D.new()
+		var _frame_box := BoxMesh.new()
+		_frame_box.size = Vector3(pw + 0.2, 0.12, pd + 0.2)
+		frame.mesh = _frame_box
+		frame.material_override = frame_mat
+		frame.position = Vector3(px, ty + 0.02, pz)
+		frame.rotation.y = panel_yaw
 		add_child(frame)
 
 ## Light columns — tall beams of light shooting upward
@@ -521,35 +587,43 @@ func _add_light_columns(area_id: String, cx: float, cz: float, radius: float,
 		var beam_h: float = rng.randf_range(15.0, 35.0)
 
 		# Light beam (semi-transparent tall cylinder)
-		var beam: CSGCylinder3D = CSGCylinder3D.new()
-		beam.radius = 0.3
-		beam.height = beam_h
-		beam.sides = 8
-		beam.position = Vector3(px, ty + beam_h * 0.5, pz)
-		var beam_mat: StandardMaterial3D = StandardMaterial3D.new()
 		var beam_color: Color = base_color.lightened(0.5)
-		beam_mat.albedo_color = Color(beam_color.r, beam_color.g, beam_color.b, 0.15)
+		var beam_mat: StandardMaterial3D = StandardMaterial3D.new()
+		beam_mat.albedo_color = Color(beam_color.r, beam_color.g, beam_color.b, 0.06)
 		beam_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		beam_mat.emission_enabled = true
 		beam_mat.emission = beam_color
-		beam_mat.emission_energy_multiplier = 1.5
-		beam_mat.no_depth_test = true
-		beam.material = beam_mat
+		beam_mat.emission_energy_multiplier = 0.5
+		beam_mat.no_depth_test = false
+
+		var beam: MeshInstance3D = MeshInstance3D.new()
+		var _beam_cyl := CylinderMesh.new()
+		_beam_cyl.top_radius = 0.3
+		_beam_cyl.bottom_radius = 0.3
+		_beam_cyl.height = beam_h
+		_beam_cyl.radial_segments = 16
+		beam.mesh = _beam_cyl
+		beam.material_override = beam_mat
+		beam.position = Vector3(px, ty + beam_h * 0.5, pz)
 		add_child(beam)
 
 		# Base emitter disc
-		var base_disc: CSGCylinder3D = CSGCylinder3D.new()
-		base_disc.radius = 1.2
-		base_disc.height = 0.15
-		base_disc.sides = 12
-		base_disc.position = Vector3(px, ty + 0.08, pz)
 		var disc_mat: StandardMaterial3D = StandardMaterial3D.new()
 		disc_mat.albedo_color = beam_color
 		disc_mat.emission_enabled = true
 		disc_mat.emission = beam_color
 		disc_mat.emission_energy_multiplier = 1.5
 		disc_mat.metallic = 0.5
-		base_disc.material = disc_mat
+
+		var base_disc: MeshInstance3D = MeshInstance3D.new()
+		var _bdisc_cyl := CylinderMesh.new()
+		_bdisc_cyl.top_radius = 1.2
+		_bdisc_cyl.bottom_radius = 1.2
+		_bdisc_cyl.height = 0.15
+		_bdisc_cyl.radial_segments = 16
+		base_disc.mesh = _bdisc_cyl
+		base_disc.material_override = disc_mat
+		base_disc.position = Vector3(px, ty + 0.08, pz)
 		add_child(base_disc)
 
 		# Register beam for pulsing animation
@@ -585,16 +659,15 @@ func _add_crystals(area_id: String, cx: float, cz: float, radius: float,
 		var crz: float = cz + sin(angle) * dist
 		var ty: float = _terrain_y(crx, crz)
 
-		var crystal: CSGCylinder3D = CSGCylinder3D.new()
-		crystal.radius = c_radius
-		crystal.height = c_height
-		crystal.sides = 5
-		crystal.cone = true
-		crystal.position = Vector3(
-			crx,
-			ty + c_height * 0.5,
-			crz
-		)
+		# Crystal approximated with CylinderMesh (cone shape)
+		var crystal: MeshInstance3D = MeshInstance3D.new()
+		var _crys_mesh := CylinderMesh.new()
+		_crys_mesh.top_radius = 0.001
+		_crys_mesh.bottom_radius = c_radius
+		_crys_mesh.height = c_height
+		_crys_mesh.radial_segments = 5
+		crystal.mesh = _crys_mesh
+		crystal.position = Vector3(crx, ty + c_height * 0.5, crz)
 		crystal.rotation = Vector3(
 			rng.randf_range(-0.35, 0.35),
 			rng.randf() * TAU,
@@ -607,18 +680,21 @@ func _add_crystals(area_id: String, cx: float, cz: float, radius: float,
 		cryst_mat.emission_enabled = true
 		cryst_mat.emission = base_color.lightened(0.6)
 		cryst_mat.emission_energy_multiplier = 1.8
-		crystal.material = cryst_mat
+		crystal.material_override = cryst_mat
 		add_child(crystal)
-		# No collision — scatter crystals are decorative scenery
 
 		# Add cluster mates (2-3 smaller crystals near each large one)
 		if rng.randf() > 0.4:
 			for j in range(rng.randi_range(1, 3)):
-				var sub: CSGCylinder3D = CSGCylinder3D.new()
-				sub.radius = c_radius * rng.randf_range(0.3, 0.6)
-				sub.height = c_height * rng.randf_range(0.3, 0.7)
-				sub.sides = 5
-				sub.cone = true
+				var sub_r: float = c_radius * rng.randf_range(0.3, 0.6)
+				var sub_h: float = c_height * rng.randf_range(0.3, 0.7)
+				var sub: MeshInstance3D = MeshInstance3D.new()
+				var _sub_crys := CylinderMesh.new()
+				_sub_crys.top_radius = 0.001
+				_sub_crys.bottom_radius = sub_r
+				_sub_crys.height = sub_h
+				_sub_crys.radial_segments = 5
+				sub.mesh = _sub_crys
 				sub.position = crystal.position + Vector3(
 					rng.randf_range(-1.0, 1.0),
 					-c_height * 0.1,
@@ -629,7 +705,7 @@ func _add_crystals(area_id: String, cx: float, cz: float, radius: float,
 					rng.randf() * TAU,
 					rng.randf_range(-0.5, 0.5)
 				)
-				sub.material = cryst_mat
+				sub.material_override = cryst_mat
 				add_child(sub)
 
 ## Alien flora — bioluminescent plants for safe/gathering areas and marsh/fungal zones
@@ -656,29 +732,29 @@ func _add_alien_flora(area_id: String, cx: float, cz: float, radius: float,
 		var ty: float = _terrain_y(px, pz)
 
 		# Stem
-		var stem: CSGCylinder3D = CSGCylinder3D.new()
-		stem.radius = 0.08 + rng.randf() * 0.06
-		stem.height = stem_h
-		stem.sides = 6
-		stem.position = Vector3(px, ty + stem_h * 0.5, pz)
-		stem.rotation.z = rng.randf_range(-0.2, 0.2)
-		stem.rotation.x = rng.randf_range(-0.1, 0.1)
+		var stem_r: float = 0.08 + rng.randf() * 0.06
 		var stem_mat: StandardMaterial3D = StandardMaterial3D.new()
 		stem_mat.albedo_color = Color(0.06, 0.25, 0.12)
 		stem_mat.roughness = 0.55
 		stem_mat.emission_enabled = true
 		stem_mat.emission = Color(0.04, 0.12, 0.06)
 		stem_mat.emission_energy_multiplier = 0.4
-		stem.material = stem_mat
+
+		var stem: MeshInstance3D = MeshInstance3D.new()
+		var _stem_cyl := CylinderMesh.new()
+		_stem_cyl.top_radius = stem_r
+		_stem_cyl.bottom_radius = stem_r
+		_stem_cyl.height = stem_h
+		_stem_cyl.radial_segments = 16
+		stem.mesh = _stem_cyl
+		stem.material_override = stem_mat
+		stem.position = Vector3(px, ty + stem_h * 0.5, pz)
+		stem.rotation.z = rng.randf_range(-0.2, 0.2)
+		stem.rotation.x = rng.randf_range(-0.1, 0.1)
 		add_child(stem)
 
 		# Bulb on top
-		var bulb: CSGSphere3D = CSGSphere3D.new()
 		var bulb_r: float = rng.randf_range(0.2, 0.7)
-		bulb.radius = bulb_r
-		bulb.radial_segments = 10
-		bulb.rings = 6
-		bulb.position = Vector3(px, ty + stem_h + bulb_r * 0.3, pz)
 		var bulb_color: Color = Color(
 			rng.randf_range(0.1, 0.4),
 			rng.randf_range(0.6, 1.0),
@@ -689,38 +765,56 @@ func _add_alien_flora(area_id: String, cx: float, cz: float, radius: float,
 		bulb_mat.emission_enabled = true
 		bulb_mat.emission = bulb_color
 		bulb_mat.emission_energy_multiplier = 1.2
-		bulb.material = bulb_mat
+
+		var bulb: MeshInstance3D = MeshInstance3D.new()
+		var _bulb_sph := SphereMesh.new()
+		_bulb_sph.radius = bulb_r
+		_bulb_sph.height = bulb_r * 2.0
+		_bulb_sph.radial_segments = 16
+		_bulb_sph.rings = 8
+		bulb.mesh = _bulb_sph
+		bulb.material_override = bulb_mat
+		bulb.position = Vector3(px, ty + stem_h + bulb_r * 0.3, pz)
 		add_child(bulb)
 
 		# Tendril branches (1-3 per plant)
 		if rng.randf() > 0.5:
 			for j in range(rng.randi_range(1, 3)):
-				var tendril: CSGCylinder3D = CSGCylinder3D.new()
-				tendril.radius = 0.03
-				tendril.height = stem_h * rng.randf_range(0.3, 0.6)
-				tendril.sides = 4
+				var t_h: float = stem_h * rng.randf_range(0.3, 0.6)
 				var t_y: float = ty + stem_h * rng.randf_range(0.3, 0.7)
+				var t_yaw: float = rng.randf() * TAU
+
+				var tendril: MeshInstance3D = MeshInstance3D.new()
+				var _tend_cyl := CylinderMesh.new()
+				_tend_cyl.top_radius = 0.03
+				_tend_cyl.bottom_radius = 0.03
+				_tend_cyl.height = t_h
+				_tend_cyl.radial_segments = 16
+				tendril.mesh = _tend_cyl
+				tendril.material_override = stem_mat
 				tendril.position = Vector3(px, t_y, pz)
 				tendril.rotation = Vector3(
 					rng.randf_range(-0.8, 0.8),
-					rng.randf() * TAU,
+					t_yaw,
 					rng.randf_range(-0.5, 0.5)
 				)
-				tendril.material = stem_mat
 				add_child(tendril)
 
 				# Small light on tendril tip
-				var tip: CSGSphere3D = CSGSphere3D.new()
-				tip.radius = 0.08
-				tip.radial_segments = 6
-				tip.rings = 4
 				var tip_offset: Vector3 = Vector3(
-					sin(tendril.rotation.y) * tendril.height * 0.4,
-					tendril.height * 0.3,
-					cos(tendril.rotation.y) * tendril.height * 0.4
+					sin(t_yaw) * t_h * 0.4,
+					t_h * 0.3,
+					cos(t_yaw) * t_h * 0.4
 				)
+				var tip: MeshInstance3D = MeshInstance3D.new()
+				var _tip_sph := SphereMesh.new()
+				_tip_sph.radius = 0.08
+				_tip_sph.height = 0.16
+				_tip_sph.radial_segments = 16
+				_tip_sph.rings = 8
+				tip.mesh = _tip_sph
+				tip.material_override = bulb_mat
 				tip.position = tendril.position + tip_offset
-				tip.material = bulb_mat
 				add_child(tip)
 
 ## Floating debris — small rocks/metal fragments hovering in the air
@@ -747,22 +841,27 @@ func _add_floating_debris(area_id: String, cx: float, cz: float, radius: float,
 		var px: float = cx + cos(angle) * dist
 		var pz: float = cz + sin(angle) * dist
 
-		var debris: CSGBox3D = CSGBox3D.new()
 		var s: float = rng.randf_range(0.2, 0.8)
 		# Varied aspect ratios to look like broken ship/tech fragments
+		var debris_size: Vector3
 		var aspect: int = rng.randi_range(0, 2)
 		match aspect:
-			0: debris.size = Vector3(s, s * 0.3, s * 1.2)   # flat plate
-			1: debris.size = Vector3(s * 0.4, s * 0.4, s * 1.5)  # beam fragment
-			2: debris.size = Vector3(s, s * 0.5, s * 0.5)  # chunk
+			0: debris_size = Vector3(s, s * 0.3, s * 1.2)   # flat plate
+			1: debris_size = Vector3(s * 0.4, s * 0.4, s * 1.5)  # beam fragment
+			_: debris_size = Vector3(s, s * 0.5, s * 0.5)  # chunk
 		var ty: float = _terrain_y(px, pz)
+
+		var debris: MeshInstance3D = MeshInstance3D.new()
+		var _debris_box := BoxMesh.new()
+		_debris_box.size = debris_size
+		debris.mesh = _debris_box
+		debris.material_override = debris_mat
 		debris.position = Vector3(px, ty + hover_h, pz)
 		debris.rotation = Vector3(
 			rng.randf() * TAU,
 			rng.randf() * TAU,
 			rng.randf() * TAU
 		)
-		debris.material = debris_mat
 		add_child(debris)
 
 		# Register for slow hovering animation
@@ -808,13 +907,16 @@ func _add_pipe_structures(area_id: String, cx: float, cz: float, radius: float,
 		var pipe_yaw: float = rng.randf() * TAU
 
 		# Pipe cylinder
-		var pipe: CSGCylinder3D = CSGCylinder3D.new()
-		pipe.radius = pipe_r
-		pipe.height = pipe_len
-		pipe.sides = 8
+		var pipe: MeshInstance3D = MeshInstance3D.new()
+		var _pipe_cyl := CylinderMesh.new()
+		_pipe_cyl.top_radius = pipe_r
+		_pipe_cyl.bottom_radius = pipe_r
+		_pipe_cyl.height = pipe_len
+		_pipe_cyl.radial_segments = 16
+		pipe.mesh = _pipe_cyl
+		pipe.material_override = pipe_mat
 		pipe.position = Vector3(px, ty + pipe_h, pz)
 		pipe.rotation = Vector3(0, pipe_yaw, PI / 2.0)
-		pipe.material = pipe_mat
 		add_child(pipe)
 
 		# Support legs (2 per pipe) so they don't appear to float
@@ -826,22 +928,29 @@ func _add_pipe_structures(area_id: String, cx: float, cz: float, radius: float,
 			var leg_h: float = pipe_h + (ty - leg_ty)
 			if leg_h < 0.2:
 				leg_h = 0.2
-			var leg: CSGCylinder3D = CSGCylinder3D.new()
-			leg.radius = pipe_r * 0.4
-			leg.height = leg_h
-			leg.sides = 6
+			var leg_r: float = pipe_r * 0.4
+			var leg: MeshInstance3D = MeshInstance3D.new()
+			var _leg_cyl := CylinderMesh.new()
+			_leg_cyl.top_radius = leg_r
+			_leg_cyl.bottom_radius = leg_r
+			_leg_cyl.height = leg_h
+			_leg_cyl.radial_segments = 16
+			leg.mesh = _leg_cyl
+			leg.material_override = pipe_mat
 			leg.position = Vector3(leg_x, leg_ty + leg_h * 0.5, leg_z)
-			leg.material = pipe_mat
 			add_child(leg)
 
 		# Pipe junction rings
 		for j in range(rng.randi_range(1, 3)):
-			var junc: CSGTorus3D = CSGTorus3D.new()
-			junc.inner_radius = pipe_r
-			junc.outer_radius = pipe_r + 0.08
-			junc.ring_sides = 6
-			junc.sides = 8
 			var frac: float = rng.randf_range(-0.4, 0.4)
+			var junc: MeshInstance3D = MeshInstance3D.new()
+			var _junc_torus := TorusMesh.new()
+			_junc_torus.inner_radius = 0.04
+			_junc_torus.outer_radius = pipe_r + 0.04
+			_junc_torus.rings = 20
+			_junc_torus.ring_segments = 16
+			junc.mesh = _junc_torus
+			junc.material_override = pipe_mat
 			junc.position = Vector3(
 				px + cos(pipe_yaw) * pipe_len * frac,
 				ty + pipe_h,
@@ -849,7 +958,6 @@ func _add_pipe_structures(area_id: String, cx: float, cz: float, radius: float,
 			)
 			junc.rotation.z = PI / 2.0
 			junc.rotation.y = pipe_yaw
-			junc.material = pipe_mat
 			add_child(junc)
 
 ## Ruined wall sections — broken structures suggesting ancient civilization
@@ -883,28 +991,33 @@ func _add_ruined_walls(area_id: String, cx: float, cz: float, radius: float,
 		var wall_w: float = rng.randf_range(3.0, 10.0)
 
 		# Wall section
-		var wall: CSGBox3D = CSGBox3D.new()
-		wall.size = Vector3(wall_w, wall_h, 0.4)
+		var wall_yaw: float = rng.randf() * TAU
+		var wall: MeshInstance3D = MeshInstance3D.new()
+		var _wall_box := BoxMesh.new()
+		_wall_box.size = Vector3(wall_w, wall_h, 0.4)
+		wall.mesh = _wall_box
+		wall.material_override = wall_mat
 		wall.position = Vector3(px, ty + wall_h * 0.5, pz)
-		wall.rotation.y = rng.randf() * TAU
-		wall.material = wall_mat
+		wall.rotation.y = wall_yaw
 		add_child(wall)
 		# No collision — ruined walls are walk-through scenery to avoid trapping player
 
 		# Broken top — irregular jagged silhouette (smaller boxes on top)
 		for j in range(rng.randi_range(2, 5)):
-			var chunk: CSGBox3D = CSGBox3D.new()
 			var cw: float = rng.randf_range(0.5, wall_w * 0.4)
 			var ch: float = rng.randf_range(0.5, 2.0)
-			chunk.size = Vector3(cw, ch, 0.4)
+			var chunk: MeshInstance3D = MeshInstance3D.new()
+			var _chunk_box := BoxMesh.new()
+			_chunk_box.size = Vector3(cw, ch, 0.4)
+			chunk.mesh = _chunk_box
+			chunk.material_override = wall_mat
 			chunk.position = Vector3(
 				px + (rng.randf() - 0.5) * wall_w * 0.5,
 				ty + wall_h + ch * 0.3,
 				pz
 			)
-			chunk.rotation.y = wall.rotation.y
+			chunk.rotation.y = wall_yaw
 			chunk.rotation.z = rng.randf_range(-0.15, 0.15)
-			chunk.material = wall_mat
 			add_child(chunk)
 
 ## Per-area unique structures — each area gets its signature landmarks
@@ -963,45 +1076,57 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 	crate_mat.roughness = 0.4
 
 	# ── Central platform (raised marketplace area where NPCs cluster) ──
-	var center_plat: CSGCylinder3D = CSGCylinder3D.new()
-	center_plat.radius = 12.0
-	center_plat.height = 0.25
-	center_plat.sides = 32
+	var center_plat: MeshInstance3D = MeshInstance3D.new()
+	var _cplat_cyl := CylinderMesh.new()
+	_cplat_cyl.top_radius = 12.0
+	_cplat_cyl.bottom_radius = 12.0
+	_cplat_cyl.height = 0.25
+	_cplat_cyl.radial_segments = 16
+	center_plat.mesh = _cplat_cyl
+	center_plat.material_override = dark_metal
 	center_plat.position = Vector3(cx, y_base + 0.15, cz)
-	center_plat.material = dark_metal
 	add_child(center_plat)
 
 	# Central platform glowing edge
-	var center_ring: CSGTorus3D = CSGTorus3D.new()
-	center_ring.inner_radius = 11.5
-	center_ring.outer_radius = 12.0
-	center_ring.ring_sides = 6
-	center_ring.sides = 32
+	var center_ring: MeshInstance3D = MeshInstance3D.new()
+	var _cring_torus := TorusMesh.new()
+	_cring_torus.inner_radius = 11.5
+	_cring_torus.outer_radius = 12.0
+	_cring_torus.rings = 20
+	_cring_torus.ring_segments = 16
+	center_ring.mesh = _cring_torus
+	center_ring.material_override = glow_mat
 	center_ring.position = Vector3(cx, y_base + 0.3, cz)
-	center_ring.material = glow_mat
 	add_child(center_ring)
 
 	# Holographic station map (center feature)
-	var holo_base: CSGCylinder3D = CSGCylinder3D.new()
-	holo_base.radius = 1.2
-	holo_base.height = 0.8
-	holo_base.sides = 8
+	var holo_base: MeshInstance3D = MeshInstance3D.new()
+	var _hbase_cyl := CylinderMesh.new()
+	_hbase_cyl.top_radius = 1.2
+	_hbase_cyl.bottom_radius = 1.2
+	_hbase_cyl.height = 0.8
+	_hbase_cyl.radial_segments = 16
+	holo_base.mesh = _hbase_cyl
+	holo_base.material_override = dark_metal
 	holo_base.position = Vector3(cx, y_base + 0.7, cz)
-	holo_base.material = dark_metal
 	add_child(holo_base)
 
-	var holo_globe: CSGSphere3D = CSGSphere3D.new()
-	holo_globe.radius = 0.6
-	holo_globe.radial_segments = 12
-	holo_globe.rings = 8
-	holo_globe.position = Vector3(cx, y_base + 1.5, cz)
 	var holo_mat: StandardMaterial3D = StandardMaterial3D.new()
 	holo_mat.albedo_color = Color(0.1, 0.5, 0.8, 0.4)
 	holo_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	holo_mat.emission_enabled = true
 	holo_mat.emission = Color(0.2, 0.7, 1.0)
 	holo_mat.emission_energy_multiplier = 1.0
-	holo_globe.material = holo_mat
+
+	var holo_globe: MeshInstance3D = MeshInstance3D.new()
+	var _hglobe_sph := SphereMesh.new()
+	_hglobe_sph.radius = 0.6
+	_hglobe_sph.height = 1.2
+	_hglobe_sph.radial_segments = 16
+	_hglobe_sph.rings = 8
+	holo_globe.mesh = _hglobe_sph
+	holo_globe.material_override = holo_mat
+	holo_globe.position = Vector3(cx, y_base + 1.5, cz)
 	add_child(holo_globe)
 	_animated_nodes.append({
 		"node": holo_globe, "type": "rotate",
@@ -1009,14 +1134,16 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 	})
 
 	# Holo ring orbiting the globe
-	var holo_ring: CSGTorus3D = CSGTorus3D.new()
-	holo_ring.inner_radius = 0.7
-	holo_ring.outer_radius = 0.75
-	holo_ring.ring_sides = 4
-	holo_ring.sides = 20
+	var holo_ring: MeshInstance3D = MeshInstance3D.new()
+	var _hring2_torus := TorusMesh.new()
+	_hring2_torus.inner_radius = 0.7
+	_hring2_torus.outer_radius = 0.75
+	_hring2_torus.rings = 20
+	_hring2_torus.ring_segments = 16
+	holo_ring.mesh = _hring2_torus
+	holo_ring.material_override = glow_mat
 	holo_ring.position = Vector3(cx, y_base + 1.5, cz)
 	holo_ring.rotation.x = 0.4
-	holo_ring.material = glow_mat
 	add_child(holo_ring)
 	_animated_nodes.append({
 		"node": holo_ring, "type": "rotate",
@@ -1030,21 +1157,27 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 		var lz: float = cz + sin(angle) * 10.0
 
 		# Lamp post
-		var post: CSGCylinder3D = CSGCylinder3D.new()
-		post.radius = 0.08
-		post.height = 3.5
-		post.sides = 6
+		var post: MeshInstance3D = MeshInstance3D.new()
+		var _post_cyl := CylinderMesh.new()
+		_post_cyl.top_radius = 0.08
+		_post_cyl.bottom_radius = 0.08
+		_post_cyl.height = 3.5
+		_post_cyl.radial_segments = 16
+		post.mesh = _post_cyl
+		post.material_override = metal_mat
 		post.position = Vector3(lx, y_base + 1.75, lz)
-		post.material = metal_mat
 		add_child(post)
 
 		# Lamp head
-		var lamp: CSGSphere3D = CSGSphere3D.new()
-		lamp.radius = 0.2
-		lamp.radial_segments = 8
-		lamp.rings = 4
+		var lamp: MeshInstance3D = MeshInstance3D.new()
+		var _lamp_sph := SphereMesh.new()
+		_lamp_sph.radius = 0.2
+		_lamp_sph.height = 0.4
+		_lamp_sph.radial_segments = 16
+		_lamp_sph.rings = 8
+		lamp.mesh = _lamp_sph
+		lamp.material_override = warm_glow
 		lamp.position = Vector3(lx, y_base + 3.6, lz)
-		lamp.material = warm_glow
 		add_child(lamp)
 
 		# Lamp light
@@ -1070,17 +1203,16 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 		var sc: Color = sp["color"] as Color
 
 		# Counter/stall
-		var counter: CSGBox3D = CSGBox3D.new()
-		counter.size = Vector3(2.5, 0.9, 0.8)
+		var counter: MeshInstance3D = MeshInstance3D.new()
+		var _counter_box := BoxMesh.new()
+		_counter_box.size = Vector3(2.5, 0.9, 0.8)
+		counter.mesh = _counter_box
+		counter.material_override = metal_mat
 		counter.position = Vector3(sx, y_base + 0.5, sz + 1.5)
-		counter.material = metal_mat
 		add_child(counter)
 		_add_box_collision(counter, Vector3(2.5, 0.9, 0.8))
 
 		# Awning roof
-		var awning: CSGBox3D = CSGBox3D.new()
-		awning.size = Vector3(3.5, 0.08, 2.5)
-		awning.position = Vector3(sx, y_base + 3.0, sz + 0.5)
 		var awning_mat: StandardMaterial3D = StandardMaterial3D.new()
 		awning_mat.albedo_color = sc
 		awning_mat.metallic = 0.3
@@ -1088,48 +1220,67 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 		awning_mat.emission_enabled = true
 		awning_mat.emission = sc.lightened(0.2)
 		awning_mat.emission_energy_multiplier = 0.3
-		awning.material = awning_mat
+
+		var awning: MeshInstance3D = MeshInstance3D.new()
+		var _awning_box := BoxMesh.new()
+		_awning_box.size = Vector3(3.5, 0.08, 2.5)
+		awning.mesh = _awning_box
+		awning.material_override = awning_mat
+		awning.position = Vector3(sx, y_base + 3.0, sz + 0.5)
 		add_child(awning)
 
 		# Support poles
 		for px_off in [-1.5, 1.5]:
-			var pole: CSGCylinder3D = CSGCylinder3D.new()
-			pole.radius = 0.06
-			pole.height = 2.8
-			pole.sides = 6
+			var pole: MeshInstance3D = MeshInstance3D.new()
+			var _pole2_cyl := CylinderMesh.new()
+			_pole2_cyl.top_radius = 0.06
+			_pole2_cyl.bottom_radius = 0.06
+			_pole2_cyl.height = 2.8
+			_pole2_cyl.radial_segments = 16
+			pole.mesh = _pole2_cyl
+			pole.material_override = metal_mat
 			pole.position = Vector3(sx + px_off, y_base + 1.4, sz + 1.7)
-			pole.material = metal_mat
 			add_child(pole)
 
 		# Small glow strip under awning
-		var strip: CSGBox3D = CSGBox3D.new()
-		strip.size = Vector3(2.8, 0.04, 0.04)
-		strip.position = Vector3(sx, y_base + 2.9, sz - 0.6)
 		var strip_mat: StandardMaterial3D = StandardMaterial3D.new()
 		strip_mat.albedo_color = sc.lightened(0.4)
 		strip_mat.emission_enabled = true
 		strip_mat.emission = sc.lightened(0.5)
 		strip_mat.emission_energy_multiplier = 1.0
-		strip.material = strip_mat
+
+		var strip: MeshInstance3D = MeshInstance3D.new()
+		var _strip_box := BoxMesh.new()
+		_strip_box.size = Vector3(2.8, 0.04, 0.04)
+		strip.mesh = _strip_box
+		strip.material_override = strip_mat
+		strip.position = Vector3(sx, y_base + 2.9, sz - 0.6)
 		add_child(strip)
 
 	# ── Landing pad (NE quadrant) ──
-	var pad: CSGCylinder3D = CSGCylinder3D.new()
-	pad.radius = 8.0
-	pad.height = 0.3
-	pad.sides = 32
+	var pad: MeshInstance3D = MeshInstance3D.new()
+	var _pad_cyl := CylinderMesh.new()
+	_pad_cyl.top_radius = 8.0
+	_pad_cyl.bottom_radius = 8.0
+	_pad_cyl.height = 0.3
+	_pad_cyl.radial_segments = 16
+	pad.mesh = _pad_cyl
+	pad.material_override = metal_mat
 	pad.position = Vector3(cx + 25, y_base + 0.2, cz + 20)
-	pad.material = metal_mat
 	add_child(pad)
 
 	for i in range(3):
-		var mark: CSGTorus3D = CSGTorus3D.new()
-		mark.inner_radius = 2.0 + float(i) * 2.0
-		mark.outer_radius = 2.2 + float(i) * 2.0
-		mark.ring_sides = 6
-		mark.sides = 24
+		var m_inner: float = 2.0 + float(i) * 2.0
+		var m_outer: float = 2.2 + float(i) * 2.0
+		var mark: MeshInstance3D = MeshInstance3D.new()
+		var _mark_torus := TorusMesh.new()
+		_mark_torus.inner_radius = m_inner
+		_mark_torus.outer_radius = m_outer
+		_mark_torus.rings = 20
+		_mark_torus.ring_segments = 16
+		mark.mesh = _mark_torus
+		mark.material_override = glow_mat
 		mark.position = Vector3(cx + 25, y_base + 0.4, cz + 20)
-		mark.material = glow_mat
 		add_child(mark)
 
 	# Pad corner beacons
@@ -1137,20 +1288,27 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 		var ba: float = float(bi) / 4.0 * TAU + PI * 0.25
 		var bx: float = cx + 25 + cos(ba) * 7.5
 		var bz: float = cz + 20 + sin(ba) * 7.5
-		var pad_beacon: CSGCylinder3D = CSGCylinder3D.new()
-		pad_beacon.radius = 0.12
-		pad_beacon.height = 2.0
-		pad_beacon.sides = 6
+
+		var pad_beacon: MeshInstance3D = MeshInstance3D.new()
+		var _pbeacon_cyl := CylinderMesh.new()
+		_pbeacon_cyl.top_radius = 0.12
+		_pbeacon_cyl.bottom_radius = 0.12
+		_pbeacon_cyl.height = 2.0
+		_pbeacon_cyl.radial_segments = 16
+		pad_beacon.mesh = _pbeacon_cyl
+		pad_beacon.material_override = metal_mat
 		pad_beacon.position = Vector3(bx, y_base + 1.0, bz)
-		pad_beacon.material = metal_mat
 		add_child(pad_beacon)
 
-		var pad_light: CSGSphere3D = CSGSphere3D.new()
-		pad_light.radius = 0.15
-		pad_light.radial_segments = 6
-		pad_light.rings = 4
+		var pad_light: MeshInstance3D = MeshInstance3D.new()
+		var _plight_sph := SphereMesh.new()
+		_plight_sph.radius = 0.15
+		_plight_sph.height = 0.3
+		_plight_sph.radial_segments = 16
+		_plight_sph.rings = 8
+		pad_light.mesh = _plight_sph
+		pad_light.material_override = glow_mat
 		pad_light.position = Vector3(bx, y_base + 2.1, bz)
-		pad_light.material = glow_mat
 		add_child(pad_light)
 		_animated_nodes.append({
 			"node": pad_light, "type": "pulse_scale",
@@ -1159,52 +1317,65 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 		})
 
 	# ── Control tower (NW) ──
-	var tower_base: CSGCylinder3D = CSGCylinder3D.new()
-	tower_base.radius = 1.8
-	tower_base.height = 14.0
-	tower_base.sides = 8
+	var tower_base: MeshInstance3D = MeshInstance3D.new()
+	var _tower_cyl := CylinderMesh.new()
+	_tower_cyl.top_radius = 1.8
+	_tower_cyl.bottom_radius = 1.8
+	_tower_cyl.height = 14.0
+	_tower_cyl.radial_segments = 16
+	tower_base.mesh = _tower_cyl
+	tower_base.material_override = metal_mat
 	tower_base.position = Vector3(cx - 20, y_base + 7.0, cz - 15)
-	tower_base.material = metal_mat
 	add_child(tower_base)
 	_add_cylinder_collision(tower_base, 2.0, 14.0)
 
 	# Tower windows (rings)
 	for wi in range(3):
-		var win_ring: CSGTorus3D = CSGTorus3D.new()
-		win_ring.inner_radius = 1.7
-		win_ring.outer_radius = 1.85
-		win_ring.ring_sides = 4
-		win_ring.sides = 8
+		var win_ring: MeshInstance3D = MeshInstance3D.new()
+		var _wring_torus := TorusMesh.new()
+		_wring_torus.inner_radius = 1.7
+		_wring_torus.outer_radius = 1.85
+		_wring_torus.rings = 20
+		_wring_torus.ring_segments = 16
+		win_ring.mesh = _wring_torus
+		win_ring.material_override = glow_mat
 		win_ring.position = Vector3(cx - 20, y_base + 4.0 + float(wi) * 4.0, cz - 15)
-		win_ring.material = glow_mat
 		add_child(win_ring)
 
 	# Tower observation deck
-	var deck: CSGCylinder3D = CSGCylinder3D.new()
-	deck.radius = 3.5
-	deck.height = 2.5
-	deck.sides = 12
+	var deck: MeshInstance3D = MeshInstance3D.new()
+	var _deck_cyl := CylinderMesh.new()
+	_deck_cyl.top_radius = 3.5
+	_deck_cyl.bottom_radius = 3.5
+	_deck_cyl.height = 2.5
+	_deck_cyl.radial_segments = 16
+	deck.mesh = _deck_cyl
+	deck.material_override = metal_mat
 	deck.position = Vector3(cx - 20, y_base + 15.5, cz - 15)
-	deck.material = metal_mat
 	add_child(deck)
 
 	# Deck railing
-	var deck_rail: CSGTorus3D = CSGTorus3D.new()
-	deck_rail.inner_radius = 3.3
-	deck_rail.outer_radius = 3.5
-	deck_rail.ring_sides = 4
-	deck_rail.sides = 12
+	var deck_rail: MeshInstance3D = MeshInstance3D.new()
+	var _drail_torus := TorusMesh.new()
+	_drail_torus.inner_radius = 3.3
+	_drail_torus.outer_radius = 3.5
+	_drail_torus.rings = 20
+	_drail_torus.ring_segments = 16
+	deck_rail.mesh = _drail_torus
+	deck_rail.material_override = dark_metal
 	deck_rail.position = Vector3(cx - 20, y_base + 17.0, cz - 15)
-	deck_rail.material = dark_metal
 	add_child(deck_rail)
 
 	# Tower beacon
-	var beacon: CSGSphere3D = CSGSphere3D.new()
-	beacon.radius = 0.6
-	beacon.radial_segments = 10
-	beacon.rings = 6
+	var beacon: MeshInstance3D = MeshInstance3D.new()
+	var _beacon_sph := SphereMesh.new()
+	_beacon_sph.radius = 0.6
+	_beacon_sph.height = 1.2
+	_beacon_sph.radial_segments = 16
+	_beacon_sph.rings = 8
+	beacon.mesh = _beacon_sph
+	beacon.material_override = glow_mat
 	beacon.position = Vector3(cx - 20, y_base + 17.8, cz - 15)
-	beacon.material = glow_mat
 	add_child(beacon)
 	_animated_nodes.append({
 		"node": beacon, "type": "pulse_scale",
@@ -1216,30 +1387,40 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 	for i in range(4):
 		var ax: float = cx + 10 + float(i) * 3.0
 		var ant_h: float = 5.0 + float(i) * 2.5
-		var ant: CSGCylinder3D = CSGCylinder3D.new()
-		ant.radius = 0.06
-		ant.height = ant_h
-		ant.sides = 6
+
+		var ant: MeshInstance3D = MeshInstance3D.new()
+		var _ant_cyl := CylinderMesh.new()
+		_ant_cyl.top_radius = 0.06
+		_ant_cyl.bottom_radius = 0.06
+		_ant_cyl.height = ant_h
+		_ant_cyl.radial_segments = 16
+		ant.mesh = _ant_cyl
+		ant.material_override = metal_mat
 		ant.position = Vector3(ax, y_base + ant_h * 0.5, cz - 22)
-		ant.material = metal_mat
 		add_child(ant)
 
-		var dish: CSGSphere3D = CSGSphere3D.new()
-		dish.radius = 0.9
-		dish.radial_segments = 8
-		dish.rings = 4
+		var dish: MeshInstance3D = MeshInstance3D.new()
+		var _dish_sph := SphereMesh.new()
+		_dish_sph.radius = 0.9
+		_dish_sph.height = 1.8
+		_dish_sph.radial_segments = 16
+		_dish_sph.rings = 8
+		dish.mesh = _dish_sph
+		dish.material_override = metal_mat
 		dish.position = Vector3(ax, y_base + ant_h + 0.5, cz - 22)
 		dish.scale = Vector3(1.0, 0.3, 1.0)
-		dish.material = metal_mat
 		add_child(dish)
 
 		# Dish glow point
-		var dish_glow: CSGSphere3D = CSGSphere3D.new()
-		dish_glow.radius = 0.12
-		dish_glow.radial_segments = 6
-		dish_glow.rings = 4
+		var dish_glow: MeshInstance3D = MeshInstance3D.new()
+		var _dglow_sph := SphereMesh.new()
+		_dglow_sph.radius = 0.12
+		_dglow_sph.height = 0.24
+		_dglow_sph.radial_segments = 16
+		_dglow_sph.rings = 8
+		dish_glow.mesh = _dglow_sph
+		dish_glow.material_override = glow_mat
 		dish_glow.position = Vector3(ax, y_base + ant_h + 0.6, cz - 22)
-		dish_glow.material = glow_mat
 		add_child(dish_glow)
 
 	# ── Supply depot (SE — cargo crates and containers) ──
@@ -1250,30 +1431,38 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 		Vector3(cx + 23, y_base + 0.5, cz - 9),
 	]
 	for pos in depot_positions:
-		var crate: CSGBox3D = CSGBox3D.new()
-		crate.size = Vector3(1.2 + randf() * 0.4, 0.8 + randf() * 0.4, 1.2 + randf() * 0.3)
+		var cs: Vector3 = Vector3(1.2 + randf() * 0.4, 0.8 + randf() * 0.4, 1.2 + randf() * 0.3)
+		var crate: MeshInstance3D = MeshInstance3D.new()
+		var _crate_box := BoxMesh.new()
+		_crate_box.size = cs
+		crate.mesh = _crate_box
+		crate.material_override = crate_mat
 		crate.position = pos
 		crate.rotation.y = randf() * 0.8
-		crate.material = crate_mat
 		add_child(crate)
 
 	# Large shipping container
-	var container: CSGBox3D = CSGBox3D.new()
-	container.size = Vector3(4.0, 2.5, 2.0)
-	container.position = Vector3(cx + 22, y_base + 1.25, cz - 12)
 	var container_mat: StandardMaterial3D = StandardMaterial3D.new()
 	container_mat.albedo_color = Color(0.18, 0.3, 0.22)
 	container_mat.metallic = 0.6
 	container_mat.roughness = 0.35
-	container.material = container_mat
+
+	var container: MeshInstance3D = MeshInstance3D.new()
+	var _cont_box := BoxMesh.new()
+	_cont_box.size = Vector3(4.0, 2.5, 2.0)
+	container.mesh = _cont_box
+	container.material_override = container_mat
+	container.position = Vector3(cx + 22, y_base + 1.25, cz - 12)
 	add_child(container)
 	_add_box_collision(container, Vector3(4.0, 2.5, 2.0))
 
 	# Container marking strip
-	var cont_strip: CSGBox3D = CSGBox3D.new()
-	cont_strip.size = Vector3(3.8, 0.15, 0.05)
+	var cont_strip: MeshInstance3D = MeshInstance3D.new()
+	var _cstrip_box := BoxMesh.new()
+	_cstrip_box.size = Vector3(3.8, 0.15, 0.05)
+	cont_strip.mesh = _cstrip_box
+	cont_strip.material_override = warm_glow
 	cont_strip.position = Vector3(cx + 22, y_base + 2.2, cz - 11.0)
-	cont_strip.material = warm_glow
 	add_child(cont_strip)
 
 	# ── Perimeter barriers (low walls around hub edge) ──
@@ -1291,75 +1480,95 @@ func _build_hub_structures(cx: float, cz: float, radius: float,
 
 		var bx: float = cx + cos(angle + 0.2) * (radius - 5.0)
 		var bz: float = cz + sin(angle + 0.2) * (radius - 5.0)
-		var barrier: CSGBox3D = CSGBox3D.new()
-		barrier.size = Vector3(8.0, 1.0, 0.3)
+		var barrier: MeshInstance3D = MeshInstance3D.new()
+		var _barrier_box := BoxMesh.new()
+		_barrier_box.size = Vector3(8.0, 1.0, 0.3)
+		barrier.mesh = _barrier_box
+		barrier.material_override = dark_metal
 		barrier.position = Vector3(bx, y_base + 0.5, bz)
 		barrier.rotation.y = angle + PI * 0.5
-		barrier.material = dark_metal
 		add_child(barrier)
 		_add_box_collision(barrier, Vector3(8.0, 1.5, 0.5))
 
 		# Barrier glow strip
-		var b_strip: CSGBox3D = CSGBox3D.new()
-		b_strip.size = Vector3(7.5, 0.06, 0.05)
+		var b_strip: MeshInstance3D = MeshInstance3D.new()
+		var _bstrip_box := BoxMesh.new()
+		_bstrip_box.size = Vector3(7.5, 0.06, 0.05)
+		b_strip.mesh = _bstrip_box
+		b_strip.material_override = glow_mat
 		b_strip.position = Vector3(bx, y_base + 0.9, bz)
 		b_strip.rotation.y = angle + PI * 0.5
-		b_strip.material = glow_mat
 		add_child(b_strip)
 
 	# ── Commander's platform (north center — Vex & Grax area) ──
-	var cmd_plat: CSGBox3D = CSGBox3D.new()
-	cmd_plat.size = Vector3(8.0, 0.2, 4.0)
+	var cmd_plat: MeshInstance3D = MeshInstance3D.new()
+	var _cmdp_box := BoxMesh.new()
+	_cmdp_box.size = Vector3(8.0, 0.2, 4.0)
+	cmd_plat.mesh = _cmdp_box
+	cmd_plat.material_override = dark_metal
 	cmd_plat.position = Vector3(cx, y_base + 0.15, cz - 25)
-	cmd_plat.material = dark_metal
 	add_child(cmd_plat)
 
 	# Command console
-	var console: CSGBox3D = CSGBox3D.new()
-	console.size = Vector3(2.0, 1.0, 0.5)
+	var console: MeshInstance3D = MeshInstance3D.new()
+	var _cons_box := BoxMesh.new()
+	_cons_box.size = Vector3(2.0, 1.0, 0.5)
+	console.mesh = _cons_box
+	console.material_override = metal_mat
 	console.position = Vector3(cx + 2, y_base + 0.7, cz - 26)
-	console.material = metal_mat
 	add_child(console)
 
-	var console_screen: CSGBox3D = CSGBox3D.new()
-	console_screen.size = Vector3(1.6, 0.6, 0.04)
-	console_screen.position = Vector3(cx + 2, y_base + 1.0, cz - 25.7)
 	var screen_mat: StandardMaterial3D = StandardMaterial3D.new()
 	screen_mat.albedo_color = Color(0.1, 0.3, 0.2)
 	screen_mat.emission_enabled = true
 	screen_mat.emission = Color(0.15, 0.5, 0.3)
 	screen_mat.emission_energy_multiplier = 1.5
-	console_screen.material = screen_mat
+
+	var console_screen: MeshInstance3D = MeshInstance3D.new()
+	var _screen_box := BoxMesh.new()
+	_screen_box.size = Vector3(1.6, 0.6, 0.04)
+	console_screen.mesh = _screen_box
+	console_screen.material_override = screen_mat
+	console_screen.position = Vector3(cx + 2, y_base + 1.0, cz - 25.7)
 	add_child(console_screen)
 
 	# ── Researchers' alcove (south — Dr. Elara Voss & Archivist area) ──
-	var res_plat: CSGBox3D = CSGBox3D.new()
-	res_plat.size = Vector3(10.0, 0.15, 4.0)
+	var res_plat: MeshInstance3D = MeshInstance3D.new()
+	var _respl_box := BoxMesh.new()
+	_respl_box.size = Vector3(10.0, 0.15, 4.0)
+	res_plat.mesh = _respl_box
+	res_plat.material_override = dark_metal
 	res_plat.position = Vector3(cx, y_base + 0.12, cz + 20)
-	res_plat.material = dark_metal
 	add_child(res_plat)
 
 	# Research equipment
-	var res_pod: CSGCylinder3D = CSGCylinder3D.new()
-	res_pod.radius = 0.6
-	res_pod.height = 2.5
-	res_pod.sides = 8
-	res_pod.position = Vector3(cx - 3, y_base + 1.25, cz + 21)
 	var pod_mat: StandardMaterial3D = StandardMaterial3D.new()
 	pod_mat.albedo_color = Color(0.1, 0.15, 0.25, 0.5)
 	pod_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	pod_mat.emission_enabled = true
 	pod_mat.emission = Color(0.2, 0.4, 0.6)
 	pod_mat.emission_energy_multiplier = 1.0
-	res_pod.material = pod_mat
+
+	var res_pod: MeshInstance3D = MeshInstance3D.new()
+	var _rpod_cyl := CylinderMesh.new()
+	_rpod_cyl.top_radius = 0.6
+	_rpod_cyl.bottom_radius = 0.6
+	_rpod_cyl.height = 2.5
+	_rpod_cyl.radial_segments = 16
+	res_pod.mesh = _rpod_cyl
+	res_pod.material_override = pod_mat
+	res_pod.position = Vector3(cx - 3, y_base + 1.25, cz + 21)
 	add_child(res_pod)
 
-	var res_pod2: CSGCylinder3D = CSGCylinder3D.new()
-	res_pod2.radius = 0.5
-	res_pod2.height = 2.0
-	res_pod2.sides = 8
+	var res_pod2: MeshInstance3D = MeshInstance3D.new()
+	var _rpod2_cyl := CylinderMesh.new()
+	_rpod2_cyl.top_radius = 0.5
+	_rpod2_cyl.bottom_radius = 0.5
+	_rpod2_cyl.height = 2.0
+	_rpod2_cyl.radial_segments = 16
+	res_pod2.mesh = _rpod2_cyl
+	res_pod2.material_override = pod_mat
 	res_pod2.position = Vector3(cx + 3, y_base + 1.0, cz + 21)
-	res_pod2.material = pod_mat
 	add_child(res_pod2)
 
 ## Gathering Grounds — mushroom groves, spore vents, resource nodes highlighted
@@ -1384,25 +1593,33 @@ func _build_gathering_structures(cx: float, cz: float, radius: float,
 		var stem_h: float = rng.randf_range(5.0, 10.0)
 
 		# Thick stem
-		var stem: CSGCylinder3D = CSGCylinder3D.new()
-		stem.radius = 0.5
-		stem.height = stem_h
-		stem.sides = 8
-		stem.position = Vector3(px, y_base + stem_h * 0.5, pz)
 		var stem_mat: StandardMaterial3D = StandardMaterial3D.new()
 		stem_mat.albedo_color = Color(0.12, 0.3, 0.18)
 		stem_mat.roughness = 0.7
-		stem.material = stem_mat
+
+		var stem: MeshInstance3D = MeshInstance3D.new()
+		var _gstem_cyl := CylinderMesh.new()
+		_gstem_cyl.top_radius = 0.5
+		_gstem_cyl.bottom_radius = 0.5
+		_gstem_cyl.height = stem_h
+		_gstem_cyl.radial_segments = 16
+		stem.mesh = _gstem_cyl
+		stem.material_override = stem_mat
+		stem.position = Vector3(px, y_base + stem_h * 0.5, pz)
 		add_child(stem)
 		# No collision — mushroom stems are walk-through scenery
 
 		# Large cap
-		var cap: CSGCylinder3D = CSGCylinder3D.new()
-		cap.radius = rng.randf_range(2.0, 4.0)
-		cap.height = 0.8
-		cap.sides = 12
+		var cap_r: float = rng.randf_range(2.0, 4.0)
+		var cap: MeshInstance3D = MeshInstance3D.new()
+		var _gcap_cyl := CylinderMesh.new()
+		_gcap_cyl.top_radius = cap_r
+		_gcap_cyl.bottom_radius = cap_r
+		_gcap_cyl.height = 0.8
+		_gcap_cyl.radial_segments = 16
+		cap.mesh = _gcap_cyl
+		cap.material_override = cap_mat
 		cap.position = Vector3(px, y_base + stem_h + 0.3, pz)
-		cap.material = cap_mat
 		add_child(cap)
 
 	# Spore vent holes
@@ -1415,16 +1632,19 @@ func _build_gathering_structures(cx: float, cz: float, radius: float,
 	for i in range(4):
 		var angle: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(8.0, radius * 0.6)
-		var vent: CSGCylinder3D = CSGCylinder3D.new()
-		vent.radius = 0.6
-		vent.height = 0.5
-		vent.sides = 8
+		var vent: MeshInstance3D = MeshInstance3D.new()
+		var _vent_cyl := CylinderMesh.new()
+		_vent_cyl.top_radius = 0.6
+		_vent_cyl.bottom_radius = 0.6
+		_vent_cyl.height = 0.5
+		_vent_cyl.radial_segments = 16
+		vent.mesh = _vent_cyl
+		vent.material_override = vent_mat
 		vent.position = Vector3(
 			cx + cos(angle) * dist,
 			y_base + 0.25,
 			cz + sin(angle) * dist
 		)
-		vent.material = vent_mat
 		add_child(vent)
 
 ## Spore Marshes — bioluminescent pods and spore clouds
@@ -1449,12 +1669,16 @@ func _build_spore_marshes_structures(cx: float, cz: float, radius: float,
 		var pz: float = cz + sin(angle) * dist
 		var py: float = _terrain_y(px, pz)
 
-		var pod: CSGSphere3D = CSGSphere3D.new()
-		pod.radius = rng.randf_range(0.8, 2.5)
-		pod.rings = 8
-		pod.radial_segments = 8
-		pod.position = Vector3(px, py + pod.radius * 0.5, pz)
-		pod.material = pod_mat
+		var pod_r: float = rng.randf_range(0.8, 2.5)
+		var pod: MeshInstance3D = MeshInstance3D.new()
+		var _pod_sph := SphereMesh.new()
+		_pod_sph.radius = pod_r
+		_pod_sph.height = pod_r * 2.0
+		_pod_sph.radial_segments = 16
+		_pod_sph.rings = 8
+		pod.mesh = _pod_sph
+		pod.material_override = pod_mat
+		pod.position = Vector3(px, py + pod_r * 0.5, pz)
 		add_child(pod)
 
 	# Tall marsh reeds
@@ -1468,12 +1692,17 @@ func _build_spore_marshes_structures(cx: float, cz: float, radius: float,
 		var pz: float = cz + sin(angle) * dist
 		var py: float = _terrain_y(px, pz)
 
-		var reed: CSGCylinder3D = CSGCylinder3D.new()
-		reed.radius = rng.randf_range(0.05, 0.15)
-		reed.height = rng.randf_range(2.0, 5.0)
-		reed.sides = 6
-		reed.position = Vector3(px, py + reed.height * 0.5, pz)
-		reed.material = reed_mat
+		var reed_r: float = rng.randf_range(0.05, 0.15)
+		var reed_h: float = rng.randf_range(2.0, 5.0)
+		var reed: MeshInstance3D = MeshInstance3D.new()
+		var _reed_cyl := CylinderMesh.new()
+		_reed_cyl.top_radius = reed_r
+		_reed_cyl.bottom_radius = reed_r
+		_reed_cyl.height = reed_h
+		_reed_cyl.radial_segments = 16
+		reed.mesh = _reed_cyl
+		reed.material_override = reed_mat
+		reed.position = Vector3(px, py + reed_h * 0.5, pz)
 		add_child(reed)
 
 ## Hive Tunnels — chitin walls and hive arches
@@ -1495,11 +1724,14 @@ func _build_hive_tunnels_structures(cx: float, cz: float, radius: float,
 		var pz: float = cz + sin(angle) * dist
 		var py: float = _terrain_y(px, pz)
 
-		var wall: CSGBox3D = CSGBox3D.new()
-		wall.size = Vector3(rng.randf_range(3.0, 6.0), rng.randf_range(2.0, 4.5), rng.randf_range(0.5, 1.2))
-		wall.position = Vector3(px, py + wall.size.y * 0.5, pz)
+		var ws: Vector3 = Vector3(rng.randf_range(3.0, 6.0), rng.randf_range(2.0, 4.5), rng.randf_range(0.5, 1.2))
+		var wall: MeshInstance3D = MeshInstance3D.new()
+		var _hwall_box := BoxMesh.new()
+		_hwall_box.size = ws
+		wall.mesh = _hwall_box
+		wall.material_override = chitin_mat
+		wall.position = Vector3(px, py + ws.y * 0.5, pz)
 		wall.rotation.y = rng.randf() * TAU
-		wall.material = chitin_mat
 		add_child(wall)
 
 	# Hive arch structures (pairs of pillars with crossbar)
@@ -1520,29 +1752,33 @@ func _build_hive_tunnels_structures(cx: float, cz: float, radius: float,
 		var yaw: float = rng.randf() * TAU
 
 		# Left pillar
-		var lp: CSGCylinder3D = CSGCylinder3D.new()
-		lp.radius = 0.4
-		lp.height = arch_h
-		lp.sides = 8
+		var lp: MeshInstance3D = MeshInstance3D.new()
+		var _lp_cyl := CylinderMesh.new()
+		_lp_cyl.top_radius = 0.4
+		_lp_cyl.bottom_radius = 0.4
+		_lp_cyl.height = arch_h
+		_lp_cyl.radial_segments = 16
+		lp.mesh = _lp_cyl
+		lp.material_override = amber_mat
 		lp.position = Vector3(px - cos(yaw) * gap, py + arch_h * 0.5, pz - sin(yaw) * gap)
-		lp.material = amber_mat
 		add_child(lp)
 
 		# Right pillar
-		var rp: CSGCylinder3D = CSGCylinder3D.new()
-		rp.radius = 0.4
-		rp.height = arch_h
-		rp.sides = 8
+		var rp: MeshInstance3D = MeshInstance3D.new()
+		rp.mesh = lp.mesh
+		rp.material_override = amber_mat
 		rp.position = Vector3(px + cos(yaw) * gap, py + arch_h * 0.5, pz + sin(yaw) * gap)
-		rp.material = amber_mat
 		add_child(rp)
 
 		# Crossbar
-		var bar: CSGBox3D = CSGBox3D.new()
-		bar.size = Vector3(gap * 2.0 + 0.8, 0.6, 0.6)
+		var bar_w: float = gap * 2.0 + 0.8
+		var bar: MeshInstance3D = MeshInstance3D.new()
+		var _bar_box := BoxMesh.new()
+		_bar_box.size = Vector3(bar_w, 0.6, 0.6)
+		bar.mesh = _bar_box
+		bar.material_override = amber_mat
 		bar.position = Vector3(px, py + arch_h, pz)
 		bar.rotation.y = yaw
-		bar.material = amber_mat
 		add_child(bar)
 
 ## Fungal Wastes — giant mushrooms and mycelium networks
@@ -1571,22 +1807,29 @@ func _build_fungal_structures(cx: float, cz: float, radius: float,
 		var cap_r: float = rng.randf_range(1.5, 4.0)
 
 		# Stem
-		var stem: CSGCylinder3D = CSGCylinder3D.new()
-		stem.radius = rng.randf_range(0.3, 0.7)
-		stem.height = stem_h
-		stem.sides = 8
+		var stem_r: float = rng.randf_range(0.3, 0.7)
+		var stem: MeshInstance3D = MeshInstance3D.new()
+		var _fstem_cyl := CylinderMesh.new()
+		_fstem_cyl.top_radius = stem_r
+		_fstem_cyl.bottom_radius = stem_r
+		_fstem_cyl.height = stem_h
+		_fstem_cyl.radial_segments = 16
+		stem.mesh = _fstem_cyl
+		stem.material_override = stem_mat
 		stem.position = Vector3(px, py + stem_h * 0.5, pz)
-		stem.material = stem_mat
 		add_child(stem)
 
 		# Cap (flattened sphere)
-		var cap: CSGSphere3D = CSGSphere3D.new()
-		cap.radius = cap_r
-		cap.rings = 8
-		cap.radial_segments = 12
+		var cap: MeshInstance3D = MeshInstance3D.new()
+		var _fcap_sph := SphereMesh.new()
+		_fcap_sph.radius = cap_r
+		_fcap_sph.height = cap_r * 2.0
+		_fcap_sph.radial_segments = 16
+		_fcap_sph.rings = 8
+		cap.mesh = _fcap_sph
+		cap.material_override = cap_mat
 		cap.position = Vector3(px, py + stem_h + cap_r * 0.3, pz)
 		cap.scale = Vector3(1.0, 0.35, 1.0)
-		cap.material = cap_mat
 		add_child(cap)
 
 	# Mycelium ground tendrils
@@ -1601,11 +1844,15 @@ func _build_fungal_structures(cx: float, cz: float, radius: float,
 		var pz: float = cz + sin(angle) * dist
 		var py: float = _terrain_y(px, pz)
 
-		var tendril: CSGBox3D = CSGBox3D.new()
-		tendril.size = Vector3(rng.randf_range(2.0, 6.0), 0.15, rng.randf_range(0.3, 0.8))
+		var t_w: float = rng.randf_range(2.0, 6.0)
+		var t_d: float = rng.randf_range(0.3, 0.8)
+		var tendril: MeshInstance3D = MeshInstance3D.new()
+		var _tend_box := BoxMesh.new()
+		_tend_box.size = Vector3(t_w, 0.15, t_d)
+		tendril.mesh = _tend_box
+		tendril.material_override = myc_mat
 		tendril.position = Vector3(px, py + 0.1, pz)
 		tendril.rotation.y = rng.randf() * TAU
-		tendril.material = myc_mat
 		add_child(tendril)
 
 ## Stalker Reaches — web canopies and cocoons
@@ -1627,12 +1874,16 @@ func _build_stalker_structures(cx: float, cz: float, radius: float,
 		var py: float = _terrain_y(px, pz)
 		var h: float = rng.randf_range(4.0, 9.0)
 
-		var pillar: CSGCylinder3D = CSGCylinder3D.new()
-		pillar.radius = rng.randf_range(0.3, 0.7)
-		pillar.height = h
-		pillar.sides = 6
+		var p_r: float = rng.randf_range(0.3, 0.7)
+		var pillar: MeshInstance3D = MeshInstance3D.new()
+		var _spil_cyl := CylinderMesh.new()
+		_spil_cyl.top_radius = p_r
+		_spil_cyl.bottom_radius = p_r
+		_spil_cyl.height = h
+		_spil_cyl.radial_segments = 16
+		pillar.mesh = _spil_cyl
+		pillar.material_override = pillar_mat
 		pillar.position = Vector3(px, py + h * 0.5, pz)
-		pillar.material = pillar_mat
 		add_child(pillar)
 
 	# Cocoon pods
@@ -1647,13 +1898,17 @@ func _build_stalker_structures(cx: float, cz: float, radius: float,
 		var pz: float = cz + sin(angle) * dist
 		var py: float = _terrain_y(px, pz)
 
-		var cocoon: CSGSphere3D = CSGSphere3D.new()
-		cocoon.radius = rng.randf_range(0.5, 1.5)
-		cocoon.rings = 6
-		cocoon.radial_segments = 8
+		var coc_r: float = rng.randf_range(0.5, 1.5)
+		var cocoon: MeshInstance3D = MeshInstance3D.new()
+		var _coc_sph := SphereMesh.new()
+		_coc_sph.radius = coc_r
+		_coc_sph.height = coc_r * 2.0
+		_coc_sph.radial_segments = 16
+		_coc_sph.rings = 8
+		cocoon.mesh = _coc_sph
+		cocoon.material_override = cocoon_mat
 		cocoon.position = Vector3(px, py + rng.randf_range(1.0, 3.0), pz)
 		cocoon.scale = Vector3(0.7, 1.3, 0.7)
-		cocoon.material = cocoon_mat
 		add_child(cocoon)
 
 	# Golem remains (shattered stone blocks)
@@ -1668,12 +1923,15 @@ func _build_stalker_structures(cx: float, cz: float, radius: float,
 		var pz: float = cz + sin(angle) * dist
 		var py: float = _terrain_y(px, pz)
 
-		var block: CSGBox3D = CSGBox3D.new()
 		var s: float = rng.randf_range(0.5, 2.0)
-		block.size = Vector3(s * rng.randf_range(0.8, 1.5), s, s * rng.randf_range(0.8, 1.5))
-		block.position = Vector3(px, py + block.size.y * 0.5, pz)
+		var bs: Vector3 = Vector3(s * rng.randf_range(0.8, 1.5), s, s * rng.randf_range(0.8, 1.5))
+		var block: MeshInstance3D = MeshInstance3D.new()
+		var _block_box := BoxMesh.new()
+		_block_box.size = bs
+		block.mesh = _block_box
+		block.material_override = stone_mat
+		block.position = Vector3(px, py + bs.y * 0.5, pz)
 		block.rotation = Vector3(rng.randf_range(-0.3, 0.3), rng.randf() * TAU, rng.randf_range(-0.3, 0.3))
-		block.material = stone_mat
 		add_child(block)
 
 ## The Abyss — void pillars, floating platforms, reality tears, eye clusters
@@ -1705,16 +1963,20 @@ func _build_abyss_structures(cx: float, cz: float, radius: float,
 		var px: float = cx + cos(angle) * dist
 		var pz: float = cz + sin(angle) * dist
 
-		var pillar: CSGCylinder3D = CSGCylinder3D.new()
-		pillar.radius = rng.randf_range(0.5, 2.0)
-		pillar.height = pillar_h
-		pillar.sides = 6
+		var vp_r: float = rng.randf_range(0.5, 2.0)
+		var pillar: MeshInstance3D = MeshInstance3D.new()
+		var _vpil_cyl := CylinderMesh.new()
+		_vpil_cyl.top_radius = vp_r
+		_vpil_cyl.bottom_radius = vp_r
+		_vpil_cyl.height = pillar_h
+		_vpil_cyl.radial_segments = 16
+		pillar.mesh = _vpil_cyl
+		pillar.material_override = void_mat
 		pillar.position = Vector3(px, y_base + pillar_h * 0.5, pz)
 		pillar.rotation = Vector3(
 			rng.randf_range(-0.1, 0.1), 0,
 			rng.randf_range(-0.1, 0.1)
 		)
-		pillar.material = void_mat
 		add_child(pillar)
 		# No collision — scatter pillars are walk-through scenery
 
@@ -1727,11 +1989,14 @@ func _build_abyss_structures(cx: float, cz: float, radius: float,
 		var rift_h: float = rng.randf_range(4.0, 12.0)
 		var rift_ty: float = _terrain_y(px, pz)
 
-		var rift: CSGBox3D = CSGBox3D.new()
-		rift.size = Vector3(rng.randf_range(0.5, 2.0), rift_h, 0.05)
+		var rift_w: float = rng.randf_range(0.5, 2.0)
+		var rift: MeshInstance3D = MeshInstance3D.new()
+		var _rift_box := BoxMesh.new()
+		_rift_box.size = Vector3(rift_w, rift_h, 0.05)
+		rift.mesh = _rift_box
+		rift.material_override = rift_mat
 		rift.position = Vector3(px, rift_ty + rift_h * 0.5, pz)
 		rift.rotation.y = rng.randf() * TAU
-		rift.material = rift_mat
 		add_child(rift)
 
 		# Glow light at rift center
@@ -1779,37 +2044,44 @@ func _build_mines_structures(cx: float, cz: float, radius: float,
 		# Tower frame (4 legs)
 		for j in range(4):
 			var la: float = float(j) * PI / 2.0
-			var leg: CSGCylinder3D = CSGCylinder3D.new()
-			leg.radius = 0.15
-			leg.height = tower_h
-			leg.sides = 6
+			var leg: MeshInstance3D = MeshInstance3D.new()
+			var _mleg_cyl := CylinderMesh.new()
+			_mleg_cyl.top_radius = 0.15
+			_mleg_cyl.bottom_radius = 0.15
+			_mleg_cyl.height = tower_h
+			_mleg_cyl.radial_segments = 16
+			leg.mesh = _mleg_cyl
+			leg.material_override = metal_mat
 			leg.position = Vector3(
 				px + cos(la) * 1.5,
 				y_base + tower_h * 0.5,
 				pz + sin(la) * 1.5
 			)
 			leg.rotation = Vector3(0.08 * cos(la), 0, 0.08 * sin(la))
-			leg.material = metal_mat
 			add_child(leg)
 
 		# Platform at top
-		var top: CSGBox3D = CSGBox3D.new()
-		top.size = Vector3(4.0, 0.3, 4.0)
+		var top: MeshInstance3D = MeshInstance3D.new()
+		var _top_box := BoxMesh.new()
+		_top_box.size = Vector3(4.0, 0.3, 4.0)
+		top.mesh = _top_box
+		top.material_override = metal_mat
 		top.position = Vector3(px, y_base + tower_h, pz)
-		top.material = metal_mat
 		add_child(top)
 		# Collision cylinder around the tower footprint
 		_add_cylinder_collision(top, 2.0, tower_h, -tower_h * 0.5)
 
-		# Drill bit
-		var drill: CSGCylinder3D = CSGCylinder3D.new()
-		drill.radius = 0.4
-		drill.height = 3.0
-		drill.sides = 6
-		drill.cone = true
+		# Drill bit (cone)
+		var drill: MeshInstance3D = MeshInstance3D.new()
+		var _drill_cyl := CylinderMesh.new()
+		_drill_cyl.top_radius = 0.001
+		_drill_cyl.bottom_radius = 0.4
+		_drill_cyl.height = 3.0
+		_drill_cyl.radial_segments = 16
+		drill.mesh = _drill_cyl
+		drill.material_override = orange_mat
 		drill.position = Vector3(px, y_base + tower_h - 2.0, pz)
 		drill.rotation.x = PI
-		drill.material = orange_mat
 		add_child(drill)
 		_animated_nodes.append({
 			"node": drill, "type": "rotate",
@@ -1827,26 +2099,31 @@ func _build_mines_structures(cx: float, cz: float, radius: float,
 		var conv_h: float = rng.randf_range(2.0, 4.0)
 
 		# Main beam
-		var beam: CSGBox3D = CSGBox3D.new()
-		beam.size = Vector3(conv_len, 0.3, 0.8)
+		var beam: MeshInstance3D = MeshInstance3D.new()
+		var _cbeam_box := BoxMesh.new()
+		_cbeam_box.size = Vector3(conv_len, 0.3, 0.8)
+		beam.mesh = _cbeam_box
+		beam.material_override = metal_mat
 		beam.position = Vector3(px, y_base + conv_h, pz)
 		beam.rotation.y = angle
-		beam.material = metal_mat
 		add_child(beam)
 
 		# Support legs
 		for j in range(4):
 			var frac: float = -0.4 + float(j) * 0.27
-			var support: CSGCylinder3D = CSGCylinder3D.new()
-			support.radius = 0.1
-			support.height = conv_h
-			support.sides = 6
+			var support: MeshInstance3D = MeshInstance3D.new()
+			var _sup_cyl := CylinderMesh.new()
+			_sup_cyl.top_radius = 0.1
+			_sup_cyl.bottom_radius = 0.1
+			_sup_cyl.height = conv_h
+			_sup_cyl.radial_segments = 16
+			support.mesh = _sup_cyl
+			support.material_override = metal_mat
 			support.position = Vector3(
 				px + cos(angle) * conv_len * frac,
 				y_base + conv_h * 0.5,
 				pz + sin(angle) * conv_len * frac
 			)
-			support.material = metal_mat
 			add_child(support)
 
 ## Bio-Lab — containment pods, lab benches, data terminals, tubes
@@ -1876,38 +2153,49 @@ func _build_biolab_structures(cx: float, cz: float, radius: float,
 	glow_mat.emission_energy_multiplier = 1.2
 
 	# ── Central reactor column ──
-	var reactor_base: CSGCylinder3D = CSGCylinder3D.new()
-	reactor_base.radius = 1.8
-	reactor_base.height = 0.35
-	reactor_base.sides = 16
+	var reactor_base: MeshInstance3D = MeshInstance3D.new()
+	var _rbase_cyl := CylinderMesh.new()
+	_rbase_cyl.top_radius = 1.8
+	_rbase_cyl.bottom_radius = 1.8
+	_rbase_cyl.height = 0.35
+	_rbase_cyl.radial_segments = 16
+	reactor_base.mesh = _rbase_cyl
+	reactor_base.material_override = lab_mat
 	reactor_base.position = Vector3(cx, y_base + 0.18, cz)
-	reactor_base.material = lab_mat
 	add_child(reactor_base)
 
-	var reactor_glass: CSGCylinder3D = CSGCylinder3D.new()
-	reactor_glass.radius = 1.2
-	reactor_glass.height = 3.0
-	reactor_glass.sides = 12
+	var reactor_glass: MeshInstance3D = MeshInstance3D.new()
+	var _rglass_cyl := CylinderMesh.new()
+	_rglass_cyl.top_radius = 1.2
+	_rglass_cyl.bottom_radius = 1.2
+	_rglass_cyl.height = 3.0
+	_rglass_cyl.radial_segments = 16
+	reactor_glass.mesh = _rglass_cyl
+	reactor_glass.material_override = glass_mat
 	reactor_glass.position = Vector3(cx, y_base + 1.85, cz)
-	reactor_glass.material = glass_mat
 	add_child(reactor_glass)
 
-	var reactor_cap: CSGCylinder3D = CSGCylinder3D.new()
-	reactor_cap.radius = 1.5
-	reactor_cap.height = 0.25
-	reactor_cap.sides = 16
+	var reactor_cap: MeshInstance3D = MeshInstance3D.new()
+	var _rcap_cyl := CylinderMesh.new()
+	_rcap_cyl.top_radius = 1.5
+	_rcap_cyl.bottom_radius = 1.5
+	_rcap_cyl.height = 0.25
+	_rcap_cyl.radial_segments = 16
+	reactor_cap.mesh = _rcap_cyl
+	reactor_cap.material_override = lab_mat
 	reactor_cap.position = Vector3(cx, y_base + 3.5, cz)
-	reactor_cap.material = lab_mat
 	add_child(reactor_cap)
 
 	# Slow-spinning glow ring around reactor
-	var ring: CSGTorus3D = CSGTorus3D.new()
-	ring.inner_radius = 1.6
-	ring.outer_radius = 2.0
-	ring.ring_sides = 6
-	ring.sides = 20
+	var ring: MeshInstance3D = MeshInstance3D.new()
+	var _ring_torus := TorusMesh.new()
+	_ring_torus.inner_radius = 1.6
+	_ring_torus.outer_radius = 2.0
+	_ring_torus.rings = 20
+	_ring_torus.ring_segments = 16
+	ring.mesh = _ring_torus
+	ring.material_override = glow_mat
 	ring.position = Vector3(cx, y_base + 2.0, cz)
-	ring.material = glow_mat
 	add_child(ring)
 	_animated_nodes.append({
 		"node": ring, "type": "slow_rotate", "speed": 0.5, "base_y": 0.0, "phase": 0.0
@@ -1927,28 +2215,37 @@ func _build_biolab_structures(cx: float, cz: float, radius: float,
 		var px: float = cx + side_sign * 6.0
 		var pz: float = cz
 
-		var pod_base: CSGCylinder3D = CSGCylinder3D.new()
-		pod_base.radius = 0.8
-		pod_base.height = 0.3
-		pod_base.sides = 10
+		var pod_base: MeshInstance3D = MeshInstance3D.new()
+		var _pbase_cyl := CylinderMesh.new()
+		_pbase_cyl.top_radius = 0.8
+		_pbase_cyl.bottom_radius = 0.8
+		_pbase_cyl.height = 0.3
+		_pbase_cyl.radial_segments = 16
+		pod_base.mesh = _pbase_cyl
+		pod_base.material_override = lab_mat
 		pod_base.position = Vector3(px, y_base + 0.15, pz)
-		pod_base.material = lab_mat
 		add_child(pod_base)
 
-		var pod_glass: CSGCylinder3D = CSGCylinder3D.new()
-		pod_glass.radius = 0.6
-		pod_glass.height = 2.5
-		pod_glass.sides = 10
+		var pod_glass: MeshInstance3D = MeshInstance3D.new()
+		var _pglass_cyl := CylinderMesh.new()
+		_pglass_cyl.top_radius = 0.6
+		_pglass_cyl.bottom_radius = 0.6
+		_pglass_cyl.height = 2.5
+		_pglass_cyl.radial_segments = 16
+		pod_glass.mesh = _pglass_cyl
+		pod_glass.material_override = glass_mat
 		pod_glass.position = Vector3(px, y_base + 1.55, pz)
-		pod_glass.material = glass_mat
 		add_child(pod_glass)
 
-		var pod_cap: CSGCylinder3D = CSGCylinder3D.new()
-		pod_cap.radius = 0.8
-		pod_cap.height = 0.2
-		pod_cap.sides = 10
+		var pod_cap: MeshInstance3D = MeshInstance3D.new()
+		var _pcap_cyl := CylinderMesh.new()
+		_pcap_cyl.top_radius = 0.8
+		_pcap_cyl.bottom_radius = 0.8
+		_pcap_cyl.height = 0.2
+		_pcap_cyl.radial_segments = 16
+		pod_cap.mesh = _pcap_cyl
+		pod_cap.material_override = lab_mat
 		pod_cap.position = Vector3(px, y_base + 2.9, pz)
-		pod_cap.material = lab_mat
 		add_child(pod_cap)
 
 	# ── Overhead light (single warm lamp) ──
@@ -1993,12 +2290,25 @@ func _add_point_lights(area_id: String, cx: float, cz: float, radius: float,
 # ═══════════════════════════════════════════════════════════════════════════════
 
 ## Gate barrier meshes — keyed by area_id, updated each frame for color
-var _gate_barriers: Dictionary = {}  # { area_id: Array[CSGBox3D] }
+var _gate_barriers: Dictionary = {}  # { area_id: Array[MeshInstance3D] }
 
 func _build_corridors() -> void:
+	var loaded_count: int = 0
+	var built_count: int = 0
 	for corridor_data in DataManager.corridors:
+		var corr_id: String = str(corridor_data.get("id", ""))
+		var scene_path: String = "res://scenes/areas/corridor_%s.tscn" % corr_id
+		if ResourceLoader.exists(scene_path):
+			var scene: PackedScene = load(scene_path)
+			if scene:
+				var instance: Node3D = scene.instantiate()
+				add_child(instance)
+				loaded_count += 1
+				continue
+		# Fallback: procedural building
 		_create_corridor(corridor_data)
-	print("AreaManager: Built %d corridors" % DataManager.corridors.size())
+		built_count += 1
+	print("AreaManager: %d corridors loaded from scenes, %d built procedurally" % [loaded_count, built_count])
 
 ## Build semi-transparent energy barriers at corridor mouths for gated areas
 func _build_corridor_gates() -> void:
@@ -2039,14 +2349,11 @@ func _build_corridor_gates() -> void:
 			)
 
 			# Build the energy barrier — a thin translucent wall
-			var barrier: CSGBox3D = CSGBox3D.new()
-			barrier.name = "GateBarrier_%s" % area_id
+			var b_size: Vector3
 			if is_vertical:
-				barrier.size = Vector3(maxf(corr_w, 10.0), 5.0, 0.6)
+				b_size = Vector3(maxf(corr_w, 10.0), 5.0, 0.6)
 			else:
-				barrier.size = Vector3(0.6, 5.0, maxf(corr_d, 10.0))
-			barrier.position = gate_pos
-			barrier.position.y = 2.5  # Center vertically
+				b_size = Vector3(0.6, 5.0, maxf(corr_d, 10.0))
 
 			var mat: StandardMaterial3D = StandardMaterial3D.new()
 			mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -2055,7 +2362,15 @@ func _build_corridor_gates() -> void:
 			mat.emission = Color(0.8, 0.15, 0.1)
 			mat.emission_energy_multiplier = 0.8
 			mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-			barrier.material = mat
+
+			var barrier: MeshInstance3D = MeshInstance3D.new()
+			barrier.name = "GateBarrier_%s" % area_id
+			var _gbar_box := BoxMesh.new()
+			_gbar_box.size = b_size
+			barrier.mesh = _gbar_box
+			barrier.material_override = mat
+			barrier.position = gate_pos
+			barrier.position.y = 2.5  # Center vertically
 
 			add_child(barrier)
 			if not _gate_barriers.has(area_id):
@@ -2072,7 +2387,7 @@ func _update_gate_barriers() -> void:
 		for barrier in _gate_barriers[area_id]:
 			if barrier == null or not is_instance_valid(barrier):
 				continue
-			var mat: StandardMaterial3D = barrier.material as StandardMaterial3D
+			var mat: StandardMaterial3D = barrier.material_override as StandardMaterial3D
 			if mat == null:
 				continue
 			if accessible:
@@ -2151,21 +2466,27 @@ func _create_corridor(data: Dictionary) -> void:
 				post_pos = Vector3(px, _terrain_y(px, pz), pz)
 
 			# Post
-			var post: CSGCylinder3D = CSGCylinder3D.new()
-			post.radius = 0.08
-			post.height = 2.5
-			post.sides = 6
+			var post: MeshInstance3D = MeshInstance3D.new()
+			var _cpost_cyl := CylinderMesh.new()
+			_cpost_cyl.top_radius = 0.08
+			_cpost_cyl.bottom_radius = 0.08
+			_cpost_cyl.height = 2.5
+			_cpost_cyl.radial_segments = 16
+			post.mesh = _cpost_cyl
+			post.material_override = post_mat
 			post.position = post_pos + Vector3(0, 1.25, 0)
-			post.material = post_mat
 			add_child(post)
 
 			# Lamp orb on top
-			var lamp: CSGSphere3D = CSGSphere3D.new()
-			lamp.radius = 0.18
-			lamp.radial_segments = 8
-			lamp.rings = 4
+			var lamp: MeshInstance3D = MeshInstance3D.new()
+			var _clamp_sph := SphereMesh.new()
+			_clamp_sph.radius = 0.18
+			_clamp_sph.height = 0.36
+			_clamp_sph.radial_segments = 16
+			_clamp_sph.rings = 8
+			lamp.mesh = _clamp_sph
+			lamp.material_override = lamp_mat
 			lamp.position = post_pos + Vector3(0, 2.6, 0)
-			lamp.material = lamp_mat
 			add_child(lamp)
 
 	# ── Arch structures over long corridors ──
@@ -2185,37 +2506,42 @@ func _create_corridor(data: Dictionary) -> void:
 			var arch_span: float = corridor_w if is_vertical else corridor_d
 
 			# Left pillar
-			var lp: CSGCylinder3D = CSGCylinder3D.new()
-			lp.radius = 0.2
-			lp.height = arch_h
-			lp.sides = 6
+			var lp: MeshInstance3D = MeshInstance3D.new()
+			var _alp_cyl := CylinderMesh.new()
+			_alp_cyl.top_radius = 0.2
+			_alp_cyl.bottom_radius = 0.2
+			_alp_cyl.height = arch_h
+			_alp_cyl.radial_segments = 16
+			lp.mesh = _alp_cyl
+			lp.material_override = post_mat
 			if is_vertical:
 				lp.position = arch_pos + Vector3(-arch_span * 0.5, arch_h * 0.5, 0)
 			else:
 				lp.position = arch_pos + Vector3(0, arch_h * 0.5, -arch_span * 0.5)
-			lp.material = post_mat
 			add_child(lp)
 
 			# Right pillar
-			var rp_arch: CSGCylinder3D = CSGCylinder3D.new()
-			rp_arch.radius = 0.2
-			rp_arch.height = arch_h
-			rp_arch.sides = 6
+			var rp_arch: MeshInstance3D = MeshInstance3D.new()
+			rp_arch.mesh = lp.mesh
+			rp_arch.material_override = post_mat
 			if is_vertical:
 				rp_arch.position = arch_pos + Vector3(arch_span * 0.5, arch_h * 0.5, 0)
 			else:
 				rp_arch.position = arch_pos + Vector3(0, arch_h * 0.5, arch_span * 0.5)
-			rp_arch.material = post_mat
 			add_child(rp_arch)
 
 			# Cross beam
-			var crossbeam: CSGBox3D = CSGBox3D.new()
+			var cb_size: Vector3
 			if is_vertical:
-				crossbeam.size = Vector3(arch_span + 0.5, 0.25, 0.25)
+				cb_size = Vector3(arch_span + 0.5, 0.25, 0.25)
 			else:
-				crossbeam.size = Vector3(0.25, 0.25, arch_span + 0.5)
+				cb_size = Vector3(0.25, 0.25, arch_span + 0.5)
+			var crossbeam: MeshInstance3D = MeshInstance3D.new()
+			var _cb_box := BoxMesh.new()
+			_cb_box.size = cb_size
+			crossbeam.mesh = _cb_box
+			crossbeam.material_override = post_mat
 			crossbeam.position = arch_pos + Vector3(0, arch_h, 0)
-			crossbeam.material = post_mat
 			add_child(crossbeam)
 
 
@@ -2338,10 +2664,10 @@ func _animate_world(delta: float) -> void:
 				# For light beams — pulse their transparency
 				var min_a: float = entry.get("min_alpha", 0.08)
 				var max_a: float = entry.get("max_alpha", 0.25)
-				if node is CSGCylinder3D:
-					var csg: CSGCylinder3D = node as CSGCylinder3D
-					if csg.material is StandardMaterial3D:
-						var m: StandardMaterial3D = csg.material as StandardMaterial3D
+				if node is MeshInstance3D:
+					var mi: MeshInstance3D = node as MeshInstance3D
+					if mi.material_override is StandardMaterial3D:
+						var m: StandardMaterial3D = mi.material_override as StandardMaterial3D
 						m.albedo_color.a = lerpf(min_a, max_a, (sin(_time * speed + phase) + 1.0) * 0.5)
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -2564,10 +2890,35 @@ func _is_point_in_world(p: Vector2) -> bool:
 	return false
 
 # ═══════════════════════════════════════════════════════════════════════════════
+#  ENHANCED GLOW / BLOOM
+# ═══════════════════════════════════════════════════════════════════════════════
+
+func _setup_enhanced_glow() -> void:
+	if world_env == null or world_env.environment == null:
+		return
+	var env: Environment = world_env.environment
+	env.glow_enabled = true
+	env.glow_intensity = 0.6
+	env.glow_strength = 0.6
+	env.glow_bloom = 0.1
+	env.glow_hdr_threshold = 1.0
+	env.glow_hdr_scale = 1.0
+	env.glow_hdr_luminance_cap = 8.0
+	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+	env.set_glow_level(0, true)
+	env.set_glow_level(1, true)
+	env.set_glow_level(2, true)
+	env.set_glow_level(3, false)
+	env.set_glow_level(4, false)
+	env.set_glow_level(5, false)
+	env.set_glow_level(6, false)
+
+# ═══════════════════════════════════════════════════════════════════════════════
 #  ATMOSPHERE
 # ═══════════════════════════════════════════════════════════════════════════════
 
 var _dir_light: DirectionalLight3D = null
+var _sky_material: ProceduralSkyMaterial = null
 
 func _update_atmosphere(area_id: String) -> void:
 	var atmos: Dictionary = DataManager.get_atmosphere(area_id)
@@ -2578,14 +2929,34 @@ func _update_atmosphere(area_id: String) -> void:
 	if env == null:
 		return
 
+	# ── Fog (boosted for atmosphere) ──
 	var fog_color_int: int = int(atmos.get("fogColor", 0x020810))
 	env.fog_light_color = _hex_to_color(fog_color_int).lightened(0.1)
-	env.fog_density = float(atmos.get("fogDensity", 0.005))
+	var base_fog_density: float = float(atmos.get("fogDensity", 0.005))
+	env.fog_density = base_fog_density * 1.5
+	env.fog_light_energy = 1.5
+	env.fog_sun_scatter = 0.3
+	env.fog_aerial_perspective = 0.3
 
+	# ── Ambient light ──
 	var ambient_color_int: int = int(atmos.get("ambientColor", 0x1a2a4a))
-	env.ambient_light_color = _hex_to_color(ambient_color_int).lightened(0.2)
+	var ambient_color: Color = _hex_to_color(ambient_color_int).lightened(0.2)
 	env.ambient_light_energy = maxf(float(atmos.get("ambientInt", 0.5)), 0.6)
 
+	# ── Color grading per area ──
+	env.adjustment_enabled = true
+	env.adjustment_saturation = float(atmos.get("cgSat", 1.0))
+	env.adjustment_contrast = float(atmos.get("cgContrast", 1.0))
+	env.adjustment_brightness = float(atmos.get("cgBright", 1.0))
+
+	# Tint — blend into ambient light color
+	var tint_str: float = float(atmos.get("cgTintStr", 0.0))
+	if tint_str > 0.0:
+		var tint_color: Color = _hex_to_color(int(atmos.get("cgTint", 0xFFFFFF)))
+		ambient_color = ambient_color.lerp(tint_color, tint_str)
+	env.ambient_light_color = ambient_color
+
+	# ── Directional light ──
 	if _dir_light == null:
 		_dir_light = get_tree().get_first_node_in_group("dir_light") as DirectionalLight3D
 		if _dir_light == null:
@@ -2600,6 +2971,19 @@ func _update_atmosphere(area_id: String) -> void:
 		var dir_color_int: int = int(atmos.get("dirColor", 0xAABBFF))
 		_dir_light.light_color = _hex_to_color(dir_color_int)
 		_dir_light.light_energy = float(atmos.get("dirInt", 0.7))
+
+	# ── Per-area sky colors ──
+	if _sky_material == null and env.sky and env.sky.sky_material is ProceduralSkyMaterial:
+		_sky_material = env.sky.sky_material as ProceduralSkyMaterial
+
+	if _sky_material:
+		var sky_top: Color = _hex_to_color(int(atmos.get("skyTop", 0x000510)))
+		var sky_bottom: Color = _hex_to_color(int(atmos.get("skyBottom", 0x020810)))
+		_sky_material.sky_top_color = sky_top
+		_sky_material.ground_bottom_color = sky_bottom
+		var horizon: Color = sky_top.lerp(sky_bottom, 0.5).lightened(0.15)
+		_sky_material.sky_horizon_color = horizon
+		_sky_material.ground_horizon_color = horizon
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  UTILITY

@@ -517,6 +517,16 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_M:
 				_toggle_world_map_panel()
 				get_viewport().set_input_as_handled()
+			# Minimap toggle (V)
+			KEY_V:
+				_toggle_panel(_minimap_container, "minimap")
+				get_viewport().set_input_as_handled()
+			# Signal Archaeology scan mode toggle (Z)
+			KEY_Z:
+				var sig_sys: Node = get_tree().get_first_node_in_group("signal_archaeology_system")
+				if sig_sys and sig_sys.has_method("toggle_scan"):
+					sig_sys.toggle_scan()
+				get_viewport().set_input_as_handled()
 
 ## Toggle a panel's visibility
 func _toggle_panel(panel: PanelContainer, panel_name: String) -> void:

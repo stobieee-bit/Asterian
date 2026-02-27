@@ -116,6 +116,39 @@
       "softGateText": "Requires Level 10 in any combat skill.",
       "needs": ["astromining", "bioforge"],
       "feedDesc": "Transmute ores to skip tiers and synthesize rare materials. Needs Bioforge catalysts at high levels."
+    },
+    "signal_archaeology": {
+      "name": "Signal Archaeology",
+      "icon": "📡",
+      "color": "#44ddff",
+      "type": "exploration",
+      "desc": "Scan for and decode ancient signal fragments scattered across all areas. Higher levels unlock rarer fragment tiers and powerful protocol buffs.",
+      "trains": "Collect signal fragments in scan mode and decode protocols at Decoder Terminals.",
+      "category": "Exploration",
+      "feeds": ["entropy_engineering", "dimensional_weaving"],
+      "feedDesc": "Decoded protocols buff entropy yield and reveal hidden thread anchors. Echo data from entropy scans fuels fragment processing."
+    },
+    "entropy_engineering": {
+      "name": "Entropy Engineering",
+      "icon": "🔥",
+      "color": "#ff6644",
+      "type": "deconstruction",
+      "desc": "Scan enemies to learn their weaknesses and deconstruct items into entropic materials. Mastering an enemy type grants permanent combat bonuses.",
+      "trains": "Entropy-scan enemies and deconstruct items at Entropy Forges.",
+      "category": "Exploration",
+      "feeds": ["signal_archaeology", "dimensional_weaving"],
+      "feedDesc": "Scans produce echo data for Signal Archaeology. Deconstruction yields thread filaments for Dimensional Weaving."
+    },
+    "dimensional_weaving": {
+      "name": "Dimensional Weaving",
+      "icon": "🌀",
+      "color": "#aa66ff",
+      "type": "construction",
+      "desc": "Gather thread filaments from dimensional anchors and weave spatial constructs — snares, shields, and teleport folds.",
+      "trains": "Gather thread anchors across all areas and weave constructs at Dimensional Looms.",
+      "category": "Exploration",
+      "feeds": ["entropy_engineering", "signal_archaeology"],
+      "feedDesc": "Expired constructs yield entropic residue. High-level protocols open portable decoding stations."
     }
   },
   "unlocks": {
@@ -888,6 +921,50 @@
         "type": "item",
         "desc": "Forge Temporal Shard"
       }
+    ],
+    "signal_archaeology": [
+      { "level": 1, "type": "item", "desc": "Collect Alpha Signal Fragments" },
+      { "level": 10, "type": "item", "desc": "Collect Beta Signal Fragments" },
+      { "level": 15, "type": "item", "desc": "Decode Gathering Protocol" },
+      { "level": 20, "type": "item", "desc": "Collect Gamma Signal Fragments" },
+      { "level": 25, "type": "item", "desc": "Decode Combat Protocol" },
+      { "level": 30, "type": "item", "desc": "Decode Decay Protocol" },
+      { "level": 40, "type": "item", "desc": "Collect Delta Signal Fragments" },
+      { "level": 50, "type": "item", "desc": "Decode Resonance Protocol" },
+      { "level": 60, "type": "item", "desc": "Collect Omega Signal Fragments" },
+      { "level": 70, "type": "item", "desc": "Decode Warp Protocol" },
+      { "level": 80, "type": "item", "desc": "Portable Decoder uplink" },
+      { "level": 90, "type": "item", "desc": "Collect Primordial Signal Fragments" },
+      { "level": 99, "type": "item", "desc": "Decode Cosmic Protocol" }
+    ],
+    "entropy_engineering": [
+      { "level": 1, "type": "item", "desc": "Entropy-scan enemies for echo data" },
+      { "level": 10, "type": "item", "desc": "Forge Unstable Nanoblade" },
+      { "level": 15, "type": "item", "desc": "Extract Thread Filaments from dust" },
+      { "level": 20, "type": "item", "desc": "Forge Entropic Shield" },
+      { "level": 25, "type": "item", "desc": "Deconstruct tier-3 items" },
+      { "level": 30, "type": "item", "desc": "Forge Unstable Coilgun" },
+      { "level": 40, "type": "item", "desc": "Deconstruct tier-5 items" },
+      { "level": 50, "type": "item", "desc": "Forge Unstable Voidstaff" },
+      { "level": 60, "type": "item", "desc": "Deconstruct tier-7 items" },
+      { "level": 70, "type": "item", "desc": "Unlock Entropy Mastery tracking" },
+      { "level": 80, "type": "item", "desc": "Deconstruct tier-9 items" },
+      { "level": 90, "type": "item", "desc": "Refine Decay Catalyst" },
+      { "level": 99, "type": "item", "desc": "Entropy Mastery grants 15% bonus" }
+    ],
+    "dimensional_weaving": [
+      { "level": 1, "type": "item", "desc": "Gather Minor Thread Filaments" },
+      { "level": 10, "type": "item", "desc": "Weave Minor Snare, Gather Standard Filaments" },
+      { "level": 15, "type": "item", "desc": "Weave Thread Shield" },
+      { "level": 20, "type": "item", "desc": "Weave Spatial Fold (Short), Gather Major Filaments" },
+      { "level": 30, "type": "item", "desc": "Improved snare duration" },
+      { "level": 40, "type": "item", "desc": "Weave Spatial Fold (Medium), Gather Superior Filaments" },
+      { "level": 50, "type": "item", "desc": "Weave Dimensional Barrier" },
+      { "level": 60, "type": "item", "desc": "Gather Pristine Thread Filaments" },
+      { "level": 70, "type": "item", "desc": "Weave Spatial Fold (Long)" },
+      { "level": 80, "type": "item", "desc": "Constructs last 50% longer" },
+      { "level": 90, "type": "item", "desc": "Gather Primordial Thread Filaments" },
+      { "level": 99, "type": "item", "desc": "Weave Dimensional Rift (portable loom)" }
     ]
   },
   "xp_table": [

@@ -4942,5 +4942,160 @@
       "cosmic_alloy": 1
     },
     "name": "Forge Cosmic Alloy"
+  },
+
+  "process_echo_data": {
+    "skill": "signal_archaeology",
+    "level": 1,
+    "xp": 25,
+    "input": { "echo_data": 3 },
+    "output": { "alpha_signal_fragment": 1 },
+    "name": "Process Echo Data"
+  },
+  "decode_gathering_protocol": {
+    "skill": "signal_archaeology",
+    "level": 15,
+    "xp": 80,
+    "input": { "beta_signal_fragment": 3, "alpha_signal_fragment": 5 },
+    "output": { "gathering_protocol": 1 },
+    "name": "Decode Gathering Protocol"
+  },
+  "decode_combat_protocol": {
+    "skill": "signal_archaeology",
+    "level": 25,
+    "xp": 130,
+    "input": { "gamma_signal_fragment": 2, "beta_signal_fragment": 3 },
+    "output": { "combat_protocol": 1 },
+    "name": "Decode Combat Protocol"
+  },
+  "decode_decay_protocol": {
+    "skill": "signal_archaeology",
+    "level": 30,
+    "xp": 160,
+    "input": { "gamma_signal_fragment": 4 },
+    "output": { "decay_protocol": 1 },
+    "name": "Decode Decay Protocol"
+  },
+  "decode_resonance_protocol": {
+    "skill": "signal_archaeology",
+    "level": 50,
+    "xp": 280,
+    "input": { "delta_signal_fragment": 3, "gamma_signal_fragment": 5 },
+    "output": { "resonance_protocol": 1 },
+    "name": "Decode Resonance Protocol"
+  },
+  "decode_warp_protocol": {
+    "skill": "signal_archaeology",
+    "level": 70,
+    "xp": 420,
+    "input": { "omega_signal_fragment": 3, "delta_signal_fragment": 5 },
+    "output": { "warp_protocol": 1 },
+    "name": "Decode Warp Protocol"
+  },
+  "decode_cosmic_protocol": {
+    "skill": "signal_archaeology",
+    "level": 99,
+    "xp": 800,
+    "input": { "primordial_signal_fragment": 5, "omega_signal_fragment": 10 },
+    "output": { "cosmic_protocol": 1 },
+    "name": "Decode Cosmic Protocol"
+  },
+
+  "forge_unstable_blade": {
+    "skill": "entropy_engineering",
+    "level": 10,
+    "xp": 60,
+    "input": { "entropic_shard": 3, "entropic_dust": 10 },
+    "output": { "unstable_blade": 1 },
+    "name": "Forge Unstable Nanoblade"
+  },
+  "forge_entropic_shield": {
+    "skill": "entropy_engineering",
+    "level": 20,
+    "xp": 100,
+    "input": { "entropic_shard": 5, "entropic_residue": 3 },
+    "output": { "entropic_shield": 1 },
+    "name": "Forge Entropic Shield"
+  },
+  "forge_unstable_coilgun": {
+    "skill": "entropy_engineering",
+    "level": 30,
+    "xp": 160,
+    "input": { "entropic_core": 2, "entropic_shard": 5 },
+    "output": { "unstable_coilgun": 1 },
+    "name": "Forge Unstable Coilgun"
+  },
+  "forge_unstable_voidstaff": {
+    "skill": "entropy_engineering",
+    "level": 50,
+    "xp": 280,
+    "input": { "entropic_core": 5, "decay_catalyst": 1 },
+    "output": { "unstable_voidstaff": 1 },
+    "name": "Forge Unstable Voidstaff"
+  },
+  "refine_decay_catalyst": {
+    "skill": "entropy_engineering",
+    "level": 90,
+    "xp": 650,
+    "input": { "entropic_core": 10, "entropic_shard": 20 },
+    "output": { "decay_catalyst": 1 },
+    "name": "Refine Decay Catalyst"
+  },
+  "extract_thread_filaments": {
+    "skill": "entropy_engineering",
+    "level": 15,
+    "xp": 45,
+    "input": { "entropic_dust": 3 },
+    "output": { "minor_thread_filament": 1 },
+    "name": "Extract Thread Filaments"
+  },
+
+  "weave_minor_snare": {
+    "skill": "dimensional_weaving",
+    "level": 10,
+    "xp": 55,
+    "input": { "minor_thread_filament": 5, "standard_thread_filament": 2 },
+    "output": { "minor_snare": 1 },
+    "name": "Weave Minor Snare"
+  },
+  "weave_thread_shield": {
+    "skill": "dimensional_weaving",
+    "level": 15,
+    "xp": 75,
+    "input": { "standard_thread_filament": 4 },
+    "output": { "thread_shield": 1 },
+    "name": "Weave Thread Shield"
+  },
+  "weave_spatial_fold_short": {
+    "skill": "dimensional_weaving",
+    "level": 20,
+    "xp": 100,
+    "input": { "major_thread_filament": 3, "standard_thread_filament": 5 },
+    "output": { "spatial_fold_short": 1 },
+    "name": "Weave Spatial Fold (Short)"
+  },
+  "weave_spatial_fold_medium": {
+    "skill": "dimensional_weaving",
+    "level": 40,
+    "xp": 200,
+    "input": { "superior_thread_filament": 3, "major_thread_filament": 5 },
+    "output": { "spatial_fold_medium": 1 },
+    "name": "Weave Spatial Fold (Medium)"
+  },
+  "weave_dimensional_barrier": {
+    "skill": "dimensional_weaving",
+    "level": 50,
+    "xp": 280,
+    "input": { "superior_thread_filament": 5, "pristine_thread_filament": 2 },
+    "output": { "dimensional_barrier": 1 },
+    "name": "Weave Dimensional Barrier"
+  },
+  "weave_spatial_fold_long": {
+    "skill": "dimensional_weaving",
+    "level": 70,
+    "xp": 420,
+    "input": { "pristine_thread_filament": 5, "superior_thread_filament": 10 },
+    "output": { "spatial_fold_long": 1 },
+    "name": "Weave Spatial Fold (Long)"
   }
 }

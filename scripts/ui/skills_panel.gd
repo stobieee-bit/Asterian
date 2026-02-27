@@ -20,6 +20,7 @@ var _skill_groups: Array[Dictionary] = [
 	{"label": "Combat", "color": Color(0.8, 0.3, 0.3), "skills": ["nano", "tesla", "void"]},
 	{"label": "Gathering", "color": Color(0.8, 0.6, 0.3), "skills": ["astromining", "xenobotany"]},
 	{"label": "Production", "color": Color(0.3, 0.7, 0.5), "skills": ["bioforge", "circuitry", "xenocook"]},
+	{"label": "Exploration", "color": Color(0.3, 0.6, 0.9), "skills": ["signal_archaeology", "entropy_engineering", "dimensional_weaving"]},
 ]
 
 func _ready() -> void:
@@ -513,6 +514,9 @@ func _skill_color(skill_id: String) -> Color:
 		"xenocook": return Color(0.9, 0.8, 0.2)     # Yellow
 		"psionics": return Color(0.9, 0.3, 0.9)     # Magenta
 		"chronomancy": return Color(0.3, 0.9, 0.9)  # Aqua
+		"signal_archaeology": return Color(0.27, 0.87, 1.0)  # Cyan
+		"entropy_engineering": return Color(1.0, 0.4, 0.27)   # Orange-red
+		"dimensional_weaving": return Color(0.67, 0.4, 1.0)   # Purple
 		_: return Color(0.6, 0.6, 0.6)
 
 ## Unicode icon for each skill
@@ -532,6 +536,9 @@ func _skill_icon(skill_id: String) -> String:
 		"xenocook": return "X"
 		"psionics": return "P"
 		"chronomancy": return "Ch"
+		"signal_archaeology": return "SA"
+		"entropy_engineering": return "EE"
+		"dimensional_weaving": return "DW"
 		_: return "?"
 
 ## Format large numbers: 1000 → "1.0K", 1000000 → "1.0M"

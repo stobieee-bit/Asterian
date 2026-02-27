@@ -915,6 +915,30 @@
       "position": { "x": -10, "z": -835 },
       "interactRadius": 3,
       "icon": "circuitry"
+    },
+    {
+      "id": "decoder_terminal_1",
+      "name": "Decoder Terminal",
+      "skill": "signal_archaeology",
+      "position": { "x": -48, "z": 21 },
+      "interactRadius": 3,
+      "icon": "signal_archaeology"
+    },
+    {
+      "id": "entropy_forge_1",
+      "name": "Entropy Forge",
+      "skill": "entropy_engineering",
+      "position": { "x": -52, "z": 21 },
+      "interactRadius": 3,
+      "icon": "entropy_engineering"
+    },
+    {
+      "id": "dimensional_loom_1",
+      "name": "Dimensional Loom",
+      "skill": "dimensional_weaving",
+      "position": { "x": -56, "z": 21 },
+      "interactRadius": 3,
+      "icon": "dimensional_weaving"
     }
   ]
 }

@@ -306,6 +306,51 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("y_off", y_off)
 	root.set_meta("scale", s)
 
+	# ── Store base Y positions for drift-free animation ──
+	var vein_base_y: Array[float] = []
+	for v: MeshInstance3D in veins:
+		vein_base_y.append(v.position.y)
+	root.set_meta("vein_base_y", vein_base_y)
+
+	var canal_base_y: Array[float] = []
+	for c: MeshInstance3D in canals:
+		canal_base_y.append(c.position.y)
+	root.set_meta("canal_base_y", canal_base_y)
+
+	var gonad_base_y: Array[float] = []
+	for g: MeshInstance3D in gonads:
+		gonad_base_y.append(g.position.y)
+	root.set_meta("gonad_base_y", gonad_base_y)
+
+	var manubrium_base_y: Array[float] = []
+	manubrium_base_y.append(manubrium.position.y)
+	root.set_meta("manubrium_base_y", manubrium_base_y)
+
+	var oral_arm_base_y: Array[float] = []
+	for oa: MeshInstance3D in oral_arms:
+		oral_arm_base_y.append(oa.position.y)
+	root.set_meta("oral_arm_base_y", oral_arm_base_y)
+
+	var frill_base_y: Array[float] = []
+	for f: MeshInstance3D in frills:
+		frill_base_y.append(f.position.y)
+	root.set_meta("frill_base_y", frill_base_y)
+
+	var tentacle_mid_base_y: Array[float] = []
+	for tm: MeshInstance3D in tentacle_mids:
+		tentacle_mid_base_y.append(tm.position.y)
+	root.set_meta("tentacle_mid_base_y", tentacle_mid_base_y)
+
+	var tentacle_tip_base_y: Array[float] = []
+	for tt: MeshInstance3D in tentacle_tips:
+		tentacle_tip_base_y.append(tt.position.y)
+	root.set_meta("tentacle_tip_base_y", tentacle_tip_base_y)
+
+	var spot_base_y: Array[float] = []
+	for sp: MeshInstance3D in spots:
+		spot_base_y.append(sp.position.y)
+	root.set_meta("spot_base_y", spot_base_y)
+
 	return root
 
 
@@ -326,9 +371,11 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 
 	# ── Bell Surface Veins follow bell bob ──
 	var veins: Array = root.get_meta("veins", [])
+	var vein_base_y: Array = root.get_meta("vein_base_y", [])
 	for i: int in range(veins.size()):
 		var vein: MeshInstance3D = veins[i] as MeshInstance3D
-		vein.position.y += bob * 0.9 * delta * 10.0
+		if i < vein_base_y.size():
+			vein.position.y = vein_base_y[i] + bob * 0.9
 
 	# ── Core pulse ──
 	var core_arr: Array = root.get_meta("core", [])
@@ -340,23 +387,28 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 
 	# ── Radial Canals follow bell bob ──
 	var canals: Array = root.get_meta("canals", [])
+	var canal_base_y: Array = root.get_meta("canal_base_y", [])
 	for i: int in range(canals.size()):
 		var canal: MeshInstance3D = canals[i] as MeshInstance3D
-		canal.position.y += bob * 0.85 * delta * 10.0
+		if i < canal_base_y.size():
+			canal.position.y = canal_base_y[i] + bob * 0.85
 
 	# ── Gonad structures — gentle pulse and bob ──
 	var gonads: Array = root.get_meta("gonads", [])
+	var gonad_base_y: Array = root.get_meta("gonad_base_y", [])
 	for i: int in range(gonads.size()):
 		var gonad: MeshInstance3D = gonads[i] as MeshInstance3D
-		gonad.position.y += bob * 0.85 * delta * 10.0
+		if i < gonad_base_y.size():
+			gonad.position.y = gonad_base_y[i] + bob * 0.85
 		var g_pulse: float = 1.0 + sin(phase * 2.5 + float(i) * 1.6) * 0.1
 		gonad.scale = Vector3(g_pulse, g_pulse, g_pulse)
 
 	# ── Manubrium follows bell bob ──
 	var manubrium_arr: Array = root.get_meta("manubrium", [])
-	if manubrium_arr.size() > 0:
+	var manubrium_base_y: Array = root.get_meta("manubrium_base_y", [])
+	if manubrium_arr.size() > 0 and manubrium_base_y.size() > 0:
 		var manub: MeshInstance3D = manubrium_arr[0] as MeshInstance3D
-		manub.position.y += bob * 0.7 * delta * 10.0
+		manub.position.y = manubrium_base_y[0] + bob * 0.7
 
 	# ── Rim follows bell ──
 	var rim_arr: Array = root.get_meta("rim", [])
@@ -375,6 +427,7 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 
 	# ── Oral arm sway ──
 	var oral_arms: Array = root.get_meta("oral_arms", [])
+	var oral_arm_base_y: Array = root.get_meta("oral_arm_base_y", [])
 	for i: int in range(oral_arms.size()):
 		var arm: MeshInstance3D = oral_arms[i] as MeshInstance3D
 		var arm_idx: float = float(i)
@@ -383,10 +436,12 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 		arm.rotation.x += (sway_x - arm.rotation.x) * delta * 3.0
 		arm.rotation.z += (sway_z - arm.rotation.z) * delta * 3.0
 		# Shift Y with bob
-		arm.position.y += bob * 0.5 * delta * 10.0
+		if i < oral_arm_base_y.size():
+			arm.position.y = oral_arm_base_y[i] + bob * 0.5
 
 	# ── Oral Arm Frills — gentle sway offset from arms ──
 	var frills: Array = root.get_meta("frills", [])
+	var frill_base_y: Array = root.get_meta("frill_base_y", [])
 	for i: int in range(frills.size()):
 		var frill: MeshInstance3D = frills[i] as MeshInstance3D
 		var frill_idx: float = float(i)
@@ -394,12 +449,15 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 		var frill_sway_z: float = cos(phase * 1.4 + frill_idx * 0.9) * 0.18
 		frill.rotation.x += (frill_sway_x - frill.rotation.x) * delta * 3.5
 		frill.rotation.z += (frill_sway_z - frill.rotation.z) * delta * 3.5
-		frill.position.y += bob * 0.4 * delta * 10.0
+		if i < frill_base_y.size():
+			frill.position.y = frill_base_y[i] + bob * 0.4
 
 	# ── Tentacle sway ──
 	var tentacles: Array = root.get_meta("tentacles", [])
 	var tentacle_tips: Array = root.get_meta("tentacle_tips", [])
 	var tentacle_mids: Array = root.get_meta("tentacle_mids", [])
+	var tentacle_mid_base_y: Array = root.get_meta("tentacle_mid_base_y", [])
+	var tentacle_tip_base_y: Array = root.get_meta("tentacle_tip_base_y", [])
 	for i: int in range(tentacles.size()):
 		var strand: MeshInstance3D = tentacles[i] as MeshInstance3D
 		var idx_f: float = float(i)
@@ -414,19 +472,23 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 		# Mid-segment nodes bob with tentacle
 		if i < tentacle_mids.size():
 			var mid: MeshInstance3D = tentacle_mids[i] as MeshInstance3D
-			mid.position.y += bob * 0.4 * delta * 10.0
+			if i < tentacle_mid_base_y.size():
+				mid.position.y = tentacle_mid_base_y[i] + bob * 0.4
 			var mid_pulse: float = 0.8 + 0.2 * sin(phase * 3.0 + idx_f * 1.2)
 			mid.scale = Vector3(mid_pulse, mid_pulse, mid_pulse)
 
 		# Tips follow tentacle ends loosely
 		if i < tentacle_tips.size():
 			var tip: MeshInstance3D = tentacle_tips[i] as MeshInstance3D
-			tip.position.y += bob * 0.3 * delta * 10.0
+			if i < tentacle_tip_base_y.size():
+				tip.position.y = tentacle_tip_base_y[i] + bob * 0.3
 
 	# ── Bioluminescent spot flicker (both rings) ──
 	var spots: Array = root.get_meta("spots", [])
+	var spot_base_y: Array = root.get_meta("spot_base_y", [])
 	for i: int in range(spots.size()):
 		var spot: MeshInstance3D = spots[i] as MeshInstance3D
 		var flicker: float = 0.7 + 0.3 * sin(phase * 4.0 + float(i) * 1.5)
 		spot.scale = Vector3(flicker, flicker, flicker)
-		spot.position.y += bob * 0.8 * delta * 10.0
+		if i < spot_base_y.size():
+			spot.position.y = spot_base_y[i] + bob * 0.8

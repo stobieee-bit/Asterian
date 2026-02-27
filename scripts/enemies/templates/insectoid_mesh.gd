@@ -171,13 +171,17 @@ func build_mesh(params: Dictionary) -> Node3D:
 			root, tr, Vector3(0, body_y, tz), mat_chitin_dark, thorax_scale
 		)
 		seg.name = "Thorax%d" % i
-		# Chitin plate on top of each segment
-		var plate: MeshInstance3D = EnemyMeshBuilder.add_sphere(
-			root, tr * 0.7,
-			Vector3(0, body_y + tr * 0.5, tz), mat_chitin,
-			Vector3(1.2, 0.3, 1.0)
-		)
-		plate.name = "ChitinPlate%d" % i
+
+	# Chitin dorsal ridge strip spanning all 3 thorax segments
+	var ridge_z_start: float = thorax_start_z
+	var ridge_z_end: float = thorax_start_z + 2.0 * thorax_spacing
+	var ridge_len: float = (ridge_z_end - ridge_z_start) + 0.12 * s
+	var ridge_mid_z: float = (ridge_z_start + ridge_z_end) * 0.5
+	var ridge_y: float = body_y + thorax_radii[1] * s * 0.45
+	EnemyMeshBuilder.add_ridge_strip(
+		root, ridge_len, 0.08 * s,
+		Vector3(0.0, ridge_y, ridge_mid_z), mat_chitin,
+		Vector3(0.0, 0.0, PI * 0.5), 5, 0.025 * s)
 
 	# Spiracles (breathing pores along thorax sides)
 	for si: int in range(3):
@@ -441,6 +445,11 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("antenna_r", antenna_pivot_r)
 	root.set_meta("variant", variant)
 	root.set_meta("scale", s)
+	# Store base Y positions for each leg pivot to avoid accumulation drift in animate()
+	var leg_base_ys: Array = []
+	for lp: Node3D in legs_array:
+		leg_base_ys.append(lp.position.y)
+	root.set_meta("leg_base_ys", leg_base_ys)
 
 	return root
 
@@ -453,6 +462,7 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 	var antenna_l: Node3D = root.get_meta("antenna_l", null)
 	var antenna_r: Node3D = root.get_meta("antenna_r", null)
 	var s: float = float(root.get_meta("scale", 1.0))
+	var leg_base_ys: Array = root.get_meta("leg_base_ys", [])
 
 	if is_moving:
 		# ── Tripod gait: alternate legs step up/down ──
@@ -466,9 +476,10 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 			# Additional offset per pair so not all left legs move identically
 			var pair_offset: float = float(i / 2) * (TAU / float(maxi(1, leg_count / 2)))
 			var leg_phase: float = phase * 8.0 + offset + pair_offset
-			# Bob up/down
+			# Bob up/down (absolute positioning from stored base to prevent drift)
 			var bob: float = sin(leg_phase) * 0.04 * s
-			leg_pivot.position.y += bob * delta * 15.0
+			var base_y: float = leg_base_ys[i] if i < leg_base_ys.size() else leg_pivot.position.y
+			leg_pivot.position.y = base_y + bob
 			# Slight forward/back swing
 			var swing: float = sin(leg_phase) * 0.06
 			leg_pivot.rotation.x = lerpf(leg_pivot.rotation.x, swing, delta * 10.0)

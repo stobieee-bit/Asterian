@@ -15,11 +15,16 @@ const REPAIR_COST_PER_PERCENT: float = 2.0  # Credits per 1% to repair (scaled b
 
 var _player: CharacterBody3D = null
 
+# ── Unstable item tracking ──
+var _unstable_timers: Dictionary = {}  # { slot: remaining_seconds }
+
 func _ready() -> void:
 	_player = get_parent()
 	# Connect combat signals to degrade equipment
 	EventBus.hit_landed.connect(_on_hit_for_degrade)
 	EventBus.player_attacked.connect(_on_player_attack_degrade)
+	# Check for unstable items already equipped (from save)
+	_check_unstable_on_load()
 
 ## Equip an item from inventory to its appropriate slot
 ## Returns true if equipped successfully
@@ -94,6 +99,13 @@ func equip_item(item_id: String) -> bool:
 	GameState.equipment[slot] = item_id
 	# Fresh items start at full condition
 	GameState.equipment_condition[slot] = 1.0
+
+	# Start unstable timer if applicable
+	if item.get("unstable", false):
+		var duration: float = float(item.get("unstable_duration", 600))
+		_unstable_timers[slot] = duration
+		var item_name: String = str(item.get("name", item_id))
+		EventBus.chat_message.emit("⚠ %s is unstable — will disintegrate in %.0f minutes!" % [item_name, duration / 60.0], "system")
 
 	# If weapon, switch combat style to match
 	if slot == "weapon":
@@ -447,3 +459,53 @@ func has_degraded_equipment() -> bool:
 			if cond < 1.0:
 				return true
 	return false
+
+# ── Unstable item timers ──
+
+func _process(delta: float) -> void:
+	_tick_unstable_timers(delta)
+
+func _tick_unstable_timers(delta: float) -> void:
+	if _unstable_timers.is_empty():
+		return
+	var expired_slots: Array[String] = []
+	for slot in _unstable_timers:
+		_unstable_timers[slot] -= delta
+		if float(_unstable_timers[slot]) <= 0.0:
+			expired_slots.append(slot)
+	for slot in expired_slots:
+		_expire_unstable_item(slot)
+
+func _expire_unstable_item(slot: String) -> void:
+	var item_id: String = str(GameState.equipment.get(slot, ""))
+	if item_id == "":
+		_unstable_timers.erase(slot)
+		return
+	var item: Dictionary = DataManager.get_item(item_id)
+	var item_name: String = str(item.get("name", item_id))
+	# Unequip the item (it disintegrates — does NOT go to inventory)
+	GameState.equipment[slot] = ""
+	_unstable_timers.erase(slot)
+	EventBus.item_unequipped.emit(slot, item_id)
+	# Yield entropic residue as byproduct
+	if GameState.has_inventory_space():
+		GameState.add_item("entropic_residue", 1)
+		EventBus.chat_message.emit("✖ %s disintegrated! Entropic residue recovered." % item_name, "system")
+	else:
+		EventBus.chat_message.emit("✖ %s disintegrated! Inventory full — residue lost." % item_name, "system")
+	_recalc_stats()
+
+func _check_unstable_on_load() -> void:
+	for slot in GameState.equipment:
+		var item_id: String = str(GameState.equipment.get(slot, ""))
+		if item_id == "":
+			continue
+		var item: Dictionary = DataManager.get_item(item_id)
+		if item.get("unstable", false):
+			# Give remaining duration from save or default
+			var duration: float = float(item.get("unstable_duration", 600))
+			_unstable_timers[slot] = duration
+
+## Get remaining unstable time for a slot (for HUD display). Returns 0 if not unstable.
+func get_unstable_remaining(slot: String) -> float:
+	return float(_unstable_timers.get(slot, 0.0))

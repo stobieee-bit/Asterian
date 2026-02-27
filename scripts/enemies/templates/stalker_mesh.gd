@@ -85,17 +85,10 @@ func build_mesh(params: Dictionary) -> Node3D:
 	EnemyMeshBuilder.add_capsule(root, 0.005, 0.11,
 		Vector3(-0.15, 0.74, -0.30), mat_scar, Vector3(-0.1, -0.15, 0.0))
 
-	# ── Spine ridges (5 small cones along back) ──
-	for i: int in range(5):
-		var xoff: float = -0.5 + i * 0.25
-		EnemyMeshBuilder.add_cone(root, 0.04, 0.14, Vector3(xoff, 1.05, 0.0), mat_ridge,
-			Vector3(0.0, 0.0, 0.0))
-
-	# ── Secondary spine ridges (4 smaller cones between main spines) ──
-	for i: int in range(4):
-		var xoff: float = -0.375 + i * 0.25
-		EnemyMeshBuilder.add_cone(root, 0.025, 0.08, Vector3(xoff, 1.02, 0.0), mat_ridge,
-			Vector3(0.0, 0.0, 0.0))
+	# ── Spine ridge strip (single continuous ridged strip along back) ──
+	EnemyMeshBuilder.add_ridge_strip(root, 1.2, 0.08,
+		Vector3(0.0, 1.05, 0.0), mat_ridge,
+		Vector3(0.0, 0.0, PI * 0.5), 7, 0.04)
 
 	# ── Head ──
 	var head: Node3D = Node3D.new()

@@ -520,8 +520,8 @@ func _apply_weather(area_id: String) -> void:
 ## Applies a configuration dictionary to a CPUParticles3D node.
 ## Sets emission shape, direction, velocity, gravity, scale, and color ramp.
 func _configure_emitter(emitter: CPUParticles3D, cfg: Dictionary) -> void:
-	# Particle count and lifetime
-	emitter.amount = int(cfg.get("amount", 30))
+	# Particle count and lifetime (reduced 40% from original for subtlety)
+	emitter.amount = int(int(cfg.get("amount", 30)) * 0.6)
 	emitter.lifetime = float(cfg.get("lifetime", 4.0))
 	emitter.explosiveness = 0.0
 	emitter.randomness = 0.5
@@ -544,25 +544,27 @@ func _configure_emitter(emitter: CPUParticles3D, cfg: Dictionary) -> void:
 	var grav: Vector3 = cfg.get("gravity", Vector3.ZERO) as Vector3
 	emitter.gravity = grav
 
-	# Scale
-	emitter.scale_amount_min = float(cfg.get("scale_min", 0.05))
-	emitter.scale_amount_max = float(cfg.get("scale_max", 0.15))
+	# Scale (reduced for sphere mesh — 3D volume looks bigger than flat quad)
+	emitter.scale_amount_min = float(cfg.get("scale_min", 0.05)) * 0.7
+	emitter.scale_amount_max = float(cfg.get("scale_max", 0.15)) * 0.7
 
-	# Mesh — CPUParticles3D uses the `mesh` property (not draw_pass_1)
-	var quad: QuadMesh = QuadMesh.new()
-	quad.size = Vector2(1.0, 1.0)
+	# Mesh — soft round sphere instead of flat square quad
+	var sphere: SphereMesh = SphereMesh.new()
+	sphere.radius = 0.08
+	sphere.height = 0.16
+	sphere.radial_segments = 4
+	sphere.rings = 2
 
-	# Material — unshaded billboard with alpha transparency
+	# Material — unshaded with alpha transparency
 	var mat: StandardMaterial3D = StandardMaterial3D.new()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.vertex_color_use_as_albedo = true
 	mat.no_depth_test = false
 	mat.render_priority = -1
-	quad.surface_set_material(0, mat)
+	sphere.surface_set_material(0, mat)
 
-	emitter.mesh = quad
+	emitter.mesh = sphere
 
 	# Color ramp gradient (start color -> faded end color)
 	var color_start: Color = cfg.get("color_start", Color(1.0, 1.0, 1.0, 0.4)) as Color

@@ -66,7 +66,7 @@ func _physics_process(delta: float) -> void:
 	_process_movement(delta)
 	move_and_slide()
 	if not GameState.dungeon_active:
-		# Overworld: pin to Terrain3D surface every frame
+		# Overworld: pin to ground surface every frame
 		_snap_to_terrain()
 		# Clamp position inside world bounds
 		_clamp_position()
@@ -203,8 +203,7 @@ func teleport_to(pos: Vector3) -> void:
 # ── Boundary clamping ──
 
 ## After move_and_slide(), push the player back inside the world if they slipped out.
-## Snap player Y to the Terrain3D surface every frame (overworld only).
-## Terrain3D has no physics collider, so gravity/is_on_floor() can't work.
+## Snap player Y to the ground surface every frame (overworld only).
 func _snap_to_terrain() -> void:
 	if _area_manager and _area_manager.has_method("get_terrain_height"):
 		var terrain_y: float = _area_manager.get_terrain_height(global_position.x, global_position.z)

@@ -27,6 +27,9 @@ var pet_system_script: GDScript = preload("res://scripts/systems/pet_system.gd")
 var dungeon_renderer_script: GDScript = preload("res://scripts/world/dungeon_renderer.gd")
 var weather_system_script: GDScript = preload("res://scripts/world/weather_system.gd")
 var multiplayer_client_script: GDScript = preload("res://scripts/systems/multiplayer_client.gd")
+var signal_archaeology_script: GDScript = preload("res://scripts/systems/signal_archaeology_system.gd")
+var entropy_engineering_script: GDScript = preload("res://scripts/systems/entropy_engineering_system.gd")
+var dimensional_weaving_script: GDScript = preload("res://scripts/systems/dimensional_weaving_system.gd")
 
 # Runtime references
 var game_world: Node3D = null
@@ -77,7 +80,7 @@ func _ready() -> void:
 	else:
 		print("Player spawned at Station Hub.")
 
-	# Snap spawn position to terrain surface so player doesn't clip through
+	# Snap spawn position to ground surface so player doesn't clip through
 	var area_mgr: Node3D = get_tree().get_first_node_in_group("area_manager")
 	if area_mgr and area_mgr.has_method("get_terrain_height"):
 		var terrain_y: float = area_mgr.get_terrain_height(spawn_pos.x, spawn_pos.z)
@@ -170,12 +173,12 @@ func _ready() -> void:
 	add_child(dungeon_renderer)
 	print("Dungeon renderer ready.")
 
-	# Weather system disabled — square particles were visually distracting
-	# var weather: Node3D = Node3D.new()
-	# weather.name = "WeatherSystem"
-	# weather.set_script(weather_system_script)
-	# add_child(weather)
-	# print("Weather system ready.")
+	# Weather system — sphere particles for ambient atmosphere
+	var weather: Node3D = Node3D.new()
+	weather.name = "WeatherSystem"
+	weather.set_script(weather_system_script)
+	add_child(weather)
+	print("Weather system ready.")
 
 	# Spawn NPC spawner
 	var npc_spawner: Node3D = Node3D.new()
@@ -209,6 +212,35 @@ func _ready() -> void:
 	combo_sys.set_script(combo_script)
 	add_child(combo_sys)
 	print("Combo system ready.")
+
+	# Hit effect spawner — style-colored spark bursts on combat hits
+	var hit_fx: Node3D = Node3D.new()
+	hit_fx.name = "HitEffectSpawner"
+	hit_fx.set_script(load("res://scripts/systems/hit_effect_spawner.gd"))
+	add_child(hit_fx)
+	print("Hit effect spawner ready.")
+
+	# Exploration systems — Signal Archaeology, Entropy Engineering, Dimensional Weaving
+	var sig_arch: Node3D = Node3D.new()
+	sig_arch.name = "SignalArchaeologySystem"
+	sig_arch.set_script(signal_archaeology_script)
+	sig_arch.add_to_group("signal_archaeology_system")
+	add_child(sig_arch)
+	print("Signal Archaeology system ready.")
+
+	var entropy_eng: Node = Node.new()
+	entropy_eng.name = "EntropyEngineeringSystem"
+	entropy_eng.set_script(entropy_engineering_script)
+	entropy_eng.add_to_group("entropy_engineering_system")
+	add_child(entropy_eng)
+	print("Entropy Engineering system ready.")
+
+	var dim_weave: Node = Node.new()
+	dim_weave.name = "DimensionalWeavingSystem"
+	dim_weave.set_script(dimensional_weaving_script)
+	dim_weave.add_to_group("dimensional_weaving_system")
+	add_child(dim_weave)
+	print("Dimensional Weaving system ready.")
 
 	# Spawn HUD
 	hud = hud_scene.instantiate()

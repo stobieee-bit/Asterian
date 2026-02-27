@@ -562,6 +562,24 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("scale", s)
 	root.set_meta("body_y", body_y)
 
+	# ── Store base Y/X positions for drift-free animation ──
+	# Wisp base positions (both X and Y for each wisp)
+	var wisp_base_y: Array[float] = []
+	var wisp_base_x: Array[float] = []
+	for i: int in range(nebula_wisps.size()):
+		wisp_base_y.append(nebula_wisps[i].position.y)
+		wisp_base_x.append(nebula_wisps[i].position.x)
+	root.set_meta("wisp_base_y", wisp_base_y)
+	root.set_meta("wisp_base_x", wisp_base_x)
+	# Left leg base Y: [upper, lower, foot]
+	root.set_meta("left_leg_base_y", [l_leg_upper.position.y, l_leg_lower.position.y, l_foot.position.y])
+	# Right leg base Y: [upper, lower, foot]
+	root.set_meta("right_leg_base_y", [r_leg_upper.position.y, r_leg_lower.position.y, r_foot.position.y])
+	# Left arm base Y: [arm_3 (seg), fist]
+	root.set_meta("left_arm_base_y", [l_arm_3.position.y, l_fist.position.y])
+	# Right arm base Y: [arm_3 (seg), fist]
+	root.set_meta("right_arm_base_y", [r_arm_3.position.y, r_fist.position.y])
+
 	# Built facing +Z, rotate to face -Z (Godot forward)
 	root.rotation.y = PI
 	return root
@@ -649,10 +667,14 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 
 	# ── Nebula wisp drift ──
 	var nebula_wisps: Array = root.get_meta("nebula_wisps", []) as Array
+	var wisp_base_y: Array = root.get_meta("wisp_base_y", []) as Array
+	var wisp_base_x: Array = root.get_meta("wisp_base_x", []) as Array
 	for i: int in range(nebula_wisps.size()):
 		var wisp: MeshInstance3D = nebula_wisps[i] as MeshInstance3D
-		wisp.position.y += sin(phase * 0.8 + float(i) * 1.5) * 0.003
-		wisp.position.x += cos(phase * 0.6 + float(i) * 2.0) * 0.002
+		if i < wisp_base_y.size():
+			wisp.position.y = (wisp_base_y[i] as float) + sin(phase * 0.8 + float(i) * 1.5) * 0.003
+		if i < wisp_base_x.size():
+			wisp.position.x = (wisp_base_x[i] as float) + cos(phase * 0.6 + float(i) * 2.0) * 0.002
 		wisp.rotation.z += delta * (0.15 + float(i) * 0.05)
 		wisp.rotation.x += delta * (0.1 + float(i) * 0.03)
 
@@ -679,50 +701,54 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 
 	# Left leg stomp
 	var left_leg: Array = root.get_meta("left_leg", []) as Array
-	if left_leg.size() >= 5:
+	var ll_base_y: Array = root.get_meta("left_leg_base_y", []) as Array
+	if left_leg.size() >= 5 and ll_base_y.size() >= 3:
 		var leg_swing: float = sin(phase * walk_speed) * walk_amp
 		var ul: MeshInstance3D = left_leg[0] as MeshInstance3D
-		ul.position.y += leg_swing * delta * 6.0
+		ul.position.y = (ll_base_y[0] as float) + leg_swing * 0.04
 		var ll: MeshInstance3D = left_leg[2] as MeshInstance3D
-		ll.position.y += leg_swing * 0.7 * delta * 6.0
+		ll.position.y = (ll_base_y[1] as float) + leg_swing * 0.7 * 0.04
 		var ft: MeshInstance3D = left_leg[4] as MeshInstance3D
-		ft.position.y += leg_swing * 0.5 * delta * 6.0
+		ft.position.y = (ll_base_y[2] as float) + leg_swing * 0.5 * 0.04
 
 	# Right leg stomp (opposite phase)
 	var right_leg: Array = root.get_meta("right_leg", []) as Array
-	if right_leg.size() >= 5:
+	var rl_base_y: Array = root.get_meta("right_leg_base_y", []) as Array
+	if right_leg.size() >= 5 and rl_base_y.size() >= 3:
 		var leg_swing: float = sin(phase * walk_speed + PI) * walk_amp
 		var ul: MeshInstance3D = right_leg[0] as MeshInstance3D
-		ul.position.y += leg_swing * delta * 6.0
+		ul.position.y = (rl_base_y[0] as float) + leg_swing * 0.04
 		var ll: MeshInstance3D = right_leg[2] as MeshInstance3D
-		ll.position.y += leg_swing * 0.7 * delta * 6.0
+		ll.position.y = (rl_base_y[1] as float) + leg_swing * 0.7 * 0.04
 		var ft: MeshInstance3D = right_leg[4] as MeshInstance3D
-		ft.position.y += leg_swing * 0.5 * delta * 6.0
+		ft.position.y = (rl_base_y[2] as float) + leg_swing * 0.5 * 0.04
 
 	# ── Arm sway (slower, heavier than sentinel) ──
 	var left_arm: Array = root.get_meta("left_arm", []) as Array
 	var right_arm: Array = root.get_meta("right_arm", []) as Array
+	var la_base_y: Array = root.get_meta("left_arm_base_y", []) as Array
+	var ra_base_y: Array = root.get_meta("right_arm_base_y", []) as Array
 
 	if is_moving:
 		var arm_sway_l: float = sin(phase * walk_speed + PI) * 0.05 * s
 		var arm_sway_r: float = sin(phase * walk_speed) * 0.05 * s
-		if left_arm.size() >= 6:
+		if left_arm.size() >= 6 and la_base_y.size() >= 2:
 			var seg: MeshInstance3D = left_arm[4] as MeshInstance3D
-			seg.position.y += arm_sway_l * delta * 5.0
+			seg.position.y = (la_base_y[0] as float) + arm_sway_l * 0.04
 			var fist: MeshInstance3D = left_arm[5] as MeshInstance3D
-			fist.position.y += arm_sway_l * 1.3 * delta * 5.0
-		if right_arm.size() >= 6:
+			fist.position.y = (la_base_y[1] as float) + arm_sway_l * 1.3 * 0.04
+		if right_arm.size() >= 6 and ra_base_y.size() >= 2:
 			var seg: MeshInstance3D = right_arm[4] as MeshInstance3D
-			seg.position.y += arm_sway_r * delta * 5.0
+			seg.position.y = (ra_base_y[0] as float) + arm_sway_r * 0.04
 			var fist: MeshInstance3D = right_arm[5] as MeshInstance3D
-			fist.position.y += arm_sway_r * 1.3 * delta * 5.0
+			fist.position.y = (ra_base_y[1] as float) + arm_sway_r * 1.3 * 0.04
 	else:
 		# Idle: very subtle fist drift
-		if left_arm.size() >= 6:
+		if left_arm.size() >= 6 and la_base_y.size() >= 2:
 			var drift: float = sin(phase * 0.8) * 0.01 * s
 			var fist: MeshInstance3D = left_arm[5] as MeshInstance3D
-			fist.position.y += drift * delta * 3.0
-		if right_arm.size() >= 6:
+			fist.position.y = (la_base_y[1] as float) + drift * 0.04
+		if right_arm.size() >= 6 and ra_base_y.size() >= 2:
 			var drift: float = sin(phase * 0.8 + 0.7) * 0.01 * s
 			var fist: MeshInstance3D = right_arm[5] as MeshInstance3D
-			fist.position.y += drift * delta * 3.0
+			fist.position.y = (ra_base_y[1] as float) + drift * 0.04

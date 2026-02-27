@@ -508,6 +508,27 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("scale", s)
 	root.set_meta("body_y", body_y)
 
+	# ── Store base Y positions for animation (prevents drift) ──
+	var left_leg_base_y: Array[float] = []
+	for node: MeshInstance3D in [hip_l, upper_leg_l, knee_l, lower_leg_l, leg_plate_l, foot_l]:
+		left_leg_base_y.append(node.position.y)
+	root.set_meta("left_leg_base_y", left_leg_base_y)
+
+	var right_leg_base_y: Array[float] = []
+	for node: MeshInstance3D in [hip_r, upper_leg_r, knee_r, lower_leg_r, leg_plate_r, foot_r]:
+		right_leg_base_y.append(node.position.y)
+	root.set_meta("right_leg_base_y", right_leg_base_y)
+
+	var left_arm_base_y: Array[float] = []
+	for node: MeshInstance3D in [upper_arm_l, elbow_l, forearm_l, fist_l, pauldron_l]:
+		left_arm_base_y.append(node.position.y)
+	root.set_meta("left_arm_base_y", left_arm_base_y)
+
+	var right_arm_base_y: Array[float] = []
+	for node: MeshInstance3D in [upper_arm_r, elbow_r, forearm_r, fist_r, pauldron_r]:
+		right_arm_base_y.append(node.position.y)
+	root.set_meta("right_arm_base_y", right_arm_base_y)
+
 	# Built facing +Z, rotate to face -Z (Godot forward)
 	root.rotation.y = PI
 	return root
@@ -527,60 +548,64 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 
 	# Left leg swing (forward/back on walk)
 	var left_leg: Array = root.get_meta("left_leg", []) as Array
-	if left_leg.size() >= 6:
+	var left_leg_base_y: Array = root.get_meta("left_leg_base_y", []) as Array
+	if left_leg.size() >= 6 and left_leg_base_y.size() >= 6:
 		var leg_swing: float = sin(phase * walk_speed) * walk_amp
 		# Upper leg
 		var ul: MeshInstance3D = left_leg[1] as MeshInstance3D
-		ul.position.y += leg_swing * delta * 8.0
+		ul.position.y = (left_leg_base_y[1] as float) + leg_swing * 0.05
 		# Lower leg
 		var ll: MeshInstance3D = left_leg[3] as MeshInstance3D
-		ll.position.y += leg_swing * 0.7 * delta * 8.0
+		ll.position.y = (left_leg_base_y[3] as float) + leg_swing * 0.7 * 0.05
 		# Foot
 		var ft: MeshInstance3D = left_leg[5] as MeshInstance3D
-		ft.position.y += leg_swing * 0.5 * delta * 8.0
+		ft.position.y = (left_leg_base_y[5] as float) + leg_swing * 0.5 * 0.05
 
 	# Right leg swing (opposite phase)
 	var right_leg: Array = root.get_meta("right_leg", []) as Array
-	if right_leg.size() >= 6:
+	var right_leg_base_y: Array = root.get_meta("right_leg_base_y", []) as Array
+	if right_leg.size() >= 6 and right_leg_base_y.size() >= 6:
 		var leg_swing: float = sin(phase * walk_speed + PI) * walk_amp
 		var ul: MeshInstance3D = right_leg[1] as MeshInstance3D
-		ul.position.y += leg_swing * delta * 8.0
+		ul.position.y = (right_leg_base_y[1] as float) + leg_swing * 0.05
 		var ll: MeshInstance3D = right_leg[3] as MeshInstance3D
-		ll.position.y += leg_swing * 0.7 * delta * 8.0
+		ll.position.y = (right_leg_base_y[3] as float) + leg_swing * 0.7 * 0.05
 		var ft: MeshInstance3D = right_leg[5] as MeshInstance3D
-		ft.position.y += leg_swing * 0.5 * delta * 8.0
+		ft.position.y = (right_leg_base_y[5] as float) + leg_swing * 0.5 * 0.05
 
 	# ── Arm swing (opposite to legs when walking, idle sway otherwise) ──
 	var left_arm: Array = root.get_meta("left_arm", []) as Array
 	var right_arm: Array = root.get_meta("right_arm", []) as Array
+	var left_arm_base_y: Array = root.get_meta("left_arm_base_y", []) as Array
+	var right_arm_base_y: Array = root.get_meta("right_arm_base_y", []) as Array
 
 	if is_moving:
 		var arm_swing_l: float = sin(phase * walk_speed + PI) * 0.04 * s
 		var arm_swing_r: float = sin(phase * walk_speed) * 0.04 * s
-		if left_arm.size() >= 4:
+		if left_arm.size() >= 4 and left_arm_base_y.size() >= 4:
 			var ua: MeshInstance3D = left_arm[0] as MeshInstance3D
-			ua.position.y += arm_swing_l * delta * 8.0
+			ua.position.y = (left_arm_base_y[0] as float) + arm_swing_l * 0.05
 			var fa: MeshInstance3D = left_arm[2] as MeshInstance3D
-			fa.position.y += arm_swing_l * 1.2 * delta * 8.0
+			fa.position.y = (left_arm_base_y[2] as float) + arm_swing_l * 1.2 * 0.05
 			var fist: MeshInstance3D = left_arm[3] as MeshInstance3D
-			fist.position.y += arm_swing_l * 1.4 * delta * 8.0
-		if right_arm.size() >= 4:
+			fist.position.y = (left_arm_base_y[3] as float) + arm_swing_l * 1.4 * 0.05
+		if right_arm.size() >= 4 and right_arm_base_y.size() >= 4:
 			var ua: MeshInstance3D = right_arm[0] as MeshInstance3D
-			ua.position.y += arm_swing_r * delta * 8.0
+			ua.position.y = (right_arm_base_y[0] as float) + arm_swing_r * 0.05
 			var fa: MeshInstance3D = right_arm[2] as MeshInstance3D
-			fa.position.y += arm_swing_r * 1.2 * delta * 8.0
+			fa.position.y = (right_arm_base_y[2] as float) + arm_swing_r * 1.2 * 0.05
 			var fist: MeshInstance3D = right_arm[3] as MeshInstance3D
-			fist.position.y += arm_swing_r * 1.4 * delta * 8.0
+			fist.position.y = (right_arm_base_y[3] as float) + arm_swing_r * 1.4 * 0.05
 	else:
 		# Idle: subtle arm sway
-		if left_arm.size() >= 4:
+		if left_arm.size() >= 4 and left_arm_base_y.size() >= 4:
 			var sway: float = sin(phase * 1.2) * 0.008 * s
 			var fist: MeshInstance3D = left_arm[3] as MeshInstance3D
-			fist.position.y += sway * delta * 5.0
-		if right_arm.size() >= 4:
+			fist.position.y = (left_arm_base_y[3] as float) + sway * 0.05
+		if right_arm.size() >= 4 and right_arm_base_y.size() >= 4:
 			var sway: float = sin(phase * 1.2 + 0.5) * 0.008 * s
 			var fist: MeshInstance3D = right_arm[3] as MeshInstance3D
-			fist.position.y += sway * delta * 5.0
+			fist.position.y = (right_arm_base_y[3] as float) + sway * 0.05
 
 	# ── Energy core pulse ──
 	var core_arr: Array = root.get_meta("core", []) as Array

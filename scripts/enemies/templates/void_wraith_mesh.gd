@@ -345,9 +345,17 @@ func build_mesh(params: Dictionary) -> Node3D:
 	root.set_meta("arms", [arm_l_upper, arm_r_upper, arm_l_lower, arm_r_lower])
 	root.set_meta("fingers", [finger_l1, finger_l2, finger_r1, finger_r2, finger_l3, finger_l4, finger_r3, finger_r4])
 	root.set_meta("hem_strips", hem_strips)
+	var wisp_base_positions: Array = []
+	for w: MeshInstance3D in wisps:
+		wisp_base_positions.append(Vector2(w.position.x, w.position.y))
+	var soul_wisp_base_y: Array = []
+	for sw: MeshInstance3D in soul_wisps:
+		soul_wisp_base_y.append(sw.position.y)
 	root.set_meta("wisps", wisps)
+	root.set_meta("wisp_base_positions", wisp_base_positions)
 	root.set_meta("chains", chains)
 	root.set_meta("soul_wisps", soul_wisps)
+	root.set_meta("soul_wisp_base_y", soul_wisp_base_y)
 	root.set_meta("mesh_scale", s)
 
 	# Built facing +Z, rotate to face -Z (Godot forward)
@@ -392,13 +400,15 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 			strip.rotation.z = cos(strip_phase * 0.7) * 0.10
 
 	# ── Wisps -- floating drift ──
-	if root.has_meta("wisps"):
+	if root.has_meta("wisps") and root.has_meta("wisp_base_positions"):
 		var wisps: Array = root.get_meta("wisps") as Array
+		var wisp_bases: Array = root.get_meta("wisp_base_positions") as Array
 		for i: int in range(wisps.size()):
 			var wisp: MeshInstance3D = wisps[i] as MeshInstance3D
+			var base_pos: Vector2 = wisp_bases[i] as Vector2
 			var wisp_phase: float = phase * 1.0 + float(i) * 2.1
-			wisp.position.y += sin(wisp_phase) * 0.003
-			wisp.position.x += cos(wisp_phase * 0.8) * 0.002
+			wisp.position.y = base_pos.y + sin(wisp_phase) * 0.003
+			wisp.position.x = base_pos.x + cos(wisp_phase * 0.8) * 0.002
 			wisp.rotation.z = sin(wisp_phase * 0.6) * 0.2
 
 	# ── Chains -- pendulum swing ──
@@ -409,12 +419,13 @@ func animate(root: Node3D, phase: float, is_moving: bool, delta: float) -> void:
 			chain.rotation.x = sin(phase * 1.2 + float(i) * 1.5) * 0.3
 
 	# ── Soul wisps -- orbit around body ──
-	if root.has_meta("soul_wisps"):
+	if root.has_meta("soul_wisps") and root.has_meta("soul_wisp_base_y"):
 		var soul_wisps: Array = root.get_meta("soul_wisps") as Array
+		var soul_base_y: Array = root.get_meta("soul_wisp_base_y") as Array
 		var s: float = root.get_meta("mesh_scale", 1.0) as float
 		for i: int in range(soul_wisps.size()):
 			var soul: MeshInstance3D = soul_wisps[i] as MeshInstance3D
 			var orbit_angle: float = phase * 0.8 + float(i) * (TAU / 4.0)
 			soul.position.x = cos(orbit_angle) * 0.5 * s
 			soul.position.z = sin(orbit_angle) * 0.5 * s
-			soul.position.y += sin(phase * 1.5 + float(i)) * 0.002
+			soul.position.y = (soul_base_y[i] as float) + sin(phase * 1.5 + float(i)) * 0.002
