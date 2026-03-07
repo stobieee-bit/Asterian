@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://pokemon_main"]
+
+[ext_resource type="Script" path="res://scripts/pokemon/pokemon_main.gd" id="1"]
+
+[node name="PokemonMain" type="Node2D"]
+script = ExtResource("1")

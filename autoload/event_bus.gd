@@ -122,3 +122,22 @@ signal item_deconstructed(item_id: String, outputs: Dictionary)
 signal construct_placed(construct_type: String, position: Vector3)
 signal construct_expired(construct_type: String)
 signal thread_anchor_revealed(position: Vector3)
+
+# ── Creature / Pokémon signals ──
+signal creature_battle_started(wild_creature: Dictionary)
+signal creature_battle_ended(result: String)  # "win", "lose", "run", "caught"
+signal creature_turn_executed(attacker: String, move: Dictionary, damage: int)
+signal creature_fainted(creature_data: Dictionary, is_player: bool)
+signal creature_caught(creature_data: Dictionary)
+signal creature_evolved(creature_id: String, new_id: String)
+signal creature_xp_gained(creature_data: Dictionary, amount: int)
+signal creature_level_up(creature_data: Dictionary, new_level: int)
+signal creature_party_changed
+signal creature_move_learned(creature_data: Dictionary, move_id: String)
+signal creature_switched(new_active: Dictionary)
+signal creature_healed(creature_data: Dictionary, amount: int)
+signal pokeball_thrown(ball_type: String, creature_data: Dictionary)
+signal pokedex_updated(creature_id: String)
+signal wild_encounter_triggered(area_id: String)
+signal creature_status_applied(creature_data: Dictionary, status: String)
+signal creature_status_cleared(creature_data: Dictionary)

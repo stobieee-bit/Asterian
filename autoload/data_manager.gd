@@ -46,6 +46,10 @@ var equipment_data: Dictionary = {}
 var enemy_loot_tables: Dictionary = {}
 var abilities: Dictionary = {}
 
+# ── Creature / Pokémon data ──
+var creatures: Dictionary = {}
+var creature_moves: Dictionary = {}
+
 # ── Loading ──
 
 func _ready() -> void:
@@ -143,6 +147,16 @@ func _load_all_data() -> void:
 	if ability_data is Dictionary:
 		abilities = ability_data
 
+	# Creatures
+	var creature_data: Variant = _load_json("res://data/creatures.json")
+	if creature_data is Dictionary:
+		creatures = creature_data
+
+	# Creature moves
+	var cmove_data: Variant = _load_json("res://data/creature_moves.json")
+	if cmove_data is Dictionary:
+		creature_moves = cmove_data
+
 	# Print summary
 	print("  Items: %d" % items.size())
 	print("  Recipes: %d" % recipes.size())
@@ -154,6 +168,8 @@ func _load_all_data() -> void:
 	print("  Achievements: %d" % achievements.size())
 	print("  Pets: %d" % pets.size())
 	print("  Abilities: %d" % abilities.size())
+	print("  Creatures: %d" % creatures.size())
+	print("  Creature Moves: %d" % creature_moves.size())
 
 # ── JSON loading utility ──
 
@@ -285,6 +301,40 @@ func get_abilities_for_style(style: String) -> Array:
 			result.append(ab)
 	# Sort by slot number
 	result.sort_custom(func(a, b): return int(a.get("slot", 0)) < int(b.get("slot", 0)))
+	return result
+
+## Get a creature definition by id. Returns empty dict if not found.
+func get_creature(creature_id: String) -> Dictionary:
+	if creatures.has(creature_id):
+		return creatures[creature_id]
+	return {}
+
+## Get a creature move definition by id. Returns empty dict if not found.
+func get_creature_move(move_id: String) -> Dictionary:
+	if creature_moves.has(move_id):
+		return creature_moves[move_id]
+	return {}
+
+## Get all creature IDs
+func get_all_creature_ids() -> Array[String]:
+	var ids: Array[String] = []
+	for key in creatures.keys():
+		ids.append(key)
+	return ids
+
+## Get moves a creature learns at or below a given level
+func get_creature_moves_at_level(creature_id: String, level: int) -> Array[String]:
+	var data: Dictionary = get_creature(creature_id)
+	if data.is_empty():
+		return []
+	var moves_by_level: Dictionary = data.get("moves_by_level", {})
+	var result: Array[String] = []
+	for lvl_str in moves_by_level:
+		if int(lvl_str) <= level:
+			var moves_at_lvl: Array = moves_by_level[lvl_str]
+			for m in moves_at_lvl:
+				if not result.has(str(m)):
+					result.append(str(m))
 	return result
 
 ## Get all shared (defensive/utility) abilities, sorted by slot

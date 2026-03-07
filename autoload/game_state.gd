@@ -140,6 +140,26 @@ var tutorial: Dictionary = {
 	"steps_done": [],
 }
 
+# ── Creature / Pokémon state ──
+var creature_party: Array[Dictionary] = []  # Max 6 creatures
+var creature_pc_boxes: Array[Dictionary] = []  # PC storage
+var pokedex: Dictionary = {}  # { creature_id: { seen: bool, caught: bool } }
+var creature_bag: Dictionary = {  # Ball counts
+	"pokeball": 10,
+	"greatball": 0,
+	"ultraball": 0,
+	"masterball": 0,
+	"potion": 5,
+	"super_potion": 0,
+	"hyper_potion": 0,
+	"revive": 2,
+}
+var trainer_name: String = "Trainer"
+var badges: Array[String] = []
+var creature_money: int = 3000
+var creature_steps: int = 0
+var creature_area: String = "starter_meadow"
+
 # ── Play time tracking ──
 var total_play_time: float = 0.0
 var session_start_time: float = 0.0
@@ -296,7 +316,20 @@ func to_save_data() -> Dictionary:
 	if player_copy.has("position") and player_copy["position"] is Vector3:
 		var pos: Vector3 = player_copy["position"]
 		player_copy["position"] = [pos.x, pos.y, pos.z]
+	# Serialize creature overworld position
+	var creature_party_copy: Array[Dictionary] = []
+	for c in creature_party:
+		creature_party_copy.append(c.duplicate(true))
 	return {
+		"creature_party": creature_party_copy,
+		"creature_pc_boxes": creature_pc_boxes.duplicate(true),
+		"pokedex": pokedex.duplicate(true),
+		"creature_bag": creature_bag.duplicate(true),
+		"trainer_name": trainer_name,
+		"badges": badges.duplicate(true),
+		"creature_money": creature_money,
+		"creature_steps": creature_steps,
+		"creature_area": creature_area,
 		"current_area": current_area,
 		"player": player_copy,
 		"skills": skills.duplicate(true),
@@ -389,3 +422,22 @@ func from_save_data(data: Dictionary) -> void:
 	active_constructs.clear()
 	for c in saved_constructs:
 		active_constructs.append(c)
+	# ── Creature / Pokémon state ──
+	var saved_party: Array = data.get("creature_party", [])
+	creature_party.clear()
+	for cp in saved_party:
+		creature_party.append(cp)
+	var saved_pc: Array = data.get("creature_pc_boxes", [])
+	creature_pc_boxes.clear()
+	for pc in saved_pc:
+		creature_pc_boxes.append(pc)
+	pokedex = data.get("pokedex", {})
+	creature_bag = data.get("creature_bag", creature_bag)
+	trainer_name = data.get("trainer_name", "Trainer")
+	var saved_badges: Array = data.get("badges", [])
+	badges.clear()
+	for b in saved_badges:
+		badges.append(b)
+	creature_money = data.get("creature_money", 3000)
+	creature_steps = data.get("creature_steps", 0)
+	creature_area = data.get("creature_area", "starter_meadow")
